@@ -35,6 +35,7 @@ export default function SignupPage() {
         name: salonName,
         slug: salonName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
         owner_id: data.user.id,
+        owner_email: email,
         plan: "starter",
       });
       setSuccess(true);
