@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState, use } from "react";
+import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "../../lib/supabase";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
+);
 
 export default function BookingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -13,11 +18,18 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
   const [client, setClient] = useState({ name: "", email: "", phone: "" });
   const [booked, setBooked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [chargeNow, setChargeNow] = useState(false);
+  const [cardElement, setCardElement] = useState<any>(null);
+  const [stripe, setStripe] = useState<any>(null);
+  const [paymentError, setPaymentError] = useState("");
 
   const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
 
   useEffect(() => {
     const load = async () => {
+      const stripeObj = await stripePromise;
+      setStripe(stripeObj);
+
       const { data: salonData } = await supabase.from("salons").select("*").eq("slug", slug).single();
       setSalon(salonData);
       if (salonData) {
@@ -33,19 +45,90 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
 
   const handleBook = async () => {
     setSubmitting(true);
-    const dateTime = new Date(`${selected.date}T${selected.time}`);
-    await supabase.from("appointments").insert({
-      salon_id: salon.id,
-      service_id: selected.service.id,
-      staff_id: selected.staff?.id || null,
-      client_name: client.name,
-      client_email: client.email,
-      client_phone: client.phone,
-      date_time: dateTime.toISOString(),
-      status: "pending",
-    });
-    setBooked(true);
-    setSubmitting(false);
+    setPaymentError("");
+
+    try {
+      const dateTime = new Date(`${selected.date}T${selected.time}`);
+      
+      // Create appointment
+      const { data: appointmentData, error: appointmentError } = await supabase
+        .from("appointments")
+        .insert({
+          salon_id: salon.id,
+          service_id: selected.service.id,
+          staff_id: selected.staff?.id || null,
+          client_name: client.name,
+          client_email: client.email,
+          client_phone: client.phone,
+          date_time: dateTime.toISOString(),
+          status: chargeNow ? "pending" : "pending",
+        })
+        .select()
+        .single();
+
+      if (appointmentError) throw appointmentError;
+
+      // Process payment if charge_now is enabled
+      if (chargeNow && selected.service.price > 0 && stripe && cardElement) {
+        const response = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: selected.service.price,
+            email: client.email,
+            booking_id: appointmentData.id,
+          }),
+        });
+
+        const paymentData = await response.json();
+
+        if (!response.ok || paymentData.error) {
+          setPaymentError(paymentData.error || "Payment failed");
+          setSubmitting(false);
+          return;
+        }
+
+        // Confirm payment with card
+        const { error: confirmError, paymentIntent } = 
+          await stripe.confirmCardPayment(paymentData.clientSecret, {
+            payment_method: {
+              card: cardElement,
+              billing_details: { 
+                name: client.name, 
+                email: client.email,
+              },
+            },
+          });
+
+        if (confirmError) {
+          setPaymentError(confirmError.message || "Payment failed");
+          // Delete the appointment since payment failed
+          await supabase
+            .from("appointments")
+            .delete()
+            .eq("id", appointmentData.id);
+          setSubmitting(false);
+          return;
+        }
+
+        // Payment successful - update appointment status and store payment ID
+        if (paymentIntent?.status === "succeeded") {
+          await supabase
+            .from("appointments")
+            .update({ 
+              status: "confirmed",
+              stripe_payment_id: paymentIntent.id,
+            })
+            .eq("id", appointmentData.id);
+        }
+      }
+
+      setBooked(true);
+      setSubmitting(false);
+    } catch (err: any) {
+      setPaymentError(err.message || "Booking failed");
+      setSubmitting(false);
+    }
   };
 
   if (loading) return (
@@ -176,6 +259,12 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
               {selected.staff && ` · with ${selected.staff.name}`}
             </div>
 
+            {paymentError && (
+              <div style={{ background: "#FEF2F2", border: "0.5px solid #FECACA", borderRadius: "8px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#EF4444" }}>
+                {paymentError}
+              </div>
+            )}
+
             <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "24px", marginBottom: "16px" }}>
               {[
                 { label: "Full name", key: "name", type: "text", placeholder: "Emma Wilson" },
@@ -190,10 +279,44 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
               ))}
             </div>
 
+            {selected.service?.price > 0 && (
+              <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <input
+                    type="checkbox"
+                    id="charge-now"
+                    checked={chargeNow}
+                    onChange={(e) => setChargeNow(e.target.checked)}
+                    style={{ cursor: "pointer", width: "18px", height: "18px" }}
+                  />
+                  <label htmlFor="charge-now" style={{ fontSize: "14px", color: "#0F172A", cursor: "pointer", fontWeight: 500 }}>
+                    Charge my card now (£{selected.service?.price})
+                  </label>
+                </div>
+
+                {chargeNow && (
+                  <div style={{ background: "#F8F9FC", border: "0.5px solid #E8EAF0", borderRadius: "8px", padding: "16px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 500, color: "#0F172A", display: "block", marginBottom: "10px" }}>Card details</label>
+                    <div
+                      ref={(el) => {
+                        if (el && !cardElement && stripe) {
+                          const elements = stripe.elements();
+                          const element = elements.create("card");
+                          element.mount(el);
+                          setCardElement(element);
+                        }
+                      }}
+                      style={{ padding: "12px", border: "0.5px solid #E8EAF0", borderRadius: "6px", background: "#fff" }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => setStep(2)} style={{ flex: 1, padding: "12px", background: "#fff", color: "#0F172A", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "14px", cursor: "pointer" }}>← Back</button>
               <button onClick={handleBook} disabled={!client.name || !client.email || submitting} style={{ flex: 2, padding: "12px", background: client.name && client.email ? "#4F6EF7" : "#E8EAF0", color: client.name && client.email ? "#fff" : "#94A3B8", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: client.name && client.email ? "pointer" : "not-allowed" }}>
-                {submitting ? "Booking..." : "Confirm booking"}
+                {submitting ? "Processing..." : "Confirm booking"}
               </button>
             </div>
           </div>

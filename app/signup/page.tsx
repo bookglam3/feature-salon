@@ -33,9 +33,9 @@ export default function SignupPage() {
       // Create salon record
       await supabase.from("salons").insert({
         name: salonName,
-        slug: salonName.toLowerCase().replace(/\s+/g, "-"),
+        slug: salonName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
         owner_id: data.user.id,
-        email: email,
+        plan: "starter",
       });
       setSuccess(true);
       setLoading(false);

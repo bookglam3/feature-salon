@@ -1,244 +1,287 @@
 "use client";
-
-import { useState } from "react";
-
-const bookings = [
-  { id: 1, client: "Ayesha Khan", service: "Hair Color + Cut", staff: "Sara Ahmed", date: "30 Apr 2026", time: "10:00 AM", duration: "90 min", status: "confirmed", amount: 4500, avatar: "AK", color: "#3b5bdb" },
-  { id: 2, client: "Fatima Malik", service: "Bridal Makeup", staff: "Nadia Hussain", date: "30 Apr 2026", time: "11:30 AM", duration: "120 min", status: "in-progress", amount: 12000, avatar: "FM", color: "#7c3aed" },
-  { id: 3, client: "Zara Siddiqui", service: "Facial + Cleanup", staff: "Hina Baig", date: "30 Apr 2026", time: "01:00 PM", duration: "60 min", status: "pending", amount: 2800, avatar: "ZS", color: "#0891b2" },
-  { id: 4, client: "Maryam Tariq", service: "Manicure + Pedicure", staff: "Sara Ahmed", date: "30 Apr 2026", time: "02:30 PM", duration: "75 min", status: "confirmed", amount: 3200, avatar: "MT", color: "#3b5bdb" },
-  { id: 5, client: "Sana Riaz", service: "Keratin Treatment", staff: "Nadia Hussain", date: "30 Apr 2026", time: "04:00 PM", duration: "180 min", status: "cancelled", amount: 8500, avatar: "SR", color: "#dc2626" },
-  { id: 6, client: "Hira Baig", service: "Threading + Waxing", staff: "Hina Baig", date: "01 May 2026", time: "10:00 AM", duration: "45 min", status: "confirmed", amount: 1500, avatar: "HB", color: "#3b5bdb" },
-  { id: 7, client: "Noor Fatima", service: "Hair Spa", staff: "Sara Ahmed", date: "01 May 2026", time: "12:00 PM", duration: "60 min", status: "pending", amount: 3500, avatar: "NF", color: "#0891b2" },
-];
-
-const statusConfig: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  confirmed:     { label: "Confirmed",   bg: "#f0fdf4", text: "#16a34a", border: "#bbf7d0" },
-  "in-progress": { label: "In Progress", bg: "#eff6ff", text: "#2563eb", border: "#bfdbfe" },
-  pending:       { label: "Pending",     bg: "#fffbeb", text: "#d97706", border: "#fde68a" },
-  cancelled:     { label: "Cancelled",   bg: "#fef2f2", text: "#dc2626", border: "#fecaca" },
-};
-
-const stats = [
-  { label: "Today's Bookings", value: "24", icon: "📅", change: "+3", up: true },
-  { label: "In Progress",      value: "6",  icon: "⚡", change: "Active", up: null },
-  { label: "Revenue Today",    value: "₨89,400", icon: "💰", change: "+12%", up: true },
-  { label: "Cancellations",    value: "2",  icon: "✕", change: "-1", up: false },
-];
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 
 export default function BookingsPage() {
-  const [filter, setFilter] = useState("all");
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<number | null>(null);
-  const [view, setView] = useState<"list" | "grid">("list");
+  const router = useRouter();
+  const pathname = usePathname();
+  const [salon, setSalon] = useState<any>(null);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    client_name: "",
+    client_email: "",
+    client_phone: "",
+    staff_id: "",
+    service_id: "",
+    date_time: "",
+    status: "pending",
+  });
+  const [staff, setStaff] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
 
-  const filtered = bookings.filter(b => {
-    const matchStatus = filter === "all" || b.status === filter;
-    const matchSearch = [b.client, b.service, b.staff].some(v =>
-      v.toLowerCase().includes(search.toLowerCase())
-    );
-    return matchStatus && matchSearch;
+  useEffect(() => {
+    const loadData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+
+      const { data: salonData } = await supabase
+        .from("salons").select("*").eq("owner_id", user.id).single();
+      setSalon(salonData);
+
+      if (salonData) {
+        const { data: appts } = await supabase
+          .from("appointments").select("*, services(name, price), staff(name)")
+          .eq("salon_id", salonData.id)
+          .order("date_time", { ascending: true });
+        setAppointments(appts || []);
+
+        const { data: staffData } = await supabase
+          .from("staff").select("*").eq("salon_id", salonData.id);
+        setStaff(staffData || []);
+
+        const { data: servicesData } = await supabase
+          .from("services").select("*").eq("salon_id", salonData.id);
+        setServices(servicesData || []);
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
+  const handleCreateBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!salon) return;
+
+    const { error } = await supabase.from("appointments").insert({
+      salon_id: salon.id,
+      client_name: formData.client_name,
+      client_email: formData.client_email,
+      client_phone: formData.client_phone,
+      staff_id: formData.staff_id,
+      service_id: formData.service_id,
+      date_time: formData.date_time,
+      status: formData.status,
+    });
+
+    if (!error) {
+      setFormData({
+        client_name: "",
+        client_email: "",
+        client_phone: "",
+        staff_id: "",
+        service_id: "",
+        date_time: "",
+        status: "pending",
+      });
+      setShowForm(false);
+      // Reload bookings
+      const { data: appts } = await supabase
+        .from("appointments").select("*, services(name, price), staff(name)")
+        .eq("salon_id", salon.id)
+        .order("date_time", { ascending: true });
+      setAppointments(appts || []);
+    }
+  };
+
+  const filteredAppointments = appointments.filter(a => {
+    if (activeTab === "All") return true;
+    const apptDate = new Date(a.date_time).toDateString();
+    const today = new Date().toDateString();
+    if (activeTab === "Today") return apptDate === today;
+    if (activeTab === "Upcoming") return new Date(a.date_time) > new Date();
+    return true;
   });
 
-  const sel = bookings.find(b => b.id === selected);
+  if (loading) return (
+    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#4F6EF7" }}>feature</div>
+    </div>
+  );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", fontFamily: "'Inter', -apple-system, sans-serif", color: "#0f172a" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; }
-        .btn-blue { background: #3b5bdb; color: white; border: none; cursor: pointer; transition: background 0.15s; }
-        .btn-blue:hover { background: #3451c7; }
-        .btn-outline { background: white; color: #374151; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; }
-        .btn-outline:hover { border-color: #3b5bdb; color: #3b5bdb; background: #eff6ff; }
-        .row:hover { background: #f8fafc !important; }
-        .stat-card { transition: all 0.2s; cursor: default; }
-        .stat-card:hover { box-shadow: 0 4px 20px rgba(59,91,219,0.1); transform: translateY(-1px); }
-        .filter-btn { cursor: pointer; border: none; transition: all 0.15s; }
-        .filter-btn:hover { background: #eff6ff !important; color: #3b5bdb !important; }
-        input:focus { outline: none; border-color: #3b5bdb !important; box-shadow: 0 0 0 3px rgba(59,91,219,0.1); }
-        .booking-card { transition: all 0.2s; cursor: pointer; }
-        .booking-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
-        .slide-in { animation: slideIn 0.25s ease; }
-        @keyframes slideIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-      `}</style>
+    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex" }}>
 
-      {/* Header */}
-      <div style={{ background: "white", borderBottom: "1px solid #e2e8f0", padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.3px" }}>Appointments</h1>
-          <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 3 }}>Wednesday, 30 April 2026</p>
+      {/* Sidebar */}
+      <div style={{ width: "220px", background: "#fff", borderRight: "0.5px solid #E8EAF0", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "22px 20px", borderBottom: "0.5px solid #E8EAF0" }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#0F172A", letterSpacing: "-0.5px" }}>feature</div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button className="btn-outline" style={{ padding: "9px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500 }}>↓ Export</button>
-          <button className="btn-blue" style={{ padding: "9px 18px", borderRadius: 8, fontSize: 13, fontWeight: 600 }}>+ New Booking</button>
+
+        <div style={{ padding: "8px 0", flex: 1 }}>
+          {[
+            { label: "Dashboard", path: "/dashboard" },
+            { label: "Bookings", path: "/dashboard/bookings" },
+            { label: "Clients", path: "/dashboard/clients" },
+            { label: "Staff", path: "/dashboard/staff" },
+          ].map((item) => (
+            <div 
+              key={item.label} 
+              onClick={() => router.push(item.path)}
+              style={{ padding: "9px 20px", fontSize: "13px", color: pathname === item.path ? "#4F6EF7" : "#64748B", background: pathname === item.path ? "#EEF2FF" : "transparent", borderRight: pathname === item.path ? "2px solid #4F6EF7" : "none", cursor: "pointer" }}>
+              {item.label}
+            </div>
+          ))}
+
+          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>FINANCE</div>
+          {["Payments", "Reports"].map((item) => (
+            <div key={item} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>{item}</div>
+          ))}
+
+          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>SYSTEM</div>
+          <div style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Settings</div>
+        </div>
+
+        <div style={{ padding: "16px 20px", borderTop: "0.5px solid #E8EAF0" }}>
+          <div style={{ fontSize: "12px", color: "#64748B", marginBottom: "8px" }}>{salon?.name || "My Salon"}</div>
+          <button onClick={handleLogout} style={{ fontSize: "12px", color: "#EF4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Sign out</button>
         </div>
       </div>
 
-      <div style={{ padding: "28px 32px" }}>
+      {/* Main */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* Stats */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
-          {stats.map((s, i) => (
-            <div key={i} className="stat-card" style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: "20px 22px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                <span style={{ fontSize: 22 }}>{s.icon}</span>
-                {s.up !== null && (
-                  <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, background: s.up ? "#f0fdf4" : "#fef2f2", color: s.up ? "#16a34a" : "#dc2626" }}>
-                    {s.change}
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.5px" }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{s.label}</div>
-            </div>
-          ))}
+        {/* Topbar */}
+        <div style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: "17px", fontWeight: 500, color: "#0F172A" }}>Bookings</div>
+            <div style={{ fontSize: "12px", color: "#94A3B8", marginTop: "2px" }}>{appointments.length} total appointments</div>
+          </div>
+          <button onClick={() => setShowForm(true)} style={{ background: "#4F6EF7", color: "#fff", fontSize: "13px", padding: "8px 18px", borderRadius: "8px", border: "none", cursor: "pointer" }}>
+            + New Booking
+          </button>
         </div>
 
-        {/* Filters */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 20, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, maxWidth: 300 }}>
-            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 14 }}>🔍</span>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search client, service, staff..."
-              style={{ width: "100%", padding: "10px 12px 10px 36px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "white", color: "#0f172a" }} />
-          </div>
+        {/* Content */}
+        <div style={{ padding: "24px", flex: 1, overflow: "auto" }}>
 
-          <div style={{ display: "flex", background: "white", border: "1px solid #e2e8f0", borderRadius: 8, padding: 4, gap: 2 }}>
-            {["all", "confirmed", "in-progress", "pending", "cancelled"].map(f => (
-              <button key={f} className="filter-btn" onClick={() => setFilter(f)}
-                style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, fontWeight: 500, background: filter === f ? "#3b5bdb" : "transparent", color: filter === f ? "white" : "#64748b" }}>
-                {f === "in-progress" ? "In Progress" : f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: "flex", background: "white", border: "1px solid #e2e8f0", borderRadius: 8, padding: 4, gap: 2, marginLeft: "auto" }}>
-            {(["list", "grid"] as const).map(v => (
-              <button key={v} onClick={() => setView(v)}
-                style={{ padding: "6px 12px", borderRadius: 6, fontSize: 13, border: "none", cursor: "pointer", background: view === v ? "#f1f5f9" : "transparent", color: view === v ? "#0f172a" : "#94a3b8" }}>
-                {v === "list" ? "☰" : "⊞"}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Main */}
-        <div style={{ display: "flex", gap: 20 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-
-            {view === "list" ? (
-              <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
-                {/* Table Head */}
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 2fr 1.5fr 1fr 1fr 1fr", padding: "12px 20px", borderBottom: "1px solid #f1f5f9", fontSize: 11, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.06em", gap: 12 }}>
-                  <div>Client</div><div>Service</div><div>Staff</div><div>Time</div><div>Amount</div><div>Status</div>
-                </div>
-
-                {filtered.length === 0 ? (
-                  <div style={{ padding: "60px", textAlign: "center", color: "#94a3b8" }}>
-                    <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
-                    <div style={{ fontSize: 14 }}>No bookings found</div>
-                  </div>
-                ) : filtered.map(b => {
-                  const sc = statusConfig[b.status];
-                  const isSel = selected === b.id;
-                  return (
-                    <div key={b.id} className="row" onClick={() => setSelected(isSel ? null : b.id)}
-                      style={{ display: "grid", gridTemplateColumns: "2fr 2fr 1.5fr 1fr 1fr 1fr", padding: "14px 20px", borderBottom: "1px solid #f8fafc", alignItems: "center", cursor: "pointer", gap: 12, background: isSel ? "#eff6ff" : "white", borderLeft: isSel ? "3px solid #3b5bdb" : "3px solid transparent" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 34, height: 34, borderRadius: "50%", background: b.color + "18", color: b.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{b.avatar}</div>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600 }}>{b.client}</div>
-                          <div style={{ fontSize: 11, color: "#94a3b8" }}>{b.duration}</div>
-                        </div>
-                      </div>
-                      <div style={{ fontSize: 13, color: "#374151" }}>{b.service}</div>
-                      <div style={{ fontSize: 12, color: "#64748b" }}>{b.staff}</div>
-                      <div style={{ fontSize: 13, fontWeight: 500 }}>{b.time}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#3b5bdb" }}>₨{b.amount.toLocaleString()}</div>
-                      <div>
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, display: "inline-flex", alignItems: "center", gap: 5 }}>
-                          <span className={b.status === "in-progress" ? "pulse" : ""} style={{ width: 6, height: 6, borderRadius: "50%", background: sc.text, flexShrink: 0 }} />
-                          {sc.label}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
-                {filtered.map(b => {
-                  const sc = statusConfig[b.status];
-                  return (
-                    <div key={b.id} className="booking-card" onClick={() => setSelected(selected === b.id ? null : b.id)}
-                      style={{ background: "white", border: "1px solid #e2e8f0", borderTop: `3px solid ${b.color}`, borderRadius: 12, padding: "18px 20px", boxShadow: selected === b.id ? "0 0 0 2px #3b5bdb" : "none" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: b.color + "18", color: b.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700 }}>{b.avatar}</div>
-                          <div>
-                            <div style={{ fontSize: 14, fontWeight: 600 }}>{b.client}</div>
-                            <div style={{ fontSize: 11, color: "#94a3b8" }}>{b.staff}</div>
-                          </div>
-                        </div>
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>{sc.label}</span>
-                      </div>
-                      <div style={{ fontSize: 13, color: "#374151", marginBottom: 14 }}>{b.service}</div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div style={{ fontSize: 12, color: "#94a3b8" }}>🕐 {b.time} · {b.duration}</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: "#3b5bdb" }}>₨{b.amount.toLocaleString()}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-              <span style={{ fontSize: 12, color: "#94a3b8" }}>Showing {filtered.length} of {bookings.length} appointments</span>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button className="btn-outline" style={{ padding: "6px 14px", borderRadius: 7, fontSize: 12 }}>← Prev</button>
-                <button className="btn-outline" style={{ padding: "6px 14px", borderRadius: 7, fontSize: 12 }}>Next →</button>
-              </div>
-            </div>
-          </div>
-
-          {/* Detail Panel */}
-          {sel && (
-            <div className="slide-in" style={{ width: 268, flexShrink: 0 }}>
-              <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: 20, position: "sticky", top: 20 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.07em" }}>Detail</span>
-                  <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: 20, lineHeight: 1 }}>×</button>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: sel.color + "18", color: sel.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 }}>{sel.avatar}</div>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{sel.client}</div>
-                    <div style={{ fontSize: 12, color: "#94a3b8" }}>Regular Client</div>
-                  </div>
-                </div>
-                <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 16, marginBottom: 16 }}>
-                  {[["Service", sel.service], ["Staff", sel.staff], ["Date", sel.date], ["Time", sel.time], ["Duration", sel.duration]].map(([l, v]) => (
-                    <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                      <span style={{ fontSize: 12, color: "#94a3b8" }}>{l}</span>
-                      <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{v}</span>
-                    </div>
+          {showForm && (
+            <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", padding: "24px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "15px", fontWeight: 500, color: "#0F172A", marginBottom: "18px" }}>Create New Booking</div>
+              <form onSubmit={handleCreateBooking} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+                <input
+                  type="text"
+                  placeholder="Client Name"
+                  value={formData.client_name}
+                  onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                />
+                <input
+                  type="email"
+                  placeholder="Client Email"
+                  value={formData.client_email}
+                  onChange={(e) => setFormData({ ...formData, client_email: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                />
+                <input
+                  type="tel"
+                  placeholder="Client Phone"
+                  value={formData.client_phone}
+                  onChange={(e) => setFormData({ ...formData, client_phone: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                />
+                <select
+                  value={formData.service_id}
+                  onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                >
+                  <option value="">Select Service</option>
+                  {services.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name} - £{s.price}</option>
                   ))}
+                </select>
+                <select
+                  value={formData.staff_id}
+                  onChange={(e) => setFormData({ ...formData, staff_id: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                >
+                  <option value="">Select Staff</option>
+                  {staff.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="datetime-local"
+                  value={formData.date_time}
+                  onChange={(e) => setFormData({ ...formData, date_time: e.target.value })}
+                  required
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                />
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  style={{ padding: "10px 12px", fontSize: "13px", border: "0.5px solid #E8EAF0", borderRadius: "6px", fontFamily: "inherit" }}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <div style={{ display: "flex", gap: "8px", gridColumn: "1 / -1" }}>
+                  <button type="submit" style={{ flex: 1, padding: "10px 16px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer" }}>Create</button>
+                  <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: "10px 16px", background: "#E8EAF0", color: "#64748B", border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer" }}>Cancel</button>
                 </div>
-                <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>Total Amount</div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: "#3b5bdb" }}>₨{sel.amount.toLocaleString()}</div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <button className="btn-blue" style={{ padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600 }}>✓ Mark Complete</button>
-                  <button className="btn-outline" style={{ padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 500 }}>✎ Edit Booking</button>
-                  <button style={{ padding: 10, borderRadius: 8, fontSize: 13, background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca", cursor: "pointer", fontWeight: 500 }}>Cancel Appointment</button>
-                </div>
-              </div>
+              </form>
             </div>
           )}
+
+          {/* Bookings Table */}
+          <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "0.5px solid #E8EAF0" }}>
+              <div style={{ fontSize: "13px", fontWeight: 500, color: "#0F172A" }}>All Bookings</div>
+              <div style={{ display: "flex", gap: "4px" }}>
+                {["All", "Today", "Upcoming"].map((tab) => (
+                  <button key={tab} onClick={() => setActiveTab(tab)} style={{ fontSize: "11px", padding: "4px 12px", borderRadius: "6px", border: "0.5px solid", borderColor: activeTab === tab ? "#C7D2FE" : "#E8EAF0", background: activeTab === tab ? "#EEF2FF" : "#fff", color: activeTab === tab ? "#4F6EF7" : "#94A3B8", cursor: "pointer" }}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredAppointments.length === 0 ? (
+              <div style={{ padding: "48px", textAlign: "center", color: "#94A3B8", fontSize: "14px" }}>
+                No bookings found
+              </div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ background: "#F8F9FC" }}>
+                    {["Status", "Client", "Service", "Staff", "Date & Time", "Amount"].map((h) => (
+                      <th key={h} style={{ fontSize: "11px", color: "#94A3B8", textAlign: "left", padding: "10px 18px", fontWeight: 500, borderBottom: "0.5px solid #E8EAF0" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAppointments.map((a) => (
+                    <tr key={a.id}>
+                      <td style={{ padding: "11px 18px", borderBottom: "0.5px solid #F1F5F9" }}>
+                        <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : a.status === "cancelled" ? "#FEE2E2" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : a.status === "cancelled" ? "#DC2626" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>
+                          {a.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#0F172A", borderBottom: "0.5px solid #F1F5F9" }}>{a.client_name}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#0F172A", borderBottom: "0.5px solid #F1F5F9" }}>{a.services?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{a.staff?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#0F172A", borderBottom: "0.5px solid #F1F5F9" }}>£{a.services?.price || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
     </div>
