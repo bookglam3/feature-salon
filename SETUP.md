@@ -9,6 +9,16 @@
 
 ### Create these tables in Supabase:
 
+#### `profiles`
+```sql
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  salon_id UUID REFERENCES salons(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'owner', -- owner, staff
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
 #### `salons`
 ```sql
 CREATE TABLE salons (
@@ -55,9 +65,11 @@ CREATE TABLE services (
 CREATE TABLE staff (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   salon_id UUID NOT NULL REFERENCES salons(id),
+  user_id UUID REFERENCES auth.users(id), -- for staff login
   name TEXT NOT NULL,
   email TEXT,
   role TEXT DEFAULT 'stylist', -- stylist, makeup-artist, esthetician, receptionist, manager
+  active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW()
 );
 ```
@@ -71,6 +83,11 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_or_pk_test_your_key
 STRIPE_SECRET_KEY=sk_live_or_sk_test_your_key
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+SMTP_FROM=your_email@gmail.com
 ```
 
 Get your Supabase keys from:

@@ -12,6 +12,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # Stripe Configuration (use test keys for development)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
 STRIPE_SECRET_KEY=sk_test_your_key_here
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=https://your-netlify-site.netlify.app
 ```
 
 ## Step 2: Get Supabase Keys
@@ -145,6 +148,7 @@ Visit `http://localhost:3000`
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` set
 - [ ] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` set
 - [ ] `STRIPE_SECRET_KEY` set
+- [ ] `NEXT_PUBLIC_APP_URL` set (for production/custom domain)
 - [ ] `.env.local` added to `.gitignore` (should be by default)
 
 ## Verification
@@ -183,8 +187,21 @@ vercel env add NEXT_PUBLIC_SUPABASE_URL
 vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
 vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 vercel env add STRIPE_SECRET_KEY
+vercel env add NEXT_PUBLIC_APP_URL
 vercel deploy
 ```
+
+### Deploy to Netlify:
+
+1. Connect your GitHub repository to Netlify
+2. Set build command: `npm run build`
+3. Set publish directory: `.next`
+4. Add environment variables in Netlify dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_SECRET_KEY`
+   - `NEXT_PUBLIC_APP_URL`
 
 ## Troubleshooting
 

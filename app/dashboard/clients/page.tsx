@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { getCurrentUserProfile } from "../../lib/auth";
 
 export default function ClientsPage() {
   const router = useRouter();
@@ -13,19 +14,21 @@ export default function ClientsPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
+      try {
+        const profile = await getCurrentUserProfile();
 
-      const { data: salonData } = await supabase
-        .from("salons").select("*").eq("owner_id", user.id).single();
-      setSalon(salonData);
+        if (!profile) {
+          router.push("/login");
+          return;
+        }
 
-      if (salonData) {
+        setSalon(profile.salons);
+
         // Get all unique clients from appointments
         const { data: appts } = await supabase
           .from("appointments")
           .select("client_name, client_email, client_phone, id, date_time")
-          .eq("salon_id", salonData.id)
+          .eq("salon_id", profile.salon_id)
           .order("date_time", { ascending: false });
 
         // Group by client email to get unique clients with latest booking
@@ -46,8 +49,11 @@ export default function ClientsPage() {
         });
 
         setClients(Array.from(clientMap.values()));
+      } catch (error) {
+        console.error("Error loading clients data:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     loadData();
   }, [router]);

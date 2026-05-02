@@ -16,7 +16,14 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside style={{ width: "220px", backgroundColor: "#ffffff", borderRight: "0.5px solid #E8EAF0", padding: "24px 0" }}>
+    <aside style={{
+      width: "220px",
+      backgroundColor: "#ffffff",
+      borderRight: "0.5px solid #E8EAF0",
+      padding: "24px 0",
+      display: "none",
+      "@media (min-width: 768px)": { display: "block" }
+    }}>
       <div style={{ padding: "0 24px", marginBottom: "28px" }}>
         <div style={{ fontFamily: "Georgia, serif", fontSize: "22px", color: "#0F172A", letterSpacing: "-0.5px" }}>feature</div>
       </div>

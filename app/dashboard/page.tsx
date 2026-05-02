@@ -2,12 +2,23 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardSidebar from "./Sidebar";
 
 const timeSlots = [
   "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
   "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
   "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
+];
+
+const navItems = [
+  { label: "Dashboard", path: "/dashboard", icon: "📊" },
+  { label: "Bookings", path: "/dashboard/bookings", icon: "📅" },
+  { label: "Clients", path: "/dashboard/clients", icon: "👥" },
+  { label: "Staff", path: "/dashboard/staff", icon: "👤" },
+  { label: "Payments", path: "/dashboard/payments", icon: "💳" },
+  { label: "Reports", path: "/dashboard/reports", icon: "📈" },
+  { label: "Settings", path: "/dashboard/settings", icon: "⚙️" },
 ];
 
 export default function DashboardPage() {
@@ -20,6 +31,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     client_name: "",
@@ -33,46 +45,41 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const user = authData?.user;
-      if (!user) {
-        router.push("/login");
-        return;
+      try {
+        const profile = await getCurrentUserProfile();
+
+        if (!profile) {
+          router.push("/login");
+          return;
+        }
+
+        setSalon(profile.salons);
+
+        const [{ data: appts }, { data: staffData }, { data: servicesData }] = await Promise.all([
+          supabase
+            .from("appointments")
+            .select("*, services(name, price), staff(name)")
+            .eq("salon_id", profile.salon_id)
+            .order("date_time", { ascending: true }),
+          supabase
+            .from("staff")
+            .select("*")
+            .eq("salon_id", profile.salon_id),
+          supabase
+            .from("services")
+            .select("*")
+            .eq("salon_id", profile.salon_id),
+        ]);
+
+        setAppointments(appts || []);
+        setStaff(staffData || []);
+        setServices(servicesData || []);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
       }
-
-      const { data: salonData, error: salonError } = await supabase
-        .from("salons")
-        .select("*")
-        .eq("owner_id", user.id)
-        .single();
-
-      if (salonError || !salonData) {
-        router.push("/login");
-        return;
-      }
-
-      setSalon(salonData);
-
-      const [{ data: appts }, { data: staffData }, { data: servicesData }] = await Promise.all([
-        supabase
-          .from("appointments")
-          .select("*, services(name, price), staff(name)")
-          .eq("salon_id", salonData.id)
-          .order("date_time", { ascending: true }),
-        supabase
-          .from("staff")
-          .select("*")
-          .eq("salon_id", salonData.id),
-        supabase
-          .from("services")
-          .select("*")
-          .eq("salon_id", salonData.id),
-      ]);
-
-      setAppointments(appts || []);
-      setStaff(staffData || []);
-      setServices(servicesData || []);
-      setLoading(false);
     };
 
     loadData();
@@ -160,75 +167,283 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#F2F4F7", display: "flex" }}>
-      <DashboardSidebar />
-
-      <main style={{ flex: 1, backgroundColor: "#F2F4F7", padding: "28px 32px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
-          <div>
-            <p style={{ margin: 0, fontSize: "14px", color: "#64748B" }}>Salon dashboard</p>
-            <h1 style={{ margin: 0, fontSize: "32px", color: "#0F172A" }}>Welcome back</h1>
-          </div>
-
+    <div style={{ minHeight: "100vh", backgroundColor: "#F2F4F7" }}>
+      {/* Mobile Header */}
+      <div style={{
+        display: "block",
+        backgroundColor: "#ffffff",
+        borderBottom: "0.5px solid #E8EAF0",
+        padding: "12px 16px",
+        position: "sticky",
+        top: 0,
+        zIndex: 50
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#0F172A" }}>feature</div>
           <button
             type="button"
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
             style={{
               border: "none",
-              borderRadius: "12px",
-              backgroundColor: "#4F6EF7",
-              color: "#ffffff",
-              padding: "12px 20px",
-              fontSize: "14px",
+              backgroundColor: "transparent",
+              fontSize: "20px",
               cursor: "pointer",
+              color: "#475569"
             }}
           >
-            + New Booking
+            ☰
           </button>
         </div>
+      </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px", marginTop: "24px" }}>
-          <div style={{ backgroundColor: "#ffffff", borderRadius: "20px", padding: "22px", border: "0.5px solid #E8EAF0" }}>
-            <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Today bookings</div>
-            <div style={{ fontSize: "36px", color: "#0F172A", fontWeight: 700 }}>{todayAppointments.length}</div>
-          </div>
-
-          <div style={{ backgroundColor: "#ffffff", borderRadius: "20px", padding: "22px", border: "0.5px solid #E8EAF0" }}>
-            <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Revenue</div>
-            <div style={{ fontSize: "36px", color: "#0F172A", fontWeight: 700 }}>£{revenue.toFixed(2)}</div>
-          </div>
-
-          <div style={{ backgroundColor: "#ffffff", borderRadius: "20px", padding: "22px", border: "0.5px solid #E8EAF0" }}>
-            <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Total bookings</div>
-            <div style={{ fontSize: "36px", color: "#0F172A", fontWeight: 700 }}>{appointments.length}</div>
-          </div>
-
-          <div style={{ backgroundColor: "#ffffff", borderRadius: "20px", padding: "22px", border: "0.5px solid #E8EAF0" }}>
-            <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Plan</div>
-            <div style={{ fontSize: "24px", color: "#0F172A", fontWeight: 700, textTransform: "capitalize" }}>{salon?.plan || "Starter"}</div>
-          </div>
-        </div>
-
-        {showModal && (
-          <div style={{ marginTop: "24px", backgroundColor: "#ffffff", border: "0.5px solid #E8EAF0", borderRadius: "24px", padding: "28px", maxWidth: "780px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>New booking</div>
-                <h2 style={{ margin: 0, fontSize: "22px", color: "#0F172A" }}>Create client appointment</h2>
-              </div>
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 40,
+          display: "flex"
+        }}>
+          <div style={{
+            backgroundColor: "#ffffff",
+            width: "280px",
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#0F172A" }}>feature</div>
               <button
                 type="button"
-                onClick={() => {
-                  setShowModal(false);
-                  setError("");
-                }}
-                style={{ border: "none", backgroundColor: "transparent", color: "#475569", cursor: "pointer", fontSize: "14px" }}
+                onClick={() => setShowMobileMenu(false)}
+                style={{ border: "none", backgroundColor: "transparent", fontSize: "20px", cursor: "pointer" }}
               >
-                Close
+                ×
               </button>
             </div>
+            <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {navItems.map((item) => {
+                const active = pathname === item.path;
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      router.push(item.path);
+                      setShowMobileMenu(false);
+                    }}
+                    style={{
+                      width: "100%",
+                      textAlign: "left",
+                      padding: "12px 16px",
+                      border: "none",
+                      backgroundColor: active ? "#EEF2FF" : "transparent",
+                      color: active ? "#4F6EF7" : "#475569",
+                      fontSize: "16px",
+                      fontWeight: active ? 700 : 500,
+                      cursor: "pointer",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px"
+                    }}
+                  >
+                    <span>{item.icon}</span>
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+          <div style={{ flex: 1 }} onClick={() => setShowMobileMenu(false)} />
+        </div>
+      )}
 
-            <form onSubmit={handleCreateBooking} style={{ marginTop: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+      <div style={{ display: "flex" }}>
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div style={{ display: "none" }}>
+          <DashboardSidebar />
+        </div>
+
+        <main style={{
+          flex: 1,
+          backgroundColor: "#F2F4F7",
+          padding: "20px 16px",
+          "@media (min-width: 768px)": { padding: "28px 32px" }
+        }}>
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "24px"
+          }}>
+            <div>
+              <p style={{ margin: 0, fontSize: "14px", color: "#64748B" }}>Salon dashboard</p>
+              <h1 style={{
+                margin: 0,
+                fontSize: "28px",
+                color: "#0F172A",
+                "@media (min-width: 768px)": { fontSize: "32px" }
+              }}>
+                Welcome back
+              </h1>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              style={{
+                border: "none",
+                borderRadius: "12px",
+                backgroundColor: "#4F6EF7",
+                color: "#ffffff",
+                padding: "12px 20px",
+                fontSize: "14px",
+                cursor: "pointer",
+                whiteSpace: "nowrap"
+              }}
+            >
+              + New Booking
+            </button>
+          </div>
+
+          {/* Stats Cards - Responsive grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "16px",
+            marginBottom: "24px",
+            "@media (max-width: 767px)": {
+              gridTemplateColumns: "1fr",
+              gap: "12px"
+            }
+          }}>
+            <div style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              padding: "20px",
+              border: "0.5px solid #E8EAF0",
+              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
+            }}>
+              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Today bookings</div>
+              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>0</div>
+            </div>
+
+            <div style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              padding: "20px",
+              border: "0.5px solid #E8EAF0",
+              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
+            }}>
+              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Revenue</div>
+              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>£0.00</div>
+            </div>
+
+            <div style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              padding: "20px",
+              border: "0.5px solid #E8EAF0",
+              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
+            }}>
+              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Total bookings</div>
+              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>{appointments.length}</div>
+            </div>
+
+            <div style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              padding: "20px",
+              border: "0.5px solid #E8EAF0",
+              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
+            }}>
+              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Plan</div>
+              <div style={{ fontSize: "20px", color: "#0F172A", fontWeight: 700, textTransform: "capitalize" }}>{salon?.plan || "Starter"}</div>
+            </div>
+          </div>
+
+        {showModal && (
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 50,
+            padding: "16px"
+          }}>
+            <div style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "20px",
+              padding: "24px",
+              maxWidth: "780px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              "@media (max-width: 767px)": {
+                padding: "20px",
+                borderRadius: "16px",
+                maxHeight: "95vh"
+              }
+            }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "18px",
+                flexWrap: "wrap",
+                marginBottom: "24px"
+              }}>
+                <div>
+                  <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>New booking</div>
+                  <h2 style={{
+                    margin: 0,
+                    fontSize: "22px",
+                    color: "#0F172A",
+                    "@media (max-width: 767px)": { fontSize: "20px" }
+                  }}>
+                    Create client appointment
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setError("");
+                  }}
+                  style={{
+                    border: "none",
+                    backgroundColor: "transparent",
+                    color: "#475569",
+                    cursor: "pointer",
+                    fontSize: "20px",
+                    padding: "4px"
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateBooking} style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "16px",
+                "@media (max-width: 767px)": {
+                  gridTemplateColumns: "1fr",
+                  gap: "14px"
+                }
+              }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Client name</label>
                 <input
@@ -318,20 +533,45 @@ export default function DashboardPage() {
                 </select>
               </div>
 
-              <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" }}>
+              <div style={{
+                gridColumn: "1 / -1",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+                marginTop: "8px",
+                flexWrap: "wrap"
+              }}>
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     setError("");
                   }}
-                  style={{ border: "1px solid #E8EAF0", backgroundColor: "#ffffff", color: "#475569", borderRadius: "12px", padding: "12px 18px", cursor: "pointer" }}
+                  style={{
+                    border: "1px solid #E8EAF0",
+                    backgroundColor: "#ffffff",
+                    color: "#475569",
+                    borderRadius: "12px",
+                    padding: "12px 18px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    minWidth: "80px"
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{ border: "none", backgroundColor: "#4F6EF7", color: "#ffffff", borderRadius: "12px", padding: "12px 18px", cursor: "pointer" }}
+                  style={{
+                    border: "none",
+                    backgroundColor: "#4F6EF7",
+                    color: "#ffffff",
+                    borderRadius: "12px",
+                    padding: "12px 18px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    minWidth: "120px"
+                  }}
                 >
                   Create booking
                 </button>
@@ -372,7 +612,65 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
+          {/* Mobile Card View */}
+          <div style={{
+            display: "block",
+            "@media (min-width: 768px)": { display: "none" }
+          }}>
+            {filteredAppointments.length === 0 ? (
+              <div style={{ padding: "40px 20px", textAlign: "center", color: "#64748B" }}>
+                No appointments available.
+              </div>
+            ) : (
+              filteredAppointments.map((appointment) => (
+                <div key={appointment.id} style={{
+                  backgroundColor: "#ffffff",
+                  border: "0.5px solid #E8EAF0",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  marginBottom: "12px"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+                    <div>
+                      <div style={{ fontSize: "16px", fontWeight: 600, color: "#0F172A", marginBottom: "4px" }}>
+                        {appointment.client_name}
+                      </div>
+                      <div style={{ fontSize: "14px", color: "#64748B" }}>
+                        {appointment.services?.name || "—"}
+                      </div>
+                    </div>
+                    <span style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      padding: "4px 8px",
+                      borderRadius: "999px",
+                      backgroundColor: appointment.status === "confirmed" ? "#ECFDF5" : "#EFF6FF",
+                      color: appointment.status === "confirmed" ? "#166534" : "#1D4ED8",
+                      fontSize: "11px",
+                      fontWeight: 600
+                    }}>
+                      {appointment.status}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: "13px", color: "#64748B" }}>
+                      {appointment.staff?.name || "—"} • {new Date(appointment.date_time).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}
+                    </div>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#0F172A" }}>
+                      £{appointment.services?.price?.toFixed(2) || "0.00"}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div style={{
+            overflowX: "auto",
+            display: "none",
+            "@media (min-width: 768px)": { display: "block" }
+          }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "860px", backgroundColor: "#ffffff" }}>
               <thead>
                 <tr style={{ textAlign: "left", borderBottom: "0.5px solid #E8EAF0" }}>
@@ -410,6 +708,50 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div style={{
+        display: "flex",
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "#ffffff",
+        borderTop: "0.5px solid #E8EAF0",
+        padding: "8px 0",
+        zIndex: 50,
+        "@media (min-width: 768px)": { display: "none" }
+      }}>
+        {navItems.slice(0, 5).map((item) => {
+          const active = pathname === item.path;
+          return (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => router.push(item.path)}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                padding: "8px",
+                border: "none",
+                backgroundColor: "transparent",
+                color: active ? "#4F6EF7" : "#64748B",
+                fontSize: "12px",
+                cursor: "pointer"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>{item.icon}</span>
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Add padding bottom for mobile nav */}
+      <div style={{ height: "80px", "@media (min-width: 768px)": { display: "none" } }} />
     </div>
   );
 }

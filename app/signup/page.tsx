@@ -31,13 +31,32 @@ export default function SignupPage() {
       setLoading(false);
     } else if (data.user) {
       // Create salon record
-      await supabase.from("salons").insert({
+      const { data: salonData, error: salonError } = await supabase.from("salons").insert({
         name: salonName,
         slug: salonName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
         owner_id: data.user.id,
-        owner_email: email,
         plan: "starter",
+      }).select().single();
+
+      if (salonError) {
+        setError("Failed to create salon: " + salonError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Create profile record
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: data.user.id,
+        salon_id: salonData.id,
+        role: "owner",
       });
+
+      if (profileError) {
+        setError("Failed to create profile: " + profileError.message);
+        setLoading(false);
+        return;
+      }
+
       setSuccess(true);
       setLoading(false);
       setTimeout(() => router.push("/dashboard"), 2000);

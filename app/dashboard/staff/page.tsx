@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { getCurrentUserProfile, requireOwner } from "../../lib/auth";
 
 export default function StaffPage() {
   const router = useRouter();
@@ -14,24 +15,30 @@ export default function StaffPage() {
     name: "",
     email: "",
     role: "stylist",
+    active: true,
   });
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
+      try {
+        const profile = await getCurrentUserProfile();
 
-      const { data: salonData } = await supabase
-        .from("salons").select("*").eq("owner_id", user.id).single();
-      setSalon(salonData);
+        if (!profile) {
+          router.push("/login");
+          return;
+        }
 
-      if (salonData) {
+        setSalon(profile.salons);
+
         const { data: staffData } = await supabase
-          .from("staff").select("*").eq("salon_id", salonData.id);
+          .from("staff").select("*").eq("salon_id", profile.salon_id);
         setStaffList(staffData || []);
+      } catch (error) {
+        console.error("Error loading staff data:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     loadData();
   }, [router]);
@@ -45,30 +52,52 @@ export default function StaffPage() {
     e.preventDefault();
     if (!salon) return;
 
-    const { error } = await supabase.from("staff").insert({
-      salon_id: salon.id,
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-    });
+    try {
+      await requireOwner(); // Only owners can add staff
 
-    if (!error) {
-      setFormData({ name: "", email: "", role: "stylist" });
-      setShowForm(false);
-      // Reload staff
-      const { data: staffData } = await supabase
-        .from("staff").select("*").eq("salon_id", salon.id);
-      setStaffList(staffData || []);
+      const { error } = await supabase.from("staff").insert({
+        salon_id: salon.id,
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        active: formData.active,
+      });
+
+      if (!error) {
+        setFormData({ name: "", email: "", role: "stylist", active: true });
+        setShowForm(false);
+        // Reload staff
+        const { data: staffData } = await supabase
+          .from("staff").select("*").eq("salon_id", salon.id);
+        setStaffList(staffData || []);
+      }
+    } catch (error) {
+      console.error("Error adding staff:", error);
+      alert("Only salon owners can add staff members.");
     }
+  };
+
+  const handleToggleActive = async (id: string, currentActive: boolean) => {
+    await supabase.from("staff").update({ active: !currentActive }).eq("id", id);
+    const { data: staffData } = await supabase
+      .from("staff").select("*").eq("salon_id", salon?.id);
+    setStaffList(staffData || []);
   };
 
   const handleDeleteStaff = async (id: string) => {
     if (!confirm("Are you sure you want to delete this staff member?")) return;
-    
-    await supabase.from("staff").delete().eq("id", id);
-    const { data: staffData } = await supabase
-      .from("staff").select("*").eq("salon_id", salon?.id);
-    setStaffList(staffData || []);
+
+    try {
+      await requireOwner(); // Only owners can delete staff
+
+      await supabase.from("staff").delete().eq("id", id);
+      const { data: staffData } = await supabase
+        .from("staff").select("*").eq("salon_id", salon?.id);
+      setStaffList(staffData || []);
+    } catch (error) {
+      console.error("Error deleting staff:", error);
+      alert("Only salon owners can delete staff members.");
+    }
   };
 
   const filteredStaff = staffList.filter(s =>
@@ -141,7 +170,7 @@ export default function StaffPage() {
           {showForm && (
             <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", padding: "24px", marginBottom: "20px" }}>
               <div style={{ fontSize: "15px", fontWeight: 500, color: "#0F172A", marginBottom: "18px" }}>Add New Staff Member</div>
-              <form onSubmit={handleAddStaff} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+              <form onSubmit={handleAddStaff} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
                 <input
                   type="text"
                   placeholder="Name"
@@ -169,7 +198,17 @@ export default function StaffPage() {
                   <option value="receptionist">Receptionist</option>
                   <option value="manager">Manager</option>
                 </select>
-                <div style={{ display: "flex", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <input
+                    type="checkbox"
+                    id="active"
+                    checked={formData.active}
+                    onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                    style={{ width: "16px", height: "16px" }}
+                  />
+                  <label htmlFor="active" style={{ fontSize: "13px", color: "#0F172A" }}>Active</label>
+                </div>
+                <div style={{ display: "flex", gap: "8px", gridColumn: "1 / -1" }}>
                   <button type="submit" style={{ flex: 1, padding: "10px 16px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer" }}>Add</button>
                   <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: "10px 16px", background: "#E8EAF0", color: "#64748B", border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer" }}>Cancel</button>
                 </div>
@@ -198,7 +237,7 @@ export default function StaffPage() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#F8F9FC" }}>
-                    {["Name", "Email", "Role", "Actions"].map((h) => (
+                    {["Name", "Email", "Role", "Status", "Actions"].map((h) => (
                       <th key={h} style={{ fontSize: "11px", color: "#94A3B8", textAlign: "left", padding: "10px 18px", fontWeight: 500, borderBottom: "0.5px solid #E8EAF0" }}>{h}</th>
                     ))}
                   </tr>
@@ -213,7 +252,18 @@ export default function StaffPage() {
                           {s.role}
                         </span>
                       </td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#0F172A", borderBottom: "0.5px solid #F1F5F9" }}>
+                        <span style={{ background: s.active ? "#ECFDF5" : "#FEF2F2", color: s.active ? "#166534" : "#DC2626", fontSize: "11px", padding: "4px 10px", borderRadius: "20px", textTransform: "capitalize" }}>
+                          {s.active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
                       <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>
+                        <button
+                          onClick={() => handleToggleActive(s.id, s.active)}
+                          style={{ color: s.active ? "#DC2626" : "#166534", background: "none", border: "none", cursor: "pointer", fontSize: "12px", marginRight: "12px" }}
+                        >
+                          {s.active ? "Deactivate" : "Activate"}
+                        </button>
                         <button
                           onClick={() => handleDeleteStaff(s.id)}
                           style={{ color: "#EF4444", background: "none", border: "none", cursor: "pointer", fontSize: "12px" }}
