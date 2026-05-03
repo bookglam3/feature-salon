@@ -14,12 +14,18 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [origin, setOrigin] = useState("");
   const [formData, setFormData] = useState({
     client_name: "", client_email: "", client_phone: "",
     service_id: "", staff_id: "", date: "", time: "",
   });
 
   const timeSlots = ["09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30"];
+
+  // SSR-safe: window sirf client par available hai
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,11 +71,13 @@ export default function DashboardPage() {
   };
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/book/${salon?.slug}`;
+    const link = `${origin}/book/${salon?.slug}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const bookingLink = `${origin}/book/${salon?.slug}`;
 
   const todayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === new Date().toDateString());
   const revenue = todayAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0);
@@ -83,6 +91,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex" }}>
+      {/* Sidebar */}
       <div style={{ width: "220px", background: "#fff", borderRight: "0.5px solid #E8EAF0", flexShrink: 0, display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "22px 20px", borderBottom: "0.5px solid #E8EAF0" }}>
           <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#0F172A" }}>feature</div>
@@ -111,7 +120,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Topbar */}
         <div style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <div style={{ fontSize: "17px", fontWeight: 500, color: "#0F172A" }}>Good morning 👋</div>
@@ -121,17 +132,18 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ padding: "24px", flex: 1 }}>
+
           {/* BOOKING LINK BANNER */}
           <div style={{ background: "linear-gradient(135deg, #4F6EF7 0%, #7C3AED 100%)", borderRadius: "12px", padding: "18px 22px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "4px" }}>🔗 Your Booking Link</div>
               <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", fontFamily: "monospace" }}>
-                {typeof window !== "undefined" ? `${window.location.origin}/book/${salon?.slug}` : `/book/${salon?.slug}`}
+                {salon?.slug ? bookingLink : "Loading..."}
               </div>
             </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <button onClick={handleCopyLink}
-                style={{ padding: "8px 18px", background: copied ? "#10B981" : "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}>
+                style={{ padding: "8px 18px", background: copied ? "#10B981" : "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500, transition: "background 0.2s" }}>
                 {copied ? "✓ Copied!" : "Copy Link"}
               </button>
               <button onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
@@ -156,7 +168,7 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Appointments */}
+          {/* Appointments Table */}
           <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "0.5px solid #E8EAF0" }}>
               <div style={{ fontSize: "13px", fontWeight: 500 }}>Appointments</div>
@@ -185,14 +197,16 @@ export default function DashboardPage() {
                 <tbody>
                   {filteredAppts.map(a => (
                     <tr key={a.id}>
-                      <td style={{ padding: "11px 18px" }}>
-                        <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>{a.status}</span>
+                      <td style={{ padding: "11px 18px", borderBottom: "0.5px solid #F1F5F9" }}>
+                        <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : a.status === "cancelled" ? "#FEE2E2" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : a.status === "cancelled" ? "#DC2626" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>
+                          {a.status}
+                        </span>
                       </td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>{a.client_name}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>{a.services?.name || "—"}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B" }}>{a.staff?.name || "—"}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>£{a.services?.price || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.client_name}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.services?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{a.staff?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>£{a.services?.price || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -202,6 +216,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* New Booking Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
           <div style={{ background: "#fff", borderRadius: "12px", padding: "28px", width: "440px", maxHeight: "90vh", overflowY: "auto" }}>
