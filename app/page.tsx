@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", background: "#F2F4F7", minHeight: "100vh" }}>
-      
+
       {/* Navbar */}
       <nav style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "0 40px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <span style={{ fontFamily: "Georgia, serif", fontSize: "22px", color: "#0F172A", letterSpacing: "-0.5px" }}>feature</span>
@@ -90,39 +90,90 @@ export default function Home() {
 
       {/* Pricing */}
       <section id="pricing" style={{ padding: "80px 40px", background: "#F2F4F7", borderTop: "0.5px solid #E8EAF0" }}>
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <div style={{ textAlign: "center", marginBottom: "16px" }}>
           <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#94A3B8", marginBottom: "12px" }}>PRICING</div>
           <h2 style={{ fontFamily: "Georgia, serif", fontSize: "36px", fontWeight: 400, color: "#0F172A", letterSpacing: "-0.5px" }}>Simple, honest pricing</h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", maxWidth: "640px", margin: "0 auto" }}>
+
+        {/* Fresha comparison badge */}
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#ECFDF5", border: "0.5px solid #A7F3D0", borderRadius: "20px", padding: "8px 20px" }}>
+            <span style={{ fontSize: "16px" }}>💰</span>
+            <span style={{ fontSize: "13px", color: "#065F46", fontWeight: 500 }}>Up to 30% cheaper than Fresha — with no hidden fees</span>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", maxWidth: "960px", margin: "0 auto" }}>
+
+          {/* Starter */}
           <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "32px" }}>
             <div style={{ fontSize: "11px", letterSpacing: "2px", color: "#94A3B8", marginBottom: "12px" }}>STARTER</div>
-            <div style={{ marginBottom: "16px" }}>
+            <div style={{ marginBottom: "8px" }}>
               <span style={{ fontFamily: "Georgia, serif", fontSize: "40px", color: "#0F172A" }}>£29</span>
               <span style={{ fontSize: "14px", color: "#64748B" }}>/month</span>
             </div>
             <p style={{ fontSize: "13px", color: "#64748B", marginBottom: "24px", lineHeight: "1.6" }}>Perfect for independent stylists and small salons.</p>
-            {["Online booking page", "Up to 2 staff", "Client profiles", "Email reminders"].map((f) => (
+            {[
+              "Online booking page",
+              "Up to 3 staff",
+              "Client profiles",
+              "Email reminders",
+              "50 messages/month",
+            ].map((f) => (
               <div key={f} style={{ fontSize: "13px", color: "#64748B", padding: "8px 0", borderBottom: "0.5px solid #F1F5F9", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ color: "#4F6EF7" }}>✓</span> {f}
               </div>
             ))}
             <Link href="/signup" style={{ display: "block", textAlign: "center", marginTop: "24px", padding: "12px", borderRadius: "8px", border: "0.5px solid #E8EAF0", color: "#0F172A", textDecoration: "none", fontSize: "14px" }}>Start free trial</Link>
           </div>
-          <div style={{ background: "#fff", border: "1.5px solid #4F6EF7", borderRadius: "12px", padding: "32px" }}>
-            <div style={{ fontSize: "11px", letterSpacing: "2px", color: "#4F6EF7", marginBottom: "12px" }}>PROFESSIONAL</div>
-            <div style={{ marginBottom: "16px" }}>
+
+          {/* Pro */}
+          <div style={{ background: "#fff", border: "1.5px solid #4F6EF7", borderRadius: "12px", padding: "32px", position: "relative" }}>
+            <div style={{ position: "absolute", top: "-13px", left: "50%", transform: "translateX(-50%)", background: "#4F6EF7", color: "#fff", fontSize: "11px", letterSpacing: "1px", padding: "4px 14px", borderRadius: "20px", whiteSpace: "nowrap" }}>
+              MOST POPULAR
+            </div>
+            <div style={{ fontSize: "11px", letterSpacing: "2px", color: "#4F6EF7", marginBottom: "12px" }}>PRO</div>
+            <div style={{ marginBottom: "8px" }}>
               <span style={{ fontFamily: "Georgia, serif", fontSize: "40px", color: "#0F172A" }}>£59</span>
               <span style={{ fontSize: "14px", color: "#64748B" }}>/month</span>
             </div>
             <p style={{ fontSize: "13px", color: "#64748B", marginBottom: "24px", lineHeight: "1.6" }}>For growing salons that need more power and control.</p>
-            {["Everything in Starter", "Unlimited staff", "SMS reminders", "Reports & analytics"].map((f) => (
+            {[
+              "Everything in Starter",
+              "Up to 10 staff",
+              "SMS & email reminders",
+              "Reports & analytics",
+              "100 messages/month",
+            ].map((f) => (
               <div key={f} style={{ fontSize: "13px", color: "#64748B", padding: "8px 0", borderBottom: "0.5px solid #F1F5F9", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ color: "#4F6EF7" }}>✓</span> {f}
               </div>
             ))}
             <Link href="/signup" style={{ display: "block", textAlign: "center", marginTop: "24px", padding: "12px", borderRadius: "8px", background: "#4F6EF7", color: "#fff", textDecoration: "none", fontSize: "14px" }}>Start free trial</Link>
           </div>
+
+          {/* Business */}
+          <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "32px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "2px", color: "#94A3B8", marginBottom: "12px" }}>BUSINESS</div>
+            <div style={{ marginBottom: "8px" }}>
+              <span style={{ fontFamily: "Georgia, serif", fontSize: "40px", color: "#0F172A" }}>£99</span>
+              <span style={{ fontSize: "14px", color: "#64748B" }}>/month</span>
+            </div>
+            <p style={{ fontSize: "13px", color: "#64748B", marginBottom: "24px", lineHeight: "1.6" }}>For multi-location salons and large teams.</p>
+            {[
+              "Everything in Pro",
+              "Unlimited staff",
+              "Priority support",
+              "Advanced reports",
+              "Unlimited messages",
+            ].map((f) => (
+              <div key={f} style={{ fontSize: "13px", color: "#64748B", padding: "8px 0", borderBottom: "0.5px solid #F1F5F9", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ color: "#4F6EF7" }}>✓</span> {f}
+              </div>
+            ))}
+            <Link href="/signup" style={{ display: "block", textAlign: "center", marginTop: "24px", padding: "12px", borderRadius: "8px", border: "0.5px solid #E8EAF0", color: "#0F172A", textDecoration: "none", fontSize: "14px" }}>Start free trial</Link>
+          </div>
+
         </div>
       </section>
 
