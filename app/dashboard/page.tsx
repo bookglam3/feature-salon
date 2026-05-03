@@ -1,29 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
-import DashboardSidebar from "./Sidebar";
-
-const timeSlots = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-  "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
-];
-
-const navItems = [
-  { label: "Dashboard", path: "/dashboard", icon: "📊" },
-  { label: "Bookings", path: "/dashboard/bookings", icon: "📅" },
-  { label: "Clients", path: "/dashboard/clients", icon: "👥" },
-  { label: "Staff", path: "/dashboard/staff", icon: "👤" },
-  { label: "Payments", path: "/dashboard/payments", icon: "💳" },
-  { label: "Reports", path: "/dashboard/reports", icon: "📈" },
-  { label: "Settings", path: "/dashboard/settings", icon: "⚙️" },
-];
 
 export default function DashboardPage() {
   const router = useRouter();
-  const pathname = usePathname();
   const [salon, setSalon] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [staff, setStaff] = useState<any[]>([]);
@@ -31,727 +13,257 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [showModal, setShowModal] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({
-    client_name: "",
-    client_email: "",
-    client_phone: "",
-    service_id: "",
-    staff_id: "",
-    date: "",
-    time: "",
+    client_name: "", client_email: "", client_phone: "",
+    service_id: "", staff_id: "", date: "", time: "",
   });
+
+  const timeSlots = ["09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30"];
 
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const profile = await getCurrentUserProfile();
-
-        if (!profile) {
-          router.push("/login");
-          return;
-        }
-
-        setSalon(profile.salons);
-
-        const [{ data: appts }, { data: staffData }, { data: servicesData }] = await Promise.all([
-          supabase
-            .from("appointments")
-            .select("*, services(name, price), staff(name)")
-            .eq("salon_id", profile.salon_id)
-            .order("date_time", { ascending: true }),
-          supabase
-            .from("staff")
-            .select("*")
-            .eq("salon_id", profile.salon_id),
-          supabase
-            .from("services")
-            .select("*")
-            .eq("salon_id", profile.salon_id),
-        ]);
-
-        setAppointments(appts || []);
-        setStaff(staffData || []);
-        setServices(servicesData || []);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-        setError("Failed to load dashboard data");
-      } finally {
-        setLoading(false);
-      }
+      const profile = await getCurrentUserProfile();
+      if (!profile || !profile.salon) { router.push("/login"); return; }
+      setSalon(profile.salon);
+      const salonId = profile.salon.id;
+      const [{ data: appts }, { data: staffData }, { data: servicesData }] = await Promise.all([
+        supabase.from("appointments").select("*, services(name,price), staff(name)").eq("salon_id", salonId).order("date_time", { ascending: true }),
+        supabase.from("staff").select("*").eq("salon_id", salonId),
+        supabase.from("services").select("*").eq("salon_id", salonId),
+      ]);
+      setAppointments(appts || []);
+      setStaff(staffData || []);
+      setServices(servicesData || []);
+      setLoading(false);
     };
-
     loadData();
   }, [router]);
 
-  const reloadAppointments = async () => {
-    if (!salon) return;
-    const { data: appts } = await supabase
-      .from("appointments")
-      .select("*, services(name, price), staff(name)")
-      .eq("salon_id", salon.id)
-      .order("date_time", { ascending: true });
-    setAppointments(appts || []);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
   };
 
-  const todayAppointments = appointments.filter((appointment) => {
-    const today = new Date().toDateString();
-    return new Date(appointment.date_time).toDateString() === today;
-  });
-
-  const upcomingAppointments = appointments.filter((appointment) => {
-    return new Date(appointment.date_time) > new Date();
-  });
-
-  const filteredAppointments = activeTab === "Today"
-    ? todayAppointments
-    : activeTab === "Upcoming"
-      ? upcomingAppointments
-      : appointments;
-
-  const revenue = appointments.reduce((sum, appointment) => {
-    return sum + (appointment.services?.price || 0);
-  }, 0);
-
-  const handleCreateBooking = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError("");
-
-    if (!formData.client_name || !formData.service_id || !formData.date || !formData.time) {
-      setError("Please complete the required fields.");
-      return;
-    }
-
-    const dateTime = new Date(`${formData.date}T${formData.time}`);
-    if (Number.isNaN(dateTime.getTime())) {
-      setError("Please select a valid date and time.");
-      return;
-    }
-
-    const { error: createError } = await supabase.from("appointments").insert({
+  const handleNewBooking = async () => {
+    if (!salon) return;
+    const date_time = new Date(formData.date + "T" + formData.time).toISOString();
+    await supabase.from("appointments").insert({
       salon_id: salon.id,
       client_name: formData.client_name,
       client_email: formData.client_email,
       client_phone: formData.client_phone,
-      service_id: formData.service_id,
+      service_id: formData.service_id || null,
       staff_id: formData.staff_id || null,
-      date_time: dateTime.toISOString(),
-      status: "pending",
+      date_time,
+      status: "confirmed",
     });
-
-    if (createError) {
-      setError(createError.message);
-      return;
-    }
-
     setShowModal(false);
-    setFormData({
-      client_name: "",
-      client_email: "",
-      client_phone: "",
-      service_id: "",
-      staff_id: "",
-      date: "",
-      time: "",
-    });
-    await reloadAppointments();
+    setFormData({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
+    const { data: appts } = await supabase.from("appointments").select("*, services(name,price), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
+    setAppointments(appts || []);
   };
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", backgroundColor: "#F2F4F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#4F6EF7" }}>feature</div>
-      </div>
-    );
-  }
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/book/${salon?.slug}`;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const todayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === new Date().toDateString());
+  const revenue = todayAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0);
+  const filteredAppts = activeTab === "Today" ? todayAppts : activeTab === "Upcoming" ? appointments.filter(a => new Date(a.date_time) > new Date()) : appointments;
+
+  const navItems = [
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Bookings", path: "/dashboard/bookings" },
+    { label: "Clients", path: "/dashboard/clients" },
+    { label: "Staff", path: "/dashboard/staff" },
+    { label: "Payments", path: "/dashboard/payments" },
+    { label: "Reports", path: "/dashboard/reports" },
+    { label: "Settings", path: "/dashboard/settings" },
+  ];
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F2F4F7" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#4F6EF7" }}>feature</div>
+    </div>
+  );
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#F2F4F7" }}>
-      {/* Mobile Header */}
-      <div style={{
-        display: "block",
-        backgroundColor: "#ffffff",
-        borderBottom: "0.5px solid #E8EAF0",
-        padding: "12px 16px",
-        position: "sticky",
-        top: 0,
-        zIndex: 50
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#0F172A" }}>feature</div>
-          <button
-            type="button"
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            style={{
-              border: "none",
-              backgroundColor: "transparent",
-              fontSize: "20px",
-              cursor: "pointer",
-              color: "#475569"
-            }}
-          >
-            ☰
-          </button>
+    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex" }}>
+
+      {/* Sidebar */}
+      <div style={{ width: "220px", background: "#fff", borderRight: "0.5px solid #E8EAF0", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "22px 20px", borderBottom: "0.5px solid #E8EAF0" }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#0F172A" }}>feature</div>
+        </div>
+        <div style={{ padding: "8px 0", flex: 1 }}>
+          {navItems.slice(0, 4).map((item) => (
+            <div key={item.label} onClick={() => router.push(item.path)}
+              style={{ padding: "9px 20px", fontSize: "13px", color: item.path === "/dashboard" ? "#4F6EF7" : "#64748B", background: item.path === "/dashboard" ? "#EEF2FF" : "transparent", borderRight: item.path === "/dashboard" ? "2px solid #4F6EF7" : "none", cursor: "pointer" }}>
+              {item.label}
+            </div>
+          ))}
+          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>FINANCE</div>
+          <div onClick={() => router.push("/dashboard/payments")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Payments</div>
+          <div onClick={() => router.push("/dashboard/reports")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Reports</div>
+          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>SYSTEM</div>
+          <div onClick={() => router.push("/dashboard/settings")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Settings</div>
+        </div>
+        <div style={{ padding: "16px 20px", borderTop: "0.5px solid #E8EAF0" }}>
+          <div style={{ fontSize: "12px", color: "#64748B", marginBottom: "8px" }}>{salon?.name}</div>
+          <button onClick={handleLogout} style={{ fontSize: "12px", color: "#EF4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Sign out</button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {showMobileMenu && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          zIndex: 40,
-          display: "flex"
-        }}>
-          <div style={{
-            backgroundColor: "#ffffff",
-            width: "280px",
-            padding: "24px",
-            display: "flex",
-            flexDirection: "column"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#0F172A" }}>feature</div>
+      {/* Main Content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: "17px", fontWeight: 500, color: "#0F172A" }}>Good morning 👋</div>
+            <div style={{ fontSize: "12px", color: "#94A3B8" }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
+          </div>
+          <button onClick={() => setShowModal(true)} style={{ background: "#4F6EF7", color: "#fff", fontSize: "13px", padding: "8px 18px", borderRadius: "8px", border: "none", cursor: "pointer" }}>+ New Booking</button>
+        </div>
+
+        <div style={{ padding: "24px", flex: 1 }}>
+
+          {/* ── BOOKING LINK BANNER ── */}
+          <div style={{ background: "linear-gradient(135deg, #4F6EF7 0%, #7C3AED 100%)", borderRadius: "12px", padding: "18px 22px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+            <div>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "4px" }}>🔗 Your Booking Link</div>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", fontFamily: "monospace" }}>
+                {typeof window !== "undefined" ? `${window.location.origin}/book/${salon?.slug}` : `/book/${salon?.slug}`}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
               <button
-                type="button"
-                onClick={() => setShowMobileMenu(false)}
-                style={{ border: "none", backgroundColor: "transparent", fontSize: "20px", cursor: "pointer" }}
-              >
-                ×
+                onClick={handleCopyLink}
+                style={{ padding: "8px 18px", background: copied ? "#10B981" : "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500, transition: "all 0.2s" }}>
+                {copied ? "✓ Copied!" : "Copy Link"}
+              </button>
+              <button
+                onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
+                style={{ padding: "8px 18px", background: "#fff", color: "#4F6EF7", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}>
+                Preview ↗
               </button>
             </div>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {navItems.map((item) => {
-                const active = pathname === item.path;
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => {
-                      router.push(item.path);
-                      setShowMobileMenu(false);
-                    }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "12px 16px",
-                      border: "none",
-                      backgroundColor: active ? "#EEF2FF" : "transparent",
-                      color: active ? "#4F6EF7" : "#475569",
-                      fontSize: "16px",
-                      fontWeight: active ? 700 : 500,
-                      cursor: "pointer",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px"
-                    }}
-                  >
-                    <span>{item.icon}</span>
-                    {item.label}
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "20px" }}>
+            {[
+              { label: "Today's bookings", value: todayAppts.length.toString() },
+              { label: "Revenue today", value: `£${revenue}` },
+              { label: "Total bookings", value: appointments.length.toString() },
+              { label: "Plan", value: salon?.plan || "Starter" },
+            ].map((s) => (
+              <div key={s.label} style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", padding: "16px" }}>
+                <div style={{ fontSize: "11px", color: "#94A3B8", marginBottom: "8px" }}>{s.label}</div>
+                <div style={{ fontSize: "22px", fontWeight: 500, color: "#0F172A" }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Appointments */}
+          <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "0.5px solid #E8EAF0" }}>
+              <div style={{ fontSize: "13px", fontWeight: 500 }}>Appointments</div>
+              <div style={{ display: "flex", gap: "4px" }}>
+                {["All", "Today", "Upcoming"].map((tab) => (
+                  <button key={tab} onClick={() => setActiveTab(tab)}
+                    style={{ fontSize: "11px", padding: "4px 12px", borderRadius: "6px", border: "0.5px solid", borderColor: activeTab === tab ? "#C7D2FE" : "#E8EAF0", background: activeTab === tab ? "#EEF2FF" : "#fff", color: activeTab === tab ? "#4F6EF7" : "#94A3B8", cursor: "pointer" }}>
+                    {tab}
                   </button>
-                );
-              })}
-            </nav>
-          </div>
-          <div style={{ flex: 1 }} onClick={() => setShowMobileMenu(false)} />
-        </div>
-      )}
-
-      <div style={{ display: "flex" }}>
-        {/* Desktop Sidebar - Hidden on mobile */}
-        <div style={{ display: "none" }}>
-          <DashboardSidebar />
-        </div>
-
-        <main style={{
-          flex: 1,
-          backgroundColor: "#F2F4F7",
-          padding: "20px 16px",
-          "@media (min-width: 768px)": { padding: "28px 32px" }
-        }}>
-          <div style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "16px",
-            marginBottom: "24px"
-          }}>
-            <div>
-              <p style={{ margin: 0, fontSize: "14px", color: "#64748B" }}>Salon dashboard</p>
-              <h1 style={{
-                margin: 0,
-                fontSize: "28px",
-                color: "#0F172A",
-                "@media (min-width: 768px)": { fontSize: "32px" }
-              }}>
-                Welcome back
-              </h1>
+                ))}
+              </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setShowModal(true)}
-              style={{
-                border: "none",
-                borderRadius: "12px",
-                backgroundColor: "#4F6EF7",
-                color: "#ffffff",
-                padding: "12px 20px",
-                fontSize: "14px",
-                cursor: "pointer",
-                whiteSpace: "nowrap"
-              }}
-            >
-              + New Booking
-            </button>
-          </div>
-
-          {/* Stats Cards - Responsive grid */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "16px",
-            marginBottom: "24px",
-            "@media (max-width: 767px)": {
-              gridTemplateColumns: "1fr",
-              gap: "12px"
-            }
-          }}>
-            <div style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "16px",
-              padding: "20px",
-              border: "0.5px solid #E8EAF0",
-              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
-            }}>
-              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Today bookings</div>
-              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>0</div>
-            </div>
-
-            <div style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "16px",
-              padding: "20px",
-              border: "0.5px solid #E8EAF0",
-              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
-            }}>
-              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Revenue</div>
-              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>£0.00</div>
-            </div>
-
-            <div style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "16px",
-              padding: "20px",
-              border: "0.5px solid #E8EAF0",
-              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
-            }}>
-              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Total bookings</div>
-              <div style={{ fontSize: "32px", color: "#0F172A", fontWeight: 700 }}>{appointments.length}</div>
-            </div>
-
-            <div style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "16px",
-              padding: "20px",
-              border: "0.5px solid #E8EAF0",
-              "@media (min-width: 768px)": { borderRadius: "20px", padding: "22px" }
-            }}>
-              <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>Plan</div>
-              <div style={{ fontSize: "20px", color: "#0F172A", fontWeight: 700, textTransform: "capitalize" }}>{salon?.plan || "Starter"}</div>
-            </div>
-          </div>
-
-        {showModal && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-            padding: "16px"
-          }}>
-            <div style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "20px",
-              padding: "24px",
-              maxWidth: "780px",
-              width: "100%",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              "@media (max-width: 767px)": {
-                padding: "20px",
-                borderRadius: "16px",
-                maxHeight: "95vh"
-              }
-            }}>
-              <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "18px",
-                flexWrap: "wrap",
-                marginBottom: "24px"
-              }}>
-                <div>
-                  <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>New booking</div>
-                  <h2 style={{
-                    margin: 0,
-                    fontSize: "22px",
-                    color: "#0F172A",
-                    "@media (max-width: 767px)": { fontSize: "20px" }
-                  }}>
-                    Create client appointment
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    setError("");
-                  }}
-                  style={{
-                    border: "none",
-                    backgroundColor: "transparent",
-                    color: "#475569",
-                    cursor: "pointer",
-                    fontSize: "20px",
-                    padding: "4px"
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateBooking} style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "16px",
-                "@media (max-width: 767px)": {
-                  gridTemplateColumns: "1fr",
-                  gap: "14px"
-                }
-              }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Client name</label>
-                <input
-                  type="text"
-                  value={formData.client_name}
-                  onChange={(event) => setFormData({ ...formData, client_name: event.target.value })}
-                  placeholder="E.g. Sarah Jones"
-                  required
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Client email</label>
-                <input
-                  type="email"
-                  value={formData.client_email}
-                  onChange={(event) => setFormData({ ...formData, client_email: event.target.value })}
-                  placeholder="client@example.com"
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Phone number</label>
-                <input
-                  type="tel"
-                  value={formData.client_phone}
-                  onChange={(event) => setFormData({ ...formData, client_phone: event.target.value })}
-                  placeholder="07400 123456"
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Service</label>
-                <select
-                  value={formData.service_id}
-                  onChange={(event) => setFormData({ ...formData, service_id: event.target.value })}
-                  required
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                >
-                  <option value="">Select service</option>
-                  {services.map((service) => (
-                    <option key={service.id} value={service.id}>{service.name} (£{service.price})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Staff member</label>
-                <select
-                  value={formData.staff_id}
-                  onChange={(event) => setFormData({ ...formData, staff_id: event.target.value })}
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                >
-                  <option value="">Any available staff</option>
-                  {staff.map((member) => (
-                    <option key={member.id} value={member.id}>{member.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Date</label>
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(event) => setFormData({ ...formData, date: event.target.value })}
-                  required
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "13px", color: "#0F172A", fontWeight: 600 }}>Time</label>
-                <select
-                  value={formData.time}
-                  onChange={(event) => setFormData({ ...formData, time: event.target.value })}
-                  required
-                  style={{ border: "0.5px solid #E8EAF0", borderRadius: "12px", padding: "12px 14px", fontSize: "14px", color: "#0F172A" }}
-                >
-                  <option value="">Select time</option>
-                  {timeSlots.map((slot) => (
-                    <option key={slot} value={slot}>{slot}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{
-                gridColumn: "1 / -1",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                marginTop: "8px",
-                flexWrap: "wrap"
-              }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    setError("");
-                  }}
-                  style={{
-                    border: "1px solid #E8EAF0",
-                    backgroundColor: "#ffffff",
-                    color: "#475569",
-                    borderRadius: "12px",
-                    padding: "12px 18px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    minWidth: "80px"
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    border: "none",
-                    backgroundColor: "#4F6EF7",
-                    color: "#ffffff",
-                    borderRadius: "12px",
-                    padding: "12px 18px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    minWidth: "120px"
-                  }}
-                >
-                  Create booking
-                </button>
-              </div>
-
-              {error && (
-                <div style={{ gridColumn: "1 / -1", color: "#DC2626", fontSize: "13px" }}>{error}</div>
-              )}
-            </form>
-          </div>
-        )}
-
-        <div style={{ marginTop: "28px", backgroundColor: "#ffffff", borderRadius: "20px", overflow: "hidden", border: "0.5px solid #E8EAF0" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "18px", padding: "24px 28px", borderBottom: "0.5px solid #E8EAF0" }}>
-            <div>
-              <p style={{ margin: 0, fontSize: "14px", color: "#64748B" }}>Appointments</p>
-              <h2 style={{ margin: 0, fontSize: "20px", color: "#0F172A" }}>Recent bookings</h2>
-            </div>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {["All", "Today", "Upcoming"].map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    border: "none",
-                    backgroundColor: activeTab === tab ? "#4F6EF7" : "#F8FAFC",
-                    color: activeTab === tab ? "#ffffff" : "#475569",
-                    borderRadius: "999px",
-                    padding: "10px 16px",
-                    cursor: "pointer",
-                    fontSize: "13px",
-                  }}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile Card View */}
-          <div style={{
-            display: "block",
-            "@media (min-width: 768px)": { display: "none" }
-          }}>
-            {filteredAppointments.length === 0 ? (
-              <div style={{ padding: "40px 20px", textAlign: "center", color: "#64748B" }}>
-                No appointments available.
+            {filteredAppts.length === 0 ? (
+              <div style={{ padding: "48px", textAlign: "center", color: "#94A3B8", fontSize: "14px" }}>
+                No appointments yet — share your booking link to get started!
               </div>
             ) : (
-              filteredAppointments.map((appointment) => (
-                <div key={appointment.id} style={{
-                  backgroundColor: "#ffffff",
-                  border: "0.5px solid #E8EAF0",
-                  borderRadius: "12px",
-                  padding: "16px",
-                  marginBottom: "12px"
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
-                    <div>
-                      <div style={{ fontSize: "16px", fontWeight: 600, color: "#0F172A", marginBottom: "4px" }}>
-                        {appointment.client_name}
-                      </div>
-                      <div style={{ fontSize: "14px", color: "#64748B" }}>
-                        {appointment.services?.name || "—"}
-                      </div>
-                    </div>
-                    <span style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      padding: "4px 8px",
-                      borderRadius: "999px",
-                      backgroundColor: appointment.status === "confirmed" ? "#ECFDF5" : "#EFF6FF",
-                      color: appointment.status === "confirmed" ? "#166534" : "#1D4ED8",
-                      fontSize: "11px",
-                      fontWeight: 600
-                    }}>
-                      {appointment.status}
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ fontSize: "13px", color: "#64748B" }}>
-                      {appointment.staff?.name || "—"} • {new Date(appointment.date_time).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}
-                    </div>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#0F172A" }}>
-                      £{appointment.services?.price?.toFixed(2) || "0.00"}
-                    </div>
-                  </div>
-                </div>
-              ))
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ background: "#F8F9FC" }}>
+                    {["Status","Client","Service","Staff","Date & Time","Amount"].map(h => (
+                      <th key={h} style={{ fontSize: "11px", color: "#94A3B8", textAlign: "left", padding: "10px 18px", fontWeight: 500 }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAppts.map(a => (
+                    <tr key={a.id}>
+                      <td style={{ padding: "11px 18px" }}>
+                        <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>{a.status}</span>
+                      </td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>{a.client_name}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>{a.services?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B" }}>{a.staff?.name || "—"}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
+                      <td style={{ padding: "11px 18px", fontSize: "13px" }}>£{a.services?.price || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
-
-          {/* Desktop Table View */}
-          <div style={{
-            overflowX: "auto",
-            display: "none",
-            "@media (min-width: 768px)": { display: "block" }
-          }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "860px", backgroundColor: "#ffffff" }}>
-              <thead>
-                <tr style={{ textAlign: "left", borderBottom: "0.5px solid #E8EAF0" }}>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Status</th>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Client</th>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Service</th>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Staff</th>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Date & time</th>
-                  <th style={{ padding: "16px 18px", fontSize: "12px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "1px" }}>Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAppointments.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} style={{ padding: "22px 18px", color: "#64748B", fontSize: "14px" }}>No appointments available.</td>
-                  </tr>
-                ) : (
-                  filteredAppointments.map((appointment) => (
-                    <tr key={appointment.id} style={{ borderBottom: "0.5px solid #F1F5F9" }}>
-                      <td style={{ padding: "14px 18px" }}>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "999px", backgroundColor: appointment.status === "confirmed" ? "#ECFDF5" : "#EFF6FF", color: appointment.status === "confirmed" ? "#166534" : "#1D4ED8", fontSize: "12px", fontWeight: 600 }}>
-                          {appointment.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: "14px 18px", fontSize: "14px", color: "#0F172A" }}>{appointment.client_name}</td>
-                      <td style={{ padding: "14px 18px", fontSize: "14px", color: "#0F172A" }}>{appointment.services?.name || "—"}</td>
-                      <td style={{ padding: "14px 18px", fontSize: "14px", color: "#64748B" }}>{appointment.staff?.name || "—"}</td>
-                      <td style={{ padding: "14px 18px", fontSize: "14px", color: "#0F172A" }}>{new Date(appointment.date_time).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</td>
-                      <td style={{ padding: "14px 18px", fontSize: "14px", color: "#0F172A" }}>£{appointment.services?.price?.toFixed(2) || "0.00"}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
         </div>
-      </main>
-
-      {/* Mobile Bottom Navigation */}
-      <div style={{
-        display: "flex",
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#ffffff",
-        borderTop: "0.5px solid #E8EAF0",
-        padding: "8px 0",
-        zIndex: 50,
-        "@media (min-width: 768px)": { display: "none" }
-      }}>
-        {navItems.slice(0, 5).map((item) => {
-          const active = pathname === item.path;
-          return (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => router.push(item.path)}
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                padding: "8px",
-                border: "none",
-                backgroundColor: "transparent",
-                color: active ? "#4F6EF7" : "#64748B",
-                fontSize: "12px",
-                cursor: "pointer"
-              }}
-            >
-              <span style={{ fontSize: "16px" }}>{item.icon}</span>
-              {item.label}
-            </button>
-          );
-        })}
       </div>
 
-      {/* Add padding bottom for mobile nav */}
-      <div style={{ height: "80px", "@media (min-width: 768px)": { display: "none" } }} />
+      {/* New Booking Modal */}
+      {showModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
+          <div style={{ background: "#fff", borderRadius: "12px", padding: "28px", width: "440px", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ fontSize: "16px", fontWeight: 500, marginBottom: "20px" }}>New Booking</div>
+            {[
+              { label: "Client Name", key: "client_name", type: "text", placeholder: "Sarah Johnson" },
+              { label: "Client Email", key: "client_email", type: "email", placeholder: "sarah@email.com" },
+              { label: "Client Phone", key: "client_phone", type: "text", placeholder: "+44 7700 900000" },
+              { label: "Date", key: "date", type: "date", placeholder: "" },
+            ].map(f => (
+              <div key={f.key} style={{ marginBottom: "14px" }}>
+                <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>{f.label}</label>
+                <input type={f.type} placeholder={f.placeholder} value={(formData as any)[f.key]}
+                  onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
+                  style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", boxSizing: "border-box", fontFamily: "inherit" }} />
+              </div>
+            ))}
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Time</label>
+              <select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })}
+                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
+                <option value="">Select time</option>
+                {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Service</label>
+              <select value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}
+                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
+                <option value="">Select service</option>
+                {services.map(s => <option key={s.id} value={s.id}>{s.name} — £{s.price}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Staff</label>
+              <select value={formData.staff_id} onChange={e => setFormData({ ...formData, staff_id: e.target.value })}
+                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
+                <option value="">Select staff</option>
+                {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button onClick={() => setShowModal(false)}
+                style={{ flex: 1, padding: "10px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", cursor: "pointer", background: "#fff" }}>Cancel</button>
+              <button onClick={handleNewBooking}
+                style={{ flex: 1, padding: "10px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer" }}>Create Booking</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

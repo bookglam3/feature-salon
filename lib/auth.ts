@@ -1,43 +1,26 @@
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 export async function getCurrentUserProfile() {
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return null;
 
-  if (!user) return null;
+    const user = session.user;
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select(`
-      *,
-      salons (
-        id,
-        name,
-        slug,
-        plan
-      )
-    `)
-    .eq('id', user.id)
-    .single();
+    const { data: salon, error } = await supabase
+      .from("salons")
+      .select("*")
+      .eq("owner_id", user.id)
+      .single();
 
-  return profile;
-}
+    if (error || !salon) return null;
 
-export async function requireAuth() {
-  const profile = await getCurrentUserProfile();
-
-  if (!profile) {
-    throw new Error('Authentication required');
+    return {
+      user,
+      salon,
+      salon_id: salon.id,
+    };
+  } catch {
+    return null;
   }
-
-  return profile;
-}
-
-export async function requireOwner() {
-  const profile = await requireAuth();
-
-  if (profile.role !== 'owner') {
-    throw new Error('Owner access required');
-  }
-
-  return profile;
 }

@@ -1,776 +1,353 @@
 "use client";
-import { useEffect, useState, use } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { supabase } from "../../lib/supabase";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "../../../lib/supabase";
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
-);
+type Step = "service" | "staff" | "datetime" | "details" | "confirm";
 
-export default function BookingPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+const TIME_SLOTS = [
+  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+  "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
+];
+
+export default function PublicBookingPage() {
+  const params = useParams();
+  const slug = params?.slug as string;
+
   const [salon, setSalon] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
+  const [staffList, setStaffList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(1);
-  const [selected, setSelected] = useState({ service: null as any, staff: null as any, date: "", time: "" });
-  const [client, setClient] = useState({ name: "", email: "", phone: "" });
+  const [notFound, setNotFound] = useState(false);
+  const [step, setStep] = useState<Step>("service");
   const [booked, setBooked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [chargeNow, setChargeNow] = useState(true);
-  const [cardElement, setCardElement] = useState<any>(null);
-  const [stripe, setStripe] = useState<any>(null);
-  const [paymentError, setPaymentError] = useState("");
 
-  const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
+  // Selections
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [selectedStaff, setSelectedStaff] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedTime, setSelectedTime] = useState<string>("");
+  const [clientForm, setClientForm] = useState({ name: "", email: "", phone: "" });
 
   useEffect(() => {
     const load = async () => {
-      const stripeObj = await stripePromise;
-      setStripe(stripeObj);
-
-      const { data: salonData } = await supabase.from("salons").select("*").eq("slug", slug).single();
+      const { data: salonData } = await supabase
+        .from("salons").select("*").eq("slug", slug).single();
+      if (!salonData) { setNotFound(true); setLoading(false); return; }
       setSalon(salonData);
-      if (salonData) {
-        const { data: s } = await supabase.from("services").select("*").eq("salon_id", salonData.id);
-        const { data: st } = await supabase.from("staff").select("*").eq("salon_id", salonData.id);
-        setServices(s || []);
-        setStaff(st || []);
-      }
+
+      const { data: svcData } = await supabase
+        .from("services").select("*").eq("salon_id", salonData.id).order("name");
+      setServices(svcData || []);
+
+      const { data: staffData } = await supabase
+        .from("staff").select("*").eq("salon_id", salonData.id).eq("active", true);
+      setStaffList(staffData || []);
+
       setLoading(false);
     };
-    load();
+    if (slug) load();
   }, [slug]);
 
   const handleBook = async () => {
+    if (!clientForm.name || !clientForm.email || !selectedDate || !selectedTime) return;
     setSubmitting(true);
-    setPaymentError("");
 
-    try {
-      const dateTime = new Date(`${selected.date}T${selected.time}`);
-      
-      // Create appointment
-      const { data: appointmentData, error: appointmentError } = await supabase
-        .from("appointments")
-        .insert({
-          salon_id: salon.id,
-          service_id: selected.service.id,
-          staff_id: selected.staff?.id || null,
-          client_name: client.name,
-          client_email: client.email,
-          client_phone: client.phone,
-          date_time: dateTime.toISOString(),
-          status: chargeNow ? "pending" : "pending",
-        })
-        .select()
-        .single();
+    const dateTime = `${selectedDate}T${selectedTime}:00`;
 
-      if (appointmentError) throw appointmentError;
+    const { error } = await supabase.from("appointments").insert({
+      salon_id: salon.id,
+      service_id: selectedService?.id || null,
+      staff_id: selectedStaff?.id || null,
+      client_name: clientForm.name,
+      client_email: clientForm.email,
+      client_phone: clientForm.phone,
+      date_time: dateTime,
+      status: "confirmed",
+    });
 
-      // Process payment if service has a price
-      if (selected.service.price > 0 && stripe && cardElement) {
-        const response = await fetch("/api/create-payment-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: selected.service.price,
-            email: client.email,
-            booking_id: appointmentData.id,
-          }),
-        });
-
-        const paymentData = await response.json();
-
-        if (!response.ok || paymentData.error) {
-          setPaymentError(paymentData.error || "Payment failed");
-          setSubmitting(false);
-          return;
-        }
-
-        // Confirm payment with card
-        const { error: confirmError, paymentIntent } = 
-          await stripe.confirmCardPayment(paymentData.clientSecret, {
-            payment_method: {
-              card: cardElement,
-              billing_details: { 
-                name: client.name, 
-                email: client.email,
-              },
-            },
-          });
-
-        if (confirmError) {
-          setPaymentError(confirmError.message || "Payment failed");
-          // Delete the appointment since payment failed
-          await supabase
-            .from("appointments")
-            .delete()
-            .eq("id", appointmentData.id);
-          setSubmitting(false);
-          return;
-        }
-
-        // Payment successful - update appointment status and store payment ID
-        if (paymentIntent?.status === "succeeded") {
-          await supabase
-            .from("appointments")
-            .update({ 
-              status: "confirmed",
-              stripe_payment_id: paymentIntent.id,
-            })
-            .eq("id", appointmentData.id);
-        }
-      }
-
+    if (!error) {
+      // Send confirmation email via Supabase edge function or just mark as booked
       setBooked(true);
-      setSubmitting(false);
-
-      // Send confirmation emails
-      try {
-        await fetch('/api/send-booking-emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            appointmentId: appointmentData.id,
-            clientEmail: client.email,
-            clientName: client.name,
-            serviceName: selected.service.name,
-            dateTime: dateTime.toISOString(),
-            staffName: selected.staff?.name,
-            salonName: salon.name,
-            clientPhone: client.phone,
-            salonOwnerEmail: null, // TODO: Add salon owner email to salons table
-          }),
-        });
-      } catch (emailError) {
-        console.error('Error sending emails:', emailError);
-        // Don't fail the booking if emails fail
-      }
-    } catch (err: any) {
-      setPaymentError(err.message || "Booking failed");
-      setSubmitting(false);
     }
+    setSubmitting(false);
   };
 
+  // Generate calendar days (next 30 days)
+  const getDays = () => {
+    const days = [];
+    for (let i = 0; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      days.push(d);
+    }
+    return days;
+  };
+
+  const steps: Step[] = ["service", "staff", "datetime", "details", "confirm"];
+  const stepIndex = steps.indexOf(step);
+
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#4F6EF7" }}>Loading...</div>
+    <div style={{ minHeight: "100vh", background: "#0F0F0F", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "20px", opacity: 0.6 }}>Loading...</div>
     </div>
   );
 
-  if (!salon) return (
-    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#0F172A", marginBottom: "8px" }}>Salon not found</div>
-        <p style={{ color: "#64748B" }}>This booking link may be invalid.</p>
-      </div>
+  if (notFound) return (
+    <div style={{ minHeight: "100vh", background: "#0F0F0F", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
+      <div style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "28px" }}>Salon not found</div>
+      <div style={{ color: "#666", fontSize: "14px" }}>Check the link and try again</div>
     </div>
   );
 
   if (booked) return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#F2F4F7",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "20px",
-      "@media (max-width: 767px)": { padding: "16px" }
-    }}>
-      <div style={{
-        background: "#fff",
-        border: "0.5px solid #E8EAF0",
-        borderRadius: "16px",
-        padding: "48px",
-        maxWidth: "420px",
-        width: "100%",
-        textAlign: "center",
-        "@media (max-width: 767px)": { padding: "32px 24px" }
-      }}>
-        <div style={{
-          fontSize: "48px",
-          marginBottom: "16px",
-          "@media (max-width: 767px)": { fontSize: "40px", marginBottom: "12px" }
-        }}>
-          ✅
+    <div style={{ minHeight: "100vh", background: "#0F0F0F", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
+        <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "#ECFDF5", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: "32px" }}>✓</div>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: "28px", color: "#fff", marginBottom: "12px" }}>Booking Confirmed!</div>
+        <div style={{ fontSize: "14px", color: "#888", marginBottom: "32px", lineHeight: 1.6 }}>
+          Thank you, <strong style={{ color: "#fff" }}>{clientForm.name}</strong>!<br />
+          Your appointment at <strong style={{ color: "#fff" }}>{salon.name}</strong> is confirmed.<br />
+          A confirmation has been sent to <strong style={{ color: "#fff" }}>{clientForm.email}</strong>.
         </div>
-        <h2 style={{
-          fontFamily: "Georgia, serif",
-          fontSize: "24px",
-          color: "#0F172A",
-          marginBottom: "8px",
-          "@media (max-width: 767px)": { fontSize: "20px" }
-        }}>
-          Booking confirmed!
-        </h2>
-        <p style={{
-          fontSize: "14px",
-          color: "#64748B",
-          marginBottom: "24px",
-          "@media (max-width: 767px)": { fontSize: "13px", marginBottom: "20px" }
-        }}>
-          {selected.service?.name} on {new Date(`${selected.date}T${selected.time}`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} at {selected.time}
-        </p>
-        <p style={{
-          fontSize: "13px",
-          color: "#94A3B8",
-          "@media (max-width: 767px)": { fontSize: "12px" }
-        }}>
-          A confirmation will be sent to {client.email}
-        </p>
+        <div style={{ background: "#1A1A1A", borderRadius: "12px", padding: "20px", textAlign: "left", border: "0.5px solid #333" }}>
+          {selectedService && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ color: "#888", fontSize: "13px" }}>Service</span>
+            <span style={{ color: "#fff", fontSize: "13px" }}>{selectedService.name}</span>
+          </div>}
+          {selectedStaff && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ color: "#888", fontSize: "13px" }}>Staff</span>
+            <span style={{ color: "#fff", fontSize: "13px" }}>{selectedStaff.name}</span>
+          </div>}
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ color: "#888", fontSize: "13px" }}>Date</span>
+            <span style={{ color: "#fff", fontSize: "13px" }}>{new Date(selectedDate).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ color: "#888", fontSize: "13px" }}>Time</span>
+            <span style={{ color: "#fff", fontSize: "13px" }}>{selectedTime}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F2F4F7" }}>
+    <div style={{ minHeight: "100vh", background: "#0F0F0F", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
       {/* Header */}
-      <div style={{
-        background: "#fff",
-        borderBottom: "0.5px solid #E8EAF0",
-        padding: "20px",
-        textAlign: "center",
-        "@media (max-width: 767px)": { padding: "16px 20px" }
-      }}>
-        <div style={{
-          fontFamily: "Georgia, serif",
-          fontSize: "24px",
-          color: "#0F172A",
-          marginBottom: "4px",
-          "@media (max-width: 767px)": { fontSize: "20px" }
-        }}>
-          {salon.name}
+      <div style={{ borderBottom: "0.5px solid #1F1F1F", padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#fff", letterSpacing: "-0.5px" }}>{salon.name}</div>
+          <div style={{ fontSize: "12px", color: "#555", marginTop: "2px" }}>Online Booking</div>
         </div>
-        <div style={{ fontSize: "13px", color: "#64748B" }}>Book an appointment</div>
+        {/* Progress */}
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+          {steps.map((s, i) => (
+            <div key={s} style={{ width: i <= stepIndex ? "20px" : "6px", height: "6px", borderRadius: "3px", background: i <= stepIndex ? "#4F6EF7" : "#333", transition: "all 0.3s ease" }} />
+          ))}
+        </div>
       </div>
 
-      {/* Progress */}
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "8px",
-        padding: "24px 20px",
-        background: "#fff",
-        borderBottom: "0.5px solid #E8EAF0",
-        overflowX: "auto",
-        "@media (max-width: 767px)": { padding: "16px 20px", gap: "6px" }
-      }}>
-        {["Service", "Date & Time", "Your details"].map((s, i) => (
-          <div key={s} style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flexShrink: 0
-          }}>
-            <div style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "50%",
-              background: step >= i + 1 ? "#4F6EF7" : "#E8EAF0",
-              color: step >= i + 1 ? "#fff" : "#94A3B8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: 500,
-              "@media (max-width: 767px)": { width: "24px", height: "24px", fontSize: "11px" }
-            }}>
-              {i + 1}
-            </div>
-            <span style={{
-              fontSize: "13px",
-              color: step === i + 1 ? "#0F172A" : "#94A3B8",
-              whiteSpace: "nowrap",
-              "@media (max-width: 767px)": { fontSize: "12px" }
-            }}>
-              {s}
-            </span>
-            {i < 2 && (
-              <div style={{
-                width: "16px",
-                height: "0.5px",
-                background: "#E8EAF0",
-                "@media (max-width: 767px)": { width: "12px" }
-              }} />
-            )}
-          </div>
-        ))}
-      </div>
+      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "32px 24px" }}>
 
-      <div style={{
-        maxWidth: "560px",
-        margin: "32px auto",
-        padding: "0 20px",
-        "@media (max-width: 767px)": { margin: "20px auto", padding: "0 16px" }
-      }}>
-
-        {/* Step 1 */}
-        {step === 1 && (
+        {/* STEP 1: Service */}
+        {step === "service" && (
           <div>
-            <h3 style={{
-              fontFamily: "Georgia, serif",
-              fontSize: "22px",
-              color: "#0F172A",
-              marginBottom: "20px",
-              "@media (max-width: 767px)": { fontSize: "20px", marginBottom: "16px" }
-            }}>
-              Choose a service
-            </h3>
-            {services.length === 0 ? (
-              <div style={{
-                background: "#fff",
-                borderRadius: "12px",
-                padding: "32px",
-                textAlign: "center",
-                color: "#94A3B8",
-                "@media (max-width: 767px)": { padding: "24px 16px" }
-              }}>
-                No services available yet.
-              </div>
-            ) : (
-              services.map((s) => (
-                <div
-                  key={s.id}
-                  onClick={() => setSelected({ ...selected, service: s })}
-                  style={{
-                    background: "#fff",
-                    border: selected.service?.id === s.id ? "1.5px solid #4F6EF7" : "0.5px solid #E8EAF0",
-                    borderRadius: "12px",
-                    padding: "18px 20px",
-                    marginBottom: "10px",
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    transition: "all 0.2s",
-                    "@media (max-width: 767px)": { padding: "16px", marginBottom: "8px" }
-                  }}
-                >
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 600, color: "#fff", fontFamily: "Georgia, serif", marginBottom: "6px" }}>Choose a Service</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>What would you like today?</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {services.length === 0 ? (
+                <div style={{ color: "#666", fontSize: "14px", textAlign: "center", padding: "40px" }}>No services available</div>
+              ) : services.map((s) => (
+                <div key={s.id} onClick={() => { setSelectedService(s); setStep("staff"); }}
+                  style={{ background: selectedService?.id === s.id ? "#1A2040" : "#161616", border: `1px solid ${selectedService?.id === s.id ? "#4F6EF7" : "#222"}`, borderRadius: "12px", padding: "18px 20px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}>
                   <div>
-                    <div style={{
-                      fontSize: "15px",
-                      fontWeight: 500,
-                      color: "#0F172A",
-                      marginBottom: "4px",
-                      "@media (max-width: 767px)": { fontSize: "14px" }
-                    }}>
-                      {s.name}
-                    </div>
-                    <div style={{
-                      fontSize: "13px",
-                      color: "#64748B",
-                      "@media (max-width: 767px)": { fontSize: "12px" }
-                    }}>
-                      {s.duration_minutes} min
-                    </div>
+                    <div style={{ fontSize: "15px", fontWeight: 500, color: "#fff", marginBottom: "4px" }}>{s.name}</div>
+                    <div style={{ fontSize: "12px", color: "#666" }}>{s.duration_minutes} min</div>
                   </div>
-                  <div style={{
-                    fontSize: "18px",
-                    fontWeight: 500,
-                    color: "#4F6EF7",
-                    "@media (max-width: 767px)": { fontSize: "16px" }
-                  }}>
-                    £{s.price}
-                  </div>
+                  <div style={{ fontSize: "16px", fontWeight: 600, color: "#4F6EF7" }}>£{s.price}</div>
                 </div>
-              ))
-            )}
-
-            {staff.length > 0 && (
-              <div style={{ marginTop: "24px", "@media (max-width: 767px)": { marginTop: "20px" } }}>
-                <h3 style={{
-                  fontFamily: "Georgia, serif",
-                  fontSize: "18px",
-                  color: "#0F172A",
-                  marginBottom: "14px",
-                  "@media (max-width: 767px)": { fontSize: "16px", marginBottom: "12px" }
-                }}>
-                  Choose a stylist (optional)
-                </h3>
-                <div style={{
-                  display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                  "@media (max-width: 767px)": { gap: "8px" }
-                }}>
-                  {staff.map((st) => (
-                    <div
-                      key={st.id}
-                      onClick={() => setSelected({ ...selected, staff: st })}
-                      style={{
-                        background: "#fff",
-                        border: selected.staff?.id === st.id ? "1.5px solid #4F6EF7" : "0.5px solid #E8EAF0",
-                        borderRadius: "10px",
-                        padding: "12px 18px",
-                        cursor: "pointer",
-                        fontSize: "13px",
-                        color: selected.staff?.id === st.id ? "#4F6EF7" : "#0F172A",
-                        transition: "all 0.2s",
-                        "@media (max-width: 767px)": { padding: "10px 14px", fontSize: "12px" }
-                      }}
-                    >
-                      {st.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setStep(2)}
-              disabled={!selected.service}
-              style={{
-                marginTop: "24px",
-                width: "100%",
-                padding: "12px",
-                background: selected.service ? "#4F6EF7" : "#E8EAF0",
-                color: selected.service ? "#fff" : "#94A3B8",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: 500,
-                cursor: selected.service ? "pointer" : "not-allowed",
-                "@media (max-width: 767px)": { marginTop: "20px", padding: "14px", fontSize: "15px" }
-              }}
-            >
-              Continue →
-            </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Step 2 */}
-        {step === 2 && (
+        {/* STEP 2: Staff */}
+        {step === "staff" && (
           <div>
-            <h3 style={{
-              fontFamily: "Georgia, serif",
-              fontSize: "22px",
-              color: "#0F172A",
-              marginBottom: "20px",
-              "@media (max-width: 767px)": { fontSize: "20px", marginBottom: "16px" }
-            }}>
-              Pick a date & time
-            </h3>
-            <div style={{
-              background: "#fff",
-              border: "0.5px solid #E8EAF0",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "16px",
-              "@media (max-width: 767px)": { padding: "16px" }
-            }}>
-              <label style={{
-                fontSize: "13px",
-                fontWeight: 500,
-                color: "#0F172A",
-                display: "block",
-                marginBottom: "8px",
-                "@media (max-width: 767px)": { fontSize: "12px" }
-              }}>
-                Select date
-              </label>
-              <input
-                type="date"
-                value={selected.date}
-                onChange={(e) => setSelected({ ...selected, date: e.target.value })}
-                min={new Date().toISOString().split("T")[0]}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  border: "0.5px solid #E8EAF0",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  color: "#0F172A",
-                  outline: "none",
-                  boxSizing: "border-box",
-                  "@media (max-width: 767px)": { padding: "12px 14px", fontSize: "16px" }
-                }}
-              />
+            <button onClick={() => setStep("service")} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "13px", marginBottom: "20px", padding: 0, display: "flex", alignItems: "center", gap: "6px" }}>← Back</button>
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 600, color: "#fff", fontFamily: "Georgia, serif", marginBottom: "6px" }}>Choose a Stylist</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>Or skip to see all availability</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {/* No preference option */}
+              <div onClick={() => { setSelectedStaff(null); setStep("datetime"); }}
+                style={{ background: "#161616", border: "1px solid #222", borderRadius: "12px", padding: "18px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", transition: "all 0.2s" }}>
+                <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "#2A2A2A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>✨</div>
+                <div>
+                  <div style={{ fontSize: "15px", fontWeight: 500, color: "#fff" }}>No Preference</div>
+                  <div style={{ fontSize: "12px", color: "#666" }}>Any available stylist</div>
+                </div>
+              </div>
+              {staffList.map((s) => (
+                <div key={s.id} onClick={() => { setSelectedStaff(s); setStep("datetime"); }}
+                  style={{ background: selectedStaff?.id === s.id ? "#1A2040" : "#161616", border: `1px solid ${selectedStaff?.id === s.id ? "#4F6EF7" : "#222"}`, borderRadius: "12px", padding: "18px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", transition: "all 0.2s" }}>
+                  <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "#4F6EF7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: 700, color: "#fff" }}>
+                    {s.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "15px", fontWeight: 500, color: "#fff" }}>{s.name}</div>
+                    <div style={{ fontSize: "12px", color: "#666", textTransform: "capitalize" }}>{s.role}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: Date & Time */}
+        {step === "datetime" && (
+          <div>
+            <button onClick={() => setStep("staff")} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "13px", marginBottom: "20px", padding: 0 }}>← Back</button>
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 600, color: "#fff", fontFamily: "Georgia, serif", marginBottom: "6px" }}>Pick a Date & Time</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>Next 30 days available</div>
             </div>
 
-            {selected.date && (
-              <div style={{
-                background: "#fff",
-                border: "0.5px solid #E8EAF0",
-                borderRadius: "12px",
-                padding: "20px",
-                marginBottom: "16px",
-                "@media (max-width: 767px)": { padding: "16px" }
-              }}>
-                <label style={{
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  color: "#0F172A",
-                  display: "block",
-                  marginBottom: "12px",
-                  "@media (max-width: 767px)": { fontSize: "12px", marginBottom: "10px" }
-                }}>
-                  Select time
-                </label>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))",
-                  gap: "8px",
-                  "@media (max-width: 767px)": { gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))", gap: "6px" }
-                }}>
-                  {times.map((t) => (
-                    <div
-                      key={t}
-                      onClick={() => setSelected({ ...selected, time: t })}
-                      style={{
-                        padding: "8px",
-                        textAlign: "center",
-                        border: selected.time === t ? "1.5px solid #4F6EF7" : "0.5px solid #E8EAF0",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        color: selected.time === t ? "#4F6EF7" : "#0F172A",
-                        cursor: "pointer",
-                        background: selected.time === t ? "#EEF2FF" : "#fff",
-                        transition: "all 0.2s",
-                        "@media (max-width: 767px)": { padding: "10px 6px", fontSize: "12px" }
-                      }}
-                    >
-                      {t}
+            {/* Date picker */}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "12px", color: "#666", marginBottom: "12px", letterSpacing: "1px" }}>SELECT DATE</div>
+              <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "8px" }}>
+                {getDays().map((d) => {
+                  const key = d.toISOString().slice(0, 10);
+                  const isSelected = selectedDate === key;
+                  const isToday = d.toDateString() === new Date().toDateString();
+                  return (
+                    <div key={key} onClick={() => setSelectedDate(key)}
+                      style={{ minWidth: "60px", padding: "12px 8px", borderRadius: "10px", background: isSelected ? "#4F6EF7" : "#161616", border: `1px solid ${isSelected ? "#4F6EF7" : "#222"}`, cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}>
+                      <div style={{ fontSize: "10px", color: isSelected ? "#B8C8FF" : "#666", marginBottom: "4px" }}>
+                        {d.toLocaleDateString("en-GB", { weekday: "short" })}
+                      </div>
+                      <div style={{ fontSize: "16px", fontWeight: 600, color: isSelected ? "#fff" : "#fff" }}>
+                        {d.getDate()}
+                      </div>
+                      {isToday && <div style={{ fontSize: "9px", color: isSelected ? "#B8C8FF" : "#4F6EF7", marginTop: "2px" }}>Today</div>}
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Time slots */}
+            {selectedDate && (
+              <div>
+                <div style={{ fontSize: "12px", color: "#666", marginBottom: "12px", letterSpacing: "1px" }}>SELECT TIME</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+                  {TIME_SLOTS.map((t) => {
+                    const isSelected = selectedTime === t;
+                    return (
+                      <div key={t} onClick={() => setSelectedTime(t)}
+                        style={{ padding: "10px", borderRadius: "8px", background: isSelected ? "#4F6EF7" : "#161616", border: `1px solid ${isSelected ? "#4F6EF7" : "#222"}`, cursor: "pointer", textAlign: "center", fontSize: "13px", color: isSelected ? "#fff" : "#aaa", transition: "all 0.2s" }}>
+                        {t}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            <div style={{
-              display: "flex",
-              gap: "10px",
-              "@media (max-width: 767px)": { flexDirection: "column", gap: "8px" }
-            }}>
-              <button
-                onClick={() => setStep(1)}
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  background: "#fff",
-                  color: "#0F172A",
-                  border: "0.5px solid #E8EAF0",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  cursor: "pointer",
-                  "@media (max-width: 767px)": { padding: "14px", fontSize: "15px" }
-                }}
-              >
-                ← Back
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={!selected.date || !selected.time}
-                style={{
-                  flex: 2,
-                  padding: "12px",
-                  background: selected.date && selected.time ? "#4F6EF7" : "#E8EAF0",
-                  color: selected.date && selected.time ? "#fff" : "#94A3B8",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  cursor: selected.date && selected.time ? "pointer" : "not-allowed",
-                  "@media (max-width: 767px)": { flex: "none", padding: "14px", fontSize: "15px" }
-                }}
-              >
+            {selectedDate && selectedTime && (
+              <button onClick={() => setStep("details")}
+                style={{ width: "100%", marginTop: "24px", padding: "14px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 500, cursor: "pointer" }}>
                 Continue →
               </button>
-            </div>
+            )}
           </div>
         )}
 
-        {/* Step 3 */}
-        {step === 3 && (
+        {/* STEP 4: Client Details */}
+        {step === "details" && (
           <div>
-            <h3 style={{
-              fontFamily: "Georgia, serif",
-              fontSize: "22px",
-              color: "#0F172A",
-              marginBottom: "20px",
-              "@media (max-width: 767px)": { fontSize: "20px", marginBottom: "16px" }
-            }}>
-              Your details
-            </h3>
-            <div style={{
-              background: "#EEF2FF",
-              border: "0.5px solid #C7D2FE",
-              borderRadius: "10px",
-              padding: "16px",
-              marginBottom: "20px",
-              fontSize: "13px",
-              color: "#4F6EF7",
-              "@media (max-width: 767px)": { padding: "14px", fontSize: "12px", marginBottom: "16px" }
-            }}>
-              <strong>{selected.service?.name}</strong> — £{selected.service?.price} · {selected.date} at {selected.time}
-              {selected.staff && ` · with ${selected.staff.name}`}
+            <button onClick={() => setStep("datetime")} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "13px", marginBottom: "20px", padding: 0 }}>← Back</button>
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 600, color: "#fff", fontFamily: "Georgia, serif", marginBottom: "6px" }}>Your Details</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>We'll send confirmation to your email</div>
             </div>
-
-            {paymentError && (
-              <div style={{
-                background: "#FEF2F2",
-                border: "0.5px solid #FECACA",
-                borderRadius: "8px",
-                padding: "12px 16px",
-                marginBottom: "16px",
-                fontSize: "13px",
-                color: "#EF4444",
-                "@media (max-width: 767px)": { padding: "10px 14px", fontSize: "12px" }
-              }}>
-                {paymentError}
-              </div>
-            )}
-
-            <div style={{
-              background: "#fff",
-              border: "0.5px solid #E8EAF0",
-              borderRadius: "12px",
-              padding: "24px",
-              marginBottom: "16px",
-              "@media (max-width: 767px)": { padding: "20px" }
-            }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               {[
-                { label: "Full name", key: "name", type: "text", placeholder: "Emma Wilson" },
-                { label: "Email address", key: "email", type: "email", placeholder: "emma@email.co.uk" },
-                { label: "Phone number", key: "phone", type: "tel", placeholder: "+44 7700 000000" },
+                { label: "Full Name", key: "name", type: "text", placeholder: "Sarah Johnson", required: true },
+                { label: "Email Address", key: "email", type: "email", placeholder: "sarah@email.com", required: true },
+                { label: "Phone Number", key: "phone", type: "tel", placeholder: "+44 7700 900000", required: false },
               ].map((f) => (
-                <div key={f.key} style={{ marginBottom: "16px", "@media (max-width: 767px)": { marginBottom: "14px" } }}>
-                  <label style={{
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    color: "#0F172A",
-                    display: "block",
-                    marginBottom: "6px",
-                    "@media (max-width: 767px)": { fontSize: "12px", marginBottom: "4px" }
-                  }}>
-                    {f.label}
+                <div key={f.key}>
+                  <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "6px", letterSpacing: "0.5px" }}>
+                    {f.label} {f.required && <span style={{ color: "#4F6EF7" }}>*</span>}
                   </label>
                   <input
                     type={f.type}
                     placeholder={f.placeholder}
-                    value={(client as any)[f.key]}
-                    onChange={(e) => setClient({ ...client, [f.key]: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "10px 14px",
-                      border: "0.5px solid #E8EAF0",
-                      borderRadius: "8px",
-                      fontSize: "14px",
-                      color: "#0F172A",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      "@media (max-width: 767px)": { padding: "12px 14px", fontSize: "16px" }
-                    }}
+                    value={(clientForm as any)[f.key]}
+                    onChange={(e) => setClientForm({ ...clientForm, [f.key]: e.target.value })}
+                    style={{ width: "100%", padding: "13px 16px", background: "#161616", border: "1px solid #222", borderRadius: "10px", fontSize: "14px", color: "#fff", fontFamily: "inherit", boxSizing: "border-box", outline: "none" }}
                   />
                 </div>
               ))}
             </div>
+            <button
+              onClick={() => { if (clientForm.name && clientForm.email) setStep("confirm"); }}
+              disabled={!clientForm.name || !clientForm.email}
+              style={{ width: "100%", marginTop: "24px", padding: "14px", background: clientForm.name && clientForm.email ? "#4F6EF7" : "#222", color: clientForm.name && clientForm.email ? "#fff" : "#555", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 500, cursor: clientForm.name && clientForm.email ? "pointer" : "not-allowed" }}>
+              Review Booking →
+            </button>
+          </div>
+        )}
 
-            {selected.service?.price > 0 && (
-              <div style={{
-                background: "#fff",
-                border: "0.5px solid #E8EAF0",
-                borderRadius: "12px",
-                padding: "20px",
-                marginBottom: "16px",
-                "@media (max-width: 767px)": { padding: "16px" }
-              }}>
-                <div style={{ marginBottom: "16px", "@media (max-width: 767px)": { marginBottom: "14px" } }}>
-                  <label style={{
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    color: "#0F172A",
-                    display: "block",
-                    marginBottom: "10px",
-                    "@media (max-width: 767px)": { fontSize: "12px", marginBottom: "8px" }
-                  }}>
-                    Card details
-                  </label>
-                  <div
-                    ref={(el) => {
-                      if (el && !cardElement && stripe) {
-                        const elements = stripe.elements();
-                        const element = elements.create("card");
-                        element.mount(el);
-                        setCardElement(element);
-                      }
-                    }}
-                    style={{
-                      padding: "12px",
-                      border: "0.5px solid #E8EAF0",
-                      borderRadius: "6px",
-                      background: "#fff",
-                      "@media (max-width: 767px)": { padding: "14px" }
-                    }}
-                  />
-                </div>
-                <div style={{
-                  fontSize: "14px",
-                  color: "#0F172A",
-                  fontWeight: 500,
-                  "@media (max-width: 767px)": { fontSize: "13px" }
-                }}>
-                  Total: £{selected.service?.price}
-                </div>
-              </div>
-            )}
+        {/* STEP 5: Confirm */}
+        {step === "confirm" && (
+          <div>
+            <button onClick={() => setStep("details")} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "13px", marginBottom: "20px", padding: 0 }}>← Back</button>
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 600, color: "#fff", fontFamily: "Georgia, serif", marginBottom: "6px" }}>Confirm Booking</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>Please review your appointment details</div>
+            </div>
 
-            <div style={{
-              display: "flex",
-              gap: "10px",
-              "@media (max-width: 767px)": { flexDirection: "column", gap: "8px" }
-            }}>
-              <button
-                onClick={() => setStep(2)}
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  background: "#fff",
-                  color: "#0F172A",
-                  border: "0.5px solid #E8EAF0",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  cursor: "pointer",
-                  "@media (max-width: 767px)": { padding: "14px", fontSize: "15px" }
-                }}
-              >
-                ← Back
-              </button>
-              <button
-                onClick={handleBook}
-                disabled={!client.name || !client.email || submitting || (selected.service?.price > 0 && !cardElement)}
-                style={{
-                  flex: 2,
-                  padding: "12px",
-                  background: client.name && client.email && (selected.service?.price === 0 || cardElement) ? "#4F6EF7" : "#E8EAF0",
-                  color: client.name && client.email && (selected.service?.price === 0 || cardElement) ? "#fff" : "#94A3B8",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  cursor: client.name && client.email && (selected.service?.price === 0 || cardElement) ? "pointer" : "not-allowed",
-                  "@media (max-width: 767px)": { flex: "none", padding: "14px", fontSize: "15px" }
-                }}
-              >
-                {submitting ? "Processing..." : "Confirm booking"}
-              </button>
+            <div style={{ background: "#161616", borderRadius: "14px", padding: "24px", border: "0.5px solid #222", marginBottom: "20px" }}>
+              {[
+                { label: "Salon", value: salon.name },
+                { label: "Service", value: selectedService?.name || "Not selected" },
+                { label: "Duration", value: selectedService ? `${selectedService.duration_minutes} min` : "—" },
+                { label: "Price", value: selectedService ? `£${selectedService.price}` : "—" },
+                { label: "Stylist", value: selectedStaff?.name || "No preference" },
+                { label: "Date", value: new Date(selectedDate).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
+                { label: "Time", value: selectedTime },
+                { label: "Name", value: clientForm.name },
+                { label: "Email", value: clientForm.email },
+                { label: "Phone", value: clientForm.phone || "—" },
+              ].map((item, i, arr) => (
+                <div key={item.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 0", borderBottom: i < arr.length - 1 ? "0.5px solid #222" : "none" }}>
+                  <span style={{ fontSize: "13px", color: "#666" }}>{item.label}</span>
+                  <span style={{ fontSize: "13px", color: "#fff", textAlign: "right", maxWidth: "60%" }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={handleBook} disabled={submitting}
+              style={{ width: "100%", padding: "16px", background: submitting ? "#333" : "#4F6EF7", color: "#fff", border: "none", borderRadius: "12px", fontSize: "16px", fontWeight: 600, cursor: submitting ? "not-allowed" : "pointer", letterSpacing: "0.3px" }}>
+              {submitting ? "Confirming..." : "Confirm Booking ✓"}
+            </button>
+            <div style={{ textAlign: "center", marginTop: "12px", fontSize: "12px", color: "#555" }}>
+              A confirmation email will be sent to {clientForm.email}
             </div>
           </div>
         )}
 
       </div>
-
-      <div style={{
-        textAlign: "center",
-        padding: "32px",
-        fontSize: "12px",
-        color: "#CBD5E1",
-        "@media (max-width: 767px)": { padding: "24px 16px", fontSize: "11px" }
-      }}>
-        Powered by <span style={{ fontFamily: "Georgia, serif", color: "#4F6EF7" }}>feature</span>
-      </div>
-
     </div>
   );
 }
