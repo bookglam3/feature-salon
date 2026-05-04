@@ -66,6 +66,22 @@ export default function DashboardPage() {
       date_time,
       status: "confirmed",
     });
+    const selectedService = services.find(s => s.id === formData.service_id);
+const selectedStaff = staff.find(s => s.id === formData.staff_id);
+await fetch("/api/send-booking-emails", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    clientEmail: formData.client_email,
+    clientName: formData.client_name,
+    clientPhone: formData.client_phone,
+    serviceName: selectedService?.name || "Service",
+    dateTime: date_time,
+    staffName: selectedStaff?.name,
+    salonName: salon.name,
+    salonOwnerEmail: salon.owner_email,
+  }),
+});
     setShowModal(false);
     setFormData({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
     const { data: appts } = await supabase.from("appointments")
