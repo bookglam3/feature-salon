@@ -15,17 +15,19 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [origin, setOrigin] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     client_name: "", client_email: "", client_phone: "",
     service_id: "", staff_id: "", date: "", time: "",
   });
 
-  const timeSlots = ["09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30"];
+  const timeSlots = [
+    "09:00","09:30","10:00","10:30","11:00","11:30","12:00",
+    "12:30","13:00","13:30","14:00","14:30","15:00","15:30",
+    "16:00","16:30","17:00","17:30",
+  ];
 
-  // SSR-safe: window sirf client par available hai
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
+  useEffect(() => { setOrigin(window.location.origin); }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -66,7 +68,10 @@ export default function DashboardPage() {
     });
     setShowModal(false);
     setFormData({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
-    const { data: appts } = await supabase.from("appointments").select("*, services(name,price), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
+    const { data: appts } = await supabase.from("appointments")
+      .select("*, services(name,price), staff(name)")
+      .eq("salon_id", salon.id)
+      .order("date_time", { ascending: true });
     setAppointments(appts || []);
   };
 
@@ -78,10 +83,24 @@ export default function DashboardPage() {
   };
 
   const bookingLink = `${origin}/book/${salon?.slug}`;
-
-  const todayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === new Date().toDateString());
+  const todayAppts = appointments.filter(
+    a => new Date(a.date_time).toDateString() === new Date().toDateString()
+  );
   const revenue = todayAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0);
-  const filteredAppts = activeTab === "Today" ? todayAppts : activeTab === "Upcoming" ? appointments.filter(a => new Date(a.date_time) > new Date()) : appointments;
+  const filteredAppts =
+    activeTab === "Today" ? todayAppts :
+    activeTab === "Upcoming" ? appointments.filter(a => new Date(a.date_time) > new Date()) :
+    appointments;
+
+  const navItems = [
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Bookings",  path: "/dashboard/bookings" },
+    { label: "Clients",   path: "/dashboard/clients" },
+    { label: "Staff",     path: "/dashboard/staff" },
+    { label: "Payments",  path: "/dashboard/payments" },
+    { label: "Reports",   path: "/dashboard/reports" },
+    { label: "Settings",  path: "/dashboard/settings" },
+  ];
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F2F4F7" }}>
@@ -90,183 +109,383 @@ export default function DashboardPage() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex" }}>
-      {/* Sidebar */}
-      <div style={{ width: "220px", background: "#fff", borderRight: "0.5px solid #E8EAF0", flexShrink: 0, display: "flex", flexDirection: "column" }}>
-        <div style={{ padding: "22px 20px", borderBottom: "0.5px solid #E8EAF0" }}>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#0F172A" }}>feature</div>
-        </div>
-        <div style={{ padding: "8px 0", flex: 1 }}>
-          {[
-            { label: "Dashboard", path: "/dashboard" },
-            { label: "Bookings", path: "/dashboard/bookings" },
-            { label: "Clients", path: "/dashboard/clients" },
-            { label: "Staff", path: "/dashboard/staff" },
-          ].map((item) => (
-            <div key={item.label} onClick={() => router.push(item.path)}
-              style={{ padding: "9px 20px", fontSize: "13px", color: item.path === "/dashboard" ? "#4F6EF7" : "#64748B", background: item.path === "/dashboard" ? "#EEF2FF" : "transparent", borderRight: item.path === "/dashboard" ? "2px solid #4F6EF7" : "none", cursor: "pointer" }}>
-              {item.label}
-            </div>
-          ))}
-          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>FINANCE</div>
-          <div onClick={() => router.push("/dashboard/payments")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Payments</div>
-          <div onClick={() => router.push("/dashboard/reports")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Reports</div>
-          <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>SYSTEM</div>
-          <div onClick={() => router.push("/dashboard/settings")} style={{ padding: "9px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>Settings</div>
-        </div>
-        <div style={{ padding: "16px 20px", borderTop: "0.5px solid #E8EAF0" }}>
-          <div style={{ fontSize: "12px", color: "#64748B", marginBottom: "8px" }}>{salon?.name}</div>
-          <button onClick={handleLogout} style={{ fontSize: "12px", color: "#EF4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Sign out</button>
-        </div>
-      </div>
+    <>
+      {/* ── Global responsive styles ── */}
+      <style>{`
+        * { box-sizing: border-box; }
 
-      {/* Main */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* Topbar */}
-        <div style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ fontSize: "17px", fontWeight: 500, color: "#0F172A" }}>Good morning 👋</div>
-            <div style={{ fontSize: "12px", color: "#94A3B8" }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
+        /* Sidebar overlay on mobile */
+        .sidebar-overlay {
+          display: none;
+          position: fixed; inset: 0;
+          background: rgba(0,0,0,0.35);
+          z-index: 40;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* Sidebar */
+        .sidebar {
+          position: fixed; top: 0; left: 0; bottom: 0;
+          width: 220px;
+          background: #fff;
+          border-right: 0.5px solid #E8EAF0;
+          display: flex; flex-direction: column;
+          z-index: 50;
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+        }
+        @media (min-width: 768px) {
+          .sidebar { position: relative; transform: none !important; }
+          .sidebar-overlay { display: none !important; }
+          .hamburger { display: none !important; }
+          .main-layout { margin-left: 0; }
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        /* Stats grid: 2-col on mobile, 4-col on desktop */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          margin-bottom: 16px;
+        }
+        @media (min-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Booking banner */
+        .booking-banner {
+          background: linear-gradient(135deg, #4F6EF7 0%, #7C3AED 100%);
+          border-radius: 12px;
+          padding: 16px 18px;
+          margin-bottom: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        @media (min-width: 600px) {
+          .booking-banner {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+          }
+        }
+        .banner-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* Table hidden on mobile — show cards instead */
+        .appt-table { display: none; }
+        .appt-cards { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+        @media (min-width: 768px) {
+          .appt-table { display: table; width: 100%; border-collapse: collapse; }
+          .appt-cards { display: none; }
+        }
+
+        /* Modal: full-screen on mobile */
+        .modal-box {
+          background: #fff;
+          border-radius: 12px;
+          padding: 24px 20px;
+          width: 100%;
+          max-width: 440px;
+          max-height: 95vh;
+          overflow-y: auto;
+          margin: 0 12px;
+        }
+        @media (max-width: 480px) {
+          .modal-box {
+            border-radius: 16px 16px 0 0;
+            margin: 0;
+            max-height: 92vh;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+          }
+        }
+
+        /* Topbar booking button — compact on mobile */
+        .new-booking-btn {
+          background: #4F6EF7; color: #fff;
+          font-size: 13px; padding: 8px 18px;
+          border-radius: 8px; border: none; cursor: pointer;
+          white-space: nowrap;
+        }
+        @media (max-width: 480px) {
+          .new-booking-btn { padding: 8px 12px; font-size: 12px; }
+        }
+
+        /* Appointment card (mobile) */
+        .appt-card {
+          background: #fff;
+          border: 0.5px solid #E8EAF0;
+          border-radius: 10px;
+          padding: 14px;
+        }
+        .appt-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .appt-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .appt-card-field { font-size: 11px; color: #94A3B8; }
+        .appt-card-val { font-size: 13px; color: #0F172A; font-weight: 500; }
+        .status-badge {
+          font-size: 10px; padding: 3px 9px;
+          border-radius: 20px; display: inline-block;
+        }
+      `}</style>
+
+      <div style={{ minHeight: "100vh", background: "#F2F4F7", display: "flex" }}>
+
+        {/* Sidebar overlay (mobile) */}
+        <div className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
+
+        {/* ── Sidebar ── */}
+        <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+          <div style={{ padding: "20px", borderBottom: "0.5px solid #E8EAF0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#0F172A" }}>feature</div>
+            {/* Close btn (mobile only) */}
+            <button onClick={() => setSidebarOpen(false)}
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#94A3B8", display: "block" }}
+              className="hamburger">✕</button>
           </div>
-          <button onClick={() => setShowModal(true)} style={{ background: "#4F6EF7", color: "#fff", fontSize: "13px", padding: "8px 18px", borderRadius: "8px", border: "none", cursor: "pointer" }}>+ New Booking</button>
-        </div>
 
-        <div style={{ padding: "24px", flex: 1 }}>
-
-          {/* BOOKING LINK BANNER */}
-          <div style={{ background: "linear-gradient(135deg, #4F6EF7 0%, #7C3AED 100%)", borderRadius: "12px", padding: "18px 22px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-            <div>
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "4px" }}>🔗 Your Booking Link</div>
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", fontFamily: "monospace" }}>
-                {salon?.slug ? bookingLink : "Loading..."}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button onClick={handleCopyLink}
-                style={{ padding: "8px 18px", background: copied ? "#10B981" : "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500, transition: "background 0.2s" }}>
-                {copied ? "✓ Copied!" : "Copy Link"}
-              </button>
-              <button onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
-                style={{ padding: "8px 18px", background: "#fff", color: "#4F6EF7", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}>
-                Preview ↗
-              </button>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "20px" }}>
-            {[
-              { label: "Today's bookings", value: todayAppts.length.toString() },
-              { label: "Revenue today", value: `£${revenue}` },
-              { label: "Total bookings", value: appointments.length.toString() },
-              { label: "Plan", value: salon?.plan || "Starter" },
-            ].map((s) => (
-              <div key={s.label} style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", padding: "16px" }}>
-                <div style={{ fontSize: "11px", color: "#94A3B8", marginBottom: "8px" }}>{s.label}</div>
-                <div style={{ fontSize: "22px", fontWeight: 500, color: "#0F172A" }}>{s.value}</div>
+          <div style={{ padding: "8px 0", flex: 1 }}>
+            {navItems.slice(0, 4).map(item => (
+              <div key={item.label} onClick={() => { router.push(item.path); setSidebarOpen(false); }}
+                style={{
+                  padding: "10px 20px", fontSize: "13px", cursor: "pointer",
+                  color: item.path === "/dashboard" ? "#4F6EF7" : "#64748B",
+                  background: item.path === "/dashboard" ? "#EEF2FF" : "transparent",
+                  borderRight: item.path === "/dashboard" ? "2px solid #4F6EF7" : "none",
+                }}>
+                {item.label}
               </div>
             ))}
+            <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>FINANCE</div>
+            {navItems.slice(4, 6).map(item => (
+              <div key={item.label} onClick={() => { router.push(item.path); setSidebarOpen(false); }}
+                style={{ padding: "10px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>
+                {item.label}
+              </div>
+            ))}
+            <div style={{ padding: "12px 20px 4px", fontSize: "9px", color: "#CBD5E1", letterSpacing: "2px" }}>SYSTEM</div>
+            <div onClick={() => { router.push("/dashboard/settings"); setSidebarOpen(false); }}
+              style={{ padding: "10px 20px", fontSize: "13px", color: "#64748B", cursor: "pointer" }}>
+              Settings
+            </div>
           </div>
 
-          {/* Appointments Table */}
-          <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "0.5px solid #E8EAF0" }}>
-              <div style={{ fontSize: "13px", fontWeight: 500 }}>Appointments</div>
-              <div style={{ display: "flex", gap: "4px" }}>
-                {["All", "Today", "Upcoming"].map((tab) => (
-                  <button key={tab} onClick={() => setActiveTab(tab)}
-                    style={{ fontSize: "11px", padding: "4px 12px", borderRadius: "6px", border: "0.5px solid", borderColor: activeTab === tab ? "#C7D2FE" : "#E8EAF0", background: activeTab === tab ? "#EEF2FF" : "#fff", color: activeTab === tab ? "#4F6EF7" : "#94A3B8", cursor: "pointer" }}>
-                    {tab}
-                  </button>
-                ))}
+          <div style={{ padding: "16px 20px", borderTop: "0.5px solid #E8EAF0" }}>
+            <div style={{ fontSize: "12px", color: "#64748B", marginBottom: "8px" }}>{salon?.name}</div>
+            <button onClick={handleLogout}
+              style={{ fontSize: "12px", color: "#EF4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              Sign out
+            </button>
+          </div>
+        </div>
+
+        {/* ── Main ── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+
+          {/* Topbar */}
+          <div style={{ background: "#fff", borderBottom: "0.5px solid #E8EAF0", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {/* Hamburger (mobile) */}
+              <button className="hamburger" onClick={() => setSidebarOpen(true)}
+                style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", flexDirection: "column", gap: "5px" }}>
+                <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0F172A" }} />
+                <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0F172A" }} />
+                <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0F172A" }} />
+              </button>
+              <div>
+                <div style={{ fontSize: "15px", fontWeight: 500, color: "#0F172A" }}>Good morning 👋</div>
+                <div style={{ fontSize: "11px", color: "#94A3B8" }}>
+                  {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+                </div>
               </div>
             </div>
-            {filteredAppts.length === 0 ? (
-              <div style={{ padding: "48px", textAlign: "center", color: "#94A3B8", fontSize: "14px" }}>
-                No appointments yet — share your booking link to get started!
+            <button onClick={() => setShowModal(true)} className="new-booking-btn">+ New Booking</button>
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: "16px", flex: 1, overflowY: "auto" }}>
+
+            {/* Booking link banner */}
+            <div className="booking-banner">
+              <div>
+                <div style={{ fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "4px" }}>🔗 Your Booking Link</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", fontFamily: "monospace", wordBreak: "break-all" }}>
+                  {salon?.slug ? bookingLink : "Loading..."}
+                </div>
               </div>
-            ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ background: "#F8F9FC" }}>
-                    {["Status","Client","Service","Staff","Date & Time","Amount"].map(h => (
-                      <th key={h} style={{ fontSize: "11px", color: "#94A3B8", textAlign: "left", padding: "10px 18px", fontWeight: 500 }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredAppts.map(a => (
-                    <tr key={a.id}>
-                      <td style={{ padding: "11px 18px", borderBottom: "0.5px solid #F1F5F9" }}>
-                        <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : a.status === "cancelled" ? "#FEE2E2" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : a.status === "cancelled" ? "#DC2626" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>
-                          {a.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.client_name}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.services?.name || "—"}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{a.staff?.name || "—"}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
-                      <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>£{a.services?.price || "—"}</td>
-                    </tr>
+              <div className="banner-btns">
+                <button onClick={handleCopyLink}
+                  style={{ padding: "8px 16px", background: copied ? "#10B981" : "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}>
+                  {copied ? "✓ Copied!" : "Copy Link"}
+                </button>
+                <button onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
+                  style={{ padding: "8px 16px", background: "#fff", color: "#4F6EF7", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}>
+                  Preview ↗
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="stats-grid">
+              {[
+                { label: "Today's bookings", value: todayAppts.length.toString() },
+                { label: "Revenue today",    value: `£${revenue}` },
+                { label: "Total bookings",   value: appointments.length.toString() },
+                { label: "Plan",             value: salon?.plan || "Starter" },
+              ].map(s => (
+                <div key={s.label} style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", padding: "14px" }}>
+                  <div style={{ fontSize: "11px", color: "#94A3B8", marginBottom: "6px" }}>{s.label}</div>
+                  <div style={{ fontSize: "20px", fontWeight: 500, color: "#0F172A" }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Appointments */}
+            <div style={{ background: "#fff", border: "0.5px solid #E8EAF0", borderRadius: "10px", overflow: "hidden" }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "0.5px solid #E8EAF0", flexWrap: "wrap", gap: "8px" }}>
+                <div style={{ fontSize: "13px", fontWeight: 500 }}>Appointments</div>
+                <div style={{ display: "flex", gap: "4px" }}>
+                  {["All", "Today", "Upcoming"].map(tab => (
+                    <button key={tab} onClick={() => setActiveTab(tab)}
+                      style={{ fontSize: "11px", padding: "4px 12px", borderRadius: "6px", border: "0.5px solid", borderColor: activeTab === tab ? "#C7D2FE" : "#E8EAF0", background: activeTab === tab ? "#EEF2FF" : "#fff", color: activeTab === tab ? "#4F6EF7" : "#94A3B8", cursor: "pointer" }}>
+                      {tab}
+                    </button>
                   ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* New Booking Modal */}
-      {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#fff", borderRadius: "12px", padding: "28px", width: "440px", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ fontSize: "16px", fontWeight: 500, marginBottom: "20px" }}>New Booking</div>
-            {[
-              { label: "Client Name", key: "client_name", type: "text", placeholder: "Sarah Johnson" },
-              { label: "Client Email", key: "client_email", type: "email", placeholder: "sarah@email.com" },
-              { label: "Client Phone", key: "client_phone", type: "text", placeholder: "+44 7700 900000" },
-              { label: "Date", key: "date", type: "date", placeholder: "" },
-            ].map(f => (
-              <div key={f.key} style={{ marginBottom: "14px" }}>
-                <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>{f.label}</label>
-                <input type={f.type} placeholder={f.placeholder} value={(formData as any)[f.key]}
-                  onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
-                  style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", boxSizing: "border-box", fontFamily: "inherit" }} />
+                </div>
               </div>
-            ))}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Time</label>
-              <select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })}
-                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
-                <option value="">Select time</option>
-                {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Service</label>
-              <select value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}
-                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
-                <option value="">Select service</option>
-                {services.map(s => <option key={s.id} value={s.id}>{s.name} — £{s.price}</option>)}
-              </select>
-            </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>Staff</label>
-              <select value={formData.staff_id} onChange={e => setFormData({ ...formData, staff_id: e.target.value })}
-                style={{ width: "100%", padding: "9px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit" }}>
-                <option value="">Select staff</option>
-                {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => setShowModal(false)}
-                style={{ flex: 1, padding: "10px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "13px", cursor: "pointer", background: "#fff" }}>Cancel</button>
-              <button onClick={handleNewBooking}
-                style={{ flex: 1, padding: "10px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer" }}>Create Booking</button>
+
+              {filteredAppts.length === 0 ? (
+                <div style={{ padding: "48px", textAlign: "center", color: "#94A3B8", fontSize: "14px" }}>
+                  No appointments yet — share your booking link to get started!
+                </div>
+              ) : (
+                <>
+                  {/* Desktop table */}
+                  <table className="appt-table">
+                    <thead>
+                      <tr style={{ background: "#F8F9FC" }}>
+                        {["Status","Client","Service","Staff","Date & Time","Amount"].map(h => (
+                          <th key={h} style={{ fontSize: "11px", color: "#94A3B8", textAlign: "left", padding: "10px 18px", fontWeight: 500 }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAppts.map(a => (
+                        <tr key={a.id}>
+                          <td style={{ padding: "11px 18px", borderBottom: "0.5px solid #F1F5F9" }}>
+                            <span style={{ background: a.status === "confirmed" ? "#ECFDF5" : a.status === "cancelled" ? "#FEE2E2" : "#FFF7ED", color: a.status === "confirmed" ? "#059669" : a.status === "cancelled" ? "#DC2626" : "#D97706", fontSize: "10px", padding: "3px 8px", borderRadius: "20px" }}>
+                              {a.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.client_name}</td>
+                          <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>{a.services?.name || "—"}</td>
+                          <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{a.staff?.name || "—"}</td>
+                          <td style={{ padding: "11px 18px", fontSize: "13px", color: "#64748B", borderBottom: "0.5px solid #F1F5F9" }}>{new Date(a.date_time).toLocaleString("en-GB")}</td>
+                          <td style={{ padding: "11px 18px", fontSize: "13px", borderBottom: "0.5px solid #F1F5F9" }}>£{a.services?.price || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Mobile cards */}
+                  <div className="appt-cards">
+                    {filteredAppts.map(a => {
+                      const statusColor =
+                        a.status === "confirmed" ? { bg: "#ECFDF5", txt: "#059669" } :
+                        a.status === "cancelled" ? { bg: "#FEE2E2", txt: "#DC2626" } :
+                        { bg: "#FFF7ED", txt: "#D97706" };
+                      return (
+                        <div key={a.id} className="appt-card">
+                          <div className="appt-card-top">
+                            <div style={{ fontSize: "14px", fontWeight: 500, color: "#0F172A" }}>{a.client_name}</div>
+                            <span className="status-badge" style={{ background: statusColor.bg, color: statusColor.txt }}>{a.status}</span>
+                          </div>
+                          <div className="appt-card-grid">
+                            <div>
+                              <div className="appt-card-field">Service</div>
+                              <div className="appt-card-val">{a.services?.name || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="appt-card-field">Amount</div>
+                              <div className="appt-card-val">£{a.services?.price || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="appt-card-field">Staff</div>
+                              <div className="appt-card-val" style={{ fontWeight: 400, color: "#64748B" }}>{a.staff?.name || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="appt-card-field">Date & Time</div>
+                              <div className="appt-card-val" style={{ fontWeight: 400, color: "#64748B", fontSize: "12px" }}>
+                                {new Date(a.date_time).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* ── New Booking Modal ── */}
+        {showModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 50 }}
+            onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
+            <div className="modal-box">
+              <div style={{ fontSize: "16px", fontWeight: 500, marginBottom: "18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                New Booking
+                <button onClick={() => setShowModal(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#94A3B8" }}>✕</button>
+              </div>
+
+              {[
+                { label: "Client Name",  key: "client_name",  type: "text",  placeholder: "Sarah Johnson" },
+                { label: "Client Email", key: "client_email", type: "email", placeholder: "sarah@email.com" },
+                { label: "Client Phone", key: "client_phone", type: "text",  placeholder: "+44 7700 900000" },
+                { label: "Date",         key: "date",         type: "date",  placeholder: "" },
+              ].map(f => (
+                <div key={f.key} style={{ marginBottom: "12px" }}>
+                  <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>{f.label}</label>
+                  <input type={f.type} placeholder={f.placeholder} value={(formData as any)[f.key]}
+                    onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
+                    style={{ width: "100%", padding: "10px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", outline: "none" }} />
+                </div>
+              ))}
+
+              {[
+                { label: "Time",    key: "time",       opts: timeSlots.map(t => ({ v: t, l: t })) },
+                { label: "Service", key: "service_id", opts: services.map(s => ({ v: s.id, l: `${s.name} — £${s.price}` })) },
+                { label: "Staff",   key: "staff_id",   opts: staff.map(s => ({ v: s.id, l: s.name })) },
+              ].map(f => (
+                <div key={f.key} style={{ marginBottom: "12px" }}>
+                  <label style={{ fontSize: "12px", fontWeight: 500, display: "block", marginBottom: "5px" }}>{f.label}</label>
+                  <select value={(formData as any)[f.key]} onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
+                    style={{ width: "100%", padding: "10px 12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", background: "#fff" }}>
+                    <option value="">Select {f.label.toLowerCase()}</option>
+                    {f.opts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                  </select>
+                </div>
+              ))}
+
+              <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                <button onClick={() => setShowModal(false)}
+                  style={{ flex: 1, padding: "12px", border: "0.5px solid #E8EAF0", borderRadius: "8px", fontSize: "14px", cursor: "pointer", background: "#fff" }}>
+                  Cancel
+                </button>
+                <button onClick={handleNewBooking}
+                  style={{ flex: 1, padding: "12px", background: "#4F6EF7", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", cursor: "pointer", fontWeight: 500 }}>
+                  Create Booking
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
