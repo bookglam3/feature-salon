@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { sendBookingEmails } from "@/app/lib/email";
 import { sendWhatsAppConfirmation } from "@/app/lib/whatsapp";
 import { sendSMS, formatUKDate, formatUKTime } from "@/app/lib/sms";
+import { sendPushToSalon } from "@/app/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(req: NextRequest) {
   try {
-    const { appointmentId, token } = await req.json();
+    const { appointmentId, token, skipOwnerPush } = await req.json();
     if (!appointmentId) {
       return NextResponse.json({ error: "Missing appointmentId" }, { status: 400 });
     }
@@ -114,6 +115,22 @@ export async function POST(req: NextRequest) {
       } catch (waErr) {
         console.error("[send-confirmation] WhatsApp error (non-fatal):", waErr);
       }
+    }
+
+    // ── Push Notification to Owner — fire-and-forget, must never
+    // delay the response to the booking client. Skipped only when the
+    // caller explicitly asks (owner creating her own booking manually) —
+    // default is to send, since a missing notification is worse than a
+    // duplicate one ──────────────────────────────────────────────────
+    if (!skipOwnerPush) {
+      const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
+      sendPushToSalon(salon?.id, {
+        title: "New booking",
+        body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
+        url: `${appUrl}/dashboard/bookings`,
+      }).catch(pushErr => {
+        console.error(`[send-confirmation] Push error (non-fatal) for appointment ${appointmentId}:`, pushErr);
+      });
     }
 
     // ── SMS Confirmation ─────────────────────────────────────

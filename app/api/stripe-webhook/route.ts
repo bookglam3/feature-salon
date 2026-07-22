@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { sendBookingEmails } from "@/app/lib/email";
 import { sendWhatsAppConfirmation } from "@/app/lib/whatsapp";
+import { sendPushToSalon } from "@/app/lib/push";
+import { formatUKDate, formatUKTime } from "@/app/lib/sms";
 
 // ── Subscription helpers ──────────────────────────────────────────────────────
 
@@ -189,6 +191,19 @@ export async function POST(req: NextRequest) {
               console.log(`[Webhook] ✅ WhatsApp confirmation sent for booking ${bookingId}`);
             }).catch(waErr => {
               console.error(`[Webhook] WhatsApp confirmation error (non-fatal) for booking ${bookingId}:`, waErr);
+            });
+          }
+
+          // ── Push notification to owner — fire-and-forget, must never
+          // delay the webhook response or the payment/appointment record above ──
+          if (salon?.id) {
+            const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
+            sendPushToSalon(salon.id, {
+              title: "New booking",
+              body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
+              url: `${appUrl}/dashboard/bookings`,
+            }).catch(pushErr => {
+              console.error(`[Webhook] Push error (non-fatal) for booking ${bookingId}:`, pushErr);
             });
           }
         } else {

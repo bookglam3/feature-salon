@@ -104,7 +104,7 @@ export default function BookingsPage() {
           await fetch(`${appUrl}/api/send-confirmation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ appointmentId: inserted.id }),
+            body: JSON.stringify({ appointmentId: inserted.id, skipOwnerPush: true }),
           });
         } catch { /* non-fatal */ }
         setSendingEmail(false);
