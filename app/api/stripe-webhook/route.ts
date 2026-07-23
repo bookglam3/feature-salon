@@ -198,6 +198,7 @@ export async function POST(req: NextRequest) {
           // delay the webhook response or the payment/appointment record above ──
           if (salon?.id) {
             const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
+            console.log(`[Webhook] calling sendPushToSalon with salonId=${salon.id}`);
             sendPushToSalon(salon.id, {
               title: "New booking",
               body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,

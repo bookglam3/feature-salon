@@ -124,6 +124,7 @@ export async function POST(req: NextRequest) {
     // duplicate one ──────────────────────────────────────────────────
     if (!skipOwnerPush) {
       const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
+      console.log(`[send-confirmation] calling sendPushToSalon with salonId=${salon?.id ?? "null"}`);
       sendPushToSalon(salon?.id, {
         title: "New booking",
         body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,

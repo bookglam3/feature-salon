@@ -31,7 +31,12 @@ export interface PushPayload {
  * subscriptions (410/404) are pruned so every send doesn't slow down forever.
  */
 export async function sendPushToSalon(salonId: string | undefined | null, payload: PushPayload): Promise<void> {
-  if (!salonId) return;
+  console.log(`[push] entry salonId=${salonId ?? "null"} title="${payload.title}"`);
+
+  if (!salonId) {
+    console.error("[push] aborting — salonId is null/undefined");
+    return;
+  }
 
   if (!vapidConfigured) {
     const missing = [
@@ -50,10 +55,13 @@ export async function sendPushToSalon(salonId: string | undefined | null, payloa
       .eq("salon_id", salonId);
 
     if (error) {
-      console.error("[push] Failed to fetch subscriptions:", error.message);
+      console.error(`[push] Failed to fetch subscriptions for salon ${salonId}:`, error.message);
       return;
     }
-    if (!subs || subs.length === 0) return;
+    if (!subs || subs.length === 0) {
+      console.error(`[push] zero subscriptions found for salonId=${salonId}`);
+      return;
+    }
 
     // Keep well under the 4KB push payload limit
     const body = JSON.stringify({
@@ -63,31 +71,48 @@ export async function sendPushToSalon(salonId: string | undefined | null, payloa
     });
 
     const results = await Promise.allSettled(
-      subs.map((sub) =>
-        webpush.sendNotification(
+      subs.map((sub) => {
+        const host = (() => {
+          try {
+            return new URL(sub.endpoint).host;
+          } catch {
+            return "invalid-endpoint";
+          }
+        })();
+        console.log(`[push] attempting subscription ${sub.id} endpoint=${host}`);
+        return webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           body
-        )
-      )
+        ).then(() => {
+          console.log(`[push] success subscription ${sub.id} endpoint=${host}`);
+        });
+      })
     );
 
     const deadIds: string[] = [];
+    let sent = 0;
+    let failed = 0;
     results.forEach((result, i) => {
-      if (result.status === "rejected") {
-        const statusCode = (result.reason as { statusCode?: number })?.statusCode;
-        if (statusCode === 404 || statusCode === 410) {
-          deadIds.push(subs[i].id);
-        } else {
-          console.error(`[push] Send failed for subscription ${subs[i].id}:`, result.reason);
-        }
+      if (result.status === "fulfilled") {
+        sent++;
+        return;
+      }
+      failed++;
+      const statusCode = (result.reason as { statusCode?: number })?.statusCode;
+      if (statusCode === 404 || statusCode === 410) {
+        deadIds.push(subs[i].id);
+        console.error(`[push] subscription ${subs[i].id} dead — status ${statusCode}, pruning`);
+      } else {
+        console.error(`[push] send failed for subscription ${subs[i].id} — status ${statusCode ?? "unknown"}:`, result.reason);
       }
     });
 
     if (deadIds.length > 0) {
       await supabaseAdmin.from("push_subscriptions").delete().in("id", deadIds);
-      console.log(`[push] Removed ${deadIds.length} dead subscription(s) for salon ${salonId}`);
     }
+
+    console.log(`[push] summary salonId=${salonId} sent=${sent} failed=${failed} pruned=${deadIds.length}`);
   } catch (err) {
-    console.error("[push] sendPushToSalon error (non-fatal):", err);
+    console.error(`[push] sendPushToSalon error (non-fatal) for salon ${salonId}:`, err);
   }
 }
