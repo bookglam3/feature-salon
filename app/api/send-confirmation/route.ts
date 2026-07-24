@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendBookingEmails } from "@/app/lib/email";
 import { sendWhatsAppConfirmation } from "@/app/lib/whatsapp";
@@ -117,21 +117,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Push Notification to Owner — fire-and-forget, must never
-    // delay the response to the booking client. Skipped only when the
-    // caller explicitly asks (owner creating her own booking manually) —
-    // default is to send, since a missing notification is worse than a
-    // duplicate one ──────────────────────────────────────────────────
+    // ── Push Notification to Owner — scheduled via after() so it never
+    // delays the response to the booking client, but Vercel keeps the
+    // invocation alive (via waitUntil) until it actually completes instead
+    // of freezing mid-flight the way a bare un-awaited promise would.
+    // Skipped only when the caller explicitly asks (owner creating her own
+    // booking manually) — default is to send, since a missing notification
+    // is worse than a duplicate one ──────────────────────────────────────
     if (!skipOwnerPush) {
       const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
       console.log(`[send-confirmation] calling sendPushToSalon with salonId=${salon?.id ?? "null"}`);
-      sendPushToSalon(salon?.id, {
-        title: "New booking",
-        body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
-        url: `${appUrl}/dashboard/bookings`,
-      }).catch(pushErr => {
-        console.error(`[send-confirmation] Push error (non-fatal) for appointment ${appointmentId}:`, pushErr);
-      });
+      after(() =>
+        sendPushToSalon(salon?.id, {
+          title: "New booking",
+          body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
+          url: `${appUrl}/dashboard/bookings`,
+        }).catch(pushErr => {
+          console.error(`[send-confirmation] Push error (non-fatal) for appointment ${appointmentId}:`, pushErr);
+        })
+      );
     }
 
     // ── SMS Confirmation ─────────────────────────────────────

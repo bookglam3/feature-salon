@@ -60,6 +60,8 @@ self.addEventListener("push", (e) => {
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
       data: { url: data.url },
+      vibrate: [200, 100, 200],
+      silent: false,
     })
   );
 });

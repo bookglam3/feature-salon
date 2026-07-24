@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { sendBookingEmails } from "@/app/lib/email";
@@ -194,18 +194,22 @@ export async function POST(req: NextRequest) {
             });
           }
 
-          // ── Push notification to owner — fire-and-forget, must never
-          // delay the webhook response or the payment/appointment record above ──
+          // ── Push notification to owner — scheduled via after() so it never
+          // delays the webhook response, but Vercel keeps the invocation alive
+          // (via waitUntil) until it actually completes instead of freezing
+          // mid-flight the way a bare un-awaited promise would ──
           if (salon?.id) {
             const firstName = (appt.client_name || "").split(" ")[0] || appt.client_name;
             console.log(`[Webhook] calling sendPushToSalon with salonId=${salon.id}`);
-            sendPushToSalon(salon.id, {
-              title: "New booking",
-              body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
-              url: `${appUrl}/dashboard/bookings`,
-            }).catch(pushErr => {
-              console.error(`[Webhook] Push error (non-fatal) for booking ${bookingId}:`, pushErr);
-            });
+            after(() =>
+              sendPushToSalon(salon.id, {
+                title: "New booking",
+                body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
+                url: `${appUrl}/dashboard/bookings`,
+              }).catch(pushErr => {
+                console.error(`[Webhook] Push error (non-fatal) for booking ${bookingId}:`, pushErr);
+              })
+            );
           }
         } else {
           console.error(`[Webhook] ❌ Appointment ${bookingId} not found for email`);
