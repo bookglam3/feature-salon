@@ -226,19 +226,25 @@ export default function DashboardPage() {
       staff_id: formData.staff_id || null,
       date_time,
       status: "confirmed",
-    }).select("id").single();
+    }).select("id, review_token").single();
     if (error) { toast.error("Failed to create booking"); return; }
     // Send email + WhatsApp via the same route as online bookings
     if (formData.client_email && inserted?.id) {
+      let confirmationSent = false;
       try {
-        await fetch("/api/send-confirmation", {
+        const res = await fetch("/api/send-confirmation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ appointmentId: inserted.id, skipOwnerPush: true }),
+          body: JSON.stringify({ appointmentId: inserted.id, token: inserted.review_token, skipOwnerPush: true }),
         });
+        confirmationSent = res.ok;
       } catch { /* non-fatal */ }
+      toast[confirmationSent ? "success" : "error"](
+        confirmationSent ? "Booking created! Confirmation sent to client." : "Booking created, but the confirmation email failed to send."
+      );
+    } else {
+      toast.success("Booking created!");
     }
-    toast.success("Booking created! Confirmation sent to client.");
     setShowModal(false);
     setFormData({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
     await reloadAppts();

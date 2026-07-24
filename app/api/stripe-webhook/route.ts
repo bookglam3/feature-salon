@@ -152,46 +152,58 @@ export async function POST(req: NextRequest) {
             ownerEmail = authUser?.user?.email || "";
           }
 
-          await sendBookingEmails({
-            clientEmail:      appt.client_email,
-            clientName:       appt.client_name,
-            clientPhone:      appt.client_phone || "",
-            serviceName:      appt.services?.name || "Appointment",
-            dateTime:         appt.date_time,
-            staffName:        appt.staff?.name,
-            salonName:        salon?.name || "The Salon",
-            salonOwnerEmail:  ownerEmail,
-            price:            appt.services?.price,
-            salonAddress:     salon?.address,
-            cancelLink:       `${appUrl}/reschedule/${bookingId}?token=${appt.review_token}`,
-            dashboardUrl:     `${appUrl}/dashboard/bookings`,
-            paymentStatus:    depositOnly ? "deposit_paid" : "paid",
-            depositOnly,
-            businessType:     salon?.business_type,
-            salonId:          salon?.id,
-            appointmentId:    bookingId,
-            priceIsFrom:      !!appt.services?.price_is_from,
-          });
-          console.log(`[Webhook] ✅ Confirmation emails sent for booking ${bookingId}`);
-
-          // ── WhatsApp confirmation — fire-and-forget so a WhatsApp failure
-          // can never break webhook processing or the payment record above ──
-          if (appt.client_phone && salon?.whatsapp_enabled) {
-            sendWhatsAppConfirmation({
-              to:           appt.client_phone,
-              clientName:   appt.client_name,
-              serviceName:  appt.services?.name || "Appointment",
-              staffName:    appt.staff?.name,
-              salonName:    salon?.name || "The Salon",
-              salonAddress: salon?.address,
-              dateTime:     appt.date_time,
-              price:        appt.services?.price,
-              cancelLink:   `${appUrl}/reschedule/${bookingId}?token=${appt.review_token}`,
-            }).then(() => {
-              console.log(`[Webhook] ✅ WhatsApp confirmation sent for booking ${bookingId}`);
-            }).catch(waErr => {
-              console.error(`[Webhook] WhatsApp confirmation error (non-fatal) for booking ${bookingId}:`, waErr);
+          // ── Confirmation emails — isolated in its own try/catch so a Resend
+          // failure (e.g. one bad address) can never prevent the WhatsApp and
+          // push notifications below from running. DB writes for this booking
+          // already happened above this block, so they're unaffected either way ──
+          try {
+            await sendBookingEmails({
+              clientEmail:      appt.client_email,
+              clientName:       appt.client_name,
+              clientPhone:      appt.client_phone || "",
+              serviceName:      appt.services?.name || "Appointment",
+              dateTime:         appt.date_time,
+              staffName:        appt.staff?.name,
+              salonName:        salon?.name || "The Salon",
+              salonOwnerEmail:  ownerEmail,
+              price:            appt.services?.price,
+              salonAddress:     salon?.address,
+              cancelLink:       `${appUrl}/reschedule/${bookingId}?token=${appt.review_token}`,
+              dashboardUrl:     `${appUrl}/dashboard/bookings`,
+              paymentStatus:    depositOnly ? "deposit_paid" : "paid",
+              depositOnly,
+              businessType:     salon?.business_type,
+              salonId:          salon?.id,
+              appointmentId:    bookingId,
+              priceIsFrom:      !!appt.services?.price_is_from,
             });
+            console.log(`[Webhook] ✅ Confirmation emails sent for booking ${bookingId}`);
+          } catch (emailErr) {
+            console.error(`[Webhook] Confirmation email error (non-fatal) for booking ${bookingId}:`, emailErr);
+          }
+
+          // ── WhatsApp confirmation — scheduled via after() so it never delays
+          // the webhook response, but Vercel keeps the invocation alive (via
+          // waitUntil) until it actually completes instead of freezing mid-flight
+          // the way a bare un-awaited promise would ──
+          if (appt.client_phone && salon?.whatsapp_enabled) {
+            after(() =>
+              sendWhatsAppConfirmation({
+                to:           appt.client_phone,
+                clientName:   appt.client_name,
+                serviceName:  appt.services?.name || "Appointment",
+                staffName:    appt.staff?.name,
+                salonName:    salon?.name || "The Salon",
+                salonAddress: salon?.address,
+                dateTime:     appt.date_time,
+                price:        appt.services?.price,
+                cancelLink:   `${appUrl}/reschedule/${bookingId}?token=${appt.review_token}`,
+              }).then(() => {
+                console.log(`[Webhook] ✅ WhatsApp confirmation sent for booking ${bookingId}`);
+              }).catch(waErr => {
+                console.error(`[Webhook] WhatsApp confirmation error (non-fatal) for booking ${bookingId}:`, waErr);
+              })
+            );
           }
 
           // ── Push notification to owner — scheduled via after() so it never

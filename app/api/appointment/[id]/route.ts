@@ -42,7 +42,7 @@ export async function PATCH(
   // Fetch appointment + salon for owner email
   const { data: rawAppt } = await supabaseAdmin
     .from("appointments")
-    .select("salon_id, staff_id, client_name, date_time, review_token, services(name,duration_minutes), salon:salons(name,owner_email)")
+    .select("salon_id, staff_id, client_name, date_time, review_token, payment_status, services(name,duration_minutes), salon:salons(name,owner_email)")
     .eq("id", id)
     .single();
 
@@ -52,6 +52,7 @@ export async function PATCH(
     client_name: string;
     date_time: string;
     review_token: string | null;
+    payment_status: string | null;
     services: { name: string; duration_minutes?: number } | { name: string; duration_minutes?: number }[] | null;
     salon: { name: string; owner_email: string } | { name: string; owner_email: string }[] | null;
   };
@@ -137,9 +138,15 @@ export async function PATCH(
       }
     }
 
+    // A paid or deposit-paid appointment stays confirmed on reschedule — only
+    // an unpaid one goes back to "pending", otherwise a client rescheduling
+    // an already-paid booking would silently fall out of every automated
+    // reminder/thank-you flow, which all filter on status:"confirmed"
+    const alreadyPaid = appt.payment_status === "paid" || appt.payment_status === "deposit_paid";
+
     const { error } = await supabaseAdmin
       .from("appointments")
-      .update({ date_time, status: "pending", notes })
+      .update({ date_time, notes, ...(alreadyPaid ? {} : { status: "pending" }) })
       .eq("id", id);
     if (error) return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 
