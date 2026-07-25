@@ -93,28 +93,29 @@ export default function BookingsPage() {
       const { data: inserted, error } = await supabase
         .from("appointments")
         .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, status: formData.status, notes: notesValue })
-        .select("id, review_token")
+        .select("id")
         .single();
       if (error) { toast.error("Failed to create booking"); return; }
 
       if (formData.client_email && inserted?.id) {
         setSendingEmail(true);
-        let confirmationSent = false;
         try {
+          const { data: { session } } = await supabase.auth.getSession();
           const appUrl = window.location.origin;
           const res = await fetch(`${appUrl}/api/send-confirmation`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ appointmentId: inserted.id, token: inserted.review_token, skipOwnerPush: true }),
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token || ""}` },
+            body: JSON.stringify({ appointmentId: inserted.id, skipOwnerPush: true }),
           });
-          confirmationSent = res.ok;
-        } catch { /* non-fatal */ }
-        setSendingEmail(false);
-        if (confirmationSent) {
-          toast.success("Booking created! Confirmation sent to client.");
-        } else {
+          if (res.ok) {
+            toast.success("Booking created! Confirmation sent to client.");
+          } else {
+            toast.error("Booking created, but the confirmation email failed to send.");
+          }
+        } catch {
           toast.error("Booking created, but the confirmation email failed to send.");
         }
+        setSendingEmail(false);
       } else {
         toast.success("Booking created!");
       }

@@ -417,21 +417,32 @@ export default function BookingPage() {
     // Build insert — payment_method column only exists after migration
     // salon.payment_methods being set is the proxy for whether migration has run
     const hasMigration = !!salon?.payment_methods;
+    const payload = {
+      salon_id: salon.id, client_name: form.name, client_email: form.email,
+      client_phone: form.phone, service_id: selectedService.id,
+      staff_id: selectedStaff?.id || null, date_time: iso,
+      status: isImmediatelyConfirmed ? "confirmed" : "pending",
+      payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
+      ...(hasMigration ? { payment_method: pm } : {}),
+    };
+    // TEMP DIAGNOSTIC — remove once the real RLS rejection is found
+    console.log("BOOKING PAYLOAD:", JSON.stringify(payload, null, 2));
     const { data: appt, error } = await supabase
       .from("appointments")
-      .insert({
-        salon_id: salon.id, client_name: form.name, client_email: form.email,
-        client_phone: form.phone, service_id: selectedService.id,
-        staff_id: selectedStaff?.id || null, date_time: iso,
-        status: isImmediatelyConfirmed ? "confirmed" : "pending",
-        payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
-        ...(hasMigration ? { payment_method: pm } : {}),
-      })
+      .insert(payload)
       .select().single();
 
     if (error || !appt) {
-      console.error("[Booking] Insert error:", JSON.stringify(error));
-      alert("Booking failed: " + (error?.message || "Unknown error."));
+      // TEMP DIAGNOSTIC — remove once the real RLS rejection is found
+      console.error("[Booking] Insert error — message:", error?.message);
+      console.error("[Booking] Insert error — code:", error?.code);
+      console.error("[Booking] Insert error — details:", error?.details);
+      console.error("[Booking] Insert error — hint:", error?.hint);
+      alert(
+        "Booking failed: " + (error?.message || "Unknown error.") +
+        (error?.details ? `\nDetails: ${error.details}` : "") +
+        (error?.hint ? `\nHint: ${error.hint}` : "")
+      );
       setSubmitting(false); return;
     }
     setBookingId(appt.id);

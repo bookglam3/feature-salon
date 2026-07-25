@@ -226,22 +226,25 @@ export default function DashboardPage() {
       staff_id: formData.staff_id || null,
       date_time,
       status: "confirmed",
-    }).select("id, review_token").single();
+    }).select("id").single();
     if (error) { toast.error("Failed to create booking"); return; }
     // Send email + WhatsApp via the same route as online bookings
     if (formData.client_email && inserted?.id) {
-      let confirmationSent = false;
       try {
+        const { data: { session } } = await supabase.auth.getSession();
         const res = await fetch("/api/send-confirmation", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ appointmentId: inserted.id, token: inserted.review_token, skipOwnerPush: true }),
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token || ""}` },
+          body: JSON.stringify({ appointmentId: inserted.id, skipOwnerPush: true }),
         });
-        confirmationSent = res.ok;
-      } catch { /* non-fatal */ }
-      toast[confirmationSent ? "success" : "error"](
-        confirmationSent ? "Booking created! Confirmation sent to client." : "Booking created, but the confirmation email failed to send."
-      );
+        if (res.ok) {
+          toast.success("Booking created! Confirmation sent to client.");
+        } else {
+          toast.error("Booking created, but the confirmation email failed to send.");
+        }
+      } catch {
+        toast.error("Booking created, but the confirmation email failed to send.");
+      }
     } else {
       toast.success("Booking created!");
     }

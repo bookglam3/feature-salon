@@ -21,9 +21,6 @@ export async function POST(req: NextRequest) {
     if (!appointmentId) {
       return NextResponse.json({ error: "Missing appointmentId" }, { status: 400 });
     }
-    if (!token) {
-      return NextResponse.json({ error: "Missing token" }, { status: 400 });
-    }
 
     // MUST use service role key — anon key is blocked by RLS for admin lookups
     const supabase = createClient(
@@ -31,25 +28,62 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Fetch appointment with all related data
-    // token must match review_token — prevents arbitrary appointmentIds triggering emails
-    // Also check created_at — only allow within 15 minutes of booking
-    const { data: appt, error } = await supabase
-      .from("appointments")
-      .select(`
-        *,
-        services(name, price, price_is_from),
-        staff(name),
-        salons(id, name, slug, address, owner_email, owner_id, reminders_enabled, whatsapp_enabled, business_type)
-      `)
-      .eq("id", appointmentId)
-      .eq("review_token", token)
-      .gte("created_at", new Date(Date.now() - 15 * 60 * 1000).toISOString())
-      .single();
+    const selectClause = `
+      *,
+      services(name, price, price_is_from),
+      staff(name),
+      salons(id, name, slug, address, owner_email, owner_id, reminders_enabled, whatsapp_enabled, business_type)
+    `;
 
-    if (error || !appt) {
-      console.error("[send-confirmation] Appointment fetch error:", error);
-      return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+    // Two ways to prove the right to trigger this appointment's emails:
+    // 1. token matches the appointment's own review_token, within 15 minutes
+    //    of booking — the public booking page, which is unauthenticated, so
+    //    it must prove it just created this specific appointment.
+    // 2. a valid authenticated session for the salon that owns this
+    //    appointment — dashboard callers (manual booking creation) already
+    //    have a far stronger proof of identity than a token designed for
+    //    anonymous callers, so they authenticate instead of borrowing it.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let appt: any = null;
+
+    if (token) {
+      const { data } = await supabase
+        .from("appointments")
+        .select(selectClause)
+        .eq("id", appointmentId)
+        .eq("review_token", token)
+        .gte("created_at", new Date(Date.now() - 15 * 60 * 1000).toISOString())
+        .single();
+      appt = data;
+    }
+
+    if (!appt) {
+      const authHeader = req.headers.get("authorization") || "";
+      const bearerToken = authHeader.replace("Bearer ", "").trim();
+      if (bearerToken) {
+        const { data: { user } } = await supabase.auth.getUser(bearerToken);
+        if (user) {
+          const { data: ownerSalon } = await supabase
+            .from("salons")
+            .select("id")
+            .eq("owner_id", user.id)
+            .single();
+          if (ownerSalon) {
+            const { data } = await supabase
+              .from("appointments")
+              .select(selectClause)
+              .eq("id", appointmentId)
+              .eq("salon_id", ownerSalon.id)
+              .single();
+            appt = data;
+          }
+        }
+      }
+    }
+
+    if (!appt) {
+      console.error("[send-confirmation] Unauthorised or appointment not found:", appointmentId);
+      return NextResponse.json({ error: "Unauthorised or appointment not found" }, { status: 401 });
     }
 
     const salon = appt.salons;
