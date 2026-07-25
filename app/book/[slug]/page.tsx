@@ -440,8 +440,10 @@ export default function BookingPage() {
       console.error("[Booking] Insert error — hint:", error?.hint);
       alert(
         "Booking failed: " + (error?.message || "Unknown error.") +
+        (error?.code ? `\nCode: ${error.code}` : "") +
         (error?.details ? `\nDetails: ${error.details}` : "") +
-        (error?.hint ? `\nHint: ${error.hint}` : "")
+        (error?.hint ? `\nHint: ${error.hint}` : "") +
+        `\nPayload: ${JSON.stringify(payload)}`
       );
       setSubmitting(false); return;
     }
