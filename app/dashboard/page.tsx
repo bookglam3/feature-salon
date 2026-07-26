@@ -217,6 +217,12 @@ export default function DashboardPage() {
   const handleNewBooking = useCallback(async () => {
     if (!salon || !formData.client_name || !formData.date || !formData.time) { toast.error("Fill required fields"); return; }
     const date_time = new Date(formData.date + "T" + formData.time).toISOString();
+    // Stage 1 of the interval-overlap fix: end_time written at booking time.
+    // service_id is optional here (formData.service_id || null) — same
+    // 30-min fallback as every other duration-less write path in the codebase.
+    const selectedSvc = services.find(s => s.id === formData.service_id);
+    const durationMin = selectedSvc?.duration_minutes || 30;
+    const end_time = new Date(new Date(date_time).getTime() + durationMin * 60_000).toISOString();
     const { data: inserted, error } = await supabase.from("appointments").insert({
       salon_id: salon.id,
       client_name: formData.client_name,
@@ -224,7 +230,7 @@ export default function DashboardPage() {
       client_phone: formData.client_phone,
       service_id: formData.service_id || null,
       staff_id: formData.staff_id || null,
-      date_time,
+      date_time, end_time,
       status: "confirmed",
     }).select("id").single();
     if (error) { toast.error("Failed to create booking"); return; }

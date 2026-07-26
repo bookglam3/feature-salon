@@ -397,10 +397,15 @@ export default function BookingPage() {
     const dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,"0")}-${String(selDate.getDate()).padStart(2,"0")}`;
     const iso = localTimeToUTC(dateStr, selTime, salonTz);
 
+    // DEPLOY AFTER check_slot_available's new signature is live — the 4th
+    // arg (p_duration_minutes) doesn't exist until then. Safe to deploy the
+    // function first without this change (DEFAULT NULL keeps old callers
+    // working); this line is what starts using the real duration.
     const { data: slotFree } = await supabase.rpc("check_slot_available", {
       p_salon_id:  salon.id,
       p_date_time: iso,
       p_staff_id:  selectedStaff?.id ?? null,
+      p_duration_minutes: selectedService.duration_minutes ?? selectedService.duration ?? 30,
     });
     if (slotFree === false) { alert("This time slot is already booked. Please choose another time."); setSubmitting(false); return; }
 
@@ -424,11 +429,17 @@ export default function BookingPage() {
     // insert-only anon key must never be able to read booking rows back.
     const bookingId = crypto.randomUUID();
     const reviewToken = crypto.randomUUID();
+    // Stage 1 of the interval-overlap fix: end_time written at booking time
+    // instead of re-derived live from services.duration_minutes on every
+    // slot check (a live re-derivation would retroactively change a past
+    // booking's occupied window if the service's duration is edited later).
+    const serviceDurationMin = selectedService.duration_minutes ?? selectedService.duration ?? 30;
+    const endTimeIso = new Date(new Date(iso).getTime() + serviceDurationMin * 60_000).toISOString();
     const payload = {
       id: bookingId, review_token: reviewToken,
       salon_id: salon.id, client_name: form.name, client_email: form.email,
       client_phone: form.phone, service_id: selectedService.id,
-      staff_id: selectedStaff?.id || null, date_time: iso,
+      staff_id: selectedStaff?.id || null, date_time: iso, end_time: endTimeIso,
       status: isImmediatelyConfirmed ? "confirmed" : "pending",
       payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
       ...(hasMigration ? { payment_method: pm } : {}),

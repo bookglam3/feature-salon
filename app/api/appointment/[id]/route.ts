@@ -146,7 +146,9 @@ export async function PATCH(
 
     const { error } = await supabaseAdmin
       .from("appointments")
-      .update({ date_time, notes, ...(alreadyPaid ? {} : { status: "pending" }) })
+      // end_time reuses newEnd — already computed above for this exact
+      // route's own overlap guard, not a new derivation.
+      .update({ date_time, end_time: newEnd.toISOString(), notes, ...(alreadyPaid ? {} : { status: "pending" }) })
       .eq("id", id);
     if (error) return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 

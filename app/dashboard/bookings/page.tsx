@@ -85,14 +85,23 @@ export default function BookingsPage() {
     e.preventDefault();
     if (!salon) return;
     const notesValue = serializeNotes(formData, vc.consultationForm);
+    // Stage 1 of the interval-overlap fix: end_time written at booking time.
+    // formData.service_id can be "" (no service selected) — this form allows
+    // that, unlike the public booking page — so the 30-min fallback matches
+    // the same default used everywhere else in the codebase, not a guess.
+    const selectedSvc = services.find(s => s.id === formData.service_id);
+    const durationMin = selectedSvc?.duration_minutes || 30;
+    const endTimeIso = formData.date_time
+      ? new Date(new Date(formData.date_time).getTime() + durationMin * 60_000).toISOString()
+      : null;
     if (editingId) {
-      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, status: formData.status, notes: notesValue }).eq("id", editingId);
+      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, end_time: endTimeIso, status: formData.status, notes: notesValue }).eq("id", editingId);
       if (error) { toast.error("Failed to update booking"); return; }
       toast.success("Booking updated!");
     } else {
       const { data: inserted, error } = await supabase
         .from("appointments")
-        .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, status: formData.status, notes: notesValue })
+        .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, end_time: endTimeIso, status: formData.status, notes: notesValue })
         .select("id")
         .single();
       if (error) { toast.error("Failed to create booking"); return; }
