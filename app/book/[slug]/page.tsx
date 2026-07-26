@@ -417,7 +417,15 @@ export default function BookingPage() {
     // Build insert — payment_method column only exists after migration
     // salon.payment_methods being set is the proxy for whether migration has run
     const hasMigration = !!salon?.payment_methods;
+    // id and review_token are generated client-side (crypto.randomUUID(), same
+    // CSPRNG class as Postgres's gen_random_uuid() default) so the insert never
+    // needs .select()/RETURNING to read them back. RETURNING is evaluated under
+    // SELECT RLS, and appointments deliberately has no anon SELECT policy — an
+    // insert-only anon key must never be able to read booking rows back.
+    const bookingId = crypto.randomUUID();
+    const reviewToken = crypto.randomUUID();
     const payload = {
+      id: bookingId, review_token: reviewToken,
       salon_id: salon.id, client_name: form.name, client_email: form.email,
       client_phone: form.phone, service_id: selectedService.id,
       staff_id: selectedStaff?.id || null, date_time: iso,
@@ -425,30 +433,16 @@ export default function BookingPage() {
       payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
       ...(hasMigration ? { payment_method: pm } : {}),
     };
-    // TEMP DIAGNOSTIC — remove once the real RLS rejection is found
-    console.log("BOOKING PAYLOAD:", JSON.stringify(payload, null, 2));
-    const { data: appt, error } = await supabase
+    const { error } = await supabase
       .from("appointments")
-      .insert(payload)
-      .select().single();
+      .insert(payload);
 
-    if (error || !appt) {
-      // TEMP DIAGNOSTIC — remove once the real RLS rejection is found
-      console.error("[Booking] Insert error — message:", error?.message);
-      console.error("[Booking] Insert error — code:", error?.code);
-      console.error("[Booking] Insert error — details:", error?.details);
-      console.error("[Booking] Insert error — hint:", error?.hint);
-      alert(
-        "Booking failed: " + (error?.message || "Unknown error.") +
-        (error?.code ? `\nCode: ${error.code}` : "") +
-        (error?.details ? `\nDetails: ${error.details}` : "") +
-        (error?.hint ? `\nHint: ${error.hint}` : "") +
-        `\nPayload: ${JSON.stringify(payload)}`
-      );
+    if (error) {
+      alert("Booking failed: " + (error?.message || "Unknown error."));
       setSubmitting(false); return;
     }
-    setBookingId(appt.id);
-    setReviewToken((appt as Record<string,unknown>).review_token as string || "");
+    setBookingId(bookingId);
+    setReviewToken(reviewToken);
 
     // Pay at salon OR free service (£0) — skip Stripe, show confirmation directly
     if (isImmediatelyConfirmed) {
@@ -456,13 +450,13 @@ export default function BookingPage() {
       fetch("/api/send-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentId: appt.id, token: (appt as Record<string,unknown>).review_token || "" }),
+        body: JSON.stringify({ appointmentId: bookingId, token: reviewToken }),
       }).catch(e => console.error("[send-confirmation] failed:", e));
 
       const dateStr = selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) || "";
       const servicePrice = selectedService?.price ?? 0;
       const payStatus = servicePrice > 0 ? "pay_at_salon" : "free";
-      setConfirmedBooking({ service: selectedService.name, date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: appt.id, paymentStatus: payStatus, servicePrice, servicePriceIsFrom: !!selectedService?.price_is_from });
+      setConfirmedBooking({ service: selectedService.name, date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: bookingId, paymentStatus: payStatus, servicePrice, servicePriceIsFrom: !!selectedService?.price_is_from });
       setSubmitting(false);
       setStep(5);
       return;
@@ -473,7 +467,7 @@ export default function BookingPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         amount: selectedService.price, charge_amount: chargeAmount,
-        email: form.email, booking_id: appt.id,
+        email: form.email, booking_id: bookingId,
         salon_name: salon.name, service_name: selectedService.name,
         deposit_only: pm !== "full_online",
         salon_id: salon.id,
