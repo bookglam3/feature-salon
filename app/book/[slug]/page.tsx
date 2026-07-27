@@ -7,6 +7,7 @@ import { supabase } from "@/app/lib/supabase";
 import { getVerticalConfig } from "@/app/lib/verticalConfig";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { fromZonedTime } from "date-fns-tz";
 
 import {
   DAY_KEYS, COUNTRY_TIMEZONES, type BookedInterval,
@@ -75,17 +76,23 @@ function isSlotInRange(slot: string, staff: StaffMember | null, date: Date): boo
 }
 
 // Convert YYYY-MM-DD + HH:MM in the salon's timezone → UTC ISO string
+//
+// PREVIOUS implementation computed the target offset by formatting a UTC
+// noon anchor via toLocaleString(...) into a locale string (e.g. "8/6/2026,
+// 1:00:00 PM"), then re-parsing that string with `new Date(...)`. Per the JS
+// spec, a non-ISO string with no offset marker is always parsed in the
+// RUNTIME's own local timezone, not the `timezone` argument — so the
+// computed offset silently used whichever timezone the browser's OS was set
+// to, not the salon's. Confirmed live-impacting: real bookings stored at the
+// wrong UTC instant whenever the booking browser's system timezone differed
+// from the salon's configured timezone (see multi_service investigation,
+// 2026-07-27 — ~half of one salon's appointment history affected).
+//
+// fromZonedTime (date-fns-tz) does this conversion directly, without ever
+// round-tripping through a locale-formatted string — no reliance on the
+// runtime's own timezone anywhere in the computation.
 function localTimeToUTC(dateStr: string, timeStr: string, timezone: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  const [h, min] = timeStr.split(":").map(Number);
-  // Get offset: create noon UTC on that date, see what local noon looks like
-  const noonUTC = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
-  const localNoonStr = noonUTC.toLocaleString("en-US", { timeZone: timezone });
-  const localNoon = new Date(localNoonStr);
-  const offsetMs = noonUTC.getTime() - localNoon.getTime();
-  // Create target in "fake UTC" (as if timezone were UTC) then apply offset
-  const fakeUTC = new Date(Date.UTC(y, m - 1, d, h, min, 0));
-  return new Date(fakeUTC.getTime() + offsetMs).toISOString();
+  return fromZonedTime(`${dateStr}T${timeStr}:00`, timezone).toISOString();
 }
 
 // ── Country definitions ───────────────────────────────────────
