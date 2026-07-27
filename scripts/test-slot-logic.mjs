@@ -31,8 +31,12 @@ function isStaffAvailableForWindow(staff, slotStart, slotEnd, dayKey) {
 function computeBlocked(t, { selectedStaff, staffList, bookedSlots, serviceDuration, dayKey }) {
   const slotEnd = addMinutesToSlot(t, serviceDuration);
 
+  // staffId === null means "some real staff member, unrecorded" — blocks
+  // every staff id, not just unassigned checks. See the same comment in
+  // app/lib/slot-availability.ts for the full reasoning and the documented
+  // multi-staff-salon TODO this deliberately does not solve yet.
   const isStaffBusy = (sId, slotStart, slotEnd) =>
-    bookedSlots.some(b => b.staffId === sId && intervalsOverlap(slotStart, slotEnd, b.start, b.end));
+    bookedSlots.some(b => (b.staffId === sId || b.staffId === null) && intervalsOverlap(slotStart, slotEnd, b.start, b.end));
 
   if (selectedStaff !== null) {
     return !isStaffAvailableForWindow(selectedStaff, t, slotEnd, dayKey)
@@ -200,6 +204,49 @@ const staffG = {
 assert("staffF booking at 10:00 must NOT block staffG's 10:00 slot (specific-staff mode)",
   computeBlocked("10:00", { selectedStaff: staffG, staffList: [staffF, staffG], bookedSlots: [{ staffId: "sf", start: "10:00", end: "11:00" }], serviceDuration: 60, dayKey: "Mon" }),
   false);
+
+// ── Case G: staff_id = null ("Any Available" booking) blocks regardless of
+// which staff id is being checked — the fix for Anita's one-staff-salon gap ──
+
+console.log("\n─── G: null staff_id blocks specific-staff AND any-available checks ───");
+
+const staffH = {
+  id: "sh", name: "Hana",
+  working_hours: { Mon: { enabled: true, start: "09:00", end: "18:00" } },
+};
+
+// G1: an existing "Any Available" (staffId: null) booking must block a
+// SPECIFIC staff member's check — this is the actual bug being fixed. Before
+// the fix, b.staffId === sId ("sh") would never match a stored null, so this
+// assertion would have failed (returned false / free).
+assert("null-staff booking blocks a SPECIFIC staff check (10:00)",
+  computeBlocked("10:00", {
+    selectedStaff: staffH, staffList: [staffH],
+    bookedSlots: [{ staffId: null, start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
+
+// G2: the same null-staff booking must also block an "Any Available" check
+// (single staff in the pool) — this direction was ALSO broken before the fix,
+// since the any-available branch calls the same isStaffBusy(s.id) helper.
+assert("null-staff booking also blocks an ANY-AVAILABLE check (10:00)",
+  computeBlocked("10:00", {
+    selectedStaff: null, staffList: [staffH],
+    bookedSlots: [{ staffId: null, start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
+
+// G3: "vice versa" — a booking made under a SPECIFIC named staff member must
+// still correctly block a later "Any Available" check against that same
+// (single) staff pool. This direction already worked before the fix (a real
+// staffId matches s.id directly) — included as a regression guard, not a new
+// fix, to prove the change above didn't disturb it.
+assert("specific-staff booking still blocks an ANY-AVAILABLE check (vice versa, 10:00)",
+  computeBlocked("10:00", {
+    selectedStaff: null, staffList: [staffH],
+    bookedSlots: [{ staffId: "sh", start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
 
 // ── Summary ───────────────────────────────────────────────────────────────────
 

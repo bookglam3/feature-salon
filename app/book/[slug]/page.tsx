@@ -254,16 +254,21 @@ export default function BookingPage() {
     // Query wider window to account for timezone differences
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase.from("appointments") as any)
-      .select("staff_id, date_time, services(duration_minutes)")
+      .select("staff_id, date_time, end_time")
       .eq("salon_id", salonId)
       .gte("date_time", `${dateStr}T00:00:00`)
       .lte("date_time", `${dateStr}T23:59:59`)
       .not("status", "eq", "cancelled");
-    // Build [start, end) intervals tagged by staff for per-staff capacity checks
-    const intervals = (data || []).map((a: { staff_id: string | null; date_time: string; services: { duration_minutes?: number } | null }) => {
+    // Build [start, end) intervals tagged by staff for per-staff capacity checks.
+    // end_time read directly — same occupied-window source check_slot_available
+    // uses server-side (COALESCE(end_time, date_time + 30min)), not re-derived
+    // from services.duration_minutes via a join. The two can no longer disagree,
+    // and this stops depending on a join that multi-service bookings won't have
+    // a single duration for anyway.
+    const intervals = (data || []).map((a: { staff_id: string | null; date_time: string; end_time: string | null }) => {
       const start = utcToSalonTime(a.date_time, salonTz);
-      const duration = a.services?.duration_minutes || 30;
-      return { staffId: a.staff_id, start, end: addMinutesToSlot(start, duration) };
+      const end = a.end_time ? utcToSalonTime(a.end_time, salonTz) : addMinutesToSlot(start, 30);
+      return { staffId: a.staff_id, start, end };
     });
     setBookedSlots(intervals);
   }, []);

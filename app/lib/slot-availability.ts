@@ -60,8 +60,17 @@ export function computeBlocked(t: string, opts: ComputeBlockedOpts): boolean {
   const { selectedStaff, staffList, bookedIntervals, serviceDuration, dayKey } = opts;
   const slotEnd = addMinutesToSlot(t, serviceDuration);
 
+  // staffId === null on a booked interval means "some real staff member did
+  // this, we just didn't record who" (an "Any Available" booking) — not
+  // "no one." Treated as blocking every staff id, not just unassigned
+  // checks: correct for a single/low-staff salon (there's no one else it
+  // could have been); over-conservative for a genuinely multi-staff salon
+  // (could show a staff member busy who wasn't the one who actually took
+  // that booking). TODO: replace with a real capacity-pool model (track
+  // unassigned-bookings-per-window against total active staff count) once a
+  // multi-staff salon needs it — deliberately not built now.
   const isStaffBusy = (sId: string): boolean =>
-    bookedIntervals.some(b => b.staffId === sId && intervalsOverlap(t, slotEnd, b.start, b.end));
+    bookedIntervals.some(b => (b.staffId === sId || b.staffId === null) && intervalsOverlap(t, slotEnd, b.start, b.end));
 
   if (selectedStaff !== null) {
     return !isStaffAvailableForWindow(selectedStaff, t, slotEnd, dayKey) || isStaffBusy(selectedStaff.id);
