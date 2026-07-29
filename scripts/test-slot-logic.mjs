@@ -27,24 +27,34 @@ function isStaffAvailableForWindow(staff, slotStart, slotEnd, dayKey) {
 /**
  * Replicates the IIFE closures from the render function.
  * ctx = { selectedStaff, staffList, bookedSlots, serviceDuration, dayKey }
+ *
+ * Capacity-pool model — mirrors check_slot_available's plpgsql body
+ * (supabase-check-slot-capacity-pool-fix.sql) and app/lib/slot-
+ * availability.ts's computeBlocked. Keep all three in sync.
  */
 function computeBlocked(t, { selectedStaff, staffList, bookedSlots, serviceDuration, dayKey }) {
   const slotEnd = addMinutesToSlot(t, serviceDuration);
-
-  // staffId === null means "some real staff member, unrecorded" — blocks
-  // every staff id, not just unassigned checks. See the same comment in
-  // app/lib/slot-availability.ts for the full reasoning and the documented
-  // multi-staff-salon TODO this deliberately does not solve yet.
-  const isStaffBusy = (sId, slotStart, slotEnd) =>
-    bookedSlots.some(b => (b.staffId === sId || b.staffId === null) && intervalsOverlap(slotStart, slotEnd, b.start, b.end));
+  const overlapping = bookedSlots.filter(b => intervalsOverlap(t, slotEnd, b.start, b.end));
 
   if (selectedStaff !== null) {
-    return !isStaffAvailableForWindow(selectedStaff, t, slotEnd, dayKey)
-      || isStaffBusy(selectedStaff.id, t, slotEnd);
+    if (!isStaffAvailableForWindow(selectedStaff, t, slotEnd, dayKey)) return true;
+    if (overlapping.some(b => b.staffId === selectedStaff.id)) return true;
+
+    // selectedStaff can only be guaranteed free if enough OTHER staff exist
+    // to absorb every unidentified (null-staff) booking without needing
+    // selectedStaff. Pool size = staffList.length (all active staff), not
+    // working-hours-filtered — matches check_slot_available's pool exactly.
+    const busyOther = overlapping.filter(b => b.staffId !== null && b.staffId !== selectedStaff.id).length;
+    const busyNull = overlapping.filter(b => b.staffId === null).length;
+    return (staffList.length - busyOther) <= busyNull;
   }
+
+  // "Any Available": block only if every eligible (working-hours-filtered)
+  // staff member is occupied. Each overlapping interval occupies exactly
+  // one distinct staff member, guaranteed by the branch above.
   const eligible = staffList.filter(s => isStaffAvailableForWindow(s, t, slotEnd, dayKey));
   if (eligible.length === 0) return true;
-  return eligible.every(s => isStaffBusy(s.id, t, slotEnd));
+  return overlapping.length >= eligible.length;
 }
 
 // ── Test harness ──────────────────────────────────────────────────────────────
@@ -245,6 +255,82 @@ assert("specific-staff booking still blocks an ANY-AVAILABLE check (vice versa, 
   computeBlocked("10:00", {
     selectedStaff: null, staffList: [staffH],
     bookedSlots: [{ staffId: "sh", start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
+
+// ── Case H: capacity-pool math with a 3-staff pool — the "Any Available"
+// bug this whole investigation traced back to (real salon: Peter/John/
+// Saim; only Peter had a booking; calendar wrongly showed the slot blocked
+// for Any-Available anyway). Mirrors supabase-check-slot-capacity-pool-
+// test.sql cases 1/3/4/5/6 — same scenarios, same expected results. ──────
+
+console.log("\n─── H: capacity-pool math, 3-staff pool (Any-Available fix) ───────────");
+
+const hX = { id: "hx", name: "X", working_hours: { Mon: { enabled: true, start: "09:00", end: "18:00" } } };
+const hY = { id: "hy", name: "Y", working_hours: { Mon: { enabled: true, start: "09:00", end: "18:00" } } };
+const hZ = { id: "hz", name: "Z", working_hours: { Mon: { enabled: true, start: "09:00", end: "18:00" } } };
+const staffListH = [hX, hY, hZ];
+
+// H1: Any-Available, 1 of 3 directly busy → available (the reported bug, restated)
+assert("Any-Available, 1 of 3 staff directly busy → AVAILABLE (the reported bug)",
+  computeBlocked("10:00", {
+    selectedStaff: null, staffList: staffListH,
+    bookedSlots: [{ staffId: "hx", start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), false);
+
+// H2: Any-Available, 1 unidentified (null-staff) booking of 3 → available
+assert("Any-Available, 1 null-staff row of 3 → AVAILABLE",
+  computeBlocked("10:00", {
+    selectedStaff: null, staffList: staffListH,
+    bookedSlots: [{ staffId: null, start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), false);
+
+// H3: Any-Available, all 3 covered by null-staff rows → blocked
+assert("Any-Available, 3 null-staff rows (pool fully consumed) → BLOCKED",
+  computeBlocked("10:00", {
+    selectedStaff: null, staffList: staffListH,
+    bookedSlots: [
+      { staffId: null, start: "10:00", end: "11:00" },
+      { staffId: null, start: "10:00", end: "11:00" },
+      { staffId: null, start: "10:00", end: "11:00" },
+    ],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
+
+// H4: Specific staff X, 1 unrelated null-staff row, 0 other direct conflicts
+// (N=3) → available. Behavior CHANGE from the old "any null row blocks any
+// specific request" rule — the null row could be Y or Z, leaving X free.
+assert("Specific X, 1 unrelated null row, N=3 → AVAILABLE (behavior change)",
+  computeBlocked("10:00", {
+    selectedStaff: hX, staffList: staffListH,
+    bookedSlots: [{ staffId: null, start: "10:00", end: "11:00" }],
+    serviceDuration: 60, dayKey: "Mon",
+  }), false);
+
+// H5: Specific staff X, 2 null rows + Y directly busy (N=3) → blocked. Only
+// X and Z remain un-confirmed-busy; 2 unidentified bookings force both of
+// them busy, so X can't be guaranteed free.
+assert("Specific X, 2 null rows + Y direct busy, N=3 → BLOCKED",
+  computeBlocked("10:00", {
+    selectedStaff: hX, staffList: staffListH,
+    bookedSlots: [
+      { staffId: "hy", start: "10:00", end: "11:00" },
+      { staffId: null, start: "10:00", end: "11:00" },
+      { staffId: null, start: "10:00", end: "11:00" },
+    ],
+    serviceDuration: 60, dayKey: "Mon",
+  }), true);
+
+// H6: single-staff pool (N=1) — the 5e43691 shape must still block, proving
+// this is a strict generalization, not a divergent rule (see also Case G,
+// which continues to pass unchanged under this new formula).
+const hSolo = { id: "hs", name: "Solo", working_hours: { Mon: { enabled: true, start: "09:00", end: "18:00" } } };
+assert("Single-staff pool (N=1), null row → still BLOCKED (5e43691 regression, capacity-pool formula)",
+  computeBlocked("10:00", {
+    selectedStaff: hSolo, staffList: [hSolo],
+    bookedSlots: [{ staffId: null, start: "10:00", end: "11:00" }],
     serviceDuration: 60, dayKey: "Mon",
   }), true);
 
