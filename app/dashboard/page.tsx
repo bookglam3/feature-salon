@@ -11,6 +11,8 @@ import {
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
+import { fromZonedTime } from "date-fns-tz";
+import { COUNTRY_TIMEZONES } from "@/app/lib/slot-availability";
 import DashboardShell, { HamburgerBtn } from "./components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "./components/Modal";
 import EmptyState from "./components/EmptyState";
@@ -216,7 +218,12 @@ export default function DashboardPage() {
 
   const handleNewBooking = useCallback(async () => {
     if (!salon || !formData.client_name || !formData.date || !formData.time) { toast.error("Fill required fields"); return; }
-    const date_time = new Date(formData.date + "T" + formData.time).toISOString();
+    // Same fromZonedTime conversion as the public booking page (8b3ea7e) —
+    // a bare `new Date(dateStr+"T"+timeStr)` parses in the RUNTIME's own
+    // timezone, not the salon's, whenever the browser's OS timezone differs
+    // from the salon's configured one.
+    const salonTz = salon.timezone || COUNTRY_TIMEZONES[salon.country || ""] || "Europe/London";
+    const date_time = fromZonedTime(`${formData.date}T${formData.time}:00`, salonTz).toISOString();
     // Stage 1 of the interval-overlap fix: end_time written at booking time.
     // service_id is optional here (formData.service_id || null) — same
     // 30-min fallback as every other duration-less write path in the codebase.

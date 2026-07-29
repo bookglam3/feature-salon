@@ -2,6 +2,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { fromZonedTime, formatInTimeZone } from "date-fns-tz";
+import { COUNTRY_TIMEZONES } from "../../lib/slot-availability";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
 import EmptyState from "../components/EmptyState";
@@ -34,7 +36,7 @@ export default function BookingsPage() {
   const router = useRouter();
   const toast = useToast();
   const { vc } = useSalon();
-  const [salon, setSalon] = useState<{ id: string; name: string } | null>(null);
+  const [salon, setSalon] = useState<{ id: string; name: string; timezone?: string | null; country?: string | null } | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
@@ -91,17 +93,27 @@ export default function BookingsPage() {
     // the same default used everywhere else in the codebase, not a guess.
     const selectedSvc = services.find(s => s.id === formData.service_id);
     const durationMin = selectedSvc?.duration_minutes || 30;
-    const endTimeIso = formData.date_time
-      ? new Date(new Date(formData.date_time).getTime() + durationMin * 60_000).toISOString()
+    // Same fromZonedTime conversion as the public booking page (8b3ea7e).
+    // Previously date_time was formData.date_time passed straight through
+    // (Postgres treats the offset-less string as UTC), while end_time was
+    // separately derived via new Date(formData.date_time) (parsed in the
+    // BROWSER's timezone) — two different interpreters for the same
+    // instant, which could silently disagree (e.g. store a zero-duration
+    // appointment for a 60-min service). Both now derive from one corrected
+    // instant, so they can no longer contradict each other.
+    const salonTz = salon.timezone || COUNTRY_TIMEZONES[salon.country || ""] || "Europe/London";
+    const startIso = formData.date_time ? fromZonedTime(`${formData.date_time}:00`, salonTz).toISOString() : null;
+    const endTimeIso = startIso
+      ? new Date(new Date(startIso).getTime() + durationMin * 60_000).toISOString()
       : null;
     if (editingId) {
-      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, end_time: endTimeIso, status: formData.status, notes: notesValue }).eq("id", editingId);
+      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue }).eq("id", editingId);
       if (error) { toast.error("Failed to update booking"); return; }
       toast.success("Booking updated!");
     } else {
       const { data: inserted, error } = await supabase
         .from("appointments")
-        .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: formData.date_time, end_time: endTimeIso, status: formData.status, notes: notesValue })
+        .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue })
         .select("id")
         .single();
       if (error) { toast.error("Failed to create booking"); return; }
@@ -144,9 +156,20 @@ export default function BookingsPage() {
         if (p.consultation) { parsed = { notes: p.notes || "", ...p.consultation }; }
       } catch { /* plain text notes — leave as-is */ }
     }
-    setFormData({ client_name: a.client_name || "", client_email: a.client_email || "", client_phone: a.client_phone || "", staff_id: a.staff_id || "", service_id: a.service_id || "", date_time: a.date_time ? a.date_time.slice(0,16) : "", status: a.status || "pending", ...parsed });
+    // Previously a.date_time.slice(0,16) — the raw UTC digits, mislabeled
+    // as local time in the datetime-local input. Harmless-by-coincidence
+    // while the write side was also a raw passthrough (round-tripped back
+    // to the same wrong-but-consistent value); now that the write side does
+    // a real salon-local -> UTC conversion, this MUST convert UTC -> salon-
+    // local first, or saving an edit that never touched the date field
+    // would silently shift a correct booking's time. formatInTimeZone
+    // (date-fns-tz, already a dependency) rather than utcToSalonTime —
+    // that helper only returns the time portion (HH:mm), not the date, and
+    // the local calendar date can differ from the UTC one near midnight.
+    const salonTz = salon?.timezone || COUNTRY_TIMEZONES[salon?.country || ""] || "Europe/London";
+    setFormData({ client_name: a.client_name || "", client_email: a.client_email || "", client_phone: a.client_phone || "", staff_id: a.staff_id || "", service_id: a.service_id || "", date_time: a.date_time ? formatInTimeZone(a.date_time, salonTz, "yyyy-MM-dd'T'HH:mm") : "", status: a.status || "pending", ...parsed });
     setShowForm(true);
-  }, [vc]);
+  }, [vc, salon]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!window.confirm("Delete this booking? This cannot be undone.")) return;

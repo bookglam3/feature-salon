@@ -3,6 +3,7 @@ import { useEffect, useState, use, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { supabase } from "@/app/lib/supabase";
+import { fromZonedTime } from "date-fns-tz";
 import {
   DAY_KEYS, COUNTRY_TIMEZONES, type BookedInterval,
   addMinutesToSlot, utcToSalonTime, isStaffAvailableForWindow, computeBlocked,
@@ -94,7 +95,12 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
   const handleReschedule = async () => {
     if (!newDate || !newTime) return;
     setSubmitting(true);
-    const newDateTime = new Date(`${newDate}T${newTime}`).toISOString();
+    // Same fromZonedTime conversion as the public booking page (8b3ea7e) —
+    // the salon's timezone is already fetched via GET /api/appointment/[id]
+    // and used elsewhere in this file (loadAvailability, the date picker);
+    // this was the one write path still bypassing it.
+    const tz = appt?.salon?.timezone || COUNTRY_TIMEZONES[appt?.salon?.country || ""] || "Europe/London";
+    const newDateTime = fromZonedTime(`${newDate}T${newTime}:00`, tz).toISOString();
     const res = await fetch(`/api/appointment/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

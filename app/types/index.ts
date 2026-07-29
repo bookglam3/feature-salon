@@ -7,6 +7,8 @@ export interface Salon {
   plan: string;
   created_at: string;
   business_type?: string | null;
+  timezone?: string | null;
+  country?: string | null;
 }
 
 export interface Appointment {
