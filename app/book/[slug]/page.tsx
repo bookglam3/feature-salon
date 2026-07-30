@@ -218,7 +218,7 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [step, setStep] = useState(0);
-  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+  const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [staffConfirmed, setStaffConfirmed] = useState(false);
   const [selDate, setSelDate] = useState<Date|null>(null);
@@ -375,10 +375,15 @@ export default function BookingPage() {
   // A variable-priced ("from £X") service can't be paid in full online — the
   // final amount is unknown and there's no balance-due flow, so the salon would
   // be locked into charging the listed floor price. Just omit the option.
-  const isFromService = !!selectedService?.price_is_from;
+  // Applies if ANY selected service is variable-priced, not just a single one —
+  // same OR-across-the-set rule enforced server-side in create_booking_with_
+  // services and create-payment-intent.
+  const anyFromService = selectedServices.some(s => !!s.price_is_from);
+  const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
+  const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration_minutes ?? s.duration ?? 30), 0);
 
   const paymentOptionsRaw = [
-    (salonPm.full_online && !isFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
+    (salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
     salonPm.deposit_online && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#10B981" },
     salonPm.custom_deposit && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
     salonPm.pay_at_salon   && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#94A3B8" },
@@ -387,18 +392,18 @@ export default function BookingPage() {
   // Fallback: if the salon's only enabled method was full online payment, hiding
   // it for a "from" service would leave zero bookable options. Force Pay at
   // Salon on instead of silently falling through to a broken $0/pending booking.
-  const paymentOptions = (isFromService && paymentOptionsRaw.length === 0)
+  const paymentOptions = (anyFromService && paymentOptionsRaw.length === 0)
     ? [{ id: "pay_at_salon", label: "Pay at Salon", sub: "No payment required now", pct: 0, color: "#94A3B8" }]
     : paymentOptionsRaw;
 
   // Auto-select first available option
   const selectedOption = paymentOptions.find(o => o.id === paymentMethod) || paymentOptions[0];
-  const chargeAmount = selectedOption ? (selectedService?.price || 0) * selectedOption.pct / 100 : 0;
+  const chargeAmount = selectedOption ? totalPrice * selectedOption.pct / 100 : 0;
   const isPayAtSalon = selectedOption?.id === "pay_at_salon";
 
   // Step 3 -> Step 4: Save appointment + conditionally create PaymentIntent
   const handleProceedToPayment = useCallback(async () => {
-    if (!salon || !selectedService || !selDate || !selTime || !form.name.trim()) return;
+    if (!salon || selectedServices.length === 0 || !selDate || !selTime || !form.name.trim()) return;
     if (!validateForm()) return;
     setSubmitting(true);
 
@@ -408,18 +413,6 @@ export default function BookingPage() {
       || "Europe/London";
     const dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,"0")}-${String(selDate.getDate()).padStart(2,"0")}`;
     const iso = localTimeToUTC(dateStr, selTime, salonTz);
-
-    // DEPLOY AFTER check_slot_available's new signature is live — the 4th
-    // arg (p_duration_minutes) doesn't exist until then. Safe to deploy the
-    // function first without this change (DEFAULT NULL keeps old callers
-    // working); this line is what starts using the real duration.
-    const { data: slotFree } = await supabase.rpc("check_slot_available", {
-      p_salon_id:  salon.id,
-      p_date_time: iso,
-      p_staff_id:  selectedStaff?.id ?? null,
-      p_duration_minutes: selectedService.duration_minutes ?? selectedService.duration ?? 30,
-    });
-    if (slotFree === false) { alert("This time slot is already booked. Please choose another time."); setSubmitting(false); return; }
 
     const pm = selectedOption?.id || "full_online";
 
@@ -431,37 +424,63 @@ export default function BookingPage() {
     // while the row is silently stuck at status=pending/payment_status=pending.
     const isImmediatelyConfirmed = isPayAtSalon || chargeAmount === 0;
 
-    // Build insert — payment_method column only exists after migration
-    // salon.payment_methods being set is the proxy for whether migration has run
+    // payment_method column only exists after migration — salon.payment_methods
+    // being set is the proxy for whether migration has run.
     const hasMigration = !!salon?.payment_methods;
-    // id and review_token are generated client-side (crypto.randomUUID(), same
-    // CSPRNG class as Postgres's gen_random_uuid() default) so the insert never
-    // needs .select()/RETURNING to read them back. RETURNING is evaluated under
-    // SELECT RLS, and appointments deliberately has no anon SELECT policy — an
-    // insert-only anon key must never be able to read booking rows back.
+    // id and review_token stay client-generated (crypto.randomUUID(), same
+    // CSPRNG class as Postgres's gen_random_uuid() default) — unchanged from
+    // the single-service flow. No .select() needed either way: an RPC's
+    // return value was never subject to the RETURNING-requires-SELECT-RLS
+    // restriction that .insert().select() ran into (that was specific to
+    // PostgREST's return=representation read-back on a table endpoint).
     const bookingId = crypto.randomUUID();
     const reviewToken = crypto.randomUUID();
-    // Stage 1 of the interval-overlap fix: end_time written at booking time
-    // instead of re-derived live from services.duration_minutes on every
-    // slot check (a live re-derivation would retroactively change a past
-    // booking's occupied window if the service's duration is edited later).
-    const serviceDurationMin = selectedService.duration_minutes ?? selectedService.duration ?? 30;
-    const endTimeIso = new Date(new Date(iso).getTime() + serviceDurationMin * 60_000).toISOString();
-    const payload = {
-      id: bookingId, review_token: reviewToken,
-      salon_id: salon.id, client_name: form.name, client_email: form.email,
-      client_phone: form.phone, service_id: selectedService.id,
-      staff_id: selectedStaff?.id || null, date_time: iso, end_time: endTimeIso,
-      status: isImmediatelyConfirmed ? "confirmed" : "pending",
-      payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
-      ...(hasMigration ? { payment_method: pm } : {}),
-    };
-    const { error } = await supabase
-      .from("appointments")
-      .insert(payload);
+
+    // Line items in selection order. sort_order 0 is also the PRIMARY service
+    // (p_service_id below) — both come from selectedServices[0], so they can't
+    // drift apart. create_booking_with_services derives total duration and
+    // end_time internally by summing these — the client sends neither a
+    // duration nor an end_time, only the line items themselves.
+    const lineItems = selectedServices.map((s, i) => ({
+      service_id: s.id, name: s.name, price: s.price,
+      duration_minutes: s.duration_minutes ?? s.duration ?? 30,
+      price_is_from: !!s.price_is_from, sort_order: i,
+    }));
+
+    // Replaces the old separate check_slot_available call + appointments
+    // insert — one atomic RPC call does the slot check, the appointment
+    // insert, and every line-item insert together, or none of it.
+    const { error } = await supabase.rpc("create_booking_with_services", {
+      p_id: bookingId,
+      p_review_token: reviewToken,
+      p_salon_id: salon.id,
+      p_client_name: form.name,
+      p_client_email: form.email,
+      p_client_phone: form.phone,
+      p_service_id: selectedServices[0].id,
+      p_staff_id: selectedStaff?.id || null,
+      p_date_time: iso,
+      p_status: isImmediatelyConfirmed ? "confirmed" : "pending",
+      p_payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
+      p_payment_method: hasMigration ? pm : null,
+      p_line_items: lineItems,
+    });
 
     if (error) {
-      alert("Booking failed: " + (error?.message || "Unknown error."));
+      const msg = error.message || "";
+      if (msg.includes("SLOT_UNAVAILABLE")) {
+        alert("This slot was just taken. Please choose another time.");
+      } else if (msg.includes("SLOT_CHECK_DRIFT_DETECTED")) {
+        // A real server-side bug (the two availability checks disagreeing),
+        // not anything the client did — don't imply user error.
+        alert("Something went wrong on our end. Please try again in a moment, or contact the salon directly.");
+      } else {
+        // INVALID_SALON / INVALID_SERVICE / INVALID_STAFF / INVALID_STATUS /
+        // INVALID_PAYMENT_STATUS / INVALID_PAYMENT_METHOD / EMPTY_LINE_ITEMS /
+        // LINE_ITEM_SALON_MISMATCH — defense-in-depth guards that should
+        // never fire from this well-behaved client; generic fallback.
+        alert("Booking failed: " + (msg || "Unknown error."));
+      }
       setSubmitting(false); return;
     }
     setBookingId(bookingId);
@@ -477,9 +496,12 @@ export default function BookingPage() {
       }).catch(e => console.error("[send-confirmation] failed:", e));
 
       const dateStr = selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) || "";
-      const servicePrice = selectedService?.price ?? 0;
-      const payStatus = servicePrice > 0 ? "pay_at_salon" : "free";
-      setConfirmedBooking({ service: selectedService.name, date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: bookingId, paymentStatus: payStatus, servicePrice, servicePriceIsFrom: !!selectedService?.price_is_from });
+      const payStatus = totalPrice > 0 ? "pay_at_salon" : "free";
+      setConfirmedBooking({
+        service: selectedServices.map(s => s.name).join(", "),
+        date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: bookingId,
+        paymentStatus: payStatus, servicePrice: totalPrice, servicePriceIsFrom: anyFromService,
+      });
       setSubmitting(false);
       setStep(5);
       return;
@@ -489,9 +511,9 @@ export default function BookingPage() {
     const res = await fetch("/api/create-payment-intent", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: selectedService.price, charge_amount: chargeAmount,
+        amount: totalPrice, charge_amount: chargeAmount,
         email: form.email, booking_id: bookingId,
-        salon_name: salon.name, service_name: selectedService.name,
+        salon_name: salon.name, service_name: selectedServices.map(s => s.name).join(" + "),
         deposit_only: pm !== "full_online",
         salon_id: salon.id,
       }),
@@ -506,7 +528,7 @@ export default function BookingPage() {
     setClientSecret(data.clientSecret);
     setSubmitting(false);
     setStep(4);
-  }, [salon, selectedService, selectedStaff, selDate, selTime, form, selectedOption, isPayAtSalon, chargeAmount, validateForm]);
+  }, [salon, selectedServices, selectedStaff, selDate, selTime, form, selectedOption, isPayAtSalon, chargeAmount, totalPrice, anyFromService, validateForm]);
 
   const handleSendOtp = useCallback(async () => {
     if (!validateForm()) return;
@@ -554,7 +576,7 @@ export default function BookingPage() {
   // Salon-like verticals (scissors/sparkles/leaf) have relevant per-service emoji — others get a neutral icon
   const isSalonLike = ["scissors", "sparkles", "leaf"].includes(bookingVc.staffIcon);
 
-  const canNext0 = !!selectedService;
+  const canNext0 = selectedServices.length > 0;
   const canNext1 = staffConfirmed;
   const canNext2 = !!selDate && !!selTime;
   const canSubmit = !!form.name.trim() && !!form.email && !!form.phone && !errors.email && !errors.phone;
@@ -693,8 +715,11 @@ export default function BookingPage() {
                       ((s.duration_minutes ?? 0) > 0 || (s.duration ?? 0) > 0) ? `${s.duration_minutes || s.duration} mins` : null,
                       (s.gender_restriction && s.gender_restriction !== "all") ? (s.gender_restriction === "female" ? "Female only" : "Men only") : null,
                     ].filter(Boolean);
+                    const isSelected = selectedServices.some(x => x.id === s.id);
                     return (
-                    <div key={s.id} className={`item-card ${selectedService?.id===s.id?"selected":""}`} onClick={()=>setSelectedService(s)}>
+                    <div key={s.id} className={`item-card ${isSelected?"selected":""}`} onClick={()=>{
+                      setSelectedServices(prev => prev.some(x => x.id === s.id) ? prev.filter(x => x.id !== s.id) : [...prev, s]);
+                    }}>
                       <div className="item-icon">{isSalonLike ? getServiceIcon(s.name) : "📋"}</div>
                       <div className="item-content">
                         <h3>{s.name}</h3>
@@ -705,6 +730,12 @@ export default function BookingPage() {
                     </div>
                     );
                   })
+                )}
+                {selectedServices.length > 0 && (
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"12px 16px", background:"#EEF2FF", borderRadius:12, marginTop:12, marginBottom:4 }}>
+                    <span style={{ fontSize:13.5, fontWeight:700, color:"#4F46E5" }}>{selectedServices.length} service{selectedServices.length>1?"s":""} selected</span>
+                    <span style={{ fontSize:13.5, fontWeight:700, color:"#4F46E5" }}>{anyFromService?"from ":""}£{totalPrice.toFixed(2)} · {totalDuration} mins</span>
+                  </div>
                 )}
                 <button className="btn" disabled={!canNext0} onClick={()=>setStep(1)}>Continue →</button>
               </>
@@ -757,9 +788,11 @@ export default function BookingPage() {
                   );
                   const now = new Date();
                   const filteredSlots = TIME_SLOTS.filter(t => isSlotInRange(t, selectedStaff, selDate));
-                  const serviceDuration = selectedService
-                    ? (selectedService.duration_minutes ?? selectedService.duration ?? 30)
-                    : 30;
+                  // Combined duration across ALL selected services — the calendar
+                  // must grey based on the full booking's length, not one service's,
+                  // or it could show a start time that overflows into an already-
+                  // booked slot once the real (longer) window is checked server-side.
+                  const serviceDuration = totalDuration > 0 ? totalDuration : 30;
                   const dayKey = DAY_KEYS[selDate.getDay()];
 
                   const cbOpts = { selectedStaff, staffList, bookedIntervals: bookedSlots, serviceDuration, dayKey };
@@ -894,8 +927,7 @@ export default function BookingPage() {
                   <div style={{marginTop:24}}>
                     <div className="input-label" style={{marginBottom:12}}>Payment Option</div>
                     {paymentOptions.map(opt => {
-                      const servicePrice = selectedService?.price || 0;
-                      const amt = opt.pct === 0 ? servicePrice : servicePrice * opt.pct / 100;
+                      const amt = opt.pct === 0 ? totalPrice : totalPrice * opt.pct / 100;
                       const isSelected = (paymentMethod || paymentOptions[0]?.id) === opt.id;
                       return (
                         <div key={opt.id} className={`deposit-option ${isSelected ? "selected" : ""}`} onClick={() => setPaymentMethod(opt.id)}>
@@ -905,7 +937,7 @@ export default function BookingPage() {
                               <div style={{fontSize:13,color:"#64748B",marginTop:2}}>{opt.sub}</div>
                             </div>
                             <div style={{textAlign:"right",flexShrink:0}}>
-                              <div style={{fontSize:18,fontWeight:800,color:opt.color}}>{selectedService?.price_is_from ? "from " : ""}£{amt.toFixed(2)}</div>
+                              <div style={{fontSize:18,fontWeight:800,color:opt.color}}>{anyFromService ? "from " : ""}£{amt.toFixed(2)}</div>
                               {opt.pct < 100 && opt.pct > 0 && <div style={{fontSize:11,color:"#94A3B8"}}>today</div>}
                               {opt.pct === 0 && <div style={{fontSize:11,color:"#94A3B8"}}>at salon</div>}
                             </div>
@@ -917,11 +949,11 @@ export default function BookingPage() {
                 )}
 
                 <div className="summary">
-                  <div className="summary-row"><span className="summary-label">Service</span><span className="summary-value">{selectedService?.name}</span></div>
+                  <div className="summary-row"><span className="summary-label">{selectedServices.length > 1 ? "Services" : "Service"}</span><span className="summary-value">{selectedServices.map(s => s.name).join(", ")}</span></div>
                   {isPayAtSalon && (
                     <div className="summary-row">
                       <span className="summary-label">Price</span>
-                      <span className="summary-value">{selectedService?.price_is_from ? "from " : ""}£{(selectedService?.price || 0).toFixed(2)}</span>
+                      <span className="summary-value">{anyFromService ? "from " : ""}£{totalPrice.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="summary-row"><span className="summary-label">{bookingVc.staffSingular}</span><span className="summary-value">{selectedStaff?.name||"Any available"}</span></div>
@@ -994,7 +1026,7 @@ export default function BookingPage() {
                 <h2>Secure Payment</h2>
                 <div style={{padding:"14px 16px",background:"#F8FAFC",borderRadius:12,border:"1px solid #E2E8F0",marginBottom:20}}>
                   <div style={{fontSize:12,color:"#64748B",fontWeight:600,marginBottom:4}}>Paying for</div>
-                  <div style={{fontSize:15,fontWeight:700,color:"#0F172A"}}>{selectedService?.name} at {salon?.name}</div>
+                  <div style={{fontSize:15,fontWeight:700,color:"#0F172A"}}>{selectedServices.map(s => s.name).join(", ")} at {salon?.name}</div>
                    <div style={{fontSize:13,color:"#667eea",fontWeight:700,marginTop:2}}>
                     £{chargeAmount.toFixed(2)}
                     {selectedOption && selectedOption.pct < 100 ? ` (${selectedOption.label})` : ""}
@@ -1003,7 +1035,7 @@ export default function BookingPage() {
                 {paymentError && <div style={{padding:"12px 14px",background:"#FEF2F2",borderRadius:10,border:"1px solid #FECACA",color:"#EF4444",fontSize:13,fontWeight:600,marginBottom:16}}>⚠️ {paymentError}</div>}
                 <Elements stripe={stripePromise} options={{ clientSecret, appearance:{ theme:"stripe", variables:{ colorPrimary:"#667eea", borderRadius:"12px", fontFamily:"'Plus Jakarta Sans', system-ui, sans-serif" } } }}>
                   <CheckoutForm
-                    amount={selectedService?.price||0}
+                    amount={totalPrice}
                     chargeAmount={chargeAmount}
                     methodLabel={selectedOption?.label||"Pay"}
                     bookingId={bookingId}
@@ -1011,7 +1043,7 @@ export default function BookingPage() {
                     onSuccess={()=>setStep(5)}
                     onError={msg=>setPaymentError(msg)}
                     slug={slug}
-                    service={selectedService?.name||""}
+                    service={selectedServices.map(s => s.name).join(", ")}
                     date={selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})||""}
                     time={selTime}
                     name={form.name}
