@@ -15,8 +15,10 @@ interface Appointment {
   staff_id: string | null;
   client_name: string;
   date_time: string;
+  end_time: string | null;
   status: string;
   services: { name: string; price: number; duration_minutes?: number } | null;
+  line_items?: { name: string; price: number; duration_minutes?: number }[];
   salon: { name: string; slug: string; timezone?: string; country?: string } | null;
   notes?: string;
 }
@@ -52,9 +54,16 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
       .eq("active", true);
     setStaffList(st || []);
 
+    // end_time added — mirrors the PATCH handler's resolveEnd() fallback:
+    // real end_time if present, else derived from the candidate's own
+    // primary service duration. Without this, the grid could show a slot
+    // as free that a multi-service booking actually occupies, only for the
+    // server to correctly reject it on submit — a UX mismatch, not a
+    // corruption risk (the server gate is authoritative either way), but
+    // worth closing so the grid and the gate agree.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: appts } = await (supabase.from("appointments") as any)
-      .select("staff_id, date_time, services(duration_minutes)")
+      .select("staff_id, date_time, end_time, services(duration_minutes)")
       .eq("salon_id", salonId)
       .gte("date_time", `${date}T00:00:00`)
       .lte("date_time", `${date}T23:59:59`)
@@ -62,9 +71,13 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
       .neq("id", apptId);
 
     const intervals: BookedInterval[] = (appts || []).map(
-      (a: { staff_id: string | null; date_time: string; services: { duration_minutes?: number } | null }) => {
+      (a: { staff_id: string | null; date_time: string; end_time: string | null; services: { duration_minutes?: number } | { duration_minutes?: number }[] | null }) => {
         const start = utcToSalonTime(a.date_time, tz);
-        const dur = a.services?.duration_minutes || 30;
+        if (a.end_time) {
+          return { staffId: a.staff_id, start, end: utcToSalonTime(a.end_time, tz) };
+        }
+        const svc = Array.isArray(a.services) ? a.services[0] : a.services;
+        const dur = svc?.duration_minutes || 30;
         return { staffId: a.staff_id, start, end: addMinutesToSlot(start, dur) };
       }
     );
@@ -210,7 +223,15 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               { label: "Client",  value: appt.client_name },
-              { label: "Service", value: appt.services?.name || "—" },
+              {
+                label: (appt.line_items && appt.line_items.length > 1) ? "Services" : "Service",
+                // Multi-service aware: shows every booked service, not just
+                // the primary. Falls back to the single `services` join for
+                // bookings that predate multi-service (empty line_items).
+                value: (appt.line_items && appt.line_items.length > 0)
+                  ? appt.line_items.map(li => li.name).join(", ")
+                  : (appt.services?.name || "—"),
+              },
               { label: "Date",    value: apptDate.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" }) },
               { label: "Time",    value: apptDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) },
             ].map(({ label, value }) => (
@@ -254,7 +275,16 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
                       const selectedStaff = appt?.staff_id
                         ? (staffList.find(s => s.id === appt.staff_id) ?? null)
                         : null;
-                      const serviceDuration = appt?.services?.duration_minutes || 30;
+                      // This booking's own combined duration — preserved from its
+                      // current end_time - date_time, same as the PATCH handler's
+                      // fix, NOT re-derived from the primary service alone. Without
+                      // this, the grid would treat a 158-min multi-service booking
+                      // as 20 minutes long while picking its own new time, showing
+                      // a slot free that the real (longer) booking would overflow
+                      // into an adjacent appointment.
+                      const serviceDuration = appt?.end_time
+                        ? Math.round((new Date(appt.end_time).getTime() - new Date(appt.date_time).getTime()) / 60_000)
+                        : (appt?.services?.duration_minutes || 30);
                       const dayKey = newDate ? DAY_KEYS[new Date(newDate + "T12:00:00Z").getDay()] : "";
                       const cbOpts = { selectedStaff, staffList, bookedIntervals, serviceDuration, dayKey };
                       return availableSlots.map(t => {

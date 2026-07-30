@@ -18,17 +18,30 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  // Only return fields needed by the reschedule page — no PII (email/phone/payment)
+  // Only return fields needed by the reschedule page — no PII (email/phone/payment).
+  // end_time included so the client can preserve the booking's own combined
+  // duration when rendering its slot grid — same fix as the PATCH handler.
   const { data, error } = await supabaseAdmin
     .from("appointments")
-    .select("id,salon_id,staff_id,date_time,status,client_name,notes,services(name,price,duration_minutes),salon:salons(name,slug,timezone,country)")
+    .select("id,salon_id,staff_id,date_time,end_time,status,client_name,notes,services(name,price,duration_minutes),salon:salons(name,slug,timezone,country)")
     .eq("id", id)
     .single();
 
   if (error || !data) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  return NextResponse.json(data);
+
+  // Multi-service aware (3C-2a): line items, so the reschedule page can show
+  // everything actually booked, not just the primary service. Empty array
+  // for bookings that predate multi-service — the page falls back to the
+  // single `services` join above for those, same pattern as 3D.
+  const { data: lineItems } = await supabaseAdmin
+    .from("appointment_services")
+    .select("name, price, duration_minutes")
+    .eq("appointment_id", id)
+    .order("sort_order", { ascending: true });
+
+  return NextResponse.json({ ...data, line_items: lineItems || [] });
 }
 
 export async function PATCH(
@@ -42,7 +55,7 @@ export async function PATCH(
   // Fetch appointment + salon for owner email
   const { data: rawAppt } = await supabaseAdmin
     .from("appointments")
-    .select("salon_id, staff_id, client_name, date_time, review_token, payment_status, services(name,duration_minutes), salon:salons(name,owner_email)")
+    .select("salon_id, staff_id, client_name, date_time, end_time, review_token, payment_status, services(name,duration_minutes), salon:salons(name,owner_email)")
     .eq("id", id)
     .single();
 
@@ -51,6 +64,7 @@ export async function PATCH(
     staff_id: string | null;
     client_name: string;
     date_time: string;
+    end_time: string | null;
     review_token: string | null;
     payment_status: string | null;
     services: { name: string; duration_minutes?: number } | { name: string; duration_minutes?: number }[] | null;
@@ -83,30 +97,61 @@ export async function PATCH(
 
   if (action === "reschedule") {
     // Server-side double-booking guard (mirrors client capacity logic, works in UTC)
+    //
+    // 3C-2a fix: duration MUST be preserved from this appointment's own
+    // existing window (end_time - date_time), not recomputed from the
+    // primary service's duration_minutes. The old code did the latter —
+    // for a 4-service, 158-minute booking, that meant every reschedule
+    // silently shrank end_time to the PRIMARY service's duration alone
+    // (e.g. 20 minutes), corrupting the stored window AND causing the
+    // conflict-check below to run against that wrong, shortened window —
+    // opening the freed 138 minutes to a real double-booking. Preserving
+    // the delta is also strictly simpler than re-summing appointment_
+    // services: it needs no extra query, and it's correct for single- and
+    // multi-service bookings alike, since it never has to know how many
+    // services are on the appointment at all — only what its own current
+    // window already is. Falls back to the primary service's duration only
+    // if end_time is somehow null (pre-Stage-1 rows, before end_time was
+    // written at all) — there's no better source of truth in that case.
     const svc = getService();
-    const duration = svc?.duration_minutes || 30;
+    const oldStart = new Date(appt.date_time);
+    const durationMs = appt.end_time
+      ? new Date(appt.end_time).getTime() - oldStart.getTime()
+      : (svc?.duration_minutes || 30) * 60_000;
     const newStart = new Date(date_time);
-    const newEnd   = new Date(newStart.getTime() + duration * 60_000);
+    const newEnd   = new Date(newStart.getTime() + durationMs);
     const dateStr  = (date_time as string).slice(0, 10);
 
+    // end_time added to this select so the conflict-check below can use
+    // each OTHER candidate appointment's own real window too, not their
+    // primary service's duration — the same class of bug, same fix, just
+    // applied to the appointments being checked AGAINST instead of this one.
     const { data: existing } = await supabaseAdmin
       .from("appointments")
-      .select("id, staff_id, date_time, services(duration_minutes)")
+      .select("id, staff_id, date_time, end_time, services(duration_minutes)")
       .eq("salon_id", appt.salon_id)
       .gte("date_time", `${dateStr}T00:00:00Z`)
       .lte("date_time", `${dateStr}T23:59:59Z`)
       .not("status", "eq", "cancelled")
       .neq("id", id);
 
+    // COALESCE(end_time, date_time + duration_or_30min_default) — same
+    // fallback shape used everywhere else in this codebase (check_slot_
+    // available, create_booking_with_services, loadBookedSlots).
+    const resolveEnd = (e: { date_time: string; end_time: string | null; services: unknown }): Date => {
+      if (e.end_time) return new Date(e.end_time);
+      const eSvc = Array.isArray(e.services) ? e.services[0] : e.services;
+      const eDur = (eSvc as { duration_minutes?: number } | null)?.duration_minutes || 30;
+      return new Date(new Date(e.date_time).getTime() + eDur * 60_000);
+    };
+
     if (existing && existing.length > 0) {
       if (appt.staff_id) {
         // Specific staff: reject if that staff has any overlapping booking
         const conflict = existing.some(e => {
           if (e.staff_id !== appt.staff_id) return false;
-          const eSvc = Array.isArray(e.services) ? e.services[0] : e.services;
-          const eDur = (eSvc as { duration_minutes?: number } | null)?.duration_minutes || 30;
           const eStart = new Date(e.date_time);
-          const eEnd   = new Date(eStart.getTime() + eDur * 60_000);
+          const eEnd   = resolveEnd(e);
           return newStart < eEnd && eStart < newEnd;
         });
         if (conflict) {
@@ -124,10 +169,8 @@ export async function PATCH(
           const allBusy = allStaff.every(staff =>
             existing.some(e => {
               if (e.staff_id !== staff.id) return false;
-              const eSvc = Array.isArray(e.services) ? e.services[0] : e.services;
-              const eDur = (eSvc as { duration_minutes?: number } | null)?.duration_minutes || 30;
               const eStart = new Date(e.date_time);
-              const eEnd   = new Date(eStart.getTime() + eDur * 60_000);
+              const eEnd   = resolveEnd(e);
               return newStart < eEnd && eStart < newEnd;
             })
           );
