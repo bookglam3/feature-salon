@@ -102,18 +102,43 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
 
+    // Multi-service aware: appointment_services holds the real line items
+    // (3A schema, 3C-1 write path). Falls back to the single services(...)
+    // join only for bookings from before multi-service shipped, which have
+    // no line items at all — every booking from 3C-1 onward always has at
+    // least one, even for a single selected service, so this fallback is
+    // for historical data only, not an ongoing code path.
+    const { data: lineItems } = await supabase
+      .from("appointment_services")
+      .select("name, price, price_is_from")
+      .eq("appointment_id", appointmentId)
+      .order("sort_order", { ascending: true });
+
+    const hasLineItems = !!lineItems && lineItems.length > 0;
+    const serviceName = hasLineItems
+      ? lineItems!.map(li => li.name).join(", ")
+      : (appt.services?.name || "Appointment");
+    // numeric(10,2) columns come back from PostgREST as strings — Number(...)
+    // is deliberate, not decorative (same reasoning as 3B's chargeAmount sum).
+    const combinedPrice = hasLineItems
+      ? lineItems!.reduce((sum, li) => sum + Number(li.price), 0)
+      : appt.services?.price;
+    const anyPriceIsFrom = hasLineItems
+      ? lineItems!.some(li => li.price_is_from === true)
+      : !!appt.services?.price_is_from;
+
     console.log(`[send-confirmation] Sending to client=${clientEmail}, owner=${ownerEmail || "NONE"}`);
 
     await sendBookingEmails({
       clientEmail,
       clientName:      appt.client_name,
       clientPhone:     appt.client_phone || "",
-      serviceName:     appt.services?.name || "Appointment",
+      serviceName,
       dateTime:        appt.date_time,
       staffName:       appt.staff?.name,
       salonName:       salon?.name || "The Salon",
       salonOwnerEmail: ownerEmail,
-      price:           appt.services?.price,
+      price:           combinedPrice,
       salonAddress:    salon?.address,
       cancelLink:      `${appUrl}/reschedule/${appointmentId}?token=${appt.review_token}`,
       dashboardUrl:    `${appUrl}/dashboard/bookings`,
@@ -122,7 +147,7 @@ export async function POST(req: NextRequest) {
       businessType:    salon?.business_type,
       salonId:         salon?.id,
       appointmentId,
-      priceIsFrom:     !!appt.services?.price_is_from,
+      priceIsFrom:     anyPriceIsFrom,
     });
 
     // ── WhatsApp Confirmation ────────────────────────────────
@@ -132,12 +157,12 @@ export async function POST(req: NextRequest) {
         await sendWhatsAppConfirmation({
           to:           appt.client_phone,
           clientName:   appt.client_name,
-          serviceName:  appt.services?.name || "Appointment",
+          serviceName,
           staffName:    appt.staff?.name,
           salonName:    salon?.name || "The Salon",
           salonAddress: salon?.address,
           dateTime:     appt.date_time,
-          price:        appt.services?.price,
+          price:        combinedPrice,
           cancelLink:   `${appUrl}/reschedule/${appointmentId}?token=${appt.review_token}`,
         });
         await supabase
@@ -164,7 +189,7 @@ export async function POST(req: NextRequest) {
       after(() =>
         sendPushToSalon(salon?.id, {
           title: "New booking",
-          body: `${firstName} — ${appt.services?.name || "Appointment"}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
+          body: `${firstName} — ${serviceName}, ${formatUKDate(appt.date_time)} ${formatUKTime(appt.date_time)}`,
           url: `${appUrl}/dashboard/bookings`,
         }).catch(pushErr => {
           console.error(`[send-confirmation] Push error (non-fatal) for appointment ${appointmentId}:`, pushErr);
@@ -179,7 +204,7 @@ export async function POST(req: NextRequest) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
         const dateLabel = formatUKDate(appt.date_time);
         const timeLabel = formatUKTime(appt.date_time);
-        const body = `Hi ${appt.client_name}, your booking at ${salon?.name || "the salon"} is confirmed!\n${appt.services?.name} on ${dateLabel} at ${timeLabel}.\nManage: ${appUrl}/reschedule/${appointmentId}?token=${appt.review_token}`;
+        const body = `Hi ${appt.client_name}, your booking at ${salon?.name || "the salon"} is confirmed!\n${serviceName} on ${dateLabel} at ${timeLabel}.\nManage: ${appUrl}/reschedule/${appointmentId}?token=${appt.review_token}`;
         await sendSMS(appt.client_phone, body, salon?.name);
         smsSent = true;
         console.log(`[send-confirmation] ✅ SMS sent for appointment ${appointmentId}`);
