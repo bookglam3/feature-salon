@@ -23,32 +23,68 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing booking_id" }, { status: 400 });
     }
 
-    // Server-side price + salon lookup — never trust client-supplied amounts or routing
+    // Server-side price + salon lookup — never trust client-supplied amounts or routing.
+    // salon_id and the single-service join are fetched unconditionally — salon_id is
+    // needed regardless of pricing path, and the single-service join is the
+    // backward-compat fallback source of truth when no line items exist.
     const { data: apptData } = await supabaseAdmin
       .from("appointments")
       .select("salon_id, services(price, price_is_from)")
       .eq("id", booking_id)
       .single();
 
-    const services = apptData?.services as { price?: number; price_is_from?: boolean } | null;
-    const servicePrice = services?.price;
-    if (!servicePrice || servicePrice <= 0) {
+    // Resolve salon from DB (not client body) to prevent Connect routing injection
+    const resolvedSalonId = (apptData as { salon_id?: string } | null)?.salon_id ?? null;
+
+    // Multi-service line items, if any exist for this appointment. Empty for
+    // every appointment made before multi-service shipped, and for every
+    // single-service booking made before a client ever selects 2+ services —
+    // the branch below is byte-identical to the old single-service logic in
+    // that case, not just similar to it.
+    const { data: lineItems, error: lineItemsError } = await supabaseAdmin
+      .from("appointment_services")
+      .select("price, price_is_from")
+      .eq("appointment_id", booking_id);
+
+    if (lineItemsError) {
+      // A real query failure is NOT the same as "no line items" — never
+      // silently fall back to single-service pricing on an actual DB error,
+      // that risks under-charging a genuine multi-service booking.
+      return NextResponse.json({ error: "Could not determine service price" }, { status: 500 });
+    }
+
+    let totalPrice: number;
+    let anyPriceIsFrom: boolean;
+
+    if (lineItems && lineItems.length > 0) {
+      // Multi-service path. price is numeric(10,2) in Postgres, which
+      // PostgREST returns as a STRING (e.g. "40.00"), not a number — bare
+      // `sum + li.price` would silently string-concatenate from the second
+      // item onward instead of adding. Number(...) is deliberate, not decorative.
+      totalPrice = lineItems.reduce((sum, li) => sum + Number(li.price), 0);
+      anyPriceIsFrom = lineItems.some(li => li.price_is_from === true);
+    } else {
+      // Backward-compat path — identical to the pre-multi-service logic.
+      const services = apptData?.services as { price?: number; price_is_from?: boolean } | null;
+      totalPrice = services?.price ?? 0;
+      anyPriceIsFrom = !!services?.price_is_from;
+    }
+
+    if (!totalPrice || totalPrice <= 0) {
       return NextResponse.json({ error: "Could not determine service price" }, { status: 400 });
     }
 
     // A variable-priced ("from £X") service can't be charged in full online —
     // the final amount is unknown and there's no balance-due flow, so the salon
     // would be locked into charging the listed floor price. Client-side hiding
-    // of the option is not security; this is the real enforcement.
-    if (!deposit_only && services?.price_is_from) {
+    // of the option is not security; this is the real enforcement. Applies if
+    // ANY selected service is variable-priced, not just a single one.
+    if (!deposit_only && anyPriceIsFrom) {
       return NextResponse.json(
         { error: "This service has a variable price and can't be paid in full online. Please choose a deposit or pay at the salon." },
         { status: 400 },
       );
     }
-
-    // Resolve salon from DB (not client body) to prevent Connect routing injection
-    const resolvedSalonId = (apptData as { salon_id?: string } | null)?.salon_id ?? null;
     let stripeAccountId: string | null = null;
     let depositPercent = 50; // deposit_online's fixed rate — the default when the salon isn't using a custom percentage
     if (resolvedSalonId) {
@@ -70,8 +106,8 @@ export async function POST(req: NextRequest) {
     }
 
     const chargeAmount = deposit_only
-      ? Math.round(servicePrice * (depositPercent / 100) * 100)
-      : Math.round(servicePrice * 100);
+      ? Math.round(totalPrice * (depositPercent / 100) * 100)
+      : Math.round(totalPrice * 100);
 
     const platformFee = stripeAccountId ? Math.round(chargeAmount * PLATFORM_FEE_PERCENT) : undefined;
 
@@ -85,7 +121,7 @@ export async function POST(req: NextRequest) {
         salon_name:    salon_name || "",
         service_name:  service_name || "",
         deposit_only:  deposit_only ? "true" : "false",
-        full_amount:   String(Math.round(servicePrice * 100)),
+        full_amount:   String(Math.round(totalPrice * 100)),
         salon_id:      resolvedSalonId || "",
       },
       // Destination charge — routes payment to salon's Stripe account
