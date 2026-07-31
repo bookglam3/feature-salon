@@ -6,10 +6,16 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  // Optional. When provided, rendered as a non-scrolling footer pinned to
+  // the bottom of the modal (e.g. Cancel/Save) — the body between header
+  // and footer becomes the sole scroll region, so the footer never scrolls
+  // out of reach on mobile. Omit to keep the previous single-scroll layout
+  // (header + children scroll together) unchanged for existing callers.
+  footer?: React.ReactNode;
   maxWidth?: number;
 }
 
-export default function Modal({ open, onClose, title, children, maxWidth = 480 }: ModalProps) {
+export default function Modal({ open, onClose, title, children, footer, maxWidth = 480 }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,34 +68,58 @@ export default function Modal({ open, onClose, title, children, maxWidth = 480 }
           width: "100%",
           maxWidth,
           maxHeight: "92vh",
-          overflowY: "auto",
-          padding: "24px 20px 32px",
           boxShadow: "0 -8px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,162,75,0.1)",
+          ...(footer
+            ? { display: "flex", flexDirection: "column" as const, overflow: "hidden" }
+            : { overflowY: "auto" as const, padding: "24px 20px 32px" }),
         }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Drag handle (mobile) */}
-        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 99, margin: "0 auto 20px" }} />
-
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "#F7F5EF", letterSpacing: "-0.4px" }}>{title}</h2>
-          <button
-            onClick={onClose}
-            style={{
-              width: 30, height: 30, borderRadius: "50%", border: "none",
-              background: "rgba(255,255,255,0.08)", cursor: "pointer", display: "flex",
-              alignItems: "center", justifyContent: "center", fontSize: 14,
-              color: "rgba(255,255,255,0.4)", transition: "all 0.12s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
-          >✕</button>
-        </div>
-
-        {children}
+        {footer ? (
+          <>
+            <div style={{ padding: "24px 20px 0", flexShrink: 0 }}>
+              {header(title, onClose)}
+            </div>
+            <div className="modal-scroll-body" style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px 20px" }}>
+              {children}
+            </div>
+            <div style={{ flexShrink: 0, padding: "0 20px 32px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              {footer}
+            </div>
+          </>
+        ) : (
+          <>
+            {header(title, onClose)}
+            {children}
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+function header(title: string, onClose: () => void) {
+  return (
+    <>
+      {/* Drag handle (mobile) */}
+      <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 99, margin: "0 auto 20px" }} />
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: "#F7F5EF", letterSpacing: "-0.4px" }}>{title}</h2>
+        <button
+          onClick={onClose}
+          style={{
+            width: 30, height: 30, borderRadius: "50%", border: "none",
+            background: "rgba(255,255,255,0.08)", cursor: "pointer", display: "flex",
+            alignItems: "center", justifyContent: "center", fontSize: 14,
+            color: "rgba(255,255,255,0.4)", transition: "all 0.12s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+        >✕</button>
+      </div>
+    </>
   );
 }
 

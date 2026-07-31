@@ -729,17 +729,32 @@ export default function DashboardPage() {
           </div>
 
       {/* ── New Booking Modal ─────────────────────────────────────── */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={`New ${vc.bookingSingular}`}>
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title={`New ${vc.bookingSingular}`}
+        footer={
+          <ModalActions>
+            <BtnSecondary onClick={() => setShowModal(false)}>Cancel</BtnSecondary>
+            <BtnPrimary onClick={handleNewBooking} disabled={!formData.client_name || !formData.date || !formData.time}>Create Booking</BtnPrimary>
+          </ModalActions>
+        }
+      >
+        <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
+        </div>
         <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} /></FormGroup>
         <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
         <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
+        <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Appointment Details</div>
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <FormGroup label="Date *"><Input type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} /></FormGroup>
           <FormGroup label="Time *"><Select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })}><option value="">Select time</option>{TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}</Select></FormGroup>
         </div>
         <FormGroup label="Service"><Select value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}><option value="">Select service</option>{services.map(s => <option key={s.id} value={s.id}>{s.name} — £{s.price}</option>)}</Select></FormGroup>
         <FormGroup label={vc.staffSingular}><Select value={formData.staff_id} onChange={e => setFormData({ ...formData, staff_id: e.target.value })}><option value="">Assign {vc.staffSingular.toLowerCase()} (optional)</option>{staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></FormGroup>
-        <ModalActions><BtnSecondary onClick={() => setShowModal(false)}>Cancel</BtnSecondary><BtnPrimary onClick={handleNewBooking} disabled={!formData.client_name || !formData.date || !formData.time}>Create Booking</BtnPrimary></ModalActions>
       </Modal>
 
       {/* ── Add Offer Modal ───────────────────────────────────────── */}

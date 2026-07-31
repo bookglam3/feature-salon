@@ -348,11 +348,27 @@ export default function BookingsPage() {
       </div>
 
       {/* Booking Form Modal */}
-      <Modal open={showForm} onClose={() => { setShowForm(false); setEditingId(null); }} title={editingId ? `Edit ${vc.bookingSingular}` : `New ${vc.bookingSingular}`}>
-        <form onSubmit={handleSubmit}>
+      <Modal
+        open={showForm}
+        onClose={() => { setShowForm(false); setEditingId(null); }}
+        title={editingId ? `Edit ${vc.bookingSingular}` : `New ${vc.bookingSingular}`}
+        footer={
+          <ModalActions>
+            <BtnSecondary type="button" onClick={() => { setShowForm(false); setEditingId(null); }}>Cancel</BtnSecondary>
+            <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail}>{sendingEmail ? "Sending confirmation…" : editingId ? "Update" : "Create Booking"}</BtnPrimary>
+          </ModalActions>
+        }
+      >
+        <form id="booking-form" onSubmit={handleSubmit}>
+          <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
+          </div>
           <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} required /></FormGroup>
           <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
           <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
+          <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Appointment Details</div>
+          </div>
           <FormGroup label="Date & Time *"><Input type="datetime-local" value={formData.date_time} onChange={e => setFormData({ ...formData, date_time: e.target.value })} required /></FormGroup>
           <FormGroup label="Service"><Select value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}><option value="">Select service</option>{services.map(s => <option key={s.id} value={s.id}>{s.name} - {s.price_is_from ? "from " : ""}{s.price}</option>)}</Select></FormGroup>
           <FormGroup label={vc.staffSingular}><Select value={formData.staff_id} onChange={e => setFormData({ ...formData, staff_id: e.target.value })}><option value="">Any Available {vc.staffSingular}</option>{staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></FormGroup>
@@ -448,7 +464,6 @@ export default function BookingsPage() {
           {!editingId && formData.client_email && (
             <p style={{ fontSize: 12, color: "#10B981", margin: "0 0 12px", fontWeight: 500 }}>✉️ Confirmation email will be sent to {formData.client_email}</p>
           )}
-          <ModalActions><BtnSecondary type="button" onClick={() => { setShowForm(false); setEditingId(null); }}>Cancel</BtnSecondary><BtnPrimary type="submit" disabled={sendingEmail}>{sendingEmail ? "Sending confirmation…" : editingId ? "Update" : "Create Booking"}</BtnPrimary></ModalActions>
         </form>
       </Modal>
     </DashboardShell>
