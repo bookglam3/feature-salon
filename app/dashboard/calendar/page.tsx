@@ -6,6 +6,7 @@ import { getCurrentUserProfile } from "@/app/lib/auth";
 import FeatureGate from "../components/FeatureGate";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { useSalon } from "../context/SalonContext";
+import { resolveAppointmentServices } from "@/app/lib/appointmentServices";
 
 interface Appointment {
   id: string;
@@ -16,6 +17,15 @@ interface Appointment {
   status: "confirmed" | "pending" | "cancelled";
   services?: { name: string; price: number; price_is_from?: boolean } | null;
   staff?: { name: string } | null;
+  // Multi-service aware (3C-2b-display) — combined across appointment_
+  // services line items, falling back to the primary services join above
+  // for bookings with no line items. Populated once at fetch time (see
+  // CalendarContent's load()) so every sub-component below just reads
+  // these fields directly, no prop-threading of a separate lookup map
+  // through MonthView/WeekView/DayView/ApptModal needed.
+  serviceName?: string;
+  combinedPrice?: number;
+  anyPriceIsFrom?: boolean;
 }
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string; dot: string }> = {
@@ -147,7 +157,7 @@ function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewPr
                       >
                         <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: sc.dot, marginRight: 4, verticalAlign: "middle" }} />
                         {a.client_name}
-                        {a.services && <span style={{ opacity: 0.7 }}> · {a.services.name}</span>}
+                        {a.serviceName && <span style={{ opacity: 0.7 }}> · {a.serviceName}</span>}
                       </div>
                     );
                   })}
@@ -190,10 +200,10 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: sc.text }}>{a.client_name}</div>
-                        <div style={{ fontSize: 12, color: "#aab1c4", marginTop: 2 }}>{a.services?.name || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
+                        <div style={{ fontSize: 12, color: "#aab1c4", marginTop: 2 }}>{a.serviceName || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        {a.services?.price && <div style={{ fontSize: 14, fontWeight: 800, color: "#10B981" }}>{a.services.price_is_from ? "from " : ""}£{a.services.price}</div>}
+                        {!!a.combinedPrice && <div style={{ fontSize: 14, fontWeight: 800, color: "#10B981" }}>{a.anyPriceIsFrom ? "from " : ""}£{a.combinedPrice}</div>}
                         <div style={{ fontSize: 11, color: "#aab1c4", textTransform: "capitalize" }}>{a.status}</div>
                       </div>
                     </div>
@@ -235,10 +245,10 @@ function ApptModal({ selectedAppt, setSelectedAppt, onViewAll }: ApptModalProps)
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[
             { icon: "👤", label: vc.clientSingular, value: selectedAppt.client_name },
-            { icon: "💇", label: "Service",          value: selectedAppt.services?.name || "—" },
+            { icon: "💇", label: "Service",          value: selectedAppt.serviceName || "—" },
             { icon: "✂️", label: vc.staffSingular,   value: selectedAppt.staff?.name || "—" },
             { icon: "📅", label: "Date",             value: new Date(selectedAppt.date_time).toLocaleString("en-GB", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) },
-            { icon: "💰", label: "Amount",           value: selectedAppt.services?.price ? `${selectedAppt.services.price_is_from ? "from " : ""}£${selectedAppt.services.price}` : "—" },
+            { icon: "💰", label: "Amount",           value: selectedAppt.combinedPrice ? `${selectedAppt.anyPriceIsFrom ? "from " : ""}£${selectedAppt.combinedPrice}` : "—" },
           ].map(row => (
             <div key={row.label} style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "#141A2E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{row.icon}</div>
@@ -283,7 +293,12 @@ function CalendarContent() {
         .select("*, services(name,price,price_is_from), staff(name)")
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: true });
-      setAppts(data || []);
+      const resolved = await resolveAppointmentServices(supabase, data || []);
+      const enriched = (data || []).map(a => {
+        const r = resolved.get(a.id);
+        return { ...a, serviceName: r?.serviceName, combinedPrice: r?.combinedPrice, anyPriceIsFrom: r?.anyPriceIsFrom };
+      });
+      setAppts(enriched);
       setLoading(false);
     };
     load();

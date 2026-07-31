@@ -5,12 +5,14 @@ import { supabase } from "../../lib/supabase";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { SkeletonDashboard } from "../components/SkeletonLoader";
 import StatCard from "../components/StatCard";
+import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
 
 type Appt = { id: string; client_name: string; status: string; date_time: string; services?: { name: string; price: number } | null; staff?: { name: string } | null };
 
 export default function PaymentsPage() {
   const router = useRouter();
   const [appointments, setAppointments] = useState<Appt[]>([]);
+  const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
@@ -28,19 +30,20 @@ export default function PaymentsPage() {
           .eq("salon_id", salonData.id)
           .order("date_time", { ascending: false });
         setAppointments(appts || []);
+        setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
       }
       setLoading(false);
     };
     loadData();
   }, [router]);
 
-  const totalCollected = appointments.filter(a => a.status === "confirmed").reduce((s, a) => s + (a.services?.price || 0), 0);
-  const pending       = appointments.filter(a => a.status === "pending").reduce((s, a) => s + (a.services?.price || 0), 0);
-  const refunded      = appointments.filter(a => a.status === "cancelled").reduce((s, a) => s + (a.services?.price || 0), 0);
+  const totalCollected = appointments.filter(a => a.status === "confirmed").reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
+  const pending       = appointments.filter(a => a.status === "pending").reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
+  const refunded      = appointments.filter(a => a.status === "cancelled").reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
 
   const filtered = appointments.filter(a => {
     const matchTab = activeTab === "All" ? true : activeTab === "Paid" ? a.status === "confirmed" : activeTab === "Pending" ? a.status === "pending" : a.status === "cancelled";
-    const matchSearch = search === "" || a.client_name?.toLowerCase().includes(search.toLowerCase()) || a.services?.name?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = search === "" || a.client_name?.toLowerCase().includes(search.toLowerCase()) || serviceDisplay.get(a.id)?.serviceName?.toLowerCase().includes(search.toLowerCase());
     return matchTab && matchSearch;
   });
 
@@ -128,11 +131,11 @@ export default function PaymentsPage() {
                           </span>
                         </td>
                         <td style={{ padding: "13px 18px", fontSize: 13.5, fontWeight: 700, color: "var(--text-1)", borderBottom: "1px solid #2a3350" }}>{a.client_name}</td>
-                        <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-2)", borderBottom: "1px solid #2a3350" }}>{a.services?.name || "—"}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-2)", borderBottom: "1px solid #2a3350" }}>{serviceDisplay.get(a.id)?.serviceName || "—"}</td>
                         <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-3)", borderBottom: "1px solid #2a3350" }}>{a.staff?.name || "—"}</td>
                         <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-2)", borderBottom: "1px solid #2a3350" }}>{new Date(a.date_time).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
                         <td style={{ padding: "13px 18px", fontSize: 14, fontWeight: 900, color: a.status === "confirmed" ? "#10B981" : "var(--text-1)", borderBottom: "1px solid #2a3350" }}>
-                          £{a.services?.price?.toFixed(2) || "0.00"}
+                          £{(serviceDisplay.get(a.id)?.combinedPrice ?? 0).toFixed(2)}
                         </td>
                       </tr>
                     );
@@ -145,4 +148,4 @@ export default function PaymentsPage() {
       </div>
     </DashboardShell>
   );
-}
+}  

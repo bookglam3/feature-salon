@@ -11,6 +11,7 @@ import { SkeletonDashboard } from "../components/SkeletonLoader";
 import { useToast } from "../components/Toast";
 import type { Appointment, Service } from "../../types";
 import { useSalon } from "../context/SalonContext";
+import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
 
 type StaffItem = { id: string; name: string };
 
@@ -49,6 +50,12 @@ export default function BookingsPage() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  // Multi-service aware (3C-2b-display): combined service name/price per
+  // appointment, resolved from appointment_services line items where they
+  // exist, falling back to the single primary services(...) join for
+  // bookings that predate multi-service. Same pattern as 3D's confirmation
+  // fix, shared via app/lib/appointmentServices.ts instead of copied here.
+  const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
 
   useEffect(() => {
     const load = async () => {
@@ -65,6 +72,7 @@ export default function BookingsPage() {
         setAppointments(appts || []);
         setStaff(staffData || []);
         setServices(svcs || []);
+        setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
       }
       setLoading(false);
     };
@@ -75,6 +83,7 @@ export default function BookingsPage() {
     if (!salon) return;
     const { data } = await supabase.from("appointments").select("*, services(name,price,price_is_from), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
     setAppointments(data || []);
+    setServiceDisplay(await resolveAppointmentServices(supabase, data || []));
   }, [salon]);
 
   const serializeNotes = useCallback((fd: typeof EMPTY_FORM, hasConsultation: boolean): string | null => {
@@ -186,9 +195,9 @@ export default function BookingsPage() {
     else if (activeTab === "Upcoming")  list = list.filter(a => new Date(a.date_time) > now && a.status !== "cancelled" && a.status !== "completed" && a.status !== "no_show");
     else if (activeTab === "Completed") list = list.filter(a => a.status === "completed");
     else if (activeTab === "Cancelled") list = list.filter(a => a.status === "cancelled" || a.status === "no_show");
-    if (search) list = list.filter(a => a.client_name?.toLowerCase().includes(search.toLowerCase()) || a.services?.name?.toLowerCase().includes(search.toLowerCase()));
+    if (search) list = list.filter(a => a.client_name?.toLowerCase().includes(search.toLowerCase()) || serviceDisplay.get(a.id)?.serviceName?.toLowerCase().includes(search.toLowerCase()));
     return list;
-  }, [appointments, activeTab, search]);
+  }, [appointments, activeTab, search, serviceDisplay]);
 
   const getWeekDays = useCallback(() => {
     const d = new Date(); d.setDate(d.getDate() - d.getDay() + weekOffset * 7);
@@ -263,10 +272,10 @@ export default function BookingsPage() {
                       <tr key={a.id}>
                         <td><StatusPill status={a.status} /></td>
                         <td style={{ fontWeight: 700, color: "#F7F5EF" }}>{a.client_name}</td>
-                        <td style={{ color: "rgba(255,255,255,0.55)" }}>{a.services?.name || <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ color: "rgba(255,255,255,0.55)" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ color: "rgba(255,255,255,0.4)" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
                         <td style={{ color: "rgba(255,255,255,0.55)", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
-                        <td style={{ fontWeight: 700, color: "#34D399" }}>{a.services?.price ? `${a.services.price_is_from ? "from " : ""}£${a.services.price}` : <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ fontWeight: 700, color: "#34D399" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 4 }}>
                             <button onClick={() => handleEdit(a)} className="elite-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5 }}>Edit</button>
@@ -327,7 +336,7 @@ export default function BookingsPage() {
                       >
                         <div style={{ fontSize: 10.5, fontWeight: 700, color: "#C9A24B" }}>{new Date(a.date_time).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
                         <div style={{ fontSize: 10.5, color: "#F7F5EF", fontWeight: 600 }}>{a.client_name}</div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{a.services?.name}</div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
                       </div>
                     ))}
                   </div>

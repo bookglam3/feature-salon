@@ -21,6 +21,7 @@ import { useToast } from "./components/Toast";
 import type { Salon, Appointment, Service, Offer } from "../types";
 import OnboardingChecklist from "./components/OnboardingChecklist";
 import { useSalon } from "./context/SalonContext";
+import { resolveAppointmentServices, type ResolvedAppointmentServices } from "@/app/lib/appointmentServices";
 import PushNotificationButton from "@/app/components/PushNotificationButton";
 
 type StaffItem = { id: string; name: string };
@@ -112,7 +113,7 @@ function SearchBar({ value, onChange, placeholder }: { value: string; onChange: 
 }
 
 /* ─── REVENUE MINI BARS ───────────────────────────────────────── */
-function RevenueMiniChart({ appointments }: { appointments: Appointment[] }) {
+function RevenueMiniChart({ appointments, serviceDisplay }: { appointments: Appointment[]; serviceDisplay: Map<string, ResolvedAppointmentServices> }) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const now = new Date();
   const dayRevenue = days.map((_, i) => {
@@ -120,7 +121,7 @@ function RevenueMiniChart({ appointments }: { appointments: Appointment[] }) {
     return appointments.filter(a => {
       const ad = new Date(a.date_time);
       return ad.toDateString() === d.toDateString() && a.status === "confirmed";
-    }).reduce((s, a) => s + (a.services?.price || 0), 0);
+    }).reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
   });
   const max = Math.max(...dayRevenue, 1);
   const todayIdx = (now.getDay() + 6) % 7;
@@ -170,6 +171,8 @@ export default function DashboardPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
   const [offerForm, setOfferForm] = useState({ title: "", description: "", discount_type: "percentage", discount_value: "", valid_until: "", active: true });
+  // Multi-service aware (3C-2b-display) — see app/lib/appointmentServices.ts
+  const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
 
   useEffect(() => {
     const load = async () => {
@@ -185,6 +188,7 @@ export default function DashboardPage() {
         supabase.from("offers").select("*").eq("salon_id", id).eq("active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
       ]);
       setAppointments(appts || []); setStaff(staffData || []); setServices(svcs || []); setOffers(ofrs || []);
+      setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
       setLoading(false);
     };
     load();
@@ -194,6 +198,7 @@ export default function DashboardPage() {
     if (!salon) return;
     const { data } = await supabase.from("appointments").select("*, services(name,price), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
     setAppointments(data || []);
+    setServiceDisplay(await resolveAppointmentServices(supabase, data || []));
   }, [salon]);
 
   /* ── Update appointment status ── */
@@ -299,7 +304,8 @@ export default function DashboardPage() {
   const handleExportCSV = useCallback(() => {
     const rows = [["Client", "Service", "Staff", "Date & Time", "Amount", "Status"]];
     appointments.forEach(a => {
-      rows.push([a.client_name, a.services?.name || "", a.staff?.name || "", new Date(a.date_time).toLocaleString("en-GB"), a.services?.price ? `£${a.services.price}` : "", a.status]);
+      const sd = serviceDisplay.get(a.id);
+      rows.push([a.client_name, sd?.serviceName || "", a.staff?.name || "", new Date(a.date_time).toLocaleString("en-GB"), sd?.combinedPrice ? `£${sd.combinedPrice}` : "", a.status]);
     });
     const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -307,7 +313,7 @@ export default function DashboardPage() {
     const a = document.createElement("a");
     a.href = url; a.download = `appointments-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
     toast.success("CSV exported!");
-  }, [appointments, toast]);
+  }, [appointments, toast, serviceDisplay]);
 
   /* ── Computed values ── */
   const todayAppts = useMemo(() => {
@@ -320,8 +326,8 @@ export default function DashboardPage() {
   }, [appointments]);
   const confirmedAppts = useMemo(() => appointments.filter(a => a.status === "confirmed"), [appointments]);
   const pendingAppts = useMemo(() => appointments.filter(a => a.status === "pending"), [appointments]);
-  const revenue = useMemo(() => todayAppts.reduce((s, a) => s + (a.services?.price || 0), 0), [todayAppts]);
-  const totalRevenue = useMemo(() => confirmedAppts.reduce((s, a) => s + (a.services?.price || 0), 0), [confirmedAppts]);
+  const revenue = useMemo(() => todayAppts.reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0), [todayAppts, serviceDisplay]);
+  const totalRevenue = useMemo(() => confirmedAppts.reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0), [confirmedAppts, serviceDisplay]);
 
   const filteredAppts = useMemo(() => {
     let list = appointments;
@@ -334,10 +340,10 @@ export default function DashboardPage() {
     if (activeTab === "No-show")   list = appointments.filter(a => a.status === "no_show");
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(a => a.client_name?.toLowerCase().includes(q) || a.services?.name?.toLowerCase().includes(q) || a.staff?.name?.toLowerCase().includes(q));
+      list = list.filter(a => a.client_name?.toLowerCase().includes(q) || serviceDisplay.get(a.id)?.serviceName?.toLowerCase().includes(q) || a.staff?.name?.toLowerCase().includes(q));
     }
     return list;
-  }, [activeTab, appointments, todayAppts, upcomingAppts, confirmedAppts, pendingAppts, searchQuery]);
+  }, [activeTab, appointments, todayAppts, upcomingAppts, confirmedAppts, pendingAppts, searchQuery, serviceDisplay]);
 
   const greeting = useMemo(() => { const h = new Date().getHours(); return h < 12 ? "Good morning ☀️" : h < 17 ? "Good afternoon 👋" : "Good evening 🌙"; }, []);
   const plan = salon?.plan || "Starter";
@@ -525,10 +531,10 @@ export default function DashboardPage() {
                             >
                               <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}><StatusPill status={a.status} /></td>
                               <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13.5, fontWeight: 800, color: "#F7F5EF" }}>{a.client_name}</td>
-                              <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{a.services?.name || "—"}</td>
+                              <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{serviceDisplay.get(a.id)?.serviceName || "—"}</td>
                               <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, color: "rgba(255,255,255,0.35)" }}>{a.staff?.name || "—"}</td>
                               <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 12.5, color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</td>
-                              <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, fontWeight: 800, color: "#34D399" }}>{a.services?.price ? `£${a.services.price}` : "—"}</td>
+                              <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, fontWeight: 800, color: "#34D399" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `£${serviceDisplay.get(a.id)?.combinedPrice}` : "—"}</td>
                               <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                                 <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                                   {a.status !== "confirmed" && (
@@ -557,8 +563,8 @@ export default function DashboardPage() {
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 14, fontWeight: 800, color: "#F7F5EF", marginBottom: 2 }}>{a.client_name}</div>
-                                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{a.services?.name || "No service"}{a.staff?.name ? ` · ${a.staff.name}` : ""}</div>
-                                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{new Date(a.date_time).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}{a.services?.price ? ` · £${a.services.price}` : ""}</div>
+                                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{serviceDisplay.get(a.id)?.serviceName || "No service"}{a.staff?.name ? ` · ${a.staff.name}` : ""}</div>
+                                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{new Date(a.date_time).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}{serviceDisplay.get(a.id)?.combinedPrice ? ` · £${serviceDisplay.get(a.id)?.combinedPrice}` : ""}</div>
                                   </div>
                                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
                                     <StatusPill status={a.status} />
@@ -590,7 +596,7 @@ export default function DashboardPage() {
               <div style={{ background: "#100F1C", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, overflow: "hidden", padding: "18px 22px", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#F7F5EF", marginBottom: 4 }}>This Week&apos;s Revenue</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>Daily breakdown (confirmed)</div>
-                <RevenueMiniChart appointments={appointments} />
+                <RevenueMiniChart appointments={appointments} serviceDisplay={serviceDisplay} />
               </div>
 
               {/* Subscription Plan */}

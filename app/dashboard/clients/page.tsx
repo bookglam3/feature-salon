@@ -7,6 +7,7 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { SkeletonDashboard } from "../components/SkeletonLoader";
 import StatCard from "../components/StatCard";
 import { useSalon } from "../context/SalonContext";
+import { resolveAppointmentServices } from "../../lib/appointmentServices";
 
 type SortKey = "name" | "bookings" | "spent" | "lastVisit";
 
@@ -20,6 +21,10 @@ interface HistoryItem {
   id: string; date_time: string; status: string;
   services?: { name?: string; price?: number }[] | { name?: string; price?: number } | null;
   staff?: { name: string } | null;
+  // Multi-service aware (3C-2b-display) — combined across appointment_
+  // services line items, falling back to the primary services join above.
+  serviceName?: string;
+  combinedPrice?: number;
 }
 type SalonData = { id: string; slug?: string };
 
@@ -61,6 +66,8 @@ export default function ClientsPage() {
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: false });
 
+      const resolved = await resolveAppointmentServices(supabase, appts || []);
+
       const map = new Map<string, ClientRecord>();
       (appts || []).forEach((a: {
         client_name: string; client_email: string; client_phone: string;
@@ -68,16 +75,17 @@ export default function ClientsPage() {
         services?: { name?: string; price?: number }[] | { name?: string; price?: number } | null;
       }) => {
         const key = a.client_email || a.client_name;
-        const price = Array.isArray(a.services)
-          ? a.services.reduce((s, x) => s + Number(x?.price ?? 0), 0)
-          : Number(a.services?.price ?? 0);
-        const svcName = Array.isArray(a.services) ? a.services[0]?.name : a.services?.name;
+        const r = resolved.get(a.id);
+        const price = r?.combinedPrice ?? 0;
+        const lines = r?.lines ?? [];
         if (!map.has(key)) {
-          map.set(key, { name: a.client_name, email: a.client_email, phone: a.client_phone, lastVisit: new Date(a.date_time), bookings: 1, spent: price, services: svcName ? { [svcName]: 1 } : {} });
+          const services: Record<string, number> = {};
+          lines.forEach(l => { services[l.name] = (services[l.name] || 0) + 1; });
+          map.set(key, { name: a.client_name, email: a.client_email, phone: a.client_phone, lastVisit: new Date(a.date_time), bookings: 1, spent: price, services });
         } else {
           const c = map.get(key)!;
           c.bookings += 1; c.spent += price;
-          if (svcName) c.services[svcName] = (c.services[svcName] || 0) + 1;
+          lines.forEach(l => { c.services[l.name] = (c.services[l.name] || 0) + 1; });
         }
       });
 
@@ -115,7 +123,12 @@ export default function ClientsPage() {
       .select("*,services(name,price),staff(name)")
       .eq("salon_id", salon?.id ?? "").eq("client_email", c.email)
       .order("date_time", { ascending: false });
-    setHistory(data || []); setHistLoading(false);
+    const resolved = await resolveAppointmentServices(supabase, data || []);
+    const enriched = (data || []).map(h => {
+      const r = resolved.get(h.id);
+      return { ...h, serviceName: r?.serviceName, combinedPrice: r?.combinedPrice };
+    });
+    setHistory(enriched); setHistLoading(false);
   };
 
   const saveNote = async () => {
@@ -354,7 +367,7 @@ export default function ClientsPage() {
                     <div key={b.id} style={{ padding: "13px 18px", borderBottom: "1px solid #2a3350", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-1)", marginBottom: 3 }}>
-                          {Array.isArray(b.services) ? b.services[0]?.name : b.services?.name || "Service"}
+                          {b.serviceName || "Service"}
                         </div>
                         <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>
                           {new Date(b.date_time).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
@@ -363,7 +376,7 @@ export default function ClientsPage() {
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text-1)", marginBottom: 4 }}>
-                          £{Array.isArray(b.services) ? b.services[0]?.price : b.services?.price || 0}
+                          £{b.combinedPrice ?? 0}
                         </div>
                         <span style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`, fontSize: 10.5, padding: "2px 8px", borderRadius: 99, fontWeight: 700 }}>{b.status}</span>
                       </div>

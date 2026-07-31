@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import FeatureGate from "../components/FeatureGate";
+import { resolveAppointmentServices, type ResolvedAppointmentServices } from "@/app/lib/appointmentServices";
 
 interface Appointment {
   id: string;
@@ -64,6 +65,7 @@ function ReportsContent() {
   const router = useRouter();
   const [salonName, setSalonName] = useState("");
   const [appointments, setAppts] = useState<Appointment[]>([]);
+  const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,6 +79,7 @@ function ReportsContent() {
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: true });
       setAppts(data || []);
+      setServiceDisplay(await resolveAppointmentServices(supabase, data || []));
       setLoading(false);
     };
     load();
@@ -93,9 +96,9 @@ function ReportsContent() {
       return confirmed.filter(a => {
         const d = new Date(a.date_time);
         return d.getMonth() === mo && d.getFullYear() === yr;
-      }).reduce((s, a) => s + (a.services?.price || 0), 0);
+      }).reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
     });
-  }, [confirmed]);
+  }, [confirmed, serviceDisplay]);
 
   // Bookings by month (last 12)
   const monthlyBookings = useMemo(() => {
@@ -111,27 +114,34 @@ function ReportsContent() {
   }, [appointments]);
 
   // Stats
-  const totalRevenue = useMemo(() => confirmed.reduce((s, a) => s + (a.services?.price || 0), 0), [confirmed]);
+  const totalRevenue = useMemo(() => confirmed.reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0), [confirmed, serviceDisplay]);
   const thisMonthRevenue = useMemo(() => {
     const n = new Date();
     return confirmed.filter(a => {
       const d = new Date(a.date_time);
       return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
-    }).reduce((s, a) => s + (a.services?.price || 0), 0);
-  }, [confirmed]);
+    }).reduce((s, a) => s + (serviceDisplay.get(a.id)?.combinedPrice ?? 0), 0);
+  }, [confirmed, serviceDisplay]);
   const avgOrderValue = useMemo(() => confirmed.length ? (totalRevenue / confirmed.length).toFixed(2) : "0.00", [totalRevenue, confirmed]);
 
-  // Top services
+  // Top services — per-line-item breakdown: a multi-service booking
+  // attributes its count/revenue to EACH of its real services, not one
+  // combined-name bucket (that would undercount every service but the
+  // first, and invent phantom "A, B, C" buckets).
   const topServices = useMemo(() => {
     const map: Record<string, { count: number; revenue: number }> = {};
     confirmed.forEach(a => {
-      const name = a.services?.name || "Unknown";
-      if (!map[name]) map[name] = { count: 0, revenue: 0 };
-      map[name].count++;
-      map[name].revenue += a.services?.price || 0;
+      const lines = serviceDisplay.get(a.id)?.lines;
+      const items = lines && lines.length > 0 ? lines : [{ name: "Unknown", price: 0 }];
+      items.forEach(item => {
+        const name = item.name || "Unknown";
+        if (!map[name]) map[name] = { count: 0, revenue: 0 };
+        map[name].count++;
+        map[name].revenue += item.price || 0;
+      });
     });
     return Object.entries(map).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 5);
-  }, [confirmed]);
+  }, [confirmed, serviceDisplay]);
 
   // Top staff
   const topStaff = useMemo(() => {
@@ -140,10 +150,10 @@ function ReportsContent() {
       const name = a.staff?.name || "Unassigned";
       if (!map[name]) map[name] = { count: 0, revenue: 0 };
       map[name].count++;
-      map[name].revenue += a.services?.price || 0;
+      map[name].revenue += serviceDisplay.get(a.id)?.combinedPrice ?? 0;
     });
     return Object.entries(map).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 5);
-  }, [confirmed]);
+  }, [confirmed, serviceDisplay]);
 
   // Peak hours
   const peakHours = useMemo(() => {

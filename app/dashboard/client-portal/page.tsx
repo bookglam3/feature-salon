@@ -6,6 +6,7 @@ import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { useToast } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
+import { resolveAppointmentServices } from "@/app/lib/appointmentServices";
 
 interface ClientRecord {
   email: string;
@@ -18,6 +19,7 @@ interface ClientRecord {
 }
 
 interface AppointmentRow {
+  id: string;
   client_name: string;
   client_email: string;
   client_phone: string;
@@ -47,9 +49,10 @@ function ClientPortalContent() {
       setSalonSlug(profile.salon.slug);
       const { data } = await supabase
         .from("appointments")
-        .select("client_name, client_email, client_phone, status, date_time, services(price)")
+        .select("id, client_name, client_email, client_phone, status, date_time, services(price)")
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: false });
+      const resolved = await resolveAppointmentServices(supabase, data || []);
 
       // Group by email
       const map: Record<string, ClientRecord> = {};
@@ -59,7 +62,7 @@ function ClientPortalContent() {
           map[key] = { email: a.client_email, name: a.client_name, phone: a.client_phone, count: 0, revenue: 0, last_visit: a.date_time, statuses: [] };
         }
         map[key].count++;
-        map[key].revenue += (a.services?.[0]?.price ?? 0);
+        map[key].revenue += resolved.get(a.id)?.combinedPrice ?? 0;
         map[key].statuses.push(a.status);
         if (a.date_time > map[key].last_visit) map[key].last_visit = a.date_time;
       });
