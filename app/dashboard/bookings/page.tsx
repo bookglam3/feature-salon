@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { fromZonedTime, formatInTimeZone } from "date-fns-tz";
@@ -33,6 +34,52 @@ const EMPTY_FORM = { client_name: "", client_email: "", client_phone: "", staff_
   skin_type: "", allergies: "no", allergy_details: "", previous_treatments: "", medical_conditions: "", patch_test: false,
 };
 
+// Phase 1 (UX-only) wizard for the New Appointment flow. Picker UI only —
+// deliberately NOT wired to live booked-slot availability: the write path
+// this phase still targets (handleSubmit's raw insert) has no server-side
+// slot check either, that only exists inside the Phase 2 RPC. Adding
+// client-side greying against nothing would imply a guarantee this phase
+// doesn't provide. Same slot list the public booking page uses.
+const WIZARD_TIME_SLOTS = [
+  "09:00","09:30","10:00","10:30","11:00","11:30",
+  "12:00","12:30","13:00","13:30","14:00","14:30",
+  "15:00","15:30","16:00","16:30","17:00","17:30",
+  "18:00","18:30","19:00","19:30",
+];
+const WIZARD_STEP_LABELS_BASE = ["Service", "Staff", "Date & Time", "Details", "Confirm"];
+
+function todayLocalDateStr(): string {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+}
+
+function WizardProgress({ step, labels }: { step: number; labels: string[] }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+        {labels.map((_, i) => (
+          <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "linear-gradient(90deg,#C9A24B,#E7C878)" : "rgba(255,255,255,0.08)", transition: "background 0.2s" }} />
+        ))}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
+        {labels.map((label, i) => (
+          <span key={label} style={{ fontSize: 10, fontWeight: 700, color: i <= step ? "#C9A24B" : "rgba(255,255,255,0.35)", letterSpacing: "0.2px", textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center", flex: 1 }}>{label}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function wizardTapCardStyle(selected: boolean): CSSProperties {
+  return {
+    display: "flex", flexDirection: "column", gap: 2,
+    padding: "13px 14px", borderRadius: 12, marginBottom: 8, cursor: "pointer",
+    border: `1.5px solid ${selected ? "#C9A24B" : "rgba(255,255,255,0.1)"}`,
+    background: selected ? "rgba(201,162,75,0.1)" : "rgba(255,255,255,0.03)",
+    transition: "all 0.12s",
+  };
+}
+
 export default function BookingsPage() {
   const router = useRouter();
   const toast = useToast();
@@ -50,6 +97,12 @@ export default function BookingsPage() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  // Phase 1 (UX-only) wizard for New Appointment. Only used when
+  // !editingId — editing still renders the original single-screen form,
+  // untouched, below. showExtra is the collapsed-by-default toggle for the
+  // optional treatment-notes/consultation fields on the Details step.
+  const [step, setStep] = useState(0);
+  const [showExtra, setShowExtra] = useState(false);
   // Multi-service aware (3C-2b-display): combined service name/price per
   // appointment, resolved from appointment_services line items where they
   // exist, falling back to the single primary services(...) join for
@@ -199,6 +252,26 @@ export default function BookingsPage() {
     return list;
   }, [appointments, activeTab, search, serviceDisplay]);
 
+  // Service step's sort order only — never filters or auto-selects, so the
+  // field stays exactly as optional/skippable as it is today.
+  const sortedServices = useMemo(() => {
+    const counts = new Map<string, number>();
+    appointments.forEach(a => { if (a.service_id) counts.set(a.service_id, (counts.get(a.service_id) || 0) + 1); });
+    return [...services].sort((a, b) => (counts.get(b.id) || 0) - (counts.get(a.id) || 0));
+  }, [services, appointments]);
+
+  // formData.date_time stays the single source of truth (same shape
+  // handleSubmit already expects, "yyyy-MM-ddTHH:mm") — the wizard's Date &
+  // Time step just splits it for a date input + time grid instead of one
+  // native datetime-local input, and recombines on change.
+  const [wizardDatePart, wizardTimePart] = (formData.date_time || "").split("T");
+
+  // Same required/optional rules as today (Date & Time and Client Name are
+  // the only required fields; Service and Staff stay optional) — just
+  // enforced per-step instead of only at the final native-HTML wall.
+  const canNextDateTime = !!wizardDatePart && !!wizardTimePart;
+  const canNextDetails = formData.client_name.trim() !== "";
+
   const getWeekDays = useCallback(() => {
     const d = new Date(); d.setDate(d.getDate() - d.getDay() + weekOffset * 7);
     return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return x; });
@@ -226,7 +299,7 @@ export default function BookingsPage() {
           ))}
         </div>
         <button
-          onClick={() => { setShowForm(true); setEditingId(null); setFormData(EMPTY_FORM); }}
+          onClick={() => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); }}
           className="elite-btn-primary"
         >+ New {vc.bookingSingular}</button>
       </div>
@@ -256,7 +329,7 @@ export default function BookingsPage() {
         {view === "table" ? (
           <div className="elite-table-wrap fade-in-up">
             {filtered.length === 0 ? (
-              <EmptyState title="No bookings found" description={search ? "Try a different search term" : "Create your first booking to get started"} action={{ label: "+ New Booking", onClick: () => setShowForm(true) }} />
+              <EmptyState title="No bookings found" description={search ? "Try a different search term" : "Create your first booking to get started"} action={{ label: "+ New Booking", onClick: () => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); } }} />
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table className="elite-table" style={{ minWidth: 640 }}>
@@ -350,16 +423,38 @@ export default function BookingsPage() {
       {/* Booking Form Modal */}
       <Modal
         open={showForm}
-        onClose={() => { setShowForm(false); setEditingId(null); }}
+        onClose={() => { setShowForm(false); setEditingId(null); setStep(0); }}
         title={editingId ? `Edit ${vc.bookingSingular}` : `New ${vc.bookingSingular}`}
         footer={
-          <ModalActions>
-            <BtnSecondary type="button" onClick={() => { setShowForm(false); setEditingId(null); }}>Cancel</BtnSecondary>
-            <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail}>{sendingEmail ? "Sending confirmation…" : editingId ? "Update" : "Create Booking"}</BtnPrimary>
-          </ModalActions>
+          editingId ? (
+            <ModalActions>
+              <BtnSecondary type="button" onClick={() => { setShowForm(false); setEditingId(null); }}>Cancel</BtnSecondary>
+              <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail}>{sendingEmail ? "Sending confirmation…" : "Update"}</BtnPrimary>
+            </ModalActions>
+          ) : (
+            // Phase 1 (UX-only): step navigation only. The submit button on
+            // the last step still targets the SAME form="booking-form" /
+            // handleSubmit as the edit form above — same write, same
+            // validation rules, just reached by stepping instead of
+            // scrolling. Back/Next never submit (type="button").
+            <ModalActions>
+              {step === 0 ? (
+                <BtnSecondary type="button" onClick={() => { setShowForm(false); setStep(0); }}>Cancel</BtnSecondary>
+              ) : (
+                <BtnSecondary type="button" onClick={() => setStep(s => s - 1)}>Back</BtnSecondary>
+              )}
+              {step < 4 ? (
+                <BtnPrimary type="button" onClick={() => setStep(s => s + 1)} disabled={step === 2 ? !canNextDateTime : step === 3 ? !canNextDetails : false}>Next</BtnPrimary>
+              ) : (
+                <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail || !canNextDateTime || !canNextDetails}>{sendingEmail ? "Sending confirmation…" : "Create Booking"}</BtnPrimary>
+              )}
+            </ModalActions>
+          )
         }
       >
         <form id="booking-form" onSubmit={handleSubmit}>
+        {editingId ? (
+          <>
           <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
           </div>
@@ -461,9 +556,191 @@ export default function BookingsPage() {
               </FormGroup>
             </>
           )}
-          {!editingId && formData.client_email && (
-            <p style={{ fontSize: 12, color: "#10B981", margin: "0 0 12px", fontWeight: 500 }}>✉️ Confirmation email will be sent to {formData.client_email}</p>
+          </>
+        ) : (
+          <>
+          <WizardProgress step={step} labels={WIZARD_STEP_LABELS_BASE} />
+
+          {step === 0 && (
+            <div>
+              <div style={wizardTapCardStyle(formData.service_id === "")} onClick={() => setFormData({ ...formData, service_id: "" })}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>No service selected</div>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>Optional — you can add this later</div>
+              </div>
+              {sortedServices.map(s => (
+                <div key={s.id} style={wizardTapCardStyle(formData.service_id === s.id)} onClick={() => setFormData({ ...formData, service_id: s.id })}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>{s.name}</div>
+                  <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>{s.price_is_from ? "from " : ""}£{s.price}{s.duration_minutes ? ` · ${s.duration_minutes} mins` : ""}</div>
+                </div>
+              ))}
+            </div>
           )}
+
+          {step === 1 && (
+            <div>
+              <div style={wizardTapCardStyle(formData.staff_id === "")} onClick={() => setFormData({ ...formData, staff_id: "" })}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>👥 Any Available {vc.staffSingular}</div>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>We will assign whoever is free</div>
+              </div>
+              {staff.map(s => (
+                <div key={s.id} style={wizardTapCardStyle(formData.staff_id === s.id)} onClick={() => setFormData({ ...formData, staff_id: s.id })}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>{s.name}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {step === 2 && (
+            <div>
+              <FormGroup label="Date *">
+                <Input type="date" value={wizardDatePart || ""} onChange={e => setFormData({ ...formData, date_time: `${e.target.value}T${wizardTimePart || ""}` })} required />
+              </FormGroup>
+              <FormGroup label="Time *">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+                  {WIZARD_TIME_SLOTS.map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, date_time: `${wizardDatePart || todayLocalDateStr()}T${t}` })}
+                      style={{
+                        padding: "10px 6px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
+                        border: `1.5px solid ${wizardTimePart === t ? "#C9A24B" : "rgba(255,255,255,0.1)"}`,
+                        background: wizardTimePart === t ? "rgba(201,162,75,0.15)" : "rgba(255,255,255,0.03)",
+                        color: wizardTimePart === t ? "#C9A24B" : "#F7F5EF",
+                      }}
+                    >{t}</button>
+                  ))}
+                </div>
+              </FormGroup>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div>
+              <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} required /></FormGroup>
+              <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
+              <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
+              {(vc.treatmentNotes || vc.consultationForm) && (
+                <>
+                  <button type="button" onClick={() => setShowExtra(x => !x)} style={{ background: "none", border: "none", color: "#C9A24B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "4px 0", marginBottom: showExtra ? 12 : 0 }}>
+                    {showExtra ? "− Hide" : "+ Add"} {vc.consultationForm ? "consultation details" : "treatment notes"}
+                  </button>
+                  {showExtra && (
+                    <>
+                      {vc.treatmentNotes && (
+                        <FormGroup label="Treatment Notes">
+                          <textarea
+                            value={formData.notes}
+                            onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                            placeholder="Clinical observations, treatment plan, follow-up notes…"
+                            rows={4}
+                            style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
+                            onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
+                            onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                          />
+                        </FormGroup>
+                      )}
+                      {vc.consultationForm && (
+                        <>
+                          <FormGroup label="Skin Type">
+                            <Select value={formData.skin_type} onChange={e => setFormData({ ...formData, skin_type: e.target.value })}>
+                              <option value="">Select skin type</option>
+                              <option value="normal">Normal</option>
+                              <option value="dry">Dry</option>
+                              <option value="oily">Oily</option>
+                              <option value="combination">Combination</option>
+                              <option value="sensitive">Sensitive</option>
+                            </Select>
+                          </FormGroup>
+                          <FormGroup label="Known Allergies?">
+                            <Select value={formData.allergies} onChange={e => setFormData({ ...formData, allergies: e.target.value, allergy_details: e.target.value === "no" ? "" : formData.allergy_details })}>
+                              <option value="no">No known allergies</option>
+                              <option value="yes">Yes — has allergies</option>
+                            </Select>
+                          </FormGroup>
+                          {formData.allergies === "yes" && (
+                            <FormGroup label="Allergy Details">
+                              <Input
+                                placeholder="e.g. latex, fragrance, nickel…"
+                                value={formData.allergy_details}
+                                onChange={e => setFormData({ ...formData, allergy_details: e.target.value })}
+                              />
+                            </FormGroup>
+                          )}
+                          <FormGroup label="Previous Beauty Treatments">
+                            <textarea
+                              value={formData.previous_treatments}
+                              onChange={e => setFormData({ ...formData, previous_treatments: e.target.value })}
+                              placeholder="e.g. facials, waxing, lash extensions…"
+                              rows={2}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                            />
+                          </FormGroup>
+                          <FormGroup label="Medical Conditions / Medications">
+                            <textarea
+                              value={formData.medical_conditions}
+                              onChange={e => setFormData({ ...formData, medical_conditions: e.target.value })}
+                              placeholder="e.g. rosacea, eczema, pregnancy, blood thinners…"
+                              rows={2}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                            />
+                          </FormGroup>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 14px", padding: "10px 12px", background: "rgba(201,162,75,0.06)", borderRadius: 10, border: "1px solid rgba(201,162,75,0.15)", cursor: "pointer" }} onClick={() => setFormData(f => ({ ...f, patch_test: !f.patch_test }))}>
+                            <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${formData.patch_test ? "#C9A24B" : "#2a3350"}`, background: formData.patch_test ? "#C9A24B" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
+                              {formData.patch_test && <span style={{ color: "#0E1320", fontSize: 11, fontWeight: 900 }}>✓</span>}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#F7F5EF" }}>Patch Test Consent</div>
+                              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>Client consents to patch test before treatment</div>
+                            </div>
+                          </div>
+                          <FormGroup label="Additional Notes">
+                            <textarea
+                              value={formData.notes}
+                              onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                              placeholder="Any other notes about this client or appointment…"
+                              rows={2}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                            />
+                          </FormGroup>
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {step === 4 && (
+            <div>
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+                {[
+                  { label: "Service", value: formData.service_id ? (services.find(s => s.id === formData.service_id)?.name || "—") : "No service selected" },
+                  { label: vc.staffSingular, value: formData.staff_id ? (staff.find(s => s.id === formData.staff_id)?.name || "—") : `Any Available ${vc.staffSingular}` },
+                  { label: "Date & Time", value: wizardDatePart && wizardTimePart ? `${new Date(`${wizardDatePart}T${wizardTimePart}`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · ${wizardTimePart}` : "—" },
+                  { label: vc.clientSingular, value: formData.client_name || "—" },
+                ].map(row => (
+                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontWeight: 600 }}>{row.label}</span>
+                    <span style={{ fontSize: 12.5, color: "#F7F5EF", fontWeight: 700 }}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+              <FormGroup label="Status"><Select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">✓ Completed</option><option value="no_show">💤 No-show</option><option value="cancelled">Cancelled</option></Select></FormGroup>
+              {formData.client_email && (
+                <p style={{ fontSize: 12, color: "#10B981", margin: "0 0 12px", fontWeight: 500 }}>✉️ Confirmation email will be sent to {formData.client_email}</p>
+              )}
+            </div>
+          )}
+          </>
+        )}
         </form>
       </Modal>
     </DashboardShell>
