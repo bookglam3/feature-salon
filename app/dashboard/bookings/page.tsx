@@ -55,8 +55,8 @@ function todayLocalDateStr(): string {
 
 function WizardProgress({ step, labels }: { step: number; labels: string[] }) {
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
         {labels.map((_, i) => (
           <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "linear-gradient(90deg,#C9A24B,#E7C878)" : "rgba(255,255,255,0.08)", transition: "background 0.2s" }} />
         ))}

@@ -17,12 +17,23 @@ interface ModalProps {
 
 export default function Modal({ open, onClose, title, children, footer, maxWidth = 480 }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const scrollBodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handler);
     document.body.style.overflow = "hidden";
+    // Bug 2 fix (part 3): belt-and-suspenders scroll-to-top on open. The
+    // component fully unmounts on close (`if (!open) return null` below),
+    // so a freshly-mounted scroll container already starts at scrollTop 0
+    // by default — this doesn't fix a confirmed mechanism, it's explicit
+    // insurance for the "not starting scrolled to top" candidate cause,
+    // at zero cost. Covers both branches: ref is the scroll container
+    // itself when no footer is given, scrollBodyRef is the separate
+    // scroll region when one is.
+    if (ref.current) ref.current.scrollTop = 0;
+    if (scrollBodyRef.current) scrollBodyRef.current.scrollTop = 0;
     return () => {
       document.removeEventListener("keydown", handler);
       document.body.style.overflow = "";
@@ -42,8 +53,22 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <style>{`
+        /* Bug 2 fix (part 1): vh is computed against the browser's maximum
+           (chrome-collapsed) viewport, not the actually-visible one — on
+           mobile Safari/Chrome the address bar is still showing right when
+           a user opens this modal, so 92vh can be taller than what's really
+           on screen, pushing content below the visible fold even though the
+           layout math is otherwise correct. dvh recalculates against the
+           real visible viewport. Declared as a second, later rule for the
+           same property (not merged into one value) so unsupported browsers
+           simply ignore this line and keep the vh value already set —
+           standard progressive-enhancement fallback, not a replacement.
+           Must live here (a class rule), not the inline style prop below —
+           an inline style has higher specificity than any class selector
+           and would silently block this fallback from ever taking effect. */
+        .modal-inner { max-height: 92vh; max-height: 92dvh; }
         @media (min-width: 600px) {
-          .modal-inner { border-radius: 20px !important; max-height: 90vh !important; margin: 16px !important; animation: slideUp 0.24s cubic-bezier(0.4,0,0.2,1) both !important; }
+          .modal-inner { border-radius: 20px !important; max-height: 90vh !important; max-height: 90dvh !important; margin: 16px !important; animation: slideUp 0.24s cubic-bezier(0.4,0,0.2,1) both !important; }
           .modal-wrap { align-items: center !important; }
         }
         @media (max-width: 599px) {
@@ -67,7 +92,9 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
           borderRadius: "20px 20px 0 0",
           width: "100%",
           maxWidth,
-          maxHeight: "92vh",
+          // maxHeight set via the .modal-inner CSS rule above (vh + dvh
+          // fallback pair) — kept out of inline style, which would win over
+          // the class rule by specificity and block the dvh line entirely.
           boxShadow: "0 -8px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,162,75,0.1)",
           ...(footer
             ? { display: "flex", flexDirection: "column" as const, overflow: "hidden" }
@@ -77,10 +104,10 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
       >
         {footer ? (
           <>
-            <div style={{ padding: "24px 20px 0", flexShrink: 0 }}>
+            <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
               {header(title, onClose)}
             </div>
-            <div className="modal-scroll-body" style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px 20px" }}>
+            <div ref={scrollBodyRef} className="modal-scroll-body" style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px 20px" }}>
               {children}
             </div>
             <div style={{ flexShrink: 0, padding: "0 20px 32px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
@@ -102,10 +129,10 @@ function header(title: string, onClose: () => void) {
   return (
     <>
       {/* Drag handle (mobile) */}
-      <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 99, margin: "0 auto 20px" }} />
+      <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 99, margin: "0 auto 12px" }} />
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <h2 style={{ fontSize: 17, fontWeight: 700, color: "#F7F5EF", letterSpacing: "-0.4px" }}>{title}</h2>
         <button
           onClick={onClose}
