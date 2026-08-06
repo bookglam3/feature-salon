@@ -45,7 +45,20 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
   return (
     <div
       style={{
-        position: "fixed", inset: 0, zIndex: 200,
+        position: "fixed", inset: 0,
+        // Was 200 — below OnboardingChecklist's fixed, zIndex:400 corner
+        // widget (app/dashboard/components/OnboardingChecklist.tsx). On
+        // the dashboard home page, with onboarding not yet dismissed, that
+        // widget painted on top of this modal wherever their fixed-
+        // position footprints overlapped (both are bottom-anchored; the
+        // widget is ~320px wide, nearly full mobile width), covering the
+        // form fields with an unrelated white card regardless of the
+        // modal's own scroll position. 500 clears every other fixed
+        // overlay below it (Sidebar/Modal were previously tied at 200;
+        // this resolves that ambiguity toward the modal, correctly) while
+        // staying under Toast.tsx's 9999, so a toast still shows above an
+        // open modal, unchanged.
+        zIndex: 500,
         background: "rgba(0,0,0,0.75)",
         backdropFilter: "blur(8px)",
         display: "flex", alignItems: "flex-end", justifyContent: "center",
