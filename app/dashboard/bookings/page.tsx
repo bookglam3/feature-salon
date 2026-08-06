@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
@@ -97,6 +97,17 @@ export default function BookingsPage() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  // Double-submit guard (Bug 1). submittingRef is the actual gate: a plain
+  // isSubmitting STATE check at the top of handleSubmit has a real gap on
+  // a fast double-tap — two near-simultaneous calls can both read the same
+  // stale, not-yet-re-rendered closure before React commits the update, so
+  // both would see isSubmitting as still false. A ref's .current is read/
+  // written synchronously outside React's render cycle, so it can't be
+  // stale between two calls in the same tick. isSubmitting (state) still
+  // exists alongside it purely to drive the disabled/label UI, which does
+  // need a re-render to reach the DOM either way.
+  const submittingRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // Phase 1 (UX-only) wizard for New Appointment. Only used when
   // !editingId — editing still renders the original single-screen form,
   // untouched, below. showExtra is the collapsed-by-default toggle for the
@@ -147,7 +158,13 @@ export default function BookingsPage() {
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Bug 1 fix: re-entry guard. See submittingRef's declaration for why
+    // this checks the ref, not the isSubmitting state, at the gate.
+    if (submittingRef.current) return;
     if (!salon) return;
+    submittingRef.current = true;
+    setIsSubmitting(true);
+    try {
     const notesValue = serializeNotes(formData, vc.consultationForm);
     // Stage 1 of the interval-overlap fix: end_time written at booking time.
     // formData.service_id can be "" (no service selected) — this form allows
@@ -178,7 +195,18 @@ export default function BookingsPage() {
         .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue })
         .select("id")
         .single();
-      if (error) { toast.error("Failed to create booking"); return; }
+      if (error) {
+        // Bug 1 server-side backstop: the BEFORE INSERT trigger on
+        // appointments raises this exact message on a detected duplicate
+        // (see supabase-prevent-duplicate-booking.sql) — surface it as the
+        // friendly message it's meant to be, not the generic fallback.
+        if (error.message?.includes("DUPLICATE_BOOKING_DETECTED")) {
+          toast.error("Looks like this booking was just created — check the list before adding it again.");
+        } else {
+          toast.error("Failed to create booking");
+        }
+        return;
+      }
 
       if (formData.client_email && inserted?.id) {
         setSendingEmail(true);
@@ -207,6 +235,10 @@ export default function BookingsPage() {
     setShowForm(false);
     setEditingId(null);
     await reloadAppts();
+    } finally {
+      submittingRef.current = false;
+      setIsSubmitting(false);
+    }
   }, [salon, editingId, formData, vc, toast, reloadAppts, serializeNotes]);
 
   const handleEdit = useCallback((a: Appointment) => {
@@ -429,7 +461,7 @@ export default function BookingsPage() {
           editingId ? (
             <ModalActions>
               <BtnSecondary type="button" onClick={() => { setShowForm(false); setEditingId(null); }}>Cancel</BtnSecondary>
-              <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail}>{sendingEmail ? "Sending confirmation…" : "Update"}</BtnPrimary>
+              <BtnPrimary type="submit" form="booking-form" disabled={isSubmitting || sendingEmail}>{sendingEmail ? "Sending confirmation…" : "Update"}</BtnPrimary>
             </ModalActions>
           ) : (
             // Phase 1 (UX-only): step navigation only. The submit button on
@@ -446,7 +478,7 @@ export default function BookingsPage() {
               {step < 4 ? (
                 <BtnPrimary type="button" onClick={() => setStep(s => s + 1)} disabled={step === 2 ? !canNextDateTime : step === 3 ? !canNextDetails : false}>Next</BtnPrimary>
               ) : (
-                <BtnPrimary type="submit" form="booking-form" disabled={sendingEmail || !canNextDateTime || !canNextDetails}>{sendingEmail ? "Sending confirmation…" : "Create Booking"}</BtnPrimary>
+                <BtnPrimary type="submit" form="booking-form" disabled={isSubmitting || sendingEmail || !canNextDateTime || !canNextDetails}>{sendingEmail ? "Sending confirmation…" : "Create Booking"}</BtnPrimary>
               )}
             </ModalActions>
           )
