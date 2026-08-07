@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   open: boolean;
@@ -41,8 +42,21 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
   }, [open, onClose]);
 
   if (!open) return null;
+  // Stacking-context fix: this component previously rendered in-place,
+  // wherever its caller happened to sit in the tree. On the dashboard home
+  // page, DashboardShell's .ds-main establishes a stacking context
+  // (position:relative + explicit z-index:1), and z-index values alone
+  // (even raised well above every known sibling) can't reliably escape an
+  // ancestor's stacking context — only certain properties on that ancestor
+  // do (transform/filter/etc, none of which apply here, but the search for
+  // "is there a trapping ancestor anywhere in the tree, now or in any
+  // future page that uses this component" isn't a bet worth re-litigating
+  // per caller). Portaling straight to document.body sidesteps the
+  // question entirely: this always mounts as a true top-level sibling of
+  // the app root, regardless of what any current or future ancestor does.
+  if (typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed", inset: 0,
@@ -134,7 +148,8 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
