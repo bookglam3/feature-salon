@@ -390,10 +390,18 @@ export default function DashboardPage() {
   /* ── Topbar ── */
   const Topbar = (
     <header style={{ background: "rgba(10,9,20,0.96)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      {/* minWidth:0 on this row and the wrapping div below is what lets the
+          greeting text actually shrink instead of forcing the topbar wider
+          than the viewport — a flex item's default min-width:auto blocks
+          that unless overridden at every level down to the truncating text
+          itself. Everything else in this topbar (badge/export/date) is
+          already hidden or shrunk at <=767px; this was the one remaining
+          unguarded piece, and the only one whose width depends on
+          user/salon data (a long salon name) rather than a fixed label. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
         <HamburgerBtn />
-        <div>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px" }}>{greeting}, {salon?.name?.split(" ")[0]}</div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{greeting}, {salon?.name?.split(" ")[0]}</div>
           <div className="dash-greeting-date" style={{ fontSize: 11.5, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
         </div>
       </div>
@@ -499,10 +507,15 @@ export default function DashboardPage() {
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF" }}>All {vc.bookingPlural}</div>
                   <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder={`Search ${vc.clientSingular.toLowerCase()}, service...`} />
-                    <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", padding: 3, borderRadius: 10 }}>
+                    {/* Same horizontal-scroll pattern already used for the
+                        Quick Actions row below (dash-quick-scroll) — 8 tabs
+                        don't fit any tested width unwrapped, and this is the
+                        existing dashboard convention for "too many buttons
+                        in a row" rather than a new one. */}
+                    <div className="dash-tab-scroll" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", padding: 3, borderRadius: 10, overflowX: "auto", maxWidth: "100%" }}>
                       {["All", "Today", "Upcoming", "Confirmed", "Pending", "Completed", "Cancelled", "No-show"].map(t => (
                         <button key={t} onClick={() => setActiveTab(t)}
-                          style={{ fontSize: 11.5, padding: "5px 12px", borderRadius: 8, border: "none", background: activeTab === t ? "rgba(201,162,75,0.25)" : "transparent", color: activeTab === t ? "#C9A24B" : "rgba(255,255,255,0.35)", cursor: "pointer", fontWeight: activeTab === t ? 800 : 500, boxShadow: activeTab === t ? "0 1px 4px rgba(0,0,0,0.2)" : "none", transition: "all 0.12s", whiteSpace: "nowrap" }}>{t}</button>
+                          style={{ fontSize: 11.5, padding: "5px 12px", borderRadius: 8, border: "none", background: activeTab === t ? "rgba(201,162,75,0.25)" : "transparent", color: activeTab === t ? "#C9A24B" : "rgba(255,255,255,0.35)", cursor: "pointer", fontWeight: activeTab === t ? 800 : 500, boxShadow: activeTab === t ? "0 1px 4px rgba(0,0,0,0.2)" : "none", transition: "all 0.12s", whiteSpace: "nowrap", flexShrink: 0 }}>{t}</button>
                       ))}
                     </div>
                   </div>

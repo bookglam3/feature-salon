@@ -322,7 +322,11 @@ export default function BookingsPage() {
           <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>{appointments.length} total {vc.bookingPlural.toLowerCase()}</div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      {/* flexWrap: same inline-override technique already used on this
+          page's search+tabs row below — belt-and-suspenders for the
+          absolute narrowest widths (320px), on top of the .elite-topbar
+          CSS-level wrap that already applies to this whole header. */}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <div className="elite-tabs">
           {(["table","calendar"] as const).map(v => (
             <button key={v} onClick={() => setView(v)} className={`elite-tab${view === v ? " active" : ""}`}>

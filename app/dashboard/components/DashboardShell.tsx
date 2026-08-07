@@ -209,6 +209,12 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           color: #C9A24B;
           border: 1px solid rgba(201,162,75,0.25);
         }
+        /* Responsive audit fix — same breakpoint (767px) and same technique
+           (hide secondary badge) already proven on the dashboard-home
+           page's own custom topbar (.dash-topbar-badge). The page title
+           truncating (below) is what actually prevents overflow; this just
+           frees up room so the title has more space before it needs to. */
+        @media (max-width: 767px) { .ds-plan-badge { display: none !important; } }
 
         /* Hamburger */
         .hbtn { display: flex; }
@@ -351,12 +357,18 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
 
   return (
     <header className="ds-topbar">
-      {/* Left: hamburger + page title */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+      {/* Left: hamburger + page title. minWidth:0 replaces flexShrink:0 on
+          both this row and the title itself — the title must be able to
+          shrink and ellipsis rather than force the row wider than the
+          viewport. Every level between the flex row and the truncating
+          text needs its own minWidth:0, or a flex item's default
+          min-width:auto blocks the shrink before it ever reaches the text. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
         <HamburgerBtn onClick={onMenuClick} />
         <div style={{
           fontSize: 14.5, fontWeight: 800, color: "#F7F5EF",
           letterSpacing: "-0.4px", lineHeight: 1,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
         }}>
           {pageTitle}
         </div>
