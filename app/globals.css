@@ -977,11 +977,20 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 
 /* Dark topbar */
+/* Wave 1 perf pass — was blur(20px) saturate(160%), unconditional, on a
+   position:sticky element that repaints every scroll frame. Base rule now
+   ships with no backdrop-filter at all (background bumped 0.96->0.98 to
+   stay legible without it); html.gpu-capable restores a trimmed blur —
+   see the device-capability check in DashboardShell.tsx. Dropped
+   saturate() outright for both tiers: a second, separate filter pass for
+   a difference that's imperceptible next to the blur itself. */
 .ds-topbar {
-  background: rgba(10,9,20,0.96) !important;
+  background: rgba(10,9,20,0.98) !important;
   border-bottom: 1px solid var(--dk-border) !important;
-  backdrop-filter: blur(20px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+}
+html.gpu-capable .ds-topbar {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 .ds-topbar-search {
   background: rgba(255,255,255,0.05) !important;
@@ -1147,10 +1156,12 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 
 /* ── Elite topbar ── */
+/* Wave 1 perf pass — was blur(28px) saturate(180%) unconditionally, the
+   largest blur radius in the codebase, on a sticky element. Same gated
+   pattern as .ds-topbar: base ships with no backdrop-filter (background
+   bumped 0.97->0.98), html.gpu-capable restores a trimmed blur. */
 .elite-topbar {
-  background: rgba(9,9,20,0.97);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  background: rgba(9,9,20,0.98);
   border-bottom: 1px solid rgba(255,255,255,0.06);
   box-shadow: 0 1px 0 rgba(201,162,75,0.06), 0 4px 24px rgba(0,0,0,0.3);
   height: 60px;
@@ -1162,6 +1173,10 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   top: 0;
   z-index: 30;
   gap: 12px;
+}
+html.gpu-capable .elite-topbar {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 /* Responsive audit fix — had zero mobile handling (confirmed: no @media
    block anywhere in this file touches .elite-*). Used by bookings/page.tsx

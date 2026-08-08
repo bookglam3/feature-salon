@@ -34,6 +34,23 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
     return () => document.removeEventListener("open-sidebar", handler);
   }, []);
 
+  // Device-capability guard for backdrop-filter (Wave 1 perf pass).
+  // navigator.deviceMemory is Chrome/Android-only — undefined on iOS
+  // Safari and most desktop browsers, which is exactly the "no signal"
+  // case we want to default to the premium path for, not downgrade.
+  // Chrome buckets the value (0.25/0.5/1/2/4/8...); only a CONFIRMED
+  // reading below 4GB opts a device out. Starts absent (cheap/no-blur
+  // base styles apply) and gets added shortly after mount if capable —
+  // upgrading into the blur is a subtle pop-in; the alternative (starting
+  // expensive and downgrading) would mean every device pays for at least
+  // one expensive paint, which is exactly what this is trying to avoid.
+  useEffect(() => {
+    const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    if (mem === undefined || mem >= 4) {
+      document.documentElement.classList.add("gpu-capable");
+    }
+  }, []);
+
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -123,10 +140,14 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
         }
 
         /* ══ Premium Topbar ══ */
+        /* Wave 1 perf pass: this rule is actually shadowed for background/
+           backdrop-filter by the !important overrides in globals.css's
+           "DARK DASHBOARD" section (the real source of truth for those two
+           properties) — updated here too so both files agree, rather than
+           leaving two different numbers sitting around. No backdrop-filter
+           in the base rule; html.gpu-capable adds it back (see globals.css). */
         .ds-topbar {
-          background: rgba(14,19,32,0.97);
-          backdrop-filter: blur(24px) saturate(180%);
-          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          background: rgba(14,19,32,0.98);
           border-bottom: 1px solid rgba(255,255,255,0.06);
           padding: 0 20px; height: 60px;
           display: flex; align-items: center; justify-content: space-between;

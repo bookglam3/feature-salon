@@ -446,18 +446,22 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="dash-banner-btns" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {/* Wave 1 perf pass: backdropFilter removed from these 3 pill
+                  buttons — each was its own GPU layer promotion, always
+                  rendered on dashboard home, purely decorative (they don't
+                  need to blur the gradient behind them for legibility). */}
               <button onClick={handleCopyLink}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.08)", color: "#fff", border: `1px solid ${copied ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.14)"}`, borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", backdropFilter: "blur(8px)" }}>
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.08)", color: "#fff", border: `1px solid ${copied ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.14)"}`, borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }}>
                 <Link2 size={13} strokeWidth={2} />
                 {copied ? "Copied!" : "Copy Link"}
               </button>
               <button onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", backdropFilter: "blur(8px)" }}>
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }}>
                 <ExternalLink size={13} strokeWidth={2} />
                 Preview
               </button>
               <a href="/dashboard/reports"
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "rgba(255,255,255,0.06)", color: "#fff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", textDecoration: "none", backdropFilter: "blur(8px)" }}>
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "rgba(255,255,255,0.06)", color: "#fff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", textDecoration: "none" }}>
                 <BarChart2 size={13} strokeWidth={2} />
                 Reports
               </a>

@@ -52,12 +52,20 @@ export default function MobileNav() {
       <style>{`
         @media (min-width: 768px) { .mobile-nav-bar { display: none !important; } }
 
+        /* Wave 1 perf pass — was blur(28px) saturate(180%) unconditionally.
+           This bar is mounted for the entire mobile session, permanently
+           on screen, above whatever's scrolling underneath it — the
+           highest-value single change in this pass. Base ships with no
+           backdrop-filter (background bumped 0.96->0.98); html.gpu-capable
+           (set in DashboardShell.tsx) restores a trimmed blur. */
         .mobile-nav-bar {
-          background: rgba(14,19,32,0.96);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          background: rgba(14,19,32,0.98);
           border-top: 1px solid rgba(255,255,255,0.07);
           box-shadow: 0 -8px 40px rgba(0,0,0,0.45), 0 -1px 0 rgba(255,255,255,0.04);
+        }
+        html.gpu-capable .mobile-nav-bar {
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
         }
 
         .mnav-item {
