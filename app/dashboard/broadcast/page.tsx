@@ -7,8 +7,6 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { useToast } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 
-interface ApptRow { client_name: string; client_email: string; client_phone: string; date_time: string; }
-
 interface BroadcastMsg {
   id: string;
   title: string;
@@ -42,7 +40,7 @@ function BroadcastContent() {
   const [salonName, setSalonName] = useState("");
   const [salonSlug, setSalonSlug] = useState("");
   const [history, setHistory] = useState<BroadcastMsg[]>([]);
-  const [clients, setClients] = useState<{ name: string; phone: string; email: string }[]>([]);
+  const [recipientCount, setRecipientCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ title: "", message: "", channel: "whatsapp" as "whatsapp"|"sms"|"email", filter: "all" as "all"|"vip"|"new"|"inactive" });
   const [sending, setSending] = useState(false);
@@ -57,32 +55,29 @@ function BroadcastContent() {
       setSalonSlug(profile.salon.slug || "");
       setBusinessType(profile.salon.business_type ?? undefined);
 
-      const [{ data: hist }, { data: appts }] = await Promise.all([
-        supabase.from("broadcast_messages").select("*").eq("salon_id", profile.salon.id).order("created_at", { ascending: false }),
-        supabase.from("appointments").select("client_name, client_email, client_phone, date_time, status").eq("salon_id", profile.salon.id),
-      ]);
+      const { data: hist } = await supabase
+        .from("broadcast_messages").select("*").eq("salon_id", profile.salon.id).order("created_at", { ascending: false });
       setHistory(hist || []);
 
-      // Build unique clients
-      const map: Record<string, { name: string; phone: string; email: string; count: number; last: string }> = {};
-      (appts || [] as ApptRow[]).forEach((a: ApptRow) => {
-        const key = a.client_email || a.client_name;
-        if (!map[key]) map[key] = { name: a.client_name, phone: a.client_phone || "", email: a.client_email || "", count: 0, last: a.date_time };
-        map[key].count++;
-        if (a.date_time > map[key].last) map[key].last = a.date_time;
-      });
-      setClients(Object.values(map));
+      // Recipient count is server-derived (clients table, opted-in, has email) —
+      // this fetch is read-only and purely for display; the send path re-derives
+      // it itself and does not depend on this value.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        try {
+          const res = await fetch("/api/broadcast/send", {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+          const json = await res.json();
+          if (res.ok) setRecipientCount(json.recipientCount ?? 0);
+        } catch {
+          // count is display-only — a failed fetch just leaves it at 0
+        }
+      }
       setLoading(false);
     };
     load();
   }, [router]);
-
-  const filteredClients = clients.filter(() => {
-    if (form.filter === "all") return true;
-    return true; // could add vip/new/inactive filters
-  });
-
-  const recipientCount = filteredClients.length;
 
   const applyTemplate = (t: ReturnType<typeof getTemplates>[0]) => {
     const msg = t.message
@@ -118,13 +113,10 @@ function BroadcastContent() {
         },
         body: JSON.stringify({
           broadcastId: broadcastRow?.id,
-          salonId,
-          salonName,
-          salonSlug,
           channel: form.channel,
           title: form.title,
           message: form.message,
-          clients: filteredClients,
+          filter: form.filter,
         }),
       });
       const json = await res.json();

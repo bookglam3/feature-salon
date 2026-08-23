@@ -14,70 +14,100 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+interface SalonRow { id: string; name: string; slug: string; }
+
+// Resolves the caller's salon from their session token — salon identity is
+// NEVER trusted from the request body, so a tampered payload can't target
+// (or read) another salon's clients.
+async function getOwnerSalon(req: NextRequest): Promise<SalonRow | null> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) return null;
+
+  const { data: salon, error: salonErr } = await supabase
+    .from("salons")
+    .select("id, name, slug")
+    .eq("owner_id", user.id)
+    .single();
+  if (salonErr || !salon) return null;
+  return salon as SalonRow;
+}
+
+// Recipients are derived here, server-side, on every send — never accepted
+// from the client. Email-only for now (SMS/WhatsApp opt-out plumbing is a
+// separate piece of work).
+async function getRecipients(salonId: string) {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("name, email, phone")
+    .eq("salon_id", salonId)
+    .eq("marketing_opt_out", false)
+    .not("email", "is", null)
+    .neq("email", "");
+  if (error) throw error;
+  return data || [];
+}
+
+// GET — read-only recipient count for the compose screen. Does not send anything.
+export async function GET(req: NextRequest) {
+  const salon = await getOwnerSalon(req);
+  if (!salon) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const recipients = await getRecipients(salon.id);
+    return NextResponse.json({ recipientCount: recipients.length });
+  } catch (e) {
+    console.error("[broadcast/send GET] Error:", e);
+    return NextResponse.json({ error: "Failed to load recipient count" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // Verify the caller is an authenticated salon owner
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const token = authHeader.slice(7);
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const salon = await getOwnerSalon(req);
+    if (!salon) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const {
-      broadcastId,
-      salonId,
-      salonName,
-      salonSlug,
-      channel,
-      title,
-      message,
-      clients, // [{ name, email, phone }]
-    } = await req.json();
+    const { broadcastId, channel, title, message } = await req.json();
 
-    if (!salonId || !channel || !message || !clients?.length) {
+    if (!channel || !message) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Verify the authenticated user owns this salon
-    const { data: salonRow } = await supabase
-      .from("salons")
-      .select("owner_id")
-      .eq("id", salonId)
-      .single();
-    if (!salonRow || salonRow.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const recipients = await getRecipients(salon.id);
+    if (recipients.length === 0) {
+      return NextResponse.json({ error: "No recipients matched" }, { status: 400 });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
-    const bookingLink = `${appUrl}/book/${salonSlug}`;
+    const bookingLink = `${appUrl}/book/${salon.slug}`;
 
     let sent = 0;
     const errors: string[] = [];
 
-    for (const client of clients) {
+    for (const client of recipients) {
       // Personalise the message
       const personalised = message
         .replace(/{name}/g, client.name || "there")
-        .replace(/{salon}/g, salonName || "us")
+        .replace(/{salon}/g, salon.name || "us")
         .replace(/{link}/g, bookingLink);
 
       try {
         if (channel === "email" && client.email) {
+          const unsubLink = `${appUrl}/unsubscribe?email=${encodeURIComponent(client.email)}&salon=${encodeURIComponent(salon.slug)}`;
           await sendOfferEmail({
             to:           client.email,
             clientName:   client.name || "Valued Client",
-            salonName:    salonName || "Your Salon",
+            salonName:    salon.name || "Your Salon",
             offerTitle:   title,
             offerDescription: personalised,
             bookingLink,
+            unsubLink,
           });
           sent++;
         } else if (channel === "sms" && client.phone) {
-          await sendSMS(client.phone, personalised, salonName);
+          await sendSMS(client.phone, personalised, salon.name);
           sent++;
         } else if (channel === "whatsapp" && client.phone) {
           await sendWhatsApp(client.phone, personalised);
@@ -88,12 +118,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Update broadcast record with actual sent count
+    // Update broadcast record with actual sent count — scoped to this salon
+    // so a stale/foreign broadcastId can't touch another salon's log row.
     if (broadcastId) {
       await supabase
         .from("broadcast_messages")
         .update({ status: errors.length === 0 ? "sent" : "partial", recipient_count: sent })
-        .eq("id", broadcastId);
+        .eq("id", broadcastId)
+        .eq("salon_id", salon.id);
     }
 
     return NextResponse.json({ success: true, sent, errors: errors.length > 0 ? errors : undefined });

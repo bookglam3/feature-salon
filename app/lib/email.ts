@@ -454,11 +454,12 @@ export async function sendThankyouEmail({
 // ═══════════════════════════════════════════════
 export async function sendOfferEmail({
   to, clientName, salonName, offerTitle, offerDescription,
-  discountPercent, expiresAt, bookingLink,
+  discountPercent, expiresAt, bookingLink, unsubLink,
 }: {
   to: string; clientName: string; salonName: string;
   offerTitle: string; offerDescription?: string;
   discountPercent?: number; expiresAt?: string; bookingLink: string;
+  unsubLink?: string;
 }) {
   const expiryFormatted = expiresAt
     ? new Date(expiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
@@ -470,7 +471,7 @@ export async function sendOfferEmail({
     html: emailTemplate({
       title: "A Special Offer Just for You 🏷️", clientName,
       message: "As one of our valued clients, we wanted to share this exclusive offer with you before anyone else.",
-      salonName, color: "#C2185B",
+      salonName, color: "#C2185B", unsubLink,
       extra: `
         <div style="background:linear-gradient(135deg,#FDE8F0,#F3E8FD);border:1.5px solid #C2185B;border-radius:12px;padding:24px;margin-bottom:20px;text-align:center;">
           ${discountPercent ? `<p style="font-size:48px;font-weight:700;color:#C2185B;margin:0 0 8px;line-height:1;">${discountPercent}% OFF</p>` : ""}
