@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
 import SchemaMarkup from "./components/SchemaMarkup";
 import WhatsAppWidget from "./components/WhatsAppWidget";
@@ -20,6 +20,13 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
   weight: ["400", "600", "700"],
   preload: true,
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-manrope",
 });
 
 const BASE_URL = "https://www.featuresalon.co.uk";
@@ -99,7 +106,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-GB"
-      className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+      className={`${inter.variable} ${playfair.variable} ${manrope.variable} h-full antialiased`}
     >
       <head>
         <link rel="manifest" href="/manifest.json" />

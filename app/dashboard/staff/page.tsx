@@ -20,7 +20,7 @@ const EMPTY_FORM = {
 
 function Avatar({ name }: { name: string }) {
   const initials = name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
-  const colors = ["#C9A24B","#10B981","#F59E0B","#EF4444","#E7C878","#06B6D4"];
+  const colors = ["#7C3AED","#10B981","#F59E0B","#EF4444","#6D28D9","#06B6D4"];
   const bg = colors[name.charCodeAt(0) % colors.length];
   return <div style={{ width: 40, height: 40, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{initials}</div>;
 }
@@ -190,17 +190,17 @@ export default function StaffPage() {
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
   const Topbar = (
-    <header style={{ background: "#1C2438", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30 }}>
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.3px" }}>{vc.staffPlural} Management</div>
-          <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{staffList.length} {vc.staffPlural.toLowerCase()}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>{vc.staffPlural} Management</div>
+          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{staffList.length} {vc.staffPlural.toLowerCase()}</div>
         </div>
       </div>
-      <button onClick={() => { setEditingStaff(null); setFormData({ ...EMPTY_FORM, role: vc.staffSingular.toLowerCase() }); setShowForm(true); }} style={{ background: "var(--indigo)", color: "#fff", fontSize: 13, fontWeight: 600, padding: "8px 16px", borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", boxShadow: "var(--shadow-indigo)", whiteSpace: "nowrap", transition: "all 0.14s" }}
-        onMouseEnter={e => { e.currentTarget.style.background = "var(--indigo-dark)"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = "var(--indigo)"; }}
+      <button onClick={() => { setEditingStaff(null); setFormData({ ...EMPTY_FORM, role: vc.staffSingular.toLowerCase() }); setShowForm(true); }} style={{ background: "#7C3AED", color: "#fff", fontSize: 13, fontWeight: 600, padding: "8px 16px", borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.25)", whiteSpace: "nowrap", transition: "all 0.14s" }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#6D28D9"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = "#7C3AED"; }}
       >+ Add {vc.staffSingular}</button>
     </header>
   );
@@ -211,15 +211,15 @@ export default function StaffPage() {
 
         {/* Search */}
         <div style={{ marginBottom: 16 }}>
-          <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={`Search ${vc.staffPlural.toLowerCase()} by name or email…`} style={{ width: "100%", maxWidth: 360, padding: "9px 13px", border: "1px solid var(--border-2)", borderRadius: "var(--r-sm)", fontSize: 13.5, fontFamily: "var(--font)", outline: "none", color: "var(--text-1)" }}
-            onFocus={e => { e.currentTarget.style.borderColor = "var(--indigo)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(201,162,75,0.12)"; }}
-            onBlur={e => { e.currentTarget.style.borderColor = "var(--border-2)"; e.currentTarget.style.boxShadow = "none"; }}
+          <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={`Search ${vc.staffPlural.toLowerCase()} by name or email…`} style={{ width: "100%", maxWidth: 360, padding: "9px 13px", border: "1px solid #ECE9F1", borderRadius: "var(--r-sm)", fontSize: 13.5, fontFamily: "var(--font)", outline: "none", color: "#12101A" }}
+            onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(124,58,237,0.12)"; }}
+            onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.boxShadow = "none"; }}
           />
         </div>
 
         {/* Staff cards grid */}
         {filtered.length === 0 ? (
-          <div style={{ background: "#1C2438", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
             <EmptyState icon="??" title={searchTerm ? `No ${vc.staffPlural.toLowerCase()} found` : `No ${vc.staffPlural.toLowerCase()} yet`} description={searchTerm ? "Try a different search" : `Add your first ${vc.staffSingular.toLowerCase()} to get started`} action={{ label: `+ Add ${vc.staffSingular}`, onClick: () => { setEditingStaff(null); setFormData({ ...EMPTY_FORM, role: vc.staffSingular.toLowerCase() }); setShowForm(true); } }} />
           </div>
         ) : (
@@ -228,15 +228,15 @@ export default function StaffPage() {
               const wh = s.working_hours || {};
               const activeDays = DAYS.filter(d => wh[d]?.enabled);
               return (
-                <div key={s.id} style={{ background: "#1C2438", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "18px", transition: "all 0.14s" }}
+                <div key={s.id} style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: "var(--r-lg)", padding: "18px", boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)", transition: "all 0.14s" }}
                   onMouseEnter={e => { e.currentTarget.style.boxShadow = "var(--shadow-md)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)"; e.currentTarget.style.transform = "none"; }}
                 >
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
                     <Avatar name={s.name} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.2px" }}>{s.name}</div>
-                      <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.email}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.email}</div>
                     </div>
                     <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99, background: s.active ? "var(--green-light)" : "var(--red-light)", color: s.active ? "var(--green)" : "var(--red)", border: `1px solid ${s.active ? "var(--green-pale)" : "var(--red-pale)"}`, whiteSpace: "nowrap" }}>
                       {s.active ? "Active" : "Inactive"}
@@ -244,30 +244,30 @@ export default function StaffPage() {
                   </div>
 
                   <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "var(--indigo-light)", color: "var(--indigo)", border: "1px solid var(--indigo-pale)", textTransform: "capitalize" }}>{s.role}</span>
-                    {activeDays.length > 0 && <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 99, background: "var(--slate-100)", color: "var(--text-2)", border: "1px solid var(--border)" }}>{activeDays.join(", ")}</span>}
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "#EDE9FF", color: "#7C3AED", border: "1px solid #DDD6FE", textTransform: "capitalize" }}>{s.role}</span>
+                    {activeDays.length > 0 && <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 99, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1" }}>{activeDays.join(", ")}</span>}
                   </div>
 
                   {s.services?.length > 0 && (
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
                       {s.services.slice(0,3).map((sv: string) => (
-                        <span key={sv} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 4, background: "var(--slate-50)", border: "1px solid var(--border)", color: "var(--text-2)" }}>{serviceNameMap[sv] ?? sv}</span>
+                        <span key={sv} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 4, background: "#F5F3FF", border: "1px solid #ECE9F1", color: "#6B6577" }}>{serviceNameMap[sv] ?? sv}</span>
                       ))}
-                      {s.services.length > 3 && <span style={{ fontSize: 10.5, color: "var(--text-3)" }}>+{s.services.length - 3} more</span>}
+                      {s.services.length > 3 && <span style={{ fontSize: 10.5, color: "#9A94A8" }}>+{s.services.length - 3} more</span>}
                     </div>
                   )}
 
-                  <div style={{ display: "flex", gap: 6, paddingTop: 12, borderTop: "1px solid var(--slate-100)" }}>
-                    <button onClick={() => handleEdit(s)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "#1C2438", color: "var(--text-2)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--indigo)"; e.currentTarget.style.color = "var(--indigo)"; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                  <div style={{ display: "flex", gap: 6, paddingTop: 12, borderTop: "1px solid #ECE9F1" }}>
+                    <button onClick={() => handleEdit(s)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#6B6577", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.color = "#7C3AED"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#6B6577"; }}
                     >Edit</button>
-                    <button onClick={() => handleToggle(s.id, s.active)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "#1C2438", color: s.active ? "var(--red)" : "var(--green)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}>
+                    <button onClick={() => handleToggle(s.id, s.active)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: s.active ? "var(--red)" : "var(--green)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}>
                       {s.active ? "Deactivate" : "Activate"}
                     </button>
-                    <button onClick={() => handleDelete(s.id)} style={{ padding: "7px 10px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "#1C2438", color: "var(--text-3)", fontSize: 12.5, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
+                    <button onClick={() => handleDelete(s.id)} style={{ padding: "7px 10px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#9A94A8", fontSize: 12.5, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
                       onMouseEnter={e => { e.currentTarget.style.color = "var(--red)"; e.currentTarget.style.borderColor = "var(--red-pale)"; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.borderColor = "var(--border)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = "#9A94A8"; e.currentTarget.style.borderColor = "#ECE9F1"; }}
                     >🗑</button>
                   </div>
                 </div>

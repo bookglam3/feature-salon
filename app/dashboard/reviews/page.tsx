@@ -24,7 +24,7 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
     <div style={{ display: "flex", gap: 2 }}>
       {[1, 2, 3, 4, 5].map(s => (
-        <span key={s} style={{ fontSize: size, color: s <= rating ? "#F59E0B" : "#2a3350", lineHeight: 1 }}>★</span>
+        <span key={s} style={{ fontSize: size, color: s <= rating ? "#F59E0B" : "#ECE9F1", lineHeight: 1 }}>★</span>
       ))}
     </div>
   );
@@ -101,23 +101,23 @@ function ReviewsContent() {
   };
 
   const Topbar = (
-    <header style={{ background: "#1C2438", borderBottom: "1px solid #2a3350", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px" }}>⭐ Reviews</div>
-          <div style={{ fontSize: 11.5, color: "#aab1c4", marginTop: 1 }}>Client feedback & reputation</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>Reviews</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Client feedback & reputation</div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={copyReviewLink} style={{ padding: "9px 16px", background: "#141A2E", border: "1.5px solid #2a3350", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#aab1c4", cursor: "pointer" }}>🔗 Share Link</button>
+        <button onClick={copyReviewLink} style={{ padding: "9px 16px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Share Link</button>
       </div>
     </header>
   );
 
   if (loading) return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
-      <div style={{ padding: 40, textAlign: "center", color: "#aab1c4" }}>Loading reviews…</div>
+      <div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading reviews…</div>
     </DashboardShell>
   );
 
@@ -131,25 +131,25 @@ function ReviewsContent() {
         <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 20, marginBottom: 28 }}>
           {/* Avg rating */}
           <div style={{ background: "linear-gradient(135deg,#FFF7ED,#FEF3C7)", border: "1.5px solid #FDE68A", borderRadius: 20, padding: "28px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 56, fontWeight: 900, color: "#F7F5EF", lineHeight: 1, letterSpacing: "-2px" }}>{avgRating.toFixed(1)}</div>
+            <div style={{ fontSize: 56, fontWeight: 900, color: "#12101A", lineHeight: 1, letterSpacing: "-2px" }}>{avgRating.toFixed(1)}</div>
             <div style={{ marginTop: 10, marginBottom: 8 }}><StarRating rating={Math.round(avgRating)} size={22} /></div>
             <div style={{ fontSize: 13, color: "#F59E0B", fontWeight: 600 }}>{reviews.length} total · {published.length} published</div>
           </div>
           {/* Distribution */}
-          <div style={{ background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 20, padding: "22px 24px" }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#F7F5EF", marginBottom: 16 }}>Rating Breakdown</div>
+          <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, padding: "22px 24px" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A", marginBottom: 16 }}>Rating Breakdown</div>
             {ratingDist.map((count, i) => {
               const star = 5 - i;
               const pct = reviews.length ? (count / reviews.length) * 100 : 0;
               return (
                 <div key={star} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                   <div style={{ display: "flex", gap: 1, width: 80, flexShrink: 0 }}>
-                    {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 12, color: s <= star ? "#F59E0B" : "#2a3350" }}>★</span>)}
+                    {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 12, color: s <= star ? "#F59E0B" : "#ECE9F1" }}>★</span>)}
                   </div>
-                  <div style={{ flex: 1, height: 8, background: "#2a3350", borderRadius: 99 }}>
+                  <div style={{ flex: 1, height: 8, background: "#ECE9F1", borderRadius: 99 }}>
                     <div style={{ height: "100%", borderRadius: 99, background: "#F59E0B", width: `${pct}%`, transition: "width 0.6s ease" }} />
                   </div>
-                  <div style={{ width: 28, fontSize: 12.5, fontWeight: 700, color: "#aab1c4", textAlign: "right" }}>{count}</div>
+                  <div style={{ width: 28, fontSize: 12.5, fontWeight: 700, color: "#6B6577", textAlign: "right" }}>{count}</div>
                 </div>
               );
             })}
@@ -159,14 +159,14 @@ function ReviewsContent() {
         {/* Reviews list */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {reviews.length === 0 && (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#aab1c4" }}>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>⭐</div>
               <div style={{ fontSize: 16, fontWeight: 700 }}>No reviews yet</div>
               <div style={{ fontSize: 13, marginTop: 4 }}>Share your booking link to collect reviews</div>
             </div>
           )}
           {reviews.map(review => (
-            <div key={review.id} style={{ background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", opacity: review.is_published ? 1 : 0.6, transition: "all 0.18s" }}>
+            <div key={review.id} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", opacity: review.is_published ? 1 : 0.6, transition: "all 0.18s" }}>
               <div style={{ padding: "18px 22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
                   <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -174,8 +174,8 @@ function ReviewsContent() {
                       {review.client_name.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "#F7F5EF" }}>{review.client_name}</div>
-                      <div style={{ fontSize: 11.5, color: "#aab1c4", marginTop: 1 }}>{new Date(review.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A" }}>{review.client_name}</div>
+                      <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>{new Date(review.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -183,29 +183,29 @@ function ReviewsContent() {
                     {/* Published toggle */}
                     <label style={{ position: "relative", width: 32, height: 18, cursor: "pointer" }}>
                       <input type="checkbox" checked={review.is_published} onChange={() => handleToggle(review.id, review.is_published)} style={{ opacity: 0, width: 0, height: 0 }} />
-                      <span style={{ position: "absolute", inset: 0, background: review.is_published ? "#10B981" : "#aab1c4", borderRadius: 99, transition: "background 0.18s" }}>
-                        <span style={{ position: "absolute", width: 12, height: 12, left: review.is_published ? 17 : 3, top: 3, background: "#1C2438", borderRadius: "50%", transition: "left 0.18s" }} />
+                      <span style={{ position: "absolute", inset: 0, background: review.is_published ? "#10B981" : "#6B6577", borderRadius: 99, transition: "background 0.18s" }}>
+                        <span style={{ position: "absolute", width: 12, height: 12, left: review.is_published ? 17 : 3, top: 3, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s" }} />
                       </span>
                     </label>
-                    <button onClick={() => handleDelete(review.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "#aab1c4", padding: 0, transition: "color 0.12s" }}
+                    <button onClick={() => handleDelete(review.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "#6B6577", padding: 0, transition: "color 0.12s" }}
                       onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = "#aab1c4"; }}>🗑</button>
+                      onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; }}>🗑</button>
                   </div>
                 </div>
-                <p style={{ fontSize: 14, color: "#aab1c4", lineHeight: 1.7, margin: 0 }}>{review.comment}</p>
+                <p style={{ fontSize: 14, color: "#6B6577", lineHeight: 1.7, margin: 0 }}>{review.comment}</p>
 
                 {/* Reply section */}
                 {review.reply ? (
-                  <div style={{ marginTop: 14, padding: "12px 16px", background: "#141A2E", borderRadius: 12, borderLeft: "3px solid #C9A24B" }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "#C9A24B", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>Your reply</div>
-                    <p style={{ fontSize: 13.5, color: "#aab1c4", margin: 0, lineHeight: 1.6 }}>{review.reply}</p>
-                    <button onClick={() => { setReplyingTo(review.id); setReplyText(review.reply || ""); }} style={{ marginTop: 6, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "#C9A24B", fontWeight: 700, padding: 0 }}>Edit reply</button>
+                  <div style={{ marginTop: 14, padding: "12px 16px", background: "#F5F3FF", borderRadius: 12, borderLeft: "3px solid #7C3AED" }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>Your reply</div>
+                    <p style={{ fontSize: 13.5, color: "#6B6577", margin: 0, lineHeight: 1.6 }}>{review.reply}</p>
+                    <button onClick={() => { setReplyingTo(review.id); setReplyText(review.reply || ""); }} style={{ marginTop: 6, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "#7C3AED", fontWeight: 700, padding: 0 }}>Edit reply</button>
                   </div>
                 ) : (
                   <button onClick={() => { setReplyingTo(review.id); setReplyText(""); }}
-                    style={{ marginTop: 12, padding: "6px 14px", background: "rgba(201,162,75,0.10)", color: "#C9A24B", border: "none", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.12s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,162,75,0.25)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,162,75,0.10)"; }}>
+                    style={{ marginTop: 12, padding: "6px 14px", background: "rgba(124,58,237,0.10)", color: "#7C3AED", border: "none", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.12s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.25)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.10)"; }}>
                     💬 Reply
                   </button>
                 )}
@@ -214,10 +214,10 @@ function ReviewsContent() {
                 {replyingTo === review.id && (
                   <div style={{ marginTop: 14 }}>
                     <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Write your reply..." rows={3}
-                      style={{ width: "100%", padding: "10px 14px", border: "1.5px solid rgba(201,162,75,0.25)", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+                      style={{ width: "100%", padding: "10px 14px", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <button onClick={() => handleReply(review.id)} style={{ padding: "8px 18px", background: "linear-gradient(135deg,#C9A24B,#0E1320)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save Reply</button>
-                      <button onClick={() => setReplyingTo(null)} style={{ padding: "8px 14px", background: "#141A2E", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#aab1c4", cursor: "pointer" }}>Cancel</button>
+                      <button onClick={() => handleReply(review.id)} style={{ padding: "8px 18px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save Reply</button>
+                      <button onClick={() => setReplyingTo(null)} style={{ padding: "8px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
                     </div>
                   </div>
                 )}

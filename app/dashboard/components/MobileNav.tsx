@@ -26,11 +26,11 @@ const STAFF_ICON_MAP: Record<string, LucideIcon> = {
 import { useSalon } from "../context/SalonContext";
 
 const NAV_BASE = [
-  { key: "home",     path: "/dashboard",          Icon: LayoutDashboard, activeColor: "#C9A24B", activeGlow: "rgba(201,162,75,0.4)",  activeBg: "linear-gradient(135deg,#C9A24B,#A07A30)" },
-  { key: "bookings", path: "/dashboard/bookings", Icon: BookOpenCheck,   activeColor: "#60A5FA", activeGlow: "rgba(96,165,250,0.5)",   activeBg: "linear-gradient(135deg,#2563EB,#1E40AF)" },
-  { key: "clients",  path: "/dashboard/clients",  Icon: Users,           activeColor: "#34D399", activeGlow: "rgba(52,211,153,0.5)",   activeBg: "linear-gradient(135deg,#059669,#10B981)" },
-  { key: "staff",    path: "/dashboard/staff",    Icon: Scissors,        activeColor: "#C9A24B", activeGlow: "rgba(201,162,75,0.4)",  activeBg: "linear-gradient(135deg,#C9A24B,#A07A30)" },
-  { key: "settings", path: "/dashboard/settings", Icon: Settings2,       activecolor: "#aab1c4", activeGlow: "rgba(148,163,184,0.4)", activeBg: "linear-gradient(135deg,#475569,#64748B)" },
+  { key: "home",     path: "/dashboard",          Icon: LayoutDashboard, activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
+  { key: "bookings", path: "/dashboard/bookings", Icon: BookOpenCheck,   activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
+  { key: "clients",  path: "/dashboard/clients",  Icon: Users,           activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
+  { key: "staff",    path: "/dashboard/staff",    Icon: Scissors,        activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
+  { key: "settings", path: "/dashboard/settings", Icon: Settings2,       activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
 ];
 
 export default function MobileNav() {
@@ -59,9 +59,9 @@ export default function MobileNav() {
            backdrop-filter (background bumped 0.96->0.98); html.gpu-capable
            (set in DashboardShell.tsx) restores a trimmed blur. */
         .mobile-nav-bar {
-          background: rgba(14,19,32,0.98);
-          border-top: 1px solid rgba(255,255,255,0.07);
-          box-shadow: 0 -8px 40px rgba(0,0,0,0.45), 0 -1px 0 rgba(255,255,255,0.04);
+          background: #FFFFFF;
+          border-top: 1px solid #ECE9F1;
+          box-shadow: 0 -2px 12px rgba(18,16,26,0.06);
         }
         html.gpu-capable .mobile-nav-bar {
           backdrop-filter: blur(16px);
@@ -109,7 +109,7 @@ export default function MobileNav() {
           font-size: 9.5px; letter-spacing: 0.1px;
           white-space: nowrap; font-weight: 500;
           transition: all 0.18s;
-          color: rgba(255,255,255,0.3);
+          color: #9A94A8;
         }
         .mnav-item.active .mnav-label {
           font-weight: 800;
@@ -134,7 +134,7 @@ export default function MobileNav() {
               key={item.path}
               href={item.path}
               className={`mnav-item${active ? " active" : ""}`}
-              style={{ color: active ? activeColor : "rgba(255,255,255,0.3)" }}
+              style={{ color: active ? activeColor : "#9A94A8" }}
             >
               {/* Accent bar at top */}
               <div
@@ -154,12 +154,12 @@ export default function MobileNav() {
                 <Icon
                   size={18}
                   strokeWidth={active ? 2 : 1.6}
-                  color={active ? "#fff" : "rgba(255,255,255,0.3)"}
+                  color={active ? "#fff" : "#9A94A8"}
                 />
               </div>
 
               {/* Label */}
-              <span className="mnav-label" style={{ color: active ? activeColor : "rgba(255,255,255,0.3)" }}>
+              <span className="mnav-label" style={{ color: active ? activeColor : "#9A94A8" }}>
                 {labelFor(item.key)}
               </span>
             </Link>

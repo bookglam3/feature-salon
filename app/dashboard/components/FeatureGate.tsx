@@ -18,30 +18,54 @@ interface FeatureGateProps {
 
 export default function FeatureGate({ feature, children }: FeatureGateProps) {
   const router = useRouter();
-  const [status, setStatus] = useState<"loading" | "allowed" | "locked">("loading");
+  const [status, setStatus] = useState<"loading" | "allowed" | "locked" | "error">("loading");
   const [plan, setPlan] = useState<string | null>(null);
   const [hasCustId, setHasCustId] = useState(false);
   const [salonId, setSalonId] = useState<string | null>(null);
 
   useEffect(() => {
     const check = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push("/login"); return; }
 
-      const { data: salon } = await supabase
-        .from("salons")
-        .select("id, subscription_status, subscription_plan, stripe_customer_id")
-        .eq("owner_id", user.id)
-        .single();
+        // .order + .limit(1) before .single(): an owner can legitimately have
+        // more than one salon row (multi-branch — see SalonContext/switchSalon).
+        // Bare .single() errors on multiple rows, which used to null out `salon`
+        // and bounce to /login without ever leaving "loading" — an endless
+        // "Checking access…" spinner. Mirrors getCurrentUserProfile in lib/auth.
+        const { data: salon, error } = await supabase
+          .from("salons")
+          .select("id, subscription_status, subscription_plan, stripe_customer_id")
+          .eq("owner_id", user.id)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .single();
 
-      if (!salon) { router.push("/login"); return; }
+        // PGRST116 = "no rows returned". That's the genuine no-salon case and
+        // keeps its original behaviour (bounce to /login); any other error is a
+        // real failure and must surface rather than masquerade as "logged out".
+        if (error && error.code !== "PGRST116") {
+          // Never fail silently again: a query error is surfaced, not swallowed.
+          console.error("[FeatureGate] salon lookup failed:", error.message);
+          setStatus("error");
+          return;
+        }
 
-      setSalonId(salon.id);
-      setPlan(salon.subscription_plan);
-      setHasCustId(!!salon.stripe_customer_id);
+        if (!salon) { router.push("/login"); return; }
 
-      const allowed = hasFeatureAccess(feature, salon.subscription_plan, salon.subscription_status);
-      setStatus(allowed ? "allowed" : "locked");
+        setSalonId(salon.id);
+        setPlan(salon.subscription_plan);
+        setHasCustId(!!salon.stripe_customer_id);
+
+        const allowed = hasFeatureAccess(feature, salon.subscription_plan, salon.subscription_status);
+        setStatus(allowed ? "allowed" : "locked");
+      } catch (e) {
+        // Safety net: any rejection (network, auth, lock contention) lands on a
+        // real state instead of leaving the spinner up forever.
+        console.error("[FeatureGate] access check failed:", e);
+        setStatus("error");
+      }
     };
     check();
   }, [feature, router]);
@@ -49,9 +73,34 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
   if (status === "loading") {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-        <div style={{ textAlign: "center", color: "#aab1c4" }}>
+        <div style={{ textAlign: "center", color: "#6B6577" }}>
           <div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⏳</div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>Checking access…</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: "40px 24px" }}>
+        <div style={{ maxWidth: 420, width: "100%", textAlign: "center", background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 16, padding: "32px 28px", boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)" }}>
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: "#12101A", margin: "0 0 8px", letterSpacing: "-0.3px" }}>
+            Couldn&apos;t verify access
+          </h2>
+          <p style={{ fontSize: 13.5, color: "#6B6577", lineHeight: 1.6, margin: "0 0 20px" }}>
+            We couldn&apos;t check your plan just now. This is usually temporary — please try again.
+          </p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              onClick={() => window.location.reload()}
+              style={{ padding: "10px 20px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}
+            >Try again</button>
+            <button
+              onClick={() => router.push("/dashboard")}
+              style={{ padding: "10px 20px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
+            >Back to Dashboard</button>
+          </div>
         </div>
       </div>
     );
@@ -88,7 +137,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
 
         {/* Lock icon with glow */}
         <div style={{ position: "relative", display: "inline-block", marginBottom: 28 }}>
-          <div style={{ width: 90, height: 90, borderRadius: 26, background: "linear-gradient(135deg,#1E1B4B,#3730A3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto", boxShadow: "0 16px 48px rgba(201,162,75,0.35)" }}>
+          <div style={{ width: 90, height: 90, borderRadius: 26, background: "linear-gradient(135deg,#7C3AED,#6D28D9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto", boxShadow: "0 16px 48px rgba(124,58,237,0.35)" }}>
             🔒
           </div>
           <div style={{ position: "absolute", bottom: -4, right: -4, background: "#F59E0B", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, border: "2px solid #fff" }}>
@@ -96,10 +145,10 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
           </div>
         </div>
 
-        <h1 style={{ fontSize: 26, fontWeight: 900, color: "#F7F5EF", letterSpacing: "-0.8px", margin: "0 0 10px" }}>
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: "#12101A", letterSpacing: "-0.8px", margin: "0 0 10px" }}>
           {meta.label} is Locked
         </h1>
-        <p style={{ fontSize: 14.5, color: "#aab1c4", lineHeight: 1.7, margin: "0 0 28px" }}>
+        <p style={{ fontSize: 14.5, color: "#6B6577", lineHeight: 1.7, margin: "0 0 28px" }}>
           You&apos;re currently on the{" "}
           <span style={{ fontWeight: 800, color: currentInfo.color }}>{currentInfo.name}</span> plan.
           Upgrade to <span style={{ fontWeight: 800, color: requiredInfo.color }}>{requiredInfo.name}</span> or higher to unlock {meta.icon} {meta.label}.
@@ -112,13 +161,13 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
             const isRecommended = p === requiredPlan;
             return (
               <div key={p}
-                style={{ border: `2px solid ${isRecommended ? info.color : "#2a3350"}`, borderRadius: 16, padding: "16px 14px", background: isRecommended ? `${info.color}08` : "#1C2438", position: "relative", transition: "all 0.15s" }}>
+                style={{ border: `2px solid ${isRecommended ? info.color : "#ECE9F1"}`, borderRadius: 16, padding: "16px 14px", background: isRecommended ? `${info.color}08` : "#FFFFFF", position: "relative", transition: "all 0.15s" }}>
                 {isRecommended && (
                   <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: info.color, color: "#fff", fontSize: 9.5, fontWeight: 900, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>
                     RECOMMENDED
                   </div>
                 )}
-                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#F7F5EF", marginBottom: 2, textTransform: "capitalize" }}>{info.name}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#12101A", marginBottom: 2, textTransform: "capitalize" }}>{info.name}</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: info.color, letterSpacing: "-0.5px" }}>{info.price}</div>
               </div>
             );
@@ -137,9 +186,9 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
 
         <button
           onClick={() => router.push("/dashboard")}
-          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#aab1c4", fontWeight: 600, padding: 0 }}
-          onMouseEnter={e => { e.currentTarget.style.color = "#475569"; }}
-          onMouseLeave={e => { e.currentTarget.style.color = "#94A3B8"; }}
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#6B6577", fontWeight: 600, padding: 0 }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#12101A"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; }}
         >
           ← Back to Dashboard
         </button>

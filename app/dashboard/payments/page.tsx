@@ -55,12 +55,12 @@ export default function PaymentsPage() {
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
   const Topbar = (
-    <header style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12 }}>
+    <header style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <HamburgerBtn />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.4px" }}>Payments</div>
-          <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{appointments.length} transactions total</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>Payments</div>
+          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{appointments.length} transactions total</div>
         </div>
       </div>
     </header>
@@ -79,39 +79,39 @@ export default function PaymentsPage() {
         </div>
 
         {/* Table card */}
-        <div style={{ background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
+        <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
           {/* Toolbar */}
-          <div style={{ padding: "14px 18px", borderBottom: "1px solid #2a3350", display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "space-between", background: "#FAFBFF" }}>
-            <div style={{ display: "flex", gap: 2, background: "#2a3350", borderRadius: 10, padding: 3 }}>
+          <div style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "space-between", background: "#FAFBFF" }}>
+            <div style={{ display: "flex", gap: 2, background: "#ECE9F1", borderRadius: 10, padding: 3 }}>
               {["All","Paid","Pending","Cancelled"].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
-                  style={{ fontSize: 12.5, padding: "6px 12px", borderRadius: 8, border: "none", background: activeTab === tab ? "#fff" : "transparent", color: activeTab === tab ? "#C9A24B" : "var(--text-3)", cursor: "pointer", fontWeight: activeTab === tab ? 700 : 500, boxShadow: activeTab === tab ? "0 1px 4px rgba(0,0,0,0.07)" : "none", transition: "all 0.12s", fontFamily: "var(--font)" }}>{tab}
+                  style={{ fontSize: 12.5, padding: "6px 12px", borderRadius: 8, border: "none", background: activeTab === tab ? "#fff" : "transparent", color: activeTab === tab ? "#7C3AED" : "#9A94A8", cursor: "pointer", fontWeight: activeTab === tab ? 700 : 500, boxShadow: activeTab === tab ? "0 1px 4px rgba(0,0,0,0.07)" : "none", transition: "all 0.12s", fontFamily: "var(--font)" }}>{tab}
                 </button>
               ))}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#141A2E", border: "1.5px solid #2a3350", borderRadius: 10, padding: "7px 12px", minWidth: 180 }}
-              onFocusCapture={e => { e.currentTarget.style.borderColor = "#C9A24B"; e.currentTarget.style.background = "#1C2438"; }}
-              onBlurCapture={e => { e.currentTarget.style.borderColor = "#2a3350"; e.currentTarget.style.background = "#141A2E"; }}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, padding: "7px 12px", minWidth: 180 }}
+              onFocusCapture={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#FFFFFF"; }}
+              onBlurCapture={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.background = "#F5F3FF"; }}
             >
               <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#94A3B8" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round"/></svg>
               <input type="text" placeholder="Search client, service…" value={search} onChange={e => setSearch(e.target.value)}
-                style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "var(--text-1)", fontFamily: "var(--font)", width: "100%" }} />
+                style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#12101A", fontFamily: "var(--font)", width: "100%" }} />
             </div>
           </div>
 
           {filtered.length === 0 ? (
             <div style={{ padding: "56px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>💳</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-1)", marginBottom: 6 }}>No payments found</div>
-              <div style={{ fontSize: 13, color: "var(--text-3)" }}>Payments appear here once bookings are created</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", marginBottom: 6 }}>No payments found</div>
+              <div style={{ fontSize: 13, color: "#9A94A8" }}>Payments appear here once bookings are created</div>
             </div>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
                 <thead>
-                  <tr style={{ background: "#141A2E" }}>
+                  <tr style={{ background: "#F5F3FF" }}>
                     {["Status","Client","Service","Staff","Date","Amount"].map(h => (
-                      <th key={h} style={{ fontSize: 10.5, color: "var(--text-3)", textAlign: "left", padding: "11px 18px", fontWeight: 800, borderBottom: "1.5px solid #2a3350", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
+                      <th key={h} style={{ fontSize: 10.5, color: "#9A94A8", textAlign: "left", padding: "11px 18px", fontWeight: 800, borderBottom: "1.5px solid #ECE9F1", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -124,17 +124,17 @@ export default function PaymentsPage() {
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#FAFBFF"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                       >
-                        <td style={{ padding: "13px 18px", borderBottom: "1px solid #2a3350" }}>
+                        <td style={{ padding: "13px 18px", borderBottom: "1px solid #ECE9F1" }}>
                           <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`, fontSize: 10.5, padding: "3px 10px", borderRadius: 99, fontWeight: 700 }}>
                             <span style={{ width: 5, height: 5, borderRadius: "50%", background: sc.dot, flexShrink: 0 }} />
                             {a.status}
                           </span>
                         </td>
-                        <td style={{ padding: "13px 18px", fontSize: 13.5, fontWeight: 700, color: "var(--text-1)", borderBottom: "1px solid #2a3350" }}>{a.client_name}</td>
-                        <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-2)", borderBottom: "1px solid #2a3350" }}>{serviceDisplay.get(a.id)?.serviceName || "—"}</td>
-                        <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-3)", borderBottom: "1px solid #2a3350" }}>{a.staff?.name || "—"}</td>
-                        <td style={{ padding: "13px 18px", fontSize: 13, color: "var(--text-2)", borderBottom: "1px solid #2a3350" }}>{new Date(a.date_time).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
-                        <td style={{ padding: "13px 18px", fontSize: 14, fontWeight: 900, color: a.status === "confirmed" ? "#10B981" : "var(--text-1)", borderBottom: "1px solid #2a3350" }}>
+                        <td style={{ padding: "13px 18px", fontSize: 13.5, fontWeight: 700, color: "#12101A", borderBottom: "1px solid #ECE9F1" }}>{a.client_name}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 13, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{serviceDisplay.get(a.id)?.serviceName || "—"}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 13, color: "#9A94A8", borderBottom: "1px solid #ECE9F1" }}>{a.staff?.name || "—"}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 13, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{new Date(a.date_time).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 14, fontWeight: 900, color: a.status === "confirmed" ? "#10B981" : "#12101A", borderBottom: "1px solid #ECE9F1" }}>
                           £{(serviceDisplay.get(a.id)?.combinedPrice ?? 0).toFixed(2)}
                         </td>
                       </tr>

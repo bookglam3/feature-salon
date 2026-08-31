@@ -12,18 +12,18 @@ import type { Service, ServiceCategory } from "../../types";
 // ─── Service row (used in the grouped services list) ───────────
 function ServiceRow({ service, onEdit, onDelete }: { service: Service; onEdit: () => void; onDelete: () => void }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "0.5px solid #2a3350" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "0.5px solid #ECE9F1" }}>
       <div>
-        <div style={{ fontSize: "13px", color: "#1E293B", fontWeight: 600 }}>{service.name}</div>
-        <div style={{ fontSize: "12px", color: "#475569" }}>
+        <div style={{ fontSize: "13px", color: "#12101A", fontWeight: 600 }}>{service.name}</div>
+        <div style={{ fontSize: "12px", color: "#6B6577" }}>
           {((service.duration_minutes ?? 0) > 0 || (service.duration ?? 0) > 0) ? `${service.duration_minutes ?? service.duration} min · ` : ""}{service.price_is_from ? "from " : ""}£{service.price}
         </div>
         {service.description && (
-          <div style={{ fontSize: "11.5px", color: "#475569", marginTop: 2, fontStyle: "italic" }}>{service.description}</div>
+          <div style={{ fontSize: "11.5px", color: "#6B6577", marginTop: 2, fontStyle: "italic" }}>{service.description}</div>
         )}
       </div>
       <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={onEdit} style={{ color: "#C9A24B", background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>✏️ Edit</button>
+        <button onClick={onEdit} style={{ color: "#7C3AED", background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>✏️ Edit</button>
         <button onClick={onDelete} style={{ color: "#EF4444", background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500 }}>Delete</button>
       </div>
     </div>
@@ -32,7 +32,7 @@ function ServiceRow({ service, onEdit, onDelete }: { service: Service; onEdit: (
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: "#ffffff", borderRadius: "16px",
-  border: "0.5px solid #E8EAF0", padding: "24px", marginBottom: "20px",
+  border: "0.5px solid #ECE9F1", padding: "24px", marginBottom: "20px",
 };
 
 export default function ServicesPage() {
@@ -192,17 +192,17 @@ export default function ServicesPage() {
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
   const Topbar = (
-    <header style={{ background: "#1C2438", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30 }}>
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.3px" }}>Services</div>
-          <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{services.length} service{services.length !== 1 ? "s" : ""}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>Services</div>
+          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{services.length} service{services.length !== 1 ? "s" : ""}</div>
         </div>
       </div>
-      <button onClick={() => { setEditingService(null); setServiceModalOpen(true); }} style={{ background: "var(--indigo)", color: "#fff", fontSize: 13, fontWeight: 600, padding: "8px 16px", borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", boxShadow: "var(--shadow-indigo)", whiteSpace: "nowrap", transition: "all 0.14s" }}
-        onMouseEnter={e => { e.currentTarget.style.background = "var(--indigo-dark)"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = "var(--indigo)"; }}
+      <button onClick={() => { setEditingService(null); setServiceModalOpen(true); }} style={{ background: "#7C3AED", color: "#fff", fontSize: 13, fontWeight: 600, padding: "8px 16px", borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.25)", whiteSpace: "nowrap", transition: "all 0.14s" }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#6D28D9"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = "#7C3AED"; }}
       >+ Add Service</button>
     </header>
   );
@@ -213,22 +213,22 @@ export default function ServicesPage() {
 
         <div style={cardStyle}>
           {serviceError && (
-            <div style={{ background: "#141A2E", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#DC2626", fontWeight: 500 }}>
+            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#DC2626", fontWeight: 500 }}>
               ⚠️ {serviceError}
             </div>
           )}
           {categoryActionError && (
-            <div style={{ background: "#141A2E", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#DC2626", fontWeight: 500 }}>
+            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#DC2626", fontWeight: 500 }}>
               ⚠️ {categoryActionError}
             </div>
           )}
 
           {/* Category management */}
-          <div style={{ marginBottom: 22, padding: "14px 16px", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 10 }}>Categories</div>
+          <div style={{ marginBottom: 22, padding: "14px 16px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#6B6577", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 10 }}>Categories</div>
 
             {categories.length === 0 && !addingCategory && (
-              <p style={{ fontSize: 12.5, color: "#64748B", marginBottom: 10, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 12.5, color: "#6B6577", marginBottom: 10, lineHeight: 1.6 }}>
                 Group your services into categories (e.g. &quot;Womens Cuts&quot;, &quot;Colour Treatments&quot;) so clients can filter them on your booking page.
               </p>
             )}
@@ -245,7 +245,7 @@ export default function ServicesPage() {
                             Delete &quot;{cat.name}&quot;? {countInCat} service{countInCat !== 1 ? "s" : ""} will become uncategorised.
                           </span>
                           <button onClick={confirmDeleteCategory} style={{ padding: "5px 12px", background: "#DC2626", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Delete</button>
-                          <button onClick={() => setDeletingCategory(null)} style={{ padding: "5px 12px", background: "none", border: "1px solid #CBD5E1", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#475569" }}>Cancel</button>
+                          <button onClick={() => setDeletingCategory(null)} style={{ padding: "5px 12px", background: "none", border: "1px solid #D6D1DE", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#6B6577" }}>Cancel</button>
                         </div>
                       ) : renamingCategoryId === cat.id ? (
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -254,20 +254,20 @@ export default function ServicesPage() {
                             onChange={e => setRenameValue(e.target.value)}
                             autoFocus
                             onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); submitRenameCategory(cat); } if (e.key === "Escape") setRenamingCategoryId(null); }}
-                            style={{ flex: 1, padding: "6px 10px", fontSize: 12.5, border: "1.5px solid #C9A24B", borderRadius: 6, color: "#1E293B" }}
+                            style={{ flex: 1, padding: "6px 10px", fontSize: 12.5, border: "1.5px solid #7C3AED", borderRadius: 6, color: "#12101A" }}
                           />
-                          <button onClick={() => submitRenameCategory(cat)} style={{ padding: "5px 10px", background: "#C9A24B", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Save</button>
-                          <button onClick={() => setRenamingCategoryId(null)} style={{ padding: "5px 10px", background: "none", border: "1px solid #CBD5E1", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#475569" }}>Cancel</button>
+                          <button onClick={() => submitRenameCategory(cat)} style={{ padding: "5px 10px", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Save</button>
+                          <button onClick={() => setRenamingCategoryId(null)} style={{ padding: "5px 10px", background: "none", border: "1px solid #D6D1DE", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#6B6577" }}>Cancel</button>
                         </div>
                       ) : (
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                            <button onClick={() => handleMoveCategory(cat, "up")} disabled={i === 0} aria-label={`Move ${cat.name} up`} style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "#CBD5E1" : "#475569", fontSize: 10, padding: 0, lineHeight: 1 }}>▲</button>
-                            <button onClick={() => handleMoveCategory(cat, "down")} disabled={i === arr.length - 1} aria-label={`Move ${cat.name} down`} style={{ background: "none", border: "none", cursor: i === arr.length - 1 ? "default" : "pointer", color: i === arr.length - 1 ? "#CBD5E1" : "#475569", fontSize: 10, padding: 0, lineHeight: 1 }}>▼</button>
+                            <button onClick={() => handleMoveCategory(cat, "up")} disabled={i === 0} aria-label={`Move ${cat.name} up`} style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "#D6D1DE" : "#6B6577", fontSize: 10, padding: 0, lineHeight: 1 }}>▲</button>
+                            <button onClick={() => handleMoveCategory(cat, "down")} disabled={i === arr.length - 1} aria-label={`Move ${cat.name} down`} style={{ background: "none", border: "none", cursor: i === arr.length - 1 ? "default" : "pointer", color: i === arr.length - 1 ? "#D6D1DE" : "#6B6577", fontSize: 10, padding: 0, lineHeight: 1 }}>▼</button>
                           </div>
-                          <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#1E293B" }}>{cat.name}</span>
-                          <span style={{ fontSize: 11, color: "#94A3B8" }}>{countInCat}</span>
-                          <button onClick={() => { setRenamingCategoryId(cat.id); setRenameValue(cat.name); }} aria-label={`Rename ${cat.name}`} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12.5, color: "#475569", padding: "2px 4px" }}>✏️</button>
+                          <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#12101A" }}>{cat.name}</span>
+                          <span style={{ fontSize: 11, color: "#9A94A8" }}>{countInCat}</span>
+                          <button onClick={() => { setRenamingCategoryId(cat.id); setRenameValue(cat.name); }} aria-label={`Rename ${cat.name}`} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12.5, color: "#6B6577", padding: "2px 4px" }}>✏️</button>
                           <button onClick={() => setDeletingCategory(cat)} aria-label={`Delete ${cat.name}`} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12.5, color: "#EF4444", padding: "2px 4px" }}>🗑️</button>
                         </div>
                       )}
@@ -278,7 +278,7 @@ export default function ServicesPage() {
             )}
 
             {!addingCategory ? (
-              <button onClick={() => setAddingCategory(true)} style={{ background: "none", border: "none", color: "#C9A24B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: 0 }}>+ Add Category</button>
+              <button onClick={() => setAddingCategory(true)} style={{ background: "none", border: "none", color: "#7C3AED", fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: 0 }}>+ Add Category</button>
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 <input
@@ -287,10 +287,10 @@ export default function ServicesPage() {
                   autoFocus
                   placeholder="Category name"
                   onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleAddCategory(); } }}
-                  style={{ flex: 1, padding: "7px 10px", fontSize: 12.5, border: "1.5px solid #C9A24B", borderRadius: 6, color: "#1E293B" }}
+                  style={{ flex: 1, padding: "7px 10px", fontSize: 12.5, border: "1.5px solid #7C3AED", borderRadius: 6, color: "#12101A" }}
                 />
-                <button onClick={handleAddCategory} disabled={!newCategoryName.trim()} style={{ padding: "6px 12px", background: "#C9A24B", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: newCategoryName.trim() ? 1 : 0.5 }}>Add</button>
-                <button onClick={() => { setAddingCategory(false); setNewCategoryName(""); }} style={{ padding: "6px 10px", background: "none", border: "1px solid #CBD5E1", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#475569" }}>✕</button>
+                <button onClick={handleAddCategory} disabled={!newCategoryName.trim()} style={{ padding: "6px 12px", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: newCategoryName.trim() ? 1 : 0.5 }}>Add</button>
+                <button onClick={() => { setAddingCategory(false); setNewCategoryName(""); }} style={{ padding: "6px 10px", background: "none", border: "1px solid #D6D1DE", borderRadius: 6, fontSize: 12, cursor: "pointer", color: "#6B6577" }}>✕</button>
               </div>
             )}
           </div>
@@ -307,7 +307,7 @@ export default function ServicesPage() {
             <>
               {groupedServices.groups.filter(g => g.services.length > 0).map(g => (
                 <div key={g.category.id} style={{ marginBottom: 18 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 6 }}>{g.category.name}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 6 }}>{g.category.name}</div>
                   {g.services.map(s => (
                     <ServiceRow key={s.id} service={s}
                       onEdit={() => { setEditingService(s); setServiceModalOpen(true); }}
@@ -319,7 +319,7 @@ export default function ServicesPage() {
               {groupedServices.uncategorised.length > 0 && (
                 <div>
                   {categories.length > 0 && (
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 6 }}>Uncategorised</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#9A94A8", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 6 }}>Uncategorised</div>
                   )}
                   {groupedServices.uncategorised.map(s => (
                     <ServiceRow key={s.id} service={s}

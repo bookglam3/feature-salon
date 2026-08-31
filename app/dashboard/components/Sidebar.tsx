@@ -19,11 +19,11 @@ const SECTION_COLORS: Record<string, {
   border: string;
   labelColor: string;
 }> = {
-  Main:       { grad: "linear-gradient(135deg,#1C2438,#0E1320)",  dimBg: "rgba(201,162,75,0.10)",  glow: "rgba(201,162,75,0.45)", border: "#C9A24B", labelColor: "rgba(201,162,75,0.65)" },
-  Finance:    { grad: "linear-gradient(135deg,#059669,#10B981)",  dimBg: "rgba(5,150,105,0.14)",   glow: "rgba(5,150,105,0.5)",   border: "#34D399", labelColor: "rgba(52,211,153,0.6)" },
-  Engagement: { grad: "linear-gradient(135deg,#2563EB,#141A2E)",  dimBg: "rgba(37,99,235,0.14)",   glow: "rgba(37,99,235,0.5)",   border: "#60A5FA", labelColor: "rgba(96,165,250,0.6)" },
-  Content:    { grad: "linear-gradient(135deg,#DB2777,#EC4899)",  dimBg: "rgba(219,39,119,0.14)",  glow: "rgba(219,39,119,0.5)",  border: "#F472B6", labelColor: "rgba(244,114,182,0.6)" },
-  System:     { grad: "linear-gradient(135deg,#475569,#64748B)",  dimBg: "rgba(71,85,105,0.14)",   glow: "rgba(71,85,105,0.4)",   border: "#94A3B8", labelColor: "rgba(148,163,184,0.5)" },
+  Main:       { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
+  Finance:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
+  Engagement: { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
+  Content:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
+  System:     { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -132,8 +132,8 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
         .sb-wrap {
           width: 100%;
           max-width: var(--sidebar-w);
-          background: linear-gradient(180deg,#0E1320 0%,#141A2E 40%,#0E1320 100%);
-          border-right: 1px solid rgba(255,255,255,0.05);
+          background: linear-gradient(180deg,#FFFFFF,#FBFAFD);
+          border-right: 1px solid #ECE9F1;
           display: flex; flex-direction: column;
           height: 100%; overflow: hidden;
           position: relative;
@@ -144,7 +144,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           position: absolute;
           top: 60px; left: -40px;
           width: 160px; height: 160px;
-          background: radial-gradient(circle, rgba(201,162,75,0.12) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%);
           pointer-events: none;
           border-radius: 50%;
         }
@@ -153,7 +153,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           display: flex; align-items: center; gap: 10px;
           padding: 5px 8px; border-radius: 11px;
           font-size: 13px; font-weight: 500;
-          color: rgba(255,255,255,0.4);
+          color: #6B6577;
           background: transparent;
           text-decoration: none; margin-bottom: 1px;
           transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
@@ -161,16 +161,16 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           border: 1px solid transparent;
         }
         .sb-link:hover {
-          background: rgba(255,255,255,0.05);
-          color: rgba(255,255,255,0.78);
+          background: #F5F3FF;
+          color: #12101A;
           transform: translateX(2px);
-          border-color: rgba(255,255,255,0.06);
+          border-color: #ECE9F1;
         }
         .sb-link.active {
-          background: rgba(201,162,75,0.08);
-          color: #F7F5EF;
+          background: #EDE9FF;
+          color: #6D28D9;
           font-weight: 700;
-          border-color: rgba(201,162,75,0.15);
+          border-color: transparent;
         }
         /* Icon box inside link */
         .sb-icon-box {
@@ -202,7 +202,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
         }
         .sb-group-label::after {
           content: ""; flex: 1; height: 1px;
-          background: rgba(255,255,255,0.05);
+          background: #ECE9F1;
         }
         /* Scroll area */
         .sb-nav-scroll {
@@ -219,9 +219,9 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
         /* Footer signout button */
         .sb-signout-btn {
           width: 100%; padding: 8px 12px; border-radius: 9px;
-          border: 1px solid rgba(255,255,255,0.07);
-          background: rgba(255,255,255,0.03);
-          color: rgba(255,255,255,0.38);
+          border: 1px solid #ECE9F1;
+          background: #F5F3FF;
+          color: #6B6577;
           font-size: 12px; font-weight: 600; cursor: pointer;
           transition: all 0.18s;
           font-family: var(--font);
@@ -239,46 +239,30 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
         {/* ── Logo ── */}
         <div style={{
           padding: "18px 16px 14px",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          borderBottom: "1px solid #ECE9F1",
           display: "flex", alignItems: "center", justifyContent: "space-between",
           flexShrink: 0,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* App logo mark — new brand SVG */}
-            <div style={{
-              width: 36, height: 36, borderRadius: 11, position: "relative",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 4px 18px rgba(201,162,75,0.30)",
-              flexShrink: 0, overflow: "hidden",
-            }}>
-              <img
-                src="/brand/logo-app-icon.svg"
-                alt="Feature Salon"
-                style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 11, display: "block" }}
-              />
-              {/* Pulse ring */}
-              <div style={{
-                position: "absolute", inset: -3, borderRadius: 14,
-                border: "1px solid rgba(201,162,75,0.25)",
-                animation: "logoPulse 3s ease-in-out infinite",
-                pointerEvents: "none",
-              }} />
-            </div>
             <div>
-              <div style={{ fontSize: 16, fontFamily: "var(--font-inter, 'Inter', sans-serif)", fontWeight: 600, color: "#F7F5EF", letterSpacing: "-0.5px", lineHeight: 1 }}>feature</div>
-              <div style={{ fontSize: 8.5, fontWeight: 600, color: "rgba(201,162,75,0.55)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: 3 }}>{vc.productName}</div>
+              <img
+                src="/brand/logo-light-no-tagline.svg"
+                alt="Feature"
+                style={{ height: 28, width: "auto", display: "block" }}
+              />
+              <div style={{ fontSize: 8.5, fontWeight: 600, color: "#9A94A8", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: 5 }}>{vc.productName}</div>
             </div>
           </div>
           {onClose && (
             <button onClick={onClose} style={{
-              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)",
+              background: "#F5F3FF", border: "1px solid #ECE9F1",
               cursor: "pointer", width: 28, height: 28, borderRadius: 8,
-              fontSize: 12, color: "rgba(255,255,255,0.35)",
+              fontSize: 12, color: "#6B6577",
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.15s", flexShrink: 0,
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.35)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#EDE9FF"; e.currentTarget.style.color = "#6D28D9"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#6B6577"; }}
             >✕</button>
           )}
         </div>
@@ -290,39 +274,39 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
               onClick={() => setBranchOpen(o => !o)}
               style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 9,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(201,162,75,0.18)",
+                background: "#F5F3FF",
+                border: "1px solid #ECE9F1",
                 borderRadius: 11, padding: "8px 11px",
                 cursor: "pointer", transition: "all 0.15s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,162,75,0.08)"; e.currentTarget.style.borderColor = "rgba(201,162,75,0.35)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(201,162,75,0.18)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#EDE9FF"; e.currentTarget.style.borderColor = "#7C3AED"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.borderColor = "#ECE9F1"; }}
             >
               <div style={{
                 width: 26, height: 26, borderRadius: 7, flexShrink: 0,
-                background: "linear-gradient(135deg,#1C2438,#0E1320)",
+                background: "linear-gradient(135deg,#7C3AED,#6D28D9)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 10, fontWeight: 900, color: "#fff",
               }}>
                 {(activeSalon?.name || "S").slice(0, 1).toUpperCase()}
               </div>
               <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#F7F5EF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#12101A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {activeSalon?.name || "Select Branch"}
                 </div>
-                <div style={{ fontSize: 9.5, color: "rgba(201,162,75,0.65)", marginTop: 1 }}>Branch</div>
+                <div style={{ fontSize: 9.5, color: "#9A94A8", marginTop: 1 }}>Branch</div>
               </div>
-              <div style={{ fontSize: 10, color: "rgba(201,162,75,0.55)", transition: "transform 0.2s", transform: branchOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▼</div>
+              <div style={{ fontSize: 10, color: "#9A94A8", transition: "transform 0.2s", transform: branchOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▼</div>
             </button>
 
             {/* Dropdown */}
             {branchOpen && (
               <div style={{
                 position: "absolute", top: "calc(100% - 2px)", left: 12, right: 12,
-                background: "rgba(16,15,40,0.98)",
-                border: "1px solid rgba(201,162,75,0.20)",
+                background: "#FFFFFF",
+                border: "1px solid #ECE9F1",
                 borderRadius: 12, overflow: "hidden",
-                boxShadow: "0 16px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,162,75,0.08)",
+                boxShadow: "0 16px 40px rgba(18,16,26,0.12)",
                 zIndex: 200, backdropFilter: "blur(16px)",
               }}>
                 {salons.map(s => (
@@ -332,24 +316,24 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                     style={{
                       width: "100%", display: "flex", alignItems: "center", gap: 9,
                       padding: "9px 12px",
-                      background: s.id === activeSalon?.id ? "rgba(201,162,75,0.08)" : "transparent",
+                      background: s.id === activeSalon?.id ? "#EDE9FF" : "transparent",
                       border: "none", cursor: "pointer",
-                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      borderBottom: "1px solid #F5F3FF",
                       transition: "background 0.12s",
                     }}
-                    onMouseEnter={e => { if (s.id !== activeSalon?.id) e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+                    onMouseEnter={e => { if (s.id !== activeSalon?.id) e.currentTarget.style.background = "#F5F3FF"; }}
                     onMouseLeave={e => { if (s.id !== activeSalon?.id) e.currentTarget.style.background = "transparent"; }}
                   >
                     <div style={{
                       width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                      background: s.id === activeSalon?.id ? "linear-gradient(135deg,#1C2438,#0E1320)" : "rgba(255,255,255,0.07)",
+                      background: s.id === activeSalon?.id ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "#ECE9F1",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 9, fontWeight: 900, color: "#fff",
+                      fontSize: 9, fontWeight: 900, color: s.id === activeSalon?.id ? "#fff" : "#6B6577",
                     }}>{s.name.slice(0, 1).toUpperCase()}</div>
                     <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                      <div style={{ fontSize: 12, fontWeight: s.id === activeSalon?.id ? 700 : 500, color: s.id === activeSalon?.id ? "#C9A24B" : "rgba(255,255,255,0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: s.id === activeSalon?.id ? 700 : 500, color: s.id === activeSalon?.id ? "#6D28D9" : "#6B6577", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
                     </div>
-                    {s.id === activeSalon?.id && <div style={{ fontSize: 10, color: "#C9A24B" }}>✓</div>}
+                    {s.id === activeSalon?.id && <div style={{ fontSize: 10, color: "#7C3AED" }}>✓</div>}
                   </button>
                 ))}
               </div>
@@ -397,8 +381,8 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                         style={{
                           background: active ? s.grad : s.dimBg,
                           boxShadow: active ? `0 0 12px ${s.glow}, inset 0 1px 0 rgba(255,255,255,0.15)` : "none",
-                          border: `1px solid ${active ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.05)"}`,
-                          color: active ? "#fff" : "rgba(255,255,255,0.45)",
+                          border: `1px solid ${active ? "rgba(124,58,237,0.25)" : "#ECE9F1"}`,
+                          color: active ? "#fff" : "#9A94A8",
                         }}
                       >
                         {Icon && (
@@ -433,8 +417,8 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
         {/* ── Footer ── */}
         <div style={{
           padding: "12px 14px",
-          borderTop: "1px solid rgba(255,255,255,0.05)",
-          background: "rgba(255,255,255,0.02)",
+          borderTop: "1px solid #ECE9F1",
+          background: "#FBFAFD",
           backdropFilter: "blur(20px)",
           flexShrink: 0,
         }}>
@@ -442,19 +426,19 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           <div style={{
             display: "flex", alignItems: "center", gap: 10, marginBottom: 10,
             padding: "9px 10px", borderRadius: 11,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "#F5F3FF",
+            border: "1px solid #ECE9F1",
           }}>
             <div style={{
               width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-              background: "linear-gradient(135deg,#1C2438,#0E1320)",
+              background: "linear-gradient(135deg,#7C3AED,#6D28D9)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 12, fontWeight: 800, color: "#fff",
-              boxShadow: "0 2px 10px rgba(201,162,75,0.25)",
+              boxShadow: "0 2px 10px rgba(124,58,237,0.25)",
             }}>{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                fontSize: 12.5, fontWeight: 700, color: "#F7F5EF",
+                fontSize: 12.5, fontWeight: 700, color: "#12101A",
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 letterSpacing: "-0.2px",
               }}>{salonName || `Your ${vc.productName.replace(" OS","")}`}</div>

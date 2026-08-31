@@ -83,7 +83,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
         /* ══ Layout ══ */
         .ds-layout {
           display: flex; min-height: 100vh;
-          background: #141A2E;
+          background: #F5F3FF;
           position: relative;
         }
 
@@ -92,7 +92,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           content: "";
           position: fixed; inset: 0;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-          pointer-events: none; z-index: 0; opacity: 0.4;
+          pointer-events: none; z-index: 0; opacity: 0.06;
         }
 
         /* ══ Sidebar wrapper ══ */
@@ -123,7 +123,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           position: relative; z-index: 1;
         }
         .ds-content {
-          flex: 1; overflow-y: auto; background: #141A2E;
+          flex: 1; overflow-y: auto; background: #F5F3FF;
           padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
           -webkit-overflow-scrolling: touch;
         }
@@ -147,51 +147,51 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
            leaving two different numbers sitting around. No backdrop-filter
            in the base rule; html.gpu-capable adds it back (see globals.css). */
         .ds-topbar {
-          background: rgba(14,19,32,0.98);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: #FFFFFF;
+          border-bottom: 1px solid #ECE9F1;
           padding: 0 20px; height: 60px;
           display: flex; align-items: center; justify-content: space-between;
           position: sticky; top: 0; z-index: 30;
           gap: 12px;
           /* Subtle shimmer line at very bottom */
-          box-shadow: 0 1px 0 rgba(201,162,75,0.08), 0 4px 20px rgba(0,0,0,0.25);
+          box-shadow: 0 1px 3px rgba(18,16,26,0.05);
         }
 
         /* Search bar */
         .ds-topbar-search {
           display: flex; align-items: center; gap: 8px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.07);
+          background: #F5F3FF;
+          border: 1px solid #ECE9F1;
           border-radius: 10px; padding: 7px 12px;
           flex: 1; max-width: 260px;
           transition: all 0.18s ease;
         }
         .ds-topbar-search:focus-within {
-          border-color: rgba(201,162,75,0.5);
-          background: rgba(201,162,75,0.06);
-          box-shadow: 0 0 0 3px rgba(201,162,75,0.12);
+          border-color: #7C3AED;
+          background: #FFFFFF;
+          box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
         }
         .ds-topbar-search input {
           background: none; border: none; outline: none;
-          font-size: 13px; color: #2a3350;
+          font-size: 13px; color: #12101A;
           font-family: var(--font); width: 100%;
         }
-        .ds-topbar-search input::placeholder { color: rgba(255,255,255,0.2); }
+        .ds-topbar-search input::placeholder { color: #9A94A8; }
         @media (max-width: 480px) { .ds-topbar-search { display: none; } }
 
         /* Notification button */
         .ds-notif-btn {
           width: 36px; height: 36px; border-radius: 10px;
-          border: 1px solid rgba(255,255,255,0.07);
-          background: rgba(255,255,255,0.04);
+          border: 1px solid #ECE9F1;
+          background: #F5F3FF;
           display: flex; align-items: center; justify-content: center;
           cursor: pointer; position: relative; transition: all 0.18s;
-          flex-shrink: 0; color: rgba(255,255,255,0.45);
+          flex-shrink: 0; color: #6B6577;
         }
         .ds-notif-btn:hover {
-          border-color: rgba(201,162,75,0.35);
-          background: rgba(201,162,75,0.1);
-          color: rgba(255,255,255,0.75);
+          border-color: #7C3AED;
+          background: #EDE9FF;
+          color: #6D28D9;
         }
         .ds-notif-dot {
           position: absolute; top: 7px; right: 7px;
@@ -209,16 +209,16 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
         .ds-avatar-chip {
           display: flex; align-items: center; gap: 7px;
           padding: 4px 10px 4px 5px;
-          border: 1px solid rgba(255,255,255,0.07);
+          border: 1px solid #ECE9F1;
           border-radius: 11px;
-          background: rgba(255,255,255,0.04);
+          background: #F5F3FF;
           cursor: pointer; transition: all 0.18s; flex-shrink: 0;
         }
         .ds-avatar-chip:hover {
-          border-color: rgba(201,162,75,0.3);
-          background: rgba(201,162,75,0.07);
+          border-color: #7C3AED;
+          background: #EDE9FF;
           transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 16px rgba(18,16,26,0.10);
         }
 
         /* Plan badge */
@@ -226,9 +226,9 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           font-size: 9.5px; font-weight: 800; letter-spacing: 0.8px;
           text-transform: uppercase; padding: 3px 9px;
           border-radius: 99px; white-space: nowrap;
-          background: rgba(201,162,75,0.12);
-          color: #C9A24B;
-          border: 1px solid rgba(201,162,75,0.25);
+          background: #EDE9FF;
+          color: #6D28D9;
+          border: 1px solid rgba(124,58,237,0.20);
         }
         /* Responsive audit fix — same breakpoint (767px) and same technique
            (hide secondary badge) already proven on the dashboard-home
@@ -387,7 +387,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
       <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
         <HamburgerBtn onClick={onMenuClick} />
         <div style={{
-          fontSize: 14.5, fontWeight: 800, color: "#F7F5EF",
+          fontSize: 14.5, fontWeight: 800, color: "#12101A",
           letterSpacing: "-0.4px", lineHeight: 1,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
         }}>
@@ -397,7 +397,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
 
       {/* Center: Search */}
       <div className="ds-topbar-search">
-        <Search size={13} strokeWidth={2} color="rgba(255,255,255,0.22)" />
+        <Search size={13} strokeWidth={2} color="#9A94A8" />
         <input
           value={searchVal}
           onChange={e => setSearchVal(e.target.value)}
@@ -406,7 +406,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
         {searchVal && (
           <button
             onClick={() => setSearchVal("")}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", fontSize: 14, padding: 0, lineHeight: 1 }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6577", fontSize: 14, padding: 0, lineHeight: 1 }}
           >×</button>
         )}
       </div>
@@ -424,18 +424,18 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
         <div className="ds-avatar-chip" onClick={onMenuClick}>
           <div style={{
             width: 26, height: 26, borderRadius: 8,
-            background: "linear-gradient(135deg,#1C2438,#0E1320)",
+            background: "linear-gradient(135deg,#7C3AED,#6D28D9)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 10, fontWeight: 800, color: "#C9A24B", flexShrink: 0,
-            boxShadow: "0 2px 8px rgba(201,162,75,0.25)",
+            fontSize: 10, fontWeight: 800, color: "#FFFFFF", flexShrink: 0,
+            boxShadow: "0 2px 8px rgba(124,58,237,0.30)",
           }}>{initials}</div>
           <span style={{
-            fontSize: 12.5, fontWeight: 700, color: "#F7F5EF",
+            fontSize: 12.5, fontWeight: 700, color: "#12101A",
             maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
             {salonName || vc.productName.replace(" OS","")}
           </span>
-          <ChevronDown size={11} strokeWidth={2} color="rgba(255,255,255,0.3)" />
+          <ChevronDown size={11} strokeWidth={2} color="#9A94A8" />
         </div>
       </div>
     </header>

@@ -16,7 +16,7 @@ import {
 
 interface SalonData {
   id: string; name: string; slug: string; description?: string;
-  logo_url?: string; payment_methods?: any;
+  logo_url?: string; payment_methods?: any; phone?: string;
   timezone?: string; country?: string; business_type?: string;
 }
 interface ServiceItem { id: string; name: string; price: number; duration?: number; duration_minutes?: number; description?: string; category_id?: string | null; gender_restriction?: "all" | "female" | "male"; price_is_from?: boolean; }
@@ -328,7 +328,7 @@ export default function BookingPage() {
   useEffect(() => {
     if (!slug) return;
     (async () => {
-      const { data: s } = await supabase.from("salons").select("id,name,slug,description,logo_url,payment_methods,timezone,country,business_type").eq("slug", slug).single();
+      const { data: s } = await supabase.from("salons").select("id,name,slug,description,logo_url,payment_methods,timezone,country,business_type,phone").eq("slug", slug).single();
       if (!s) { setNotFound(true); setLoading(false); return; }
       setSalon(s);
       setBookingVc(getVerticalConfig(s.business_type));
@@ -450,85 +450,106 @@ export default function BookingPage() {
     // Replaces the old separate check_slot_available call + appointments
     // insert — one atomic RPC call does the slot check, the appointment
     // insert, and every line-item insert together, or none of it.
-    const { error } = await supabase.rpc("create_booking_with_services", {
-      p_id: bookingId,
-      p_review_token: reviewToken,
-      p_salon_id: salon.id,
-      p_client_name: form.name,
-      p_client_email: form.email,
-      p_client_phone: form.phone,
-      p_service_id: selectedServices[0].id,
-      p_staff_id: selectedStaff?.id || null,
-      p_date_time: iso,
-      p_status: isImmediatelyConfirmed ? "confirmed" : "pending",
-      p_payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
-      p_payment_method: hasMigration ? pm : null,
-      p_line_items: lineItems,
-    });
-
-    if (error) {
-      const msg = error.message || "";
-      if (msg.includes("SLOT_UNAVAILABLE")) {
-        alert("This slot was just taken. Please choose another time.");
-      } else if (msg.includes("SLOT_CHECK_DRIFT_DETECTED")) {
-        // A real server-side bug (the two availability checks disagreeing),
-        // not anything the client did — don't imply user error.
-        alert("Something went wrong on our end. Please try again in a moment, or contact the salon directly.");
-      } else {
-        // INVALID_SALON / INVALID_SERVICE / INVALID_STAFF / INVALID_STATUS /
-        // INVALID_PAYMENT_STATUS / INVALID_PAYMENT_METHOD / EMPTY_LINE_ITEMS /
-        // LINE_ITEM_SALON_MISMATCH — defense-in-depth guards that should
-        // never fire from this well-behaved client; generic fallback.
-        alert("Booking failed: " + (msg || "Unknown error."));
-      }
-      setSubmitting(false); return;
-    }
-    setBookingId(bookingId);
-    setReviewToken(reviewToken);
-
-    // Pay at salon OR free service (£0) — skip Stripe, show confirmation directly
-    if (isImmediatelyConfirmed) {
-      // Fire confirmation email immediately (no Stripe webhook needed)
-      fetch("/api/send-confirmation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentId: bookingId, token: reviewToken }),
-      }).catch(e => console.error("[send-confirmation] failed:", e));
-
-      const dateStr = selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) || "";
-      const payStatus = totalPrice > 0 ? "pay_at_salon" : "free";
-      setConfirmedBooking({
-        service: selectedServices.map(s => s.name).join(", "),
-        date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: bookingId,
-        paymentStatus: payStatus, servicePrice: totalPrice, servicePriceIsFrom: anyFromService,
+    //
+    // Wrapped in try/catch: without this, a raw network failure (as opposed
+    // to a normal {error} response) throws out of this async callback
+    // unhandled, leaving submitting=true forever and the button stuck on
+    // "Setting up payment…" with no way to recover except reloading.
+    try {
+      const { error } = await supabase.rpc("create_booking_with_services", {
+        p_id: bookingId,
+        p_review_token: reviewToken,
+        p_salon_id: salon.id,
+        p_client_name: form.name,
+        p_client_email: form.email,
+        p_client_phone: form.phone,
+        p_service_id: selectedServices[0].id,
+        p_staff_id: selectedStaff?.id || null,
+        p_date_time: iso,
+        p_status: isImmediatelyConfirmed ? "confirmed" : "pending",
+        p_payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
+        p_payment_method: hasMigration ? pm : null,
+        p_line_items: lineItems,
       });
-      setSubmitting(false);
-      setStep(5);
-      return;
-    }
 
-    // Online payment — create Stripe PaymentIntent
-    const res = await fetch("/api/create-payment-intent", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: totalPrice, charge_amount: chargeAmount,
-        email: form.email, booking_id: bookingId,
-        salon_name: salon.name, service_name: selectedServices.map(s => s.name).join(" + "),
-        deposit_only: pm !== "full_online",
-        salon_id: salon.id,
-      }),
-    });
-    const data = await res.json();
-    console.log("[PaymentIntent] response:", data);
-    if (data.error || !data.clientSecret) {
-      console.error("[PaymentIntent] error:", data.error);
-      alert("Payment setup failed: " + (data.error || "Could not connect to payment provider."));
-      setSubmitting(false); return;
+      if (error) {
+        const msg = error.message || "";
+        if (msg.includes("SLOT_UNAVAILABLE")) {
+          alert("This slot was just taken. Please choose another time.");
+        } else if (msg.includes("SLOT_CHECK_DRIFT_DETECTED")) {
+          // A real server-side bug (the two availability checks disagreeing),
+          // not anything the client did — don't imply user error.
+          alert("Something went wrong on our end. Please try again in a moment, or contact the salon directly.");
+        } else {
+          // INVALID_SALON / INVALID_SERVICE / INVALID_STAFF / INVALID_STATUS /
+          // INVALID_PAYMENT_STATUS / INVALID_PAYMENT_METHOD / EMPTY_LINE_ITEMS /
+          // LINE_ITEM_SALON_MISMATCH — defense-in-depth guards that should
+          // never fire from this well-behaved client; generic fallback.
+          alert("Booking failed: " + (msg || "Unknown error."));
+        }
+        setSubmitting(false); return;
+      }
+      setBookingId(bookingId);
+      setReviewToken(reviewToken);
+
+      // Pay at salon OR free service (£0) — skip Stripe, show confirmation directly
+      if (isImmediatelyConfirmed) {
+        // Fire confirmation email immediately (no Stripe webhook needed)
+        fetch("/api/send-confirmation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ appointmentId: bookingId, token: reviewToken }),
+        }).catch(e => console.error("[send-confirmation] failed:", e));
+
+        const dateStr = selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) || "";
+        const payStatus = totalPrice > 0 ? "pay_at_salon" : "free";
+        setConfirmedBooking({
+          service: selectedServices.map(s => s.name).join(", "),
+          date: dateStr, time: selTime, name: form.name, salon: salon.name, apptId: bookingId,
+          paymentStatus: payStatus, servicePrice: totalPrice, servicePriceIsFrom: anyFromService,
+        });
+        setSubmitting(false);
+        setStep(5);
+        return;
+      }
+
+      // Online payment — create Stripe PaymentIntent
+      const res = await fetch("/api/create-payment-intent", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalPrice, charge_amount: chargeAmount,
+          email: form.email, booking_id: bookingId,
+          salon_name: salon.name, service_name: selectedServices.map(s => s.name).join(" + "),
+          deposit_only: pm !== "full_online",
+          salon_id: salon.id,
+        }),
+      });
+      const data = await res.json();
+      console.log("[PaymentIntent] response:", data);
+      if (data.error || !data.clientSecret) {
+        console.error("[PaymentIntent] error:", data.error);
+        alert("Payment setup failed: " + (data.error || "Could not connect to payment provider."));
+        setSubmitting(false); return;
+      }
+      setClientSecret(data.clientSecret);
+      setSubmitting(false);
+      setStep(4);
+    } catch (err: unknown) {
+      console.error("[handleProceedToPayment] failed:", err);
+      const msg = err instanceof Error ? err.message : "Network error";
+      alert("Something went wrong while processing your booking (" + msg + "). Please try again, or contact the salon directly.");
+      setSubmitting(false);
     }
-    setClientSecret(data.clientSecret);
-    setSubmitting(false);
-    setStep(4);
   }, [salon, selectedServices, selectedStaff, selDate, selTime, form, selectedOption, isPayAtSalon, chargeAmount, totalPrice, anyFromService, validateForm]);
+
+  // If the OTP send fails on the server (Resend down, quota exhausted, etc.)
+  // the booking page has no other way to take the booking — the customer
+  // must be told to call the salon rather than left staring at a dead button.
+  const cantSendCodeMessage = useCallback(() => {
+    return salon?.phone
+      ? `We couldn't send your verification code right now — please call ${salon.name} on ${salon.phone} to book.`
+      : "We couldn't send your verification code right now — please call the salon to book.";
+  }, [salon]);
 
   const handleSendOtp = useCallback(async () => {
     if (!validateForm()) return;
@@ -541,15 +562,18 @@ export default function BookingPage() {
         body: JSON.stringify({ email: form.email }),
       });
       const data = await res.json();
-      if (!res.ok) { setOtpError(data.error || "Failed to send code"); setOtpLoading(false); return; }
+      if (!res.ok) {
+        setOtpError(res.status >= 500 ? cantSendCodeMessage() : (data.error || "Failed to send code"));
+        setOtpLoading(false); return;
+      }
       setOtpChallenge(data.challenge || "");
       setOtpSent(true);
       setOtpCode("");
     } catch {
-      setOtpError("Could not send verification code. Please try again.");
+      setOtpError(cantSendCodeMessage());
     }
     setOtpLoading(false);
-  }, [form.email, validateForm]);
+  }, [form.email, validateForm, cantSendCodeMessage]);
 
   const handleVerifyOtp = useCallback(async () => {
     if (!otpCode.trim()) { setOtpError("Please enter the code"); return; }
@@ -1007,9 +1031,19 @@ export default function BookingPage() {
                     </button>
                   </div>
                 ) : (
-                  <button className="btn" disabled={!canSubmit || submitting || otpLoading} onClick={handleSendOtp}>
-                    {otpLoading ? "Sending code…" : submitting ? "Setting up payment…" : "Proceed to Payment →"}
-                  </button>
+                  <>
+                    <button className="btn" disabled={!canSubmit || submitting || otpLoading} onClick={handleSendOtp}>
+                      {otpLoading ? "Sending code…" : submitting ? "Setting up payment…" : "Proceed to Payment →"}
+                    </button>
+                    {/* Must render even though otpSent is false here — this is exactly the
+                        case where /api/verify/send failed and otpSent never flipped to true,
+                        which is why the button used to silently reset with no visible error. */}
+                    {otpError && (
+                      <div style={{ marginTop: 12, padding: "12px 16px", background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 12, color: "#B91C1C", fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                        {otpError}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

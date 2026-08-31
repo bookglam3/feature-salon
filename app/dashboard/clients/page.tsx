@@ -29,7 +29,7 @@ interface HistoryItem {
 type SalonData = { id: string; slug?: string };
 
 function Avatar({ name, size = 36 }: { name: string; size?: number }) {
-  const colors = ["#C9A24B","#10B981","#F59E0B","#EF4444","#E7C878","#06B6D4","#EC4899"];
+  const colors = ["#7C3AED","#10B981","#F59E0B","#EF4444","#6D28D9","#06B6D4","#EC4899"];
   const bg = colors[(name?.charCodeAt(0) || 0) % colors.length];
   return (
     <div style={{
@@ -171,16 +171,16 @@ export default function ClientsPage() {
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
   const Topbar = (
-    <header style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12 }}>
+    <header style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <HamburgerBtn />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.4px" }}>{vc.clientPlural}</div>
-          <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{clients.length} {vc.clientPlural.toLowerCase()} in CRM</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>{vc.clientPlural}</div>
+          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{clients.length} {vc.clientPlural.toLowerCase()} in CRM</div>
         </div>
       </div>
       <button onClick={() => router.push("/dashboard/clients/import")}
-        style={{ padding: "8px 16px", background: "var(--indigo)", color: "#fff", fontSize: 13, fontWeight: 600, borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
+        style={{ padding: "8px 16px", background: "#7C3AED", color: "#fff", fontSize: 13, fontWeight: 600, borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
         ⬆ Import {vc.clientPlural}
       </button>
     </header>
@@ -200,40 +200,40 @@ export default function ClientsPage() {
 
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Client list */}
-          <div style={{ flex: selected ? "0 0 100%" : "1", minWidth: 0, background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
+          <div style={{ flex: selected ? "0 0 100%" : "1", minWidth: 0, background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
             {/* Toolbar */}
-            <div style={{ padding: "14px 18px", borderBottom: "1px solid #2a3350", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", background: "#141A2E" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 160, background: "#141A2E", border: "1.5px solid #2a3350", borderRadius: 10, padding: "8px 12px" }}
-                onFocusCapture={e => { e.currentTarget.style.borderColor = "#C9A24B"; e.currentTarget.style.background = "#1C2438"; }}
-                onBlurCapture={e => { e.currentTarget.style.borderColor = "#2a3350"; e.currentTarget.style.background = "#141A2E"; }}
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", background: "#F5F3FF" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 160, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, padding: "8px 12px" }}
+                onFocusCapture={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#FFFFFF"; }}
+                onBlurCapture={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.background = "#F5F3FF"; }}
               >
                 <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#94A3B8" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round"/></svg>
                 <input type="text" placeholder={`Search ${vc.clientPlural.toLowerCase()}…`} value={search} onChange={e => setSearch(e.target.value)}
-                  style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "var(--text-1)", fontFamily: "var(--font)", width: "100%" }} />
+                  style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#12101A", fontFamily: "var(--font)", width: "100%" }} />
               </div>
               <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
-                style={{ padding: "8px 12px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 12.5, fontFamily: "var(--font)", background: "#1C2438", cursor: "pointer", outline: "none", color: "var(--text-1)" }}>
+                style={{ padding: "8px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 12.5, fontFamily: "var(--font)", background: "#FFFFFF", cursor: "pointer", outline: "none", color: "#12101A" }}>
                 <option value="lastVisit">Latest Visit</option>
                 <option value="spent">Most Spent</option>
                 <option value="bookings">Most Bookings</option>
                 <option value="name">Name A–Z</option>
               </select>
-              <span style={{ fontSize: 12, color: "var(--text-3)", whiteSpace: "nowrap", fontWeight: 600 }}>{filtered.length} {vc.clientPlural.toLowerCase()}</span>
+              <span style={{ fontSize: 12, color: "#9A94A8", whiteSpace: "nowrap", fontWeight: 600 }}>{filtered.length} {vc.clientPlural.toLowerCase()}</span>
             </div>
 
             {filtered.length === 0 ? (
               <div style={{ padding: "56px 24px", textAlign: "center" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>👤</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-1)", marginBottom: 6 }}>{search ? `No ${vc.clientPlural.toLowerCase()} found` : `No ${vc.clientPlural.toLowerCase()} yet`}</div>
-                <div style={{ fontSize: 13, color: "var(--text-3)" }}>{vc.clientPlural} appear here after their first booking</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", marginBottom: 6 }}>{search ? `No ${vc.clientPlural.toLowerCase()} found` : `No ${vc.clientPlural.toLowerCase()} yet`}</div>
+                <div style={{ fontSize: 13, color: "#9A94A8" }}>{vc.clientPlural} appear here after their first booking</div>
               </div>
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540 }}>
                   <thead>
-                    <tr style={{ background: "#141A2E" }}>
+                    <tr style={{ background: "#F5F3FF" }}>
                       {[vc.clientSingular,"Contact","Bookings","Spent","Last Visit",""].map(h => (
-                        <th key={h} style={{ fontSize: 10.5, color: "var(--text-3)", textAlign: "left", padding: "11px 16px", fontWeight: 800, borderBottom: "1.5px solid #2a3350", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
+                        <th key={h} style={{ fontSize: 10.5, color: "#9A94A8", textAlign: "left", padding: "11px 16px", fontWeight: 800, borderBottom: "1.5px solid #ECE9F1", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -243,35 +243,35 @@ export default function ClientsPage() {
                       const isActive = selected?.email === c.email;
                       return (
                         <tr key={i} onClick={() => openClient(c)}
-                          style={{ cursor: "pointer", background: isActive ? "rgba(201,162,75,0.10)" : "transparent", transition: "background 0.1s" }}
+                          style={{ cursor: "pointer", background: isActive ? "rgba(124,58,237,0.10)" : "transparent", transition: "background 0.1s" }}
                           onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#FAFBFF"; }}
                           onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                         >
-                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #2a3350" }}>
+                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <Avatar name={c.name} size={34} />
                               <div>
-                                <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-1)" }}>{c.name}</div>
-                                {favService(c) && <div style={{ fontSize: 10.5, color: "var(--text-3)", marginTop: 1 }}>⭐ {favService(c)}</div>}
+                                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{c.name}</div>
+                                {favService(c) && <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 1 }}>⭐ {favService(c)}</div>}
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #2a3350" }}>
-                            <div style={{ fontSize: 12.5, color: "var(--text-2)" }}>{c.email || "—"}</div>
-                            <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>{c.phone || "—"}</div>
+                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
+                            <div style={{ fontSize: 12.5, color: "#6B6577" }}>{c.email || "—"}</div>
+                            <div style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 1 }}>{c.phone || "—"}</div>
                           </td>
-                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #2a3350" }}>
-                            <span style={{ background: "rgba(201,162,75,0.10)", color: "#C9A24B", fontSize: 12, padding: "3px 10px", borderRadius: 99, fontWeight: 800, border: "1px solid rgba(201,162,75,0.25)" }}>{c.bookings}</span>
+                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
+                            <span style={{ background: "rgba(124,58,237,0.10)", color: "#7C3AED", fontSize: 12, padding: "3px 10px", borderRadius: 99, fontWeight: 800, border: "1px solid rgba(124,58,237,0.25)" }}>{c.bookings}</span>
                           </td>
-                          <td style={{ padding: "13px 16px", fontSize: 13.5, fontWeight: 800, color: "var(--text-1)", borderBottom: "1px solid #2a3350" }}>£{c.spent.toFixed(0)}</td>
-                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #2a3350" }}>
-                            <div style={{ fontSize: 12.5, color: "var(--text-2)" }}>{new Date(c.lastVisit).toLocaleDateString("en-GB")}</div>
+                          <td style={{ padding: "13px 16px", fontSize: 13.5, fontWeight: 800, color: "#12101A", borderBottom: "1px solid #ECE9F1" }}>£{c.spent.toFixed(0)}</td>
+                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
+                            <div style={{ fontSize: 12.5, color: "#6B6577" }}>{new Date(c.lastVisit).toLocaleDateString("en-GB")}</div>
                             <div style={{ fontSize: 10.5, color: ds > 60 ? "var(--red)" : ds > 30 ? "var(--amber)" : "var(--green)", marginTop: 1, fontWeight: 700 }}>
                               {ds === 0 ? "Today" : `${ds}d ago`}
                             </div>
                           </td>
-                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #2a3350" }}>
-                            <span style={{ fontSize: 11.5, color: "#C9A24B", fontWeight: 700, background: "rgba(201,162,75,0.10)", padding: "3px 10px", borderRadius: 8, border: "1px solid rgba(201,162,75,0.25)" }}>View →</span>
+                          <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
+                            <span style={{ fontSize: 11.5, color: "#7C3AED", fontWeight: 700, background: "rgba(124,58,237,0.10)", padding: "3px 10px", borderRadius: 8, border: "1px solid rgba(124,58,237,0.25)" }}>View →</span>
                           </td>
                         </tr>
                       );
@@ -284,25 +284,25 @@ export default function ClientsPage() {
 
           {/* Detail panel */}
           {selected && (
-            <div style={{ width: "100%", background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 20, overflow: "hidden", boxShadow: "0 8px 32px rgba(201,162,75,0.12)", display: "flex", flexDirection: "column", maxHeight: "82vh" }}>
+            <div style={{ width: "100%", background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 8px 32px rgba(124,58,237,0.12)", display: "flex", flexDirection: "column", maxHeight: "82vh" }}>
               {/* Header */}
-              <div style={{ padding: "18px 20px", borderBottom: "1px solid #2a3350", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg,rgba(201,162,75,0.10),rgba(14,19,32,0.95))", flexShrink: 0 }}>
+              <div style={{ padding: "18px 20px", borderBottom: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg,rgba(124,58,237,0.10),rgba(245,243,255,0.95))", flexShrink: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <Avatar name={selected.name} size={44} />
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.3px" }}>{selected.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>{selected.email}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.3px" }}>{selected.name}</div>
+                    <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 2 }}>{selected.email}</div>
                   </div>
                 </div>
                 <button onClick={() => setSelected(null)}
-                  style={{ background: "var(--slate-100)", border: "none", cursor: "pointer", width: 30, height: 30, borderRadius: "50%", fontSize: 14, color: "var(--text-2)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.12s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--slate-200)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "var(--slate-100)"; }}
+                  style={{ background: "#F5F3FF", border: "none", cursor: "pointer", width: 30, height: 30, borderRadius: "50%", fontSize: 14, color: "#6B6577", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.12s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#ECE9F1"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; }}
                 >✕</button>
               </div>
 
               {/* Quick actions */}
-              <div style={{ padding: "12px 18px", borderBottom: "1px solid #2a3350", display: "flex", gap: 8, flexShrink: 0 }}>
+              <div style={{ padding: "12px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", gap: 8, flexShrink: 0 }}>
                 {selected.phone && (
                   <a href={`https://wa.me/${selected.phone.replace(/\D/g,"")}`} target="_blank" rel="noopener"
                     style={{ flex: 1, background: "rgba(16,185,129,0.10)", color: "#10B981", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
@@ -311,42 +311,42 @@ export default function ClientsPage() {
                 )}
                 {selected.phone && (
                   <a href={`tel:${selected.phone}`}
-                    style={{ flex: 1, background: "rgba(201,162,75,0.10)", color: "#C9A24B", border: "1px solid rgba(201,162,75,0.25)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
+                    style={{ flex: 1, background: "rgba(124,58,237,0.10)", color: "#7C3AED", border: "1px solid rgba(124,58,237,0.25)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
                     📞 Call
                   </a>
                 )}
                 {salon?.slug && (
                   <a href={`/book/${salon.slug}`} target="_blank" rel="noopener"
-                    style={{ flex: 1, background: "#141A2E", color: "var(--text-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
+                    style={{ flex: 1, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
                     📅 Book Again
                   </a>
                 )}
               </div>
 
               {/* Stats bar */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "#2a3350", flexShrink: 0 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "#ECE9F1", flexShrink: 0 }}>
                 {[
                   { label: "Visits", value: selected.bookings },
                   { label: "Total Spent", value: `£${selected.spent.toFixed(0)}` },
                   { label: "Fav Service", value: favService(selected) || "—" },
                 ].map(s => (
-                  <div key={s.label} style={{ background: "#141A2E", padding: "13px 14px", textAlign: "center" }}>
-                    <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text-1)", letterSpacing: "-0.5px" }}>{s.value}</div>
-                    <div style={{ fontSize: 10.5, color: "var(--text-3)", marginTop: 2, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{s.label}</div>
+                  <div key={s.label} style={{ background: "#F5F3FF", padding: "13px 14px", textAlign: "center" }}>
+                    <div style={{ fontSize: 17, fontWeight: 900, color: "#12101A", letterSpacing: "-0.5px" }}>{s.value}</div>
+                    <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 2, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
               {/* Notes */}
-              <div style={{ padding: "14px 18px", borderBottom: "1px solid #2a3350", flexShrink: 0 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: "var(--text-3)", marginBottom: 8, letterSpacing: "1px", textTransform: "uppercase" }}>Notes</div>
+              <div style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1", flexShrink: 0 }}>
+                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", marginBottom: 8, letterSpacing: "1px", textTransform: "uppercase" }}>Notes</div>
                 <textarea value={note} onChange={e => setNote(e.target.value)} rows={2}
                   placeholder="Add notes about this client…"
-                  style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13, fontFamily: "var(--font)", resize: "none", outline: "none", color: "var(--text-1)", boxSizing: "border-box", background: "#141A2E" }} />
+                  style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontFamily: "var(--font)", resize: "none", outline: "none", color: "#12101A", boxSizing: "border-box", background: "#F5F3FF" }} />
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
                   <span style={{ fontSize: 11.5, color: "var(--green)", fontWeight: 600 }}>{noteMsg}</span>
                   <button onClick={saveNote} disabled={noteSaving}
-                    style={{ padding: "6px 16px", background: "#C9A24B", color: "#fff", border: "none", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                    style={{ padding: "6px 16px", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                     Save Note
                   </button>
                 </div>
@@ -354,28 +354,28 @@ export default function ClientsPage() {
 
               {/* Booking history */}
               <div style={{ padding: "12px 18px 6px", flexShrink: 0 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: "var(--text-3)", letterSpacing: "1px", textTransform: "uppercase" }}>Booking History</div>
+                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", letterSpacing: "1px", textTransform: "uppercase" }}>Booking History</div>
               </div>
               <div style={{ flex: 1, overflowY: "auto" }}>
                 {histLoading ? (
-                  <div style={{ padding: 32, textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>Loading…</div>
+                  <div style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>Loading…</div>
                 ) : history.length === 0 ? (
-                  <div style={{ padding: 32, textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>No bookings found</div>
+                  <div style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>No bookings found</div>
                 ) : history.map(b => {
                   const sc = statusColor(b.status);
                   return (
-                    <div key={b.id} style={{ padding: "13px 18px", borderBottom: "1px solid #2a3350", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div key={b.id} style={{ padding: "13px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-1)", marginBottom: 3 }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A", marginBottom: 3 }}>
                           {b.serviceName || "Service"}
                         </div>
-                        <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>
+                        <div style={{ fontSize: 11.5, color: "#9A94A8" }}>
                           {new Date(b.date_time).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
                           {b.staff?.name && ` · ${b.staff.name}`}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text-1)", marginBottom: 4 }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A", marginBottom: 4 }}>
                           £{b.combinedPrice ?? 0}
                         </div>
                         <span style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`, fontSize: 10.5, padding: "2px 8px", borderRadius: 99, fontWeight: 700 }}>{b.status}</span>

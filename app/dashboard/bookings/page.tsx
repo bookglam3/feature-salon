@@ -58,12 +58,12 @@ function WizardProgress({ step, labels }: { step: number; labels: string[] }) {
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
         {labels.map((_, i) => (
-          <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "linear-gradient(90deg,#C9A24B,#E7C878)" : "rgba(255,255,255,0.08)", transition: "background 0.2s" }} />
+          <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "linear-gradient(90deg,#7C3AED,#6D28D9)" : "#ECE9F1", transition: "background 0.2s" }} />
         ))}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
         {labels.map((label, i) => (
-          <span key={label} style={{ fontSize: 10, fontWeight: 700, color: i <= step ? "#C9A24B" : "rgba(255,255,255,0.35)", letterSpacing: "0.2px", textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center", flex: 1 }}>{label}</span>
+          <span key={label} style={{ fontSize: 10, fontWeight: 700, color: i <= step ? "#7C3AED" : "#9A94A8", letterSpacing: "0.2px", textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center", flex: 1 }}>{label}</span>
         ))}
       </div>
     </div>
@@ -74,8 +74,8 @@ function wizardTapCardStyle(selected: boolean): CSSProperties {
   return {
     display: "flex", flexDirection: "column", gap: 2,
     padding: "13px 14px", borderRadius: 12, marginBottom: 8, cursor: "pointer",
-    border: `1.5px solid ${selected ? "#C9A24B" : "rgba(255,255,255,0.1)"}`,
-    background: selected ? "rgba(201,162,75,0.1)" : "rgba(255,255,255,0.03)",
+    border: `1.5px solid ${selected ? "#7C3AED" : "#ECE9F1"}`,
+    background: selected ? "rgba(124,58,237,0.1)" : "#F5F3FF",
     transition: "all 0.12s",
   };
 }
@@ -314,29 +314,31 @@ export default function BookingsPage() {
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
   const Topbar = (
-    <header className="elite-topbar">
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 20px", minHeight: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12, flexWrap: "wrap" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px" }}>{vc.bookingPlural}</div>
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>{appointments.length} total {vc.bookingPlural.toLowerCase()}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>{vc.bookingPlural}</div>
+          <div style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 1 }}>{appointments.length} total {vc.bookingPlural.toLowerCase()}</div>
         </div>
       </div>
       {/* flexWrap: same inline-override technique already used on this
           page's search+tabs row below — belt-and-suspenders for the
-          absolute narrowest widths (320px), on top of the .elite-topbar
-          CSS-level wrap that already applies to this whole header. */}
+          absolute narrowest widths (320px). The header itself now carries
+          flexWrap inline too: it used to rely on .elite-topbar's
+          max-width:767px CSS rule, which no longer applies since this
+          header was converted off that shared class. */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        <div className="elite-tabs">
+        <div style={{ display: "flex", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 10, padding: 3, gap: 1 }}>
           {(["table","calendar"] as const).map(v => (
-            <button key={v} onClick={() => setView(v)} className={`elite-tab${view === v ? " active" : ""}`}>
+            <button key={v} onClick={() => setView(v)} className={`bk-tab${view === v ? " active" : ""}`}>
               {v === "table" ? "Table" : "Calendar"}
             </button>
           ))}
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); }}
-          className="elite-btn-primary"
+          className="bk-btn-primary"
         >+ New {vc.bookingSingular}</button>
       </div>
     </header>
@@ -344,6 +346,40 @@ export default function BookingsPage() {
 
   return (
     <DashboardShell salonName={salon?.name} topbar={Topbar}>
+      {/* Page-local replacements for the shared .elite-* rules — scoped to
+          this page so globals.css stays untouched. Only pseudo-state and
+          descendant styling lives here; everything else is inline. */}
+      <style>{`
+        .bk-tab { padding: 5px 13px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600;
+          cursor: pointer; transition: all 0.15s ease; background: transparent; color: #6B6577; font-family: var(--font); }
+        .bk-tab:hover { color: #12101A; }
+        .bk-tab.active { background: #EDE9FF; color: #6D28D9; border: 1px solid #DDD6FE; box-shadow: 0 1px 3px rgba(124,58,237,0.12); }
+        .bk-btn-primary { display: inline-flex; align-items: center; gap: 7px;
+          background: linear-gradient(135deg,#7C3AED,#6D28D9); color: #fff; border: none; border-radius: 11px;
+          padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+          box-shadow: 0 4px 18px rgba(124,58,237,0.30); transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+          letter-spacing: -0.1px; font-family: var(--font); }
+        .bk-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.40); }
+        @media (max-width: 767px) { .bk-btn-primary { padding: 9px 14px; font-size: 12.5px; } }
+        .bk-btn-ghost { display: inline-flex; align-items: center; gap: 6px; background: #FFFFFF; color: #6B6577;
+          border: 1px solid #ECE9F1; border-radius: 10px; padding: 7px 14px; font-size: 12.5px; font-weight: 600;
+          cursor: pointer; white-space: nowrap; transition: all 0.15s ease; font-family: var(--font); }
+        .bk-btn-ghost:hover { background: #EDE9FF; color: #7C3AED; border-color: #DDD6FE; }
+        .bk-input { background: #FFFFFF; border: 1px solid #ECE9F1; border-radius: 11px; padding: 9px 13px;
+          font-size: 13px; color: #12101A; font-family: var(--font); outline: none;
+          transition: border-color 0.18s, box-shadow 0.18s; width: 100%; }
+        .bk-input::placeholder { color: #9A94A8; }
+        .bk-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+        .bk-table { width: 100%; border-collapse: collapse; }
+        .bk-table thead tr { background: #F5F3FF; border-bottom: 1px solid #ECE9F1; }
+        .bk-table th { text-align: left; padding: 11px 18px; font-size: 10.5px; font-weight: 800;
+          color: #6B6577; letter-spacing: 0.9px; text-transform: uppercase; white-space: nowrap; }
+        .bk-table td { padding: 13px 18px; font-size: 13px; color: #12101A;
+          border-bottom: 1px solid #ECE9F1; vertical-align: middle; }
+        .bk-table tr:last-child td { border-bottom: none; }
+        .bk-table tbody tr { transition: background 0.15s ease; cursor: default; }
+        .bk-table tbody tr:hover { background: #F5F3FF; }
+      `}</style>
       <div style={{ padding: "24px 20px" }}>
 
         {/* Search + Tabs bar */}
@@ -352,23 +388,23 @@ export default function BookingsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by client or service…"
-            className="elite-input"
+            className="bk-input"
             style={{ flex: 1, minWidth: 160 }}
           />
-          <div className="elite-tabs" style={{ flexWrap: "wrap" }}>
+          <div style={{ display: "flex", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 10, padding: 3, gap: 1, flexWrap: "wrap" }}>
             {["All","Today","Upcoming","Completed","Cancelled"].map(t => (
-              <button key={t} onClick={() => setActiveTab(t)} className={`elite-tab${activeTab === t ? " active" : ""}`}>{t}</button>
+              <button key={t} onClick={() => setActiveTab(t)} className={`bk-tab${activeTab === t ? " active" : ""}`}>{t}</button>
             ))}
           </div>
         </div>
 
         {view === "table" ? (
-          <div className="elite-table-wrap fade-in-up">
+          <div className="fade-in-up" style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)" }}>
             {filtered.length === 0 ? (
               <EmptyState title="No bookings found" description={search ? "Try a different search term" : "Create your first booking to get started"} action={{ label: "+ New Booking", onClick: () => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); } }} />
             ) : (
               <div style={{ overflowX: "auto" }}>
-                <table className="elite-table" style={{ minWidth: 640 }}>
+                <table className="bk-table" style={{ minWidth: 640 }}>
                   <thead>
                     <tr>
                       {["Status", vc.clientSingular, "Service", vc.staffSingular, "Date & Time","Amount","Actions"].map(h => (
@@ -380,21 +416,21 @@ export default function BookingsPage() {
                     {filtered.map(a => (
                       <tr key={a.id}>
                         <td><StatusPill status={a.status} /></td>
-                        <td style={{ fontWeight: 700, color: "#F7F5EF" }}>{a.client_name}</td>
-                        <td style={{ color: "rgba(255,255,255,0.55)" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
-                        <td style={{ color: "rgba(255,255,255,0.4)" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
-                        <td style={{ color: "rgba(255,255,255,0.55)", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
-                        <td style={{ fontWeight: 700, color: "#34D399" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ fontWeight: 700, color: "#12101A" }}>{a.client_name}</td>
+                        <td style={{ color: "#6B6577" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ color: "#6B6577" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
+                        <td style={{ color: "#6B6577", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
+                        <td style={{ fontWeight: 700, color: "#059669" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 4 }}>
-                            <button onClick={() => handleEdit(a)} className="elite-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5 }}>Edit</button>
+                            <button onClick={() => handleEdit(a)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5 }}>Edit</button>
                             {a.status !== "completed" && a.status !== "cancelled" && (
-                              <button onClick={async () => { await supabase.from("appointments").update({ status: "completed" }).eq("id", a.id); await reloadAppts(); toast.success("Marked complete ✓"); }} className="elite-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#34D399", borderColor: "rgba(16,185,129,0.2)" }}>Done</button>
+                              <button onClick={async () => { await supabase.from("appointments").update({ status: "completed" }).eq("id", a.id); await reloadAppts(); toast.success("Marked complete ✓"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#059669", borderColor: "rgba(16,185,129,0.2)" }}>Done</button>
                             )}
                             {a.status !== "no_show" && a.status !== "cancelled" && a.status !== "completed" && (
-                              <button onClick={async () => { await supabase.from("appointments").update({ status: "no_show" }).eq("id", a.id); await reloadAppts(); toast.success("No-show marked"); }} className="elite-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#FCD34D", borderColor: "rgba(245,158,11,0.2)" }}>No-show</button>
+                              <button onClick={async () => { await supabase.from("appointments").update({ status: "no_show" }).eq("id", a.id); await reloadAppts(); toast.success("No-show marked"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#B45309", borderColor: "rgba(245,158,11,0.2)" }}>No-show</button>
                             )}
-                            <button onClick={() => handleDelete(a.id)} className="elite-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#FCA5A5", borderColor: "rgba(239,68,68,0.2)" }}>Delete</button>
+                            <button onClick={() => handleDelete(a.id)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#DC2626", borderColor: "rgba(239,68,68,0.2)" }}>Delete</button>
                           </div>
                         </td>
                       </tr>
@@ -406,26 +442,26 @@ export default function BookingsPage() {
           </div>
         ) : (
           /* Calendar View */
-          <div className="elite-table-wrap fade-in-up">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              <button onClick={() => setWeekOffset(w => w - 1)} className="elite-btn-ghost" style={{ padding: "5px 12px" }}>←</button>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#F7F5EF" }}>
+          <div className="fade-in-up" style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid #ECE9F1" }}>
+              <button onClick={() => setWeekOffset(w => w - 1)} className="bk-btn-ghost" style={{ padding: "5px 12px" }}>←</button>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A" }}>
                 {weekDays[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – {weekDays[6].toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => setWeekOffset(0)} className="elite-btn-ghost" style={{ padding: "5px 12px", color: "#C9A24B", borderColor: "rgba(201,162,75,0.25)" }}>Today</button>
-                <button onClick={() => setWeekOffset(w => w + 1)} className="elite-btn-ghost" style={{ padding: "5px 12px" }}>→</button>
+                <button onClick={() => setWeekOffset(0)} className="bk-btn-ghost" style={{ padding: "5px 12px", color: "#7C3AED", borderColor: "rgba(124,58,237,0.25)" }}>Today</button>
+                <button onClick={() => setWeekOffset(w => w + 1)} className="bk-btn-ghost" style={{ padding: "5px 12px" }}>→</button>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderBottom: "1px solid #ECE9F1", overflowX: "auto" }}>
               {weekDays.map((day, i) => {
                 const isToday = day.toDateString() === new Date().toDateString();
                 return (
-                  <div key={i} style={{ padding: "10px 8px", textAlign: "center", borderRight: i < 6 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.28)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <div key={i} style={{ padding: "10px 8px", textAlign: "center", borderRight: i < 6 ? "1px solid #F5F3FF" : "none" }}>
+                    <div style={{ fontSize: 10, color: "#9A94A8", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][day.getDay()]}
                     </div>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: isToday ? "linear-gradient(135deg,#C9A24B,#0E1320)" : "transparent", color: isToday ? "#fff" : "#2a3350", fontSize: 13, fontWeight: isToday ? 800 : 500, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: isToday ? "0 4px 12px rgba(201,162,75,0.45)" : "none" }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: isToday ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "transparent", color: isToday ? "#fff" : "#ECE9F1", fontSize: 13, fontWeight: isToday ? 800 : 500, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: isToday ? "0 4px 12px rgba(124,58,237,0.45)" : "none" }}>
                       {day.getDate()}
                     </div>
                   </div>
@@ -436,16 +472,16 @@ export default function BookingsPage() {
               {weekDays.map((day, i) => {
                 const dayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === day.toDateString());
                 return (
-                  <div key={i} style={{ padding: 6, borderRight: i < 6 ? "1px solid rgba(255,255,255,0.05)" : "none", minHeight: 200 }}>
+                  <div key={i} style={{ padding: 6, borderRight: i < 6 ? "1px solid #F5F3FF" : "none", minHeight: 200 }}>
                     {dayAppts.map(a => (
                       <div key={a.id} onClick={() => handleEdit(a)}
-                        style={{ background: "rgba(201,162,75,0.12)", borderRadius: 7, padding: "5px 8px", marginBottom: 4, cursor: "pointer", borderLeft: "3px solid #C9A24B", transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,162,75,0.22)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,162,75,0.12)"; }}
+                        style={{ background: "rgba(124,58,237,0.12)", borderRadius: 7, padding: "5px 8px", marginBottom: 4, cursor: "pointer", borderLeft: "3px solid #7C3AED", transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.22)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.12)"; }}
                       >
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: "#C9A24B" }}>{new Date(a.date_time).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
-                        <div style={{ fontSize: 10.5, color: "#F7F5EF", fontWeight: 600 }}>{a.client_name}</div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED" }}>{new Date(a.date_time).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
+                        <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600 }}>{a.client_name}</div>
+                        <div style={{ fontSize: 10, color: "#6B6577" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
                       </div>
                     ))}
                   </div>
@@ -491,14 +527,14 @@ export default function BookingsPage() {
         <form id="booking-form" onSubmit={handleSubmit}>
         {editingId ? (
           <>
-          <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
+          <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
           </div>
           <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} required /></FormGroup>
           <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
           <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
-          <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Appointment Details</div>
+          <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", letterSpacing: "0.8px", textTransform: "uppercase" }}>Appointment Details</div>
           </div>
           <FormGroup label="Date & Time *"><Input type="datetime-local" value={formData.date_time} onChange={e => setFormData({ ...formData, date_time: e.target.value })} required /></FormGroup>
           <FormGroup label="Service"><Select value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}><option value="">Select service</option>{services.map(s => <option key={s.id} value={s.id}>{s.name} - {s.price_is_from ? "from " : ""}{s.price}</option>)}</Select></FormGroup>
@@ -511,17 +547,17 @@ export default function BookingsPage() {
                 onChange={e => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Clinical observations, treatment plan, follow-up notes…"
                 rows={4}
-                style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
-                onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
+                onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
               />
             </FormGroup>
           )}
 
           {vc.consultationForm && (
             <>
-              <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#C9A24B", letterSpacing: "0.8px", textTransform: "uppercase" }}>Beauty Consultation</div>
+              <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", letterSpacing: "0.8px", textTransform: "uppercase" }}>Beauty Consultation</div>
               </div>
               <FormGroup label="Skin Type">
                 <Select value={formData.skin_type} onChange={e => setFormData({ ...formData, skin_type: e.target.value })}>
@@ -554,9 +590,9 @@ export default function BookingsPage() {
                   onChange={e => setFormData({ ...formData, previous_treatments: e.target.value })}
                   placeholder="e.g. facials, waxing, lash extensions…"
                   rows={2}
-                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                  onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                  onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                 />
               </FormGroup>
               <FormGroup label="Medical Conditions / Medications">
@@ -565,18 +601,18 @@ export default function BookingsPage() {
                   onChange={e => setFormData({ ...formData, medical_conditions: e.target.value })}
                   placeholder="e.g. rosacea, eczema, pregnancy, blood thinners…"
                   rows={2}
-                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                  onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                  onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                 />
               </FormGroup>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 14px", padding: "10px 12px", background: "rgba(201,162,75,0.06)", borderRadius: 10, border: "1px solid rgba(201,162,75,0.15)", cursor: "pointer" }} onClick={() => setFormData(f => ({ ...f, patch_test: !f.patch_test }))}>
-                <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${formData.patch_test ? "#C9A24B" : "#2a3350"}`, background: formData.patch_test ? "#C9A24B" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
-                  {formData.patch_test && <span style={{ color: "#0E1320", fontSize: 11, fontWeight: 900 }}>✓</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 14px", padding: "10px 12px", background: "rgba(124,58,237,0.06)", borderRadius: 10, border: "1px solid rgba(124,58,237,0.15)", cursor: "pointer" }} onClick={() => setFormData(f => ({ ...f, patch_test: !f.patch_test }))}>
+                <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${formData.patch_test ? "#7C3AED" : "#ECE9F1"}`, background: formData.patch_test ? "#7C3AED" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
+                  {formData.patch_test && <span style={{ color: "#FFFFFF", fontSize: 11, fontWeight: 900 }}>✓</span>}
                 </div>
                 <div>
-                  <div style={{ fontSize: 12.5, fontWeight: 600, color: "#F7F5EF" }}>Patch Test Consent</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>Client consents to patch test before treatment</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 600, color: "#12101A" }}>Patch Test Consent</div>
+                  <div style={{ fontSize: 11, color: "#6B6577", marginTop: 1 }}>Client consents to patch test before treatment</div>
                 </div>
               </div>
               <FormGroup label="Additional Notes">
@@ -585,9 +621,9 @@ export default function BookingsPage() {
                   onChange={e => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Any other notes about this client or appointment…"
                   rows={2}
-                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                  onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                  style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                  onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                 />
               </FormGroup>
             </>
@@ -600,13 +636,13 @@ export default function BookingsPage() {
           {step === 0 && (
             <div>
               <div style={wizardTapCardStyle(formData.service_id === "")} onClick={() => setFormData({ ...formData, service_id: "" })}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>No service selected</div>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>Optional — you can add this later</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>No service selected</div>
+                <div style={{ fontSize: 11.5, color: "#6B6577" }}>Optional — you can add this later</div>
               </div>
               {sortedServices.map(s => (
                 <div key={s.id} style={wizardTapCardStyle(formData.service_id === s.id)} onClick={() => setFormData({ ...formData, service_id: s.id })}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>{s.name}</div>
-                  <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>{s.price_is_from ? "from " : ""}£{s.price}{s.duration_minutes ? ` · ${s.duration_minutes} mins` : ""}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{s.name}</div>
+                  <div style={{ fontSize: 11.5, color: "#6B6577" }}>{s.price_is_from ? "from " : ""}£{s.price}{s.duration_minutes ? ` · ${s.duration_minutes} mins` : ""}</div>
                 </div>
               ))}
             </div>
@@ -615,12 +651,12 @@ export default function BookingsPage() {
           {step === 1 && (
             <div>
               <div style={wizardTapCardStyle(formData.staff_id === "")} onClick={() => setFormData({ ...formData, staff_id: "" })}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>👥 Any Available {vc.staffSingular}</div>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.5)" }}>We will assign whoever is free</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>👥 Any Available {vc.staffSingular}</div>
+                <div style={{ fontSize: 11.5, color: "#6B6577" }}>We will assign whoever is free</div>
               </div>
               {staff.map(s => (
                 <div key={s.id} style={wizardTapCardStyle(formData.staff_id === s.id)} onClick={() => setFormData({ ...formData, staff_id: s.id })}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F7F5EF" }}>{s.name}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{s.name}</div>
                 </div>
               ))}
             </div>
@@ -640,9 +676,9 @@ export default function BookingsPage() {
                       onClick={() => setFormData({ ...formData, date_time: `${wizardDatePart || todayLocalDateStr()}T${t}` })}
                       style={{
                         padding: "10px 6px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-                        border: `1.5px solid ${wizardTimePart === t ? "#C9A24B" : "rgba(255,255,255,0.1)"}`,
-                        background: wizardTimePart === t ? "rgba(201,162,75,0.15)" : "rgba(255,255,255,0.03)",
-                        color: wizardTimePart === t ? "#C9A24B" : "#F7F5EF",
+                        border: `1.5px solid ${wizardTimePart === t ? "#7C3AED" : "#ECE9F1"}`,
+                        background: wizardTimePart === t ? "rgba(124,58,237,0.15)" : "#F5F3FF",
+                        color: wizardTimePart === t ? "#7C3AED" : "#12101A",
                       }}
                     >{t}</button>
                   ))}
@@ -658,7 +694,7 @@ export default function BookingsPage() {
               <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
               {(vc.treatmentNotes || vc.consultationForm) && (
                 <>
-                  <button type="button" onClick={() => setShowExtra(x => !x)} style={{ background: "none", border: "none", color: "#C9A24B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "4px 0", marginBottom: showExtra ? 12 : 0 }}>
+                  <button type="button" onClick={() => setShowExtra(x => !x)} style={{ background: "none", border: "none", color: "#7C3AED", fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "4px 0", marginBottom: showExtra ? 12 : 0 }}>
                     {showExtra ? "− Hide" : "+ Add"} {vc.consultationForm ? "consultation details" : "treatment notes"}
                   </button>
                   {showExtra && (
@@ -670,9 +706,9 @@ export default function BookingsPage() {
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
                             placeholder="Clinical observations, treatment plan, follow-up notes…"
                             rows={4}
-                            style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
-                            onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                            onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                            style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
+                            onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                            onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                           />
                         </FormGroup>
                       )}
@@ -709,9 +745,9 @@ export default function BookingsPage() {
                               onChange={e => setFormData({ ...formData, previous_treatments: e.target.value })}
                               placeholder="e.g. facials, waxing, lash extensions…"
                               rows={2}
-                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                             />
                           </FormGroup>
                           <FormGroup label="Medical Conditions / Medications">
@@ -720,18 +756,18 @@ export default function BookingsPage() {
                               onChange={e => setFormData({ ...formData, medical_conditions: e.target.value })}
                               placeholder="e.g. rosacea, eczema, pregnancy, blood thinners…"
                               rows={2}
-                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                             />
                           </FormGroup>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 14px", padding: "10px 12px", background: "rgba(201,162,75,0.06)", borderRadius: 10, border: "1px solid rgba(201,162,75,0.15)", cursor: "pointer" }} onClick={() => setFormData(f => ({ ...f, patch_test: !f.patch_test }))}>
-                            <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${formData.patch_test ? "#C9A24B" : "#2a3350"}`, background: formData.patch_test ? "#C9A24B" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
-                              {formData.patch_test && <span style={{ color: "#0E1320", fontSize: 11, fontWeight: 900 }}>✓</span>}
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 14px", padding: "10px 12px", background: "rgba(124,58,237,0.06)", borderRadius: 10, border: "1px solid rgba(124,58,237,0.15)", cursor: "pointer" }} onClick={() => setFormData(f => ({ ...f, patch_test: !f.patch_test }))}>
+                            <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${formData.patch_test ? "#7C3AED" : "#ECE9F1"}`, background: formData.patch_test ? "#7C3AED" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
+                              {formData.patch_test && <span style={{ color: "#FFFFFF", fontSize: 11, fontWeight: 900 }}>✓</span>}
                             </div>
                             <div>
-                              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#F7F5EF" }}>Patch Test Consent</div>
-                              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>Client consents to patch test before treatment</div>
+                              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#12101A" }}>Patch Test Consent</div>
+                              <div style={{ fontSize: 11, color: "#6B6577", marginTop: 1 }}>Client consents to patch test before treatment</div>
                             </div>
                           </div>
                           <FormGroup label="Additional Notes">
@@ -740,9 +776,9 @@ export default function BookingsPage() {
                               onChange={e => setFormData({ ...formData, notes: e.target.value })}
                               placeholder="Any other notes about this client or appointment…"
                               rows={2}
-                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #2a3350", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#F7F5EF", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
-                              onFocus={e => { e.currentTarget.style.borderColor = "#C9A24B"; }}
-                              onBlur={e => { e.currentTarget.style.borderColor = "#2a3350"; }}
+                              style={{ width: "100%", padding: "9px 12px", fontSize: 13, border: "1.5px solid #ECE9F1", borderRadius: 10, resize: "vertical", fontFamily: "inherit", color: "#12101A", lineHeight: 1.6, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                              onFocus={e => { e.currentTarget.style.borderColor = "#7C3AED"; }}
+                              onBlur={e => { e.currentTarget.style.borderColor = "#ECE9F1"; }}
                             />
                           </FormGroup>
                         </>
@@ -756,16 +792,16 @@ export default function BookingsPage() {
 
           {step === 4 && (
             <div>
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+              <div style={{ background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
                 {[
                   { label: "Service", value: formData.service_id ? (services.find(s => s.id === formData.service_id)?.name || "—") : "No service selected" },
                   { label: vc.staffSingular, value: formData.staff_id ? (staff.find(s => s.id === formData.staff_id)?.name || "—") : `Any Available ${vc.staffSingular}` },
                   { label: "Date & Time", value: wizardDatePart && wizardTimePart ? `${new Date(`${wizardDatePart}T${wizardTimePart}`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · ${wizardTimePart}` : "—" },
                   { label: vc.clientSingular, value: formData.client_name || "—" },
                 ].map(row => (
-                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontWeight: 600 }}>{row.label}</span>
-                    <span style={{ fontSize: 12.5, color: "#F7F5EF", fontWeight: 700 }}>{row.value}</span>
+                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #ECE9F1" }}>
+                    <span style={{ fontSize: 12, color: "#6B6577", fontWeight: 600 }}>{row.label}</span>
+                    <span style={{ fontSize: 12.5, color: "#12101A", fontWeight: 700 }}>{row.value}</span>
                   </div>
                 ))}
               </div>

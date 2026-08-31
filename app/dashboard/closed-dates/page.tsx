@@ -91,19 +91,19 @@ export default function ClosedDatesPage() {
   };
 
   const Topbar = (
-    <header style={{ background:"#1C2438", borderBottom:"1px solid #2a3350", padding:"0 24px", height:66, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:30, boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}>
+    <header style={{ background:"#FFFFFF", borderBottom:"1px solid #ECE9F1", padding:"0 24px", height:66, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:30, boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}>
       <div style={{ display:"flex", alignItems:"center", gap:14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize:15, fontWeight:800, color:"#F7F5EF" }}>🚫 Closed Dates</div>
-          <div style={{ fontSize:11.5, color:"#94A3B8", marginTop:1 }}>Manage holidays & salon closures</div>
+          <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>Closed Dates</div>
+          <div style={{ fontSize:11.5, color:"#9A94A8", marginTop:1 }}>Manage holidays & salon closures</div>
         </div>
       </div>
       <button onClick={() => setShowModal(true)} style={{ padding:"9px 18px", background:"linear-gradient(135deg,#EF4444,#DC2626)", color:"#fff", border:"none", borderRadius:12, fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(239,68,68,0.3)" }}>+ Add Closure</button>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding:40, textAlign:"center", color:"#94A3B8" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding:40, textAlign:"center", color:"#9A94A8" }}>Loading…</div></DashboardShell>;
 
   const now = new Date();
   const upcoming = closedDates.filter(c => c.date >= now.toISOString().slice(0,10));
@@ -120,22 +120,22 @@ export default function ClosedDatesPage() {
             { label:"Upcoming", value:upcoming.length, icon:"📅", color:"#F59E0B" },
             { label:"Past Closures", value:past.length, icon:"✅", color:"#10B981" },
           ].map(s => (
-            <div key={s.label} style={{ background:"#1C2438", border:"1.5px solid #2a3350", borderRadius:16, padding:"18px 20px", position:"relative", overflow:"hidden" }}>
+            <div key={s.label} style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:16, padding:"18px 20px", position:"relative", overflow:"hidden" }}>
               <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:s.color }} />
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <span style={{ fontSize:10, fontWeight:800, color:"#94A3B8", textTransform:"uppercase", letterSpacing:"0.8px" }}>{s.label}</span>
+                <span style={{ fontSize:10, fontWeight:800, color:"#9A94A8", textTransform:"uppercase", letterSpacing:"0.8px" }}>{s.label}</span>
                 <span style={{ fontSize:20 }}>{s.icon}</span>
               </div>
-              <div style={{ fontSize:28, fontWeight:900, color:"#F7F5EF" }}>{s.value}</div>
+              <div style={{ fontSize:28, fontWeight:900, color:"#12101A" }}>{s.value}</div>
             </div>
           ))}
         </div>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 360px", gap:20 }}>
           {/* Calendar */}
-          <div style={{ background:"#1C2438", border:"1.5px solid #2a3350", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
-            <div style={{ padding:"16px 20px", borderBottom:"1px solid #2a3350", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div style={{ fontSize:15, fontWeight:800, color:"#F7F5EF" }}>
+          <div style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
+            <div style={{ padding:"16px 20px", borderBottom:"1px solid #ECE9F1", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>
                 {weekDays[0].toLocaleDateString("en-GB", { day:"numeric", month:"short" })} – {weekDays[6].toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })}
               </div>
               <div style={{ display:"flex", gap:6 }}>
@@ -143,13 +143,13 @@ export default function ClosedDatesPage() {
                   <button key={lbl} onClick={() => {
                     if (i === 1) setWeekStart(getMonday(new Date()));
                     else { const d = new Date(weekStart); d.setDate(d.getDate() + (i===0?-7:7)); setWeekStart(d); }
-                  }} style={{ padding:"6px 12px", background: i===1 ? "#C9A24B" : "#141A2E", color: i===1 ? "#fff" : "#aab1c4", border:`1.5px solid ${i===1 ? "transparent" : "#2a3350"}`, borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer" }}>{lbl}</button>
+                  }} style={{ padding:"6px 12px", background: i===1 ? "#7C3AED" : "#F5F3FF", color: i===1 ? "#fff" : "#6B6577", border:`1.5px solid ${i===1 ? "transparent" : "#ECE9F1"}`, borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer" }}>{lbl}</button>
                 ))}
               </div>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:0 }}>
               {DAYS.map(d => (
-                <div key={d} style={{ textAlign:"center", padding:"10px 4px", fontSize:10, fontWeight:800, color:"#94A3B8", textTransform:"uppercase", letterSpacing:"0.5px", borderBottom:"1px solid #2a3350", background:"#141A2E" }}>{d}</div>
+                <div key={d} style={{ textAlign:"center", padding:"10px 4px", fontSize:10, fontWeight:800, color:"#9A94A8", textTransform:"uppercase", letterSpacing:"0.5px", borderBottom:"1px solid #ECE9F1", background:"#F5F3FF" }}>{d}</div>
               ))}
               {weekDays.map(day => {
                 const closed = isClosed(day);
@@ -158,18 +158,18 @@ export default function ClosedDatesPage() {
                 return (
                   <div key={day.toISOString()}
                     onClick={() => !isPast && quickAdd(day, "Holiday")}
-                    style={{ minHeight:80, padding:"10px 8px", borderRight:"1px solid #2a3350", borderBottom:"1px solid #2a3350", background: closed ? "rgba(239,68,68,0.10)" : isToday ? "rgba(201,162,75,0.10)" : "#1C2438", cursor: isPast ? "default" : "pointer", transition:"all 0.15s", position:"relative" }}
-                    onMouseEnter={e => { if (!isPast) e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : "#141A2E"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : isToday ? "rgba(201,162,75,0.10)" : "#1C2438"; }}
+                    style={{ minHeight:80, padding:"10px 8px", borderRight:"1px solid #ECE9F1", borderBottom:"1px solid #ECE9F1", background: closed ? "rgba(239,68,68,0.10)" : isToday ? "rgba(124,58,237,0.10)" : "#FFFFFF", cursor: isPast ? "default" : "pointer", transition:"all 0.15s", position:"relative" }}
+                    onMouseEnter={e => { if (!isPast) e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : "#F5F3FF"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : isToday ? "rgba(124,58,237,0.10)" : "#FFFFFF"; }}
                   >
-                    <div style={{ fontSize:13, fontWeight: isToday ? 900 : 600, color: closed ? "#DC2626" : isToday ? "#C9A24B" : isPast ? "#aab1c4" : "#F7F5EF", marginBottom:4 }}>{day.getDate()}</div>
+                    <div style={{ fontSize:13, fontWeight: isToday ? 900 : 600, color: closed ? "#DC2626" : isToday ? "#7C3AED" : isPast ? "#6B6577" : "#12101A", marginBottom:4 }}>{day.getDate()}</div>
                     {closed && (
                       <div style={{ fontSize:9.5, fontWeight:700, color:"#DC2626", background:"rgba(239,68,68,0.10)", padding:"2px 6px", borderRadius:5, lineHeight:1.4 }}>
                         🚫 {closed.reason || "Closed"}
                       </div>
                     )}
                     {!closed && !isPast && (
-                      <div style={{ fontSize:9, color:"#aab1c4", marginTop:4 }}>Click to close</div>
+                      <div style={{ fontSize:9, color:"#6B6577", marginTop:4 }}>Click to close</div>
                     )}
                   </div>
                 );
@@ -180,28 +180,28 @@ export default function ClosedDatesPage() {
           {/* List */}
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
             {/* Upcoming closures */}
-            <div style={{ background:"#1C2438", border:"1.5px solid #2a3350", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
-              <div style={{ padding:"16px 20px", borderBottom:"1px solid #2a3350" }}>
-                <div style={{ fontSize:14, fontWeight:800, color:"#F7F5EF" }}>📅 Upcoming Closures</div>
+            <div style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
+              <div style={{ padding:"16px 20px", borderBottom:"1px solid #ECE9F1" }}>
+                <div style={{ fontSize:14, fontWeight:800, color:"#12101A" }}>Upcoming Closures</div>
               </div>
               <div style={{ padding:12, display:"flex", flexDirection:"column", gap:8, maxHeight:280, overflowY:"auto" }}>
-                {upcoming.length === 0 && <div style={{ textAlign:"center", padding:"20px 0", color:"#94A3B8", fontSize:13 }}>No upcoming closures</div>}
+                {upcoming.length === 0 && <div style={{ textAlign:"center", padding:"20px 0", color:"#9A94A8", fontSize:13 }}>No upcoming closures</div>}
                 {upcoming.map(c => (
                   <div key={c.id} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 14px", background:"rgba(239,68,68,0.10)", border:"1.5px solid #FECACA", borderRadius:12 }}>
                     <div>
                       <div style={{ fontSize:13, fontWeight:800, color:"#DC2626" }}>{new Date(c.date + "T00:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}</div>
                       <div style={{ fontSize:11.5, color:"#EF4444", marginTop:2 }}>{c.reason || "No reason given"}</div>
                     </div>
-                    <button onClick={() => handleRemove(c.id, c.date)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#FCA5A5" }}
-                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#FCA5A5"; }}>🗑</button>
+                    <button onClick={() => handleRemove(c.id, c.date)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#DC2626" }}
+                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#DC2626"; }}>🗑</button>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Quick add common */}
-            <div style={{ background:"#1C2438", border:"1.5px solid #2a3350", borderRadius:20, padding:"16px 20px" }}>
-              <div style={{ fontSize:13, fontWeight:800, color:"#F7F5EF", marginBottom:12 }}>⚡ Quick Add UK Holidays</div>
+            <div style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:20, padding:"16px 20px" }}>
+              <div style={{ fontSize:13, fontWeight:800, color:"#12101A", marginBottom:12 }}>Quick Add UK Holidays</div>
               {[
                 { label:"Christmas Day", date:"2025-12-25" },
                 { label:"Boxing Day", date:"2025-12-26" },
@@ -217,9 +217,9 @@ export default function ClosedDatesPage() {
                     const { data } = await supabase.from("closed_dates").insert({ salon_id: salonId, date: h.date, reason: h.label }).select().single();
                     if (data) { setClosedDates(p => [...p, data].sort((a,b) => a.date.localeCompare(b.date))); toast.success(`${h.label} added!`); }
                   }}
-                  style={{ width:"100%", textAlign:"left", padding:"8px 12px", marginBottom:6, borderRadius:10, border:`1.5px solid ${isCl ? "rgba(239,68,68,0.25)" : "#2a3350"}`, background: isCl ? "rgba(239,68,68,0.10)" : "#141A2E", fontSize:12.5, fontWeight:600, color: isCl ? "#DC2626" : "#aab1c4", cursor:"pointer", display:"flex", justifyContent:"space-between", transition:"all 0.12s" }}>
+                  style={{ width:"100%", textAlign:"left", padding:"8px 12px", marginBottom:6, borderRadius:10, border:`1.5px solid ${isCl ? "rgba(239,68,68,0.25)" : "#ECE9F1"}`, background: isCl ? "rgba(239,68,68,0.10)" : "#F5F3FF", fontSize:12.5, fontWeight:600, color: isCl ? "#DC2626" : "#6B6577", cursor:"pointer", display:"flex", justifyContent:"space-between", transition:"all 0.12s" }}>
                     <span>{h.label}</span>
-                    <span style={{ fontSize:11, color:"#94A3B8" }}>{isCl ? "✓ Added" : h.date}</span>
+                    <span style={{ fontSize:11, color:"#9A94A8" }}>{isCl ? "✓ Added" : h.date}</span>
                   </button>
                 );
               })}
@@ -231,20 +231,20 @@ export default function ClosedDatesPage() {
       {/* Modal */}
       {showModal && (
         <div onClick={() => setShowModal(false)} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#1C2438", borderRadius:20, padding:28, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize:18, fontWeight:900, color:"#F7F5EF", marginBottom:20 }}>🚫 Add Closure</div>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#FFFFFF", borderRadius:20, padding:28, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
+            <div style={{ fontSize:18, fontWeight:900, color:"#12101A", marginBottom:20 }}>Add Closure</div>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#475569", display:"block", marginBottom:6 }}>Date *</label>
-                <input type="date" value={form.date} onChange={e => setForm({...form, date:e.target.value})} style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #2a3350", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
+                <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Date *</label>
+                <input type="date" value={form.date} onChange={e => setForm({...form, date:e.target.value})} style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#475569", display:"block", marginBottom:6 }}>Reason (optional)</label>
-                <input value={form.reason} onChange={e => setForm({...form, reason:e.target.value})} placeholder="e.g. Christmas, Holiday, Staff Training" style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #2a3350", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
+                <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Reason (optional)</label>
+                <input value={form.reason} onChange={e => setForm({...form, reason:e.target.value})} placeholder="e.g. Christmas, Holiday, Staff Training" style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
               </div>
             </div>
             <div style={{ display:"flex", gap:10, marginTop:20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex:1, padding:12, background:"#141A2E", border:"1.5px solid #2a3350", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#475569", cursor:"pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ flex:1, padding:12, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#6B6577", cursor:"pointer" }}>Cancel</button>
               <button onClick={handleAdd} disabled={saving || !form.date} style={{ flex:2, padding:12, background:"linear-gradient(135deg,#EF4444,#DC2626)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer", opacity: !form.date ? 0.5 : 1 }}>
                 {saving ? "Saving…" : "Add Closure"}
               </button>

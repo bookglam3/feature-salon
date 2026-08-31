@@ -141,7 +141,7 @@ function ServiceModalForm({
   };
 
   const sectionLabelStyle: React.CSSProperties = {
-    fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)",
+    fontSize: 11, fontWeight: 700, color: "#6B6577",
     letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: 12, marginTop: 20,
   };
 
@@ -171,12 +171,12 @@ function ServiceModalForm({
 
       <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", marginBottom: form.price_is_from ? 6 : 16 }}>
         <input type="checkbox" checked={form.price_is_from} onChange={e => setForm(f => ({ ...f, price_is_from: e.target.checked }))} />
-        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>
+        <span style={{ fontSize: 13, color: "#12101A" }}>
           Price varies — show as &quot;from £{form.price || "25"}&quot;
         </span>
       </label>
       {form.price_is_from && (
-        <p style={{ fontSize: 11.5, color: "rgba(255,255,255,0.4)", lineHeight: 1.5, marginBottom: 16, marginLeft: 24 }}>
+        <p style={{ fontSize: 11.5, color: "#6B6577", lineHeight: 1.5, marginBottom: 16, marginLeft: 24 }}>
           Full online payment is unavailable for variable-priced services — clients booking this service can only pay a deposit or pay at the salon.
         </p>
       )}
@@ -190,7 +190,7 @@ function ServiceModalForm({
       </FormGroup>
 
       {!showNewCategory ? (
-        <button type="button" onClick={() => setShowNewCategory(true)} style={{ background: "none", border: "none", color: "#E7C878", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginTop: -8, marginBottom: 16 }}>
+        <button type="button" onClick={() => setShowNewCategory(true)} style={{ background: "none", border: "none", color: "#7C3AED", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginTop: -8, marginBottom: 16 }}>
           + Create new category
         </button>
       ) : (
@@ -203,14 +203,14 @@ function ServiceModalForm({
               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleCreateCategory(); } }}
               autoFocus
             />
-            {categoryError && <p style={{ fontSize: 11.5, color: "#FCA5A5", marginTop: 4 }}>{categoryError}</p>}
+            {categoryError && <p style={{ fontSize: 11.5, color: "#DC2626", marginTop: 4 }}>{categoryError}</p>}
           </div>
           <button type="button" onClick={handleCreateCategory} disabled={creatingCategory || !newCategoryName.trim()}
-            style={{ padding: "10px 14px", background: "#C9A24B", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: creatingCategory || !newCategoryName.trim() ? 0.5 : 1, whiteSpace: "nowrap" }}>
+            style={{ padding: "10px 14px", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: creatingCategory || !newCategoryName.trim() ? 0.5 : 1, whiteSpace: "nowrap" }}>
             {creatingCategory ? "Adding…" : "Add"}
           </button>
           <button type="button" onClick={() => { setShowNewCategory(false); setNewCategoryName(""); setCategoryError(""); }}
-            style={{ padding: "10px 12px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
+            style={{ padding: "10px 12px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
             ✕
           </button>
         </div>
@@ -223,7 +223,7 @@ function ServiceModalForm({
       </FormGroup>
 
       {error && (
-        <div style={{ marginTop: 4, marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#FCA5A5" }}>
+        <div style={{ marginTop: 4, marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#DC2626" }}>
           ⚠️ {error}
         </div>
       )}

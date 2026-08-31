@@ -54,7 +54,7 @@ const DEFAULT_AUTOMATIONS: Automation[] = [
 const TYPE_META: Record<string, { icon: string; label: string; desc: string; color: string }> = {
   birthday:    { icon: "🎂", label: "Birthday Message",     desc: "Auto-send on client's birthday",           color: "#EC4899" },
   winback:     { icon: "💔", label: "Win-Back Campaign",    desc: "Re-engage clients who haven't visited",    color: "#F59E0B" },
-  anniversary: { icon: "🎉", label: "Loyalty Anniversary",  desc: "Celebrate 1 year with your salon",         color: "#C9A24B" },
+  anniversary: { icon: "🎉", label: "Loyalty Anniversary",  desc: "Celebrate 1 year with your salon",         color: "#7C3AED" },
   referral:    { icon: "🔗", label: "Referral Prompt",      desc: "Encourage clients to refer friends",       color: "#10B981" },
 };
 
@@ -115,12 +115,12 @@ export default function AutomationsPage() {
   };
 
   const Topbar = (
-    <header style={{ background: "#1C2438", borderBottom: "1px solid #2a3350", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF" }}>🤖 Automations</div>
-          <div style={{ fontSize: 11.5, color: "#aab1c4", marginTop: 1 }}>Birthday, Win-back & Referral messages</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Automations</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Birthday, Win-back & Referral messages</div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 12 }}>
@@ -129,18 +129,18 @@ export default function AutomationsPage() {
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#aab1c4" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
       <div style={{ padding: "28px 24px", maxWidth: 1000, margin: "0 auto" }}>
 
         {/* Info banner */}
-        <div style={{ background: "linear-gradient(135deg,rgba(201,162,75,0.10),rgba(14,19,32,0.95))", border: "1.5px solid rgba(201,162,75,0.25)", borderRadius: 16, padding: "16px 20px", marginBottom: 24, display: "flex", gap: 14, alignItems: "center" }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.10),rgba(14,19,32,0.95))", border: "1px solid #ECE9F1", borderRadius: 16, padding: "16px 20px", marginBottom: 24, display: "flex", gap: 14, alignItems: "center" }}>
           <span style={{ fontSize: 28 }}>🤖</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#F7F5EF" }}>Automated Messages</div>
-            <div style={{ fontSize: 13, color: "#aab1c4", marginTop: 2, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A" }}>Automated Messages</div>
+            <div style={{ fontSize: 13, color: "#6B6577", marginTop: 2, lineHeight: 1.5 }}>
               Set up once, send automatically. Use <strong>{"{name}"}</strong>, <strong>{"{salon}"}</strong>, <strong>{"{link}"}</strong> as variables. Messages are sent via your chosen channel.
             </div>
           </div>
@@ -152,61 +152,61 @@ export default function AutomationsPage() {
             const meta = TYPE_META[auto.type];
             const isEditing = editing === auto.type;
             return (
-              <div key={auto.type} style={{ background: "#1C2438", border: `1.5px solid ${auto.is_active ? meta.color + "40" : "#2a3350"}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", transition: "all 0.2s" }}>
+              <div key={auto.type} style={{ background: "#FFFFFF", border: `1.5px solid ${auto.is_active ? meta.color + "40" : "#ECE9F1"}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", transition: "all 0.2s" }}>
                 <div style={{ padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: `${meta.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{meta.icon}</div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF" }}>{meta.label}</div>
-                      <div style={{ fontSize: 12.5, color: "#aab1c4", marginTop: 2 }}>{meta.desc}</div>
-                      {auto.reward && <div style={{ fontSize: 11.5, fontWeight: 700, color: meta.color, marginTop: 4 }}>🎁 Reward: {auto.reward}</div>}
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>{meta.label}</div>
+                      <div style={{ fontSize: 12.5, color: "#6B6577", marginTop: 2 }}>{meta.desc}</div>
+                      {auto.reward && <div style={{ fontSize: 11.5, fontWeight: 700, color: meta.color, marginTop: 4 }}>Reward: {auto.reward}</div>}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     {auto.is_active && <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: `${meta.color}18`, color: meta.color }}>● ACTIVE</span>}
                     <label style={{ position: "relative", width: 44, height: 24, cursor: "pointer", flexShrink: 0 }}>
                       <input type="checkbox" checked={auto.is_active} onChange={() => toggleActive(auto.type, auto.is_active)} style={{ opacity: 0, width: 0, height: 0 }} />
-                      <span style={{ position: "absolute", inset: 0, background: auto.is_active ? meta.color : "#aab1c4", borderRadius: 99, transition: "background 0.18s" }}>
-                        <span style={{ position: "absolute", width: 16, height: 16, left: auto.is_active ? 24 : 4, top: 4, background: "#1C2438", borderRadius: "50%", transition: "left 0.18s", boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
+                      <span style={{ position: "absolute", inset: 0, background: auto.is_active ? meta.color : "#6B6577", borderRadius: 99, transition: "background 0.18s" }}>
+                        <span style={{ position: "absolute", width: 16, height: 16, left: auto.is_active ? 24 : 4, top: 4, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s", boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
                       </span>
                     </label>
-                    <button onClick={() => setEditing(isEditing ? null : auto.type)} style={{ padding: "7px 14px", background: isEditing ? "rgba(201,162,75,0.10)" : "#141A2E", border: `1.5px solid ${isEditing ? "rgba(201,162,75,0.25)" : "#2a3350"}`, borderRadius: 10, fontSize: 12.5, fontWeight: 700, color: isEditing ? "#C9A24B" : "#aab1c4", cursor: "pointer" }}>
-                      {isEditing ? "✕ Close" : "✏️ Edit"}
+                    <button onClick={() => setEditing(isEditing ? null : auto.type)} style={{ padding: "7px 14px", background: isEditing ? "rgba(124,58,237,0.10)" : "#F5F3FF", border: `1.5px solid ${isEditing ? "rgba(124,58,237,0.25)" : "#ECE9F1"}`, borderRadius: 10, fontSize: 12.5, fontWeight: 700, color: isEditing ? "#7C3AED" : "#6B6577", cursor: "pointer" }}>
+                      {isEditing ? "Close" : "Edit"}
                     </button>
                   </div>
                 </div>
 
                 {/* Edit panel */}
                 {isEditing && (
-                  <div style={{ borderTop: "1px solid #2a3350", padding: "20px 24px", background: "#141A2E" }}>
+                  <div style={{ borderTop: "1px solid #ECE9F1", padding: "20px 24px", background: "#F5F3FF" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                         <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Channel</label>
-                          <select value={auto.channel} onChange={e => update(auto.type, "channel", e.target.value)} style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-                            <option value="whatsapp">📱 WhatsApp</option>
-                            <option value="sms">💬 SMS</option>
-                            <option value="email">📧 Email</option>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Channel</label>
+                          <select value={auto.channel} onChange={e => update(auto.type, "channel", e.target.value)} style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit" }}>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="sms">SMS</option>
+                            <option value="email">Email</option>
                           </select>
                         </div>
                         {auto.type === "winback" && (
                           <div>
-                            <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Trigger after (days inactive)</label>
+                            <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Trigger after (days inactive)</label>
                             <input type="number" value={auto.days_before} onChange={e => update(auto.type, "days_before", parseInt(e.target.value))}
-                              style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                              style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                           </div>
                         )}
                         <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Reward (optional)</label>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Reward (optional)</label>
                           <input value={auto.reward} onChange={e => update(auto.type, "reward", e.target.value)} placeholder="e.g. 10% off"
-                            style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                            style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                         </div>
                       </div>
                       <div>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Message</label>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Message</label>
                         <textarea value={auto.message} onChange={e => update(auto.type, "message", e.target.value)} rows={3}
-                          style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.6 }} />
-                        <div style={{ fontSize: 11, color: "#aab1c4", marginTop: 4 }}>Variables: {"{name}"}, {"{salon}"}, {"{link}"}</div>
+                          style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.6 }} />
+                        <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4 }}>Variables: {"{name}"}, {"{salon}"}, {"{link}"}</div>
                       </div>
                     </div>
                     <button onClick={() => save(auto)} style={{ marginTop: 14, padding: "10px 24px", background: `linear-gradient(135deg,${meta.color},${meta.color}cc)`, border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer", boxShadow: `0 4px 14px ${meta.color}40` }}>Save Automation</button>

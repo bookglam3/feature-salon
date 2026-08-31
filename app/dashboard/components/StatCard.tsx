@@ -14,9 +14,9 @@ interface StatCardProps {
 
 const colorMap = {
   indigo: {
-    accent: "#C9A24B", light: "rgba(201,162,75,0.10)", text: "#C9A24B",
-    grad: "linear-gradient(135deg,#C9A24B,#E7C878)",
-    glow: "rgba(201,162,75,0.2)", bar: "#C9A24B",
+    accent: "#7C3AED", light: "rgba(124,58,237,0.10)", text: "#7C3AED",
+    grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",
+    glow: "rgba(124,58,237,0.2)", bar: "#7C3AED",
   },
   green: {
     accent: "#10B981", light: "rgba(16,185,129,0.10)", text: "#10B981",
@@ -34,7 +34,7 @@ const colorMap = {
     glow: "rgba(239,68,68,0.18)", bar: "#F87171",
   },
   slate: {
-    accent: "#aab1c4", light: "#2a3350", text: "#aab1c4",
+    accent: "#6B6577", light: "#F5F3FF", text: "#6B6577",
     grad: "linear-gradient(135deg,#64748B,#94A3B8)",
     glow: "rgba(100,116,139,0.15)", bar: "#94A3B8",
   },
@@ -69,9 +69,10 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
   return (
     <div
       style={{
-        background: "#1C2438", border: "1.5px solid #2a3350",
+        background: "#FFFFFF", border: "1px solid #ECE9F1",
         borderRadius: 20, padding: "20px 18px",
         display: "flex", flexDirection: "column", gap: 14,
+        boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)",
         transition: "all 0.2s ease", position: "relative", overflow: "hidden",
         cursor: "default",
       }}
@@ -81,9 +82,9 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
         e.currentTarget.style.borderColor = c.accent + "44";
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.boxShadow = "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)";
         e.currentTarget.style.transform = "none";
-        e.currentTarget.style.borderColor = "#2a3350";
+        e.currentTarget.style.borderColor = "#ECE9F1";
       }}
     >
       {/* Gradient top bar */}
@@ -96,13 +97,13 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
       <div style={{
         position: "absolute", bottom: -16, right: -16,
         width: 80, height: 80, borderRadius: "50%",
-        background: c.glow, pointerEvents: "none",
+        background: c.light, pointerEvents: "none",
       }} />
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div style={{
-          fontSize: 10.5, fontWeight: 800, color: "var(--dk-text-3)",
+          fontSize: 10.5, fontWeight: 800, color: "#6B6577",
           letterSpacing: "0.8px", textTransform: "uppercase",
         }}>{label}</div>
         <div style={{
@@ -126,14 +127,14 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
         </div>
       ) : isNumeric ? (
         <div className="count-animate" style={{
-          fontSize: 32, fontWeight: 900, color: "var(--dk-text-1)",
+          fontSize: 32, fontWeight: 900, color: "#12101A",
           letterSpacing: "-1.5px", lineHeight: 1,
         }}>
           <AnimCounter target={numVal} prefix={prefix} />
         </div>
       ) : (
         <div style={{
-          fontSize: 28, fontWeight: 900, color: "var(--dk-text-1)",
+          fontSize: 28, fontWeight: 900, color: "#12101A",
           letterSpacing: "-1px", lineHeight: 1,
         }}>{value}</div>
       )}
@@ -141,7 +142,7 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
       {/* Sub + trend */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         {sub && (
-          <div style={{ fontSize: 11.5, color: "var(--dk-text-3)", fontWeight: 500, flex: 1 }}>{sub}</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 500, flex: 1 }}>{sub}</div>
         )}
         {trend !== undefined && (
           <div style={{

@@ -151,19 +151,19 @@ export default function GalleryPage() {
   const filtered = filter === "all" ? photos : filter === "featured" ? photos.filter(p => p.is_featured) : photos.filter(p => p.category === filter);
 
   const Topbar = (
-    <header style={{ background: "#1C2438", borderBottom: "1px solid #2a3350", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#F7F5EF" }}>📸 Gallery</div>
-          <div style={{ fontSize: 11.5, color: "#aab1c4", marginTop: 1 }}>Showcase your salon work</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Gallery</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Showcase your salon work</div>
         </div>
       </div>
       <button onClick={() => setShowModal(true)} style={{ padding: "9px 18px", background: "linear-gradient(135deg,#EC4899,#DB2777)", color: "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(236,72,153,0.3)" }}>+ Add Photo</button>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#aab1c4" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
@@ -174,13 +174,13 @@ export default function GalleryPage() {
           {[
             { label: "Total Photos", value: photos.length, color: "#EC4899" },
             { label: "Featured", value: photos.filter(p => p.is_featured).length, color: "#F59E0B" },
-            { label: "Categories", value: new Set(photos.map(p => p.category)).size, color: "#C9A24B" },
+            { label: "Categories", value: new Set(photos.map(p => p.category)).size, color: "#7C3AED" },
             { label: "This Month", value: photos.filter(p => new Date(p.created_at).getMonth() === new Date().getMonth()).length, color: "#10B981" },
           ].map(s => (
-            <div key={s.label} style={{ background: "#1C2438", border: "1.5px solid #2a3350", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
+            <div key={s.label} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color }} />
-              <div style={{ fontSize: 10, fontWeight: 800, color: "#aab1c4", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>{s.label}</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#F7F5EF" }}>{s.value}</div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>{s.label}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#12101A" }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -189,7 +189,7 @@ export default function GalleryPage() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
           {["all", "featured", ...getGalleryCategories(businessType)].map(cat => (
             <button key={cat} onClick={() => setFilter(cat)}
-              style={{ padding: "6px 14px", borderRadius: 20, border: `1.5px solid ${filter === cat ? "#EC4899" : "#2a3350"}`, background: filter === cat ? "rgba(236,72,153,0.12)" : "#1C2438", color: filter === cat ? "#EC4899" : "#aab1c4", fontSize: 12.5, fontWeight: filter === cat ? 800 : 500, cursor: "pointer", transition: "all 0.12s", textTransform: "capitalize" }}>
+              style={{ padding: "6px 14px", borderRadius: 20, border: `1.5px solid ${filter === cat ? "#EC4899" : "#ECE9F1"}`, background: filter === cat ? "rgba(236,72,153,0.12)" : "#FFFFFF", color: filter === cat ? "#EC4899" : "#6B6577", fontSize: 12.5, fontWeight: filter === cat ? 800 : 500, cursor: "pointer", transition: "all 0.12s", textTransform: "capitalize" }}>
               {cat} {cat === "all" ? `(${photos.length})` : cat === "featured" ? `(${photos.filter(p => p.is_featured).length})` : `(${photos.filter(p => p.category === cat).length})`}
             </button>
           ))}
@@ -197,7 +197,7 @@ export default function GalleryPage() {
 
         {/* Grid */}
         {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#aab1c4" }}>
+          <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📸</div>
             <div style={{ fontWeight: 700 }}>No photos yet</div>
             <div style={{ fontSize: 13, marginTop: 4 }}>Add your salon portfolio photos</div>
@@ -244,8 +244,8 @@ export default function GalleryPage() {
       {/* Add Photo Modal */}
       {showModal && (
         <div onClick={() => { setShowModal(false); setSelectedFiles([]); setPreviews([]); }} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(6px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "#1C2438", borderRadius: 20, padding: 28, width: "100%", maxWidth: 520, boxShadow: "0 32px 80px rgba(0,0,0,0.25)", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: "#F7F5EF", marginBottom: 20 }}>📸 Upload Photos</div>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 20, padding: 28, width: "100%", maxWidth: 520, boxShadow: "0 32px 80px rgba(0,0,0,0.25)", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#12101A", marginBottom: 20 }}>Upload Photos</div>
 
             {/* Drop Zone */}
             <div
@@ -253,11 +253,11 @@ export default function GalleryPage() {
               onDragLeave={() => setDragOver(false)}
               onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files); }}
               onClick={() => fileInputRef.current?.click()}
-              style={{ border: `2px dashed ${dragOver ? "#EC4899" : "#2a3350"}`, borderRadius: 14, padding: "28px 20px", textAlign: "center", cursor: "pointer", background: dragOver ? "rgba(236,72,153,0.12)" : "#141A2E", transition: "all 0.18s", marginBottom: 16 }}
+              style={{ border: `2px dashed ${dragOver ? "#EC4899" : "#ECE9F1"}`, borderRadius: 14, padding: "28px 20px", textAlign: "center", cursor: "pointer", background: dragOver ? "rgba(236,72,153,0.12)" : "#F5F3FF", transition: "all 0.18s", marginBottom: 16 }}
             >
               <div style={{ fontSize: 36, marginBottom: 8 }}>📁</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#F7F5EF", marginBottom: 4 }}>Drag & drop photos here</div>
-              <div style={{ fontSize: 12.5, color: "#aab1c4" }}>or click to browse • JPG, PNG, WebP, HEIC • max 10MB each</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", marginBottom: 4 }}>Drag & drop photos here</div>
+              <div style={{ fontSize: 12.5, color: "#6B6577" }}>or click to browse • JPG, PNG, WebP, HEIC • max 10MB each</div>
               <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
                 onChange={e => { if (e.target.files) addFiles(e.target.files); e.target.value = ""; }} />
             </div>
@@ -274,35 +274,35 @@ export default function GalleryPage() {
                   </div>
                 ))}
                 <div onClick={() => fileInputRef.current?.click()}
-                  style={{ borderRadius: 10, border: "2px dashed #2a3350", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", aspectRatio: "1", color: "#aab1c4", fontSize: 22 }}>+</div>
+                  style={{ borderRadius: 10, border: "2px dashed #ECE9F1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", aspectRatio: "1", color: "#6B6577", fontSize: 22 }}>+</div>
               </div>
             )}
 
             {/* Caption + Category */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Caption (optional)</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Caption (optional)</label>
                 <input value={form.caption} onChange={e => setForm(p => ({ ...p, caption: e.target.value }))} placeholder="e.g. Balayage transformation"
-                  style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                  style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#aab1c4", display: "block", marginBottom: 6 }}>Category</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Category</label>
                 <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #2a3350", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit" }}>
+                  style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit" }}>
                   {getGalleryCategories(businessType).map((c: string) => <option key={c} value={c} style={{ textTransform: "capitalize" }}>{c}</option>)}
                 </select>
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                 <input type="checkbox" checked={form.is_featured} onChange={e => setForm(p => ({ ...p, is_featured: e.target.checked }))} />
-                <span style={{ fontSize: 13.5, fontWeight: 600, color: "#aab1c4" }}>⭐ Mark as featured</span>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: "#6B6577" }}>⭐ Mark as featured</span>
               </label>
             </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
               <button onClick={() => { setShowModal(false); setSelectedFiles([]); setPreviews([]); }}
-                style={{ flex: 1, padding: 12, background: "#141A2E", border: "1.5px solid #2a3350", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#aab1c4", cursor: "pointer" }}>Cancel</button>
+                style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleUpload} disabled={uploading || selectedFiles.length === 0}
-                style={{ flex: 2, padding: 12, background: uploading ? "#2a3350" : "linear-gradient(135deg,#EC4899,#DB2777)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: uploading ? "#94A3B8" : "#1C2438", cursor: uploading || selectedFiles.length === 0 ? "not-allowed" : "pointer", opacity: selectedFiles.length === 0 ? 0.5 : 1 }}>
+                style={{ flex: 2, padding: 12, background: uploading ? "#ECE9F1" : "linear-gradient(135deg,#EC4899,#DB2777)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: uploading ? "#9A94A8" : "#FFFFFF", cursor: uploading || selectedFiles.length === 0 ? "not-allowed" : "pointer", opacity: selectedFiles.length === 0 ? 0.5 : 1 }}>
                 {uploading ? "⏳ Uploading…" : `Upload ${selectedFiles.length > 0 ? `${selectedFiles.length} Photo${selectedFiles.length > 1 ? "s" : ""}` : "Photos"}`}
               </button>
             </div>

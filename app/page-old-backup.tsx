@@ -3,12 +3,9 @@ import LpNav from "./components/landing/LpNav";
 import LpHero from "./components/landing/LpHero";
 import LpTrust from "./components/landing/LpTrust";
 import LpFeatures from "./components/landing/LpFeatures";
-import LpHowItWorks from "./components/landing/LpHowItWorks";
 import LpCalendar from "./components/landing/LpCalendar";
-import LpCompare from "./components/landing/LpCompare";
 import LpPricing from "./components/landing/LpPricing";
 import LpTestimonials from "./components/landing/LpTestimonials";
-import LpFaq from "./components/landing/LpFaq";
 import LpCta from "./components/landing/LpCta";
 import LpFooter from "./components/landing/LpFooter";
 
@@ -18,27 +15,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.featuresalon.co.uk" },
 };
 
-// ── Schema: FAQ ───────────────────────────────────────────────────
-// Kept as a text-exact copy of the `faqs` array in LpFaq.tsx so this
-// schema matches what's actually visible on the page. LpFaq.tsx is a
-// "use client" component, and Next's server/client boundary turns every
-// export of a client module (not just the default component) into an
-// opaque reference when imported into a Server Component — so this data
-// can't be imported directly and has to be kept in sync by hand. If you
-// edit the questions/answers in LpFaq.tsx, update this list to match.
 const faqItems = [
-  { question: "How much does Feature cost?", answer: "There are three plans to choose from. Starter is £29 a month, Pro is £59, and Business is £99. Whichever one you pick, it's a flat monthly fee, so there's no commission and no charge per booking." },
-  { question: "Does Feature charge commission on bookings?", answer: "No, never. You pay your monthly fee and that's it. Whatever your clients pay you, you keep. A lot of booking platforms take a cut of every appointment. We don't work that way." },
-  { question: "Is Feature a good alternative to Fresha, Treatwell or Booksy?", answer: "It can be. Those platforms usually take commission or charge per booking, which adds up once you're busy. Feature gives you online booking, payments, reminders and client management for one flat fee instead, so you know exactly what you're paying each month." },
-  { question: "What types of business is Feature for?", answer: "Salons and barbershops mostly, but also gyms, spas, yoga studios, and physio or wellness clinics. Really, if you take appointments and need a way for clients to book you in, it'll work for your business." },
-  { question: "Can my clients book online 24/7?", answer: "Yes. You get a booking page and a QR code you can put on your door, your Instagram, wherever suits. Clients can book from their phone at any time of day, and there's nothing for them to download." },
-  { question: "Does Feature send appointment reminders?", answer: "It does. WhatsApp and email reminders go out automatically before each appointment, so you're not chasing clients yourself, and you'll see fewer no-shows." },
-  { question: "How do payments work?", answer: "Payments run through Stripe, so it's secure and the money lands straight in your own account. You can take deposits or full payment when someone books, and again, we don't take any commission from it." },
-  { question: "Can I import my existing clients?", answer: "Yes, you can bring your existing client list over when you sign up, so you're not starting from scratch. Their details and history come with them." },
-  { question: "Is there a free trial? Do I need a card to start?", answer: "There's a 14-day free trial and you don't need to put a card in to start it. If it's not for you, you can cancel any time, no hassle." },
-  { question: "Can I manage multiple staff and services?", answer: "You can. Depending on your plan, you get separate calendars for each member of staff, and you can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard." },
+  { question: "Is Feature free to start?",                          answer: "Yes — every plan includes a 14-day free trial with no credit card required. You get full access to all features from day one." },
+  { question: "Does Feature work for my type of business?",         answer: "Absolutely. Feature is built for any Health & Wellbeing business — salons, barbershops, gyms, yoga studios, physiotherapy clinics, spas, massage therapists, personal trainers, dental & aesthetic clinics, and more. If you take appointments, Feature works for you." },
+  { question: "How does Feature compare to Fresha?",                answer: "Unlike Fresha, Feature charges a flat monthly subscription with zero commission on bookings or payments. Feature also supports a much broader range of businesses — gyms, physio clinics, yoga studios — not just salons and spas. Our Pro plan at £59/month replaces Fresha's hidden fees which can exceed £150/month for a busy business." },
+  { question: "How does Feature compare to Treatwell?",             answer: "Treatwell takes a commission on every booking made through their marketplace. Feature gives you your own branded booking page with no marketplace fees — you keep 100% of your revenue. Feature also supports businesses far beyond salons and spas." },
+  { question: "Can clients book online 24/7?",                      answer: "Yes. Every business gets a public booking page where clients can browse services, choose a staff member, and book at any time — no phone calls needed." },
+  { question: "What payment methods are supported?",                answer: "Feature uses Stripe for payments, supporting all major credit and debit cards. You can take deposits or full payments at booking time to reduce no-shows." },
+  { question: "Is there a long-term contract?",                     answer: "No contracts at all. All plans are monthly and you can cancel at any time from your dashboard. We also offer a 30-day money-back guarantee." },
+  { question: "Do you send automated appointment reminders?",       answer: "Yes — Feature sends automated SMS, WhatsApp, and email reminders to clients before their appointments." },
+  { question: "How much does Feature cost?",                        answer: "Feature starts from £29/month for the Starter plan (up to 3 staff), £59/month for Pro (up to 10 staff), and £99/month for Business (unlimited staff). All plans include a 14-day free trial with no credit card required." },
+  { question: "What features does Feature include?",                answer: "Feature includes: online booking system, staff management & scheduling, automated WhatsApp/SMS/email reminders, Stripe payment processing, client CRM, revenue analytics, gift cards, loyalty program, waitlist management, class scheduling, and multi-location support." },
 ];
 
+// ── Schema: FAQ ───────────────────────────────────────────────────
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -167,12 +157,9 @@ export default function Home() {
       <LpHero />
       <LpTrust />
       <LpFeatures />
-      <LpHowItWorks />
       <LpCalendar />
-      <LpCompare />
       <LpPricing />
       <LpTestimonials />
-      <LpFaq />
       <LpCta />
       <LpFooter />
     </main>

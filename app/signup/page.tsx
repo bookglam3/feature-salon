@@ -5,7 +5,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { POPULAR_COUNTRIES, ALL_COUNTRIES, type Country } from "../lib/countries";
 
-const C = { indigo:"#C9A24B", indigoDark:"#C9A24B", indigoSoft:"rgba(201,162,75,0.10)", green:"#10B981", red:"#EF4444", text:"#F7F5EF", text2:"#aab1c4", text3:"#aab1c4", border:"#2a3350", bg:"#1C2438" };
+const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#10B981", red:"#EF4444", text:"#F7F5EF", text2:"#aab1c4", text3:"#8A8598", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#6B6577" };
 const STEPS = ["Account", "Your Business", "Verify Email", "Done!"];
 
 const BUSINESS_TYPES = [
@@ -39,12 +39,12 @@ function Inp({ label, type="text", value, onChange, placeholder, required, hint,
   { label:string; type?:string; value:string; onChange:(v:string)=>void; placeholder?:string; required?:boolean; hint?:string; right?: React.ReactNode }) {
   const [f, setF] = useState(false);
   return (
-    <div style={{ marginBottom:14 }}>
-      <label style={{ fontSize:12.5, fontWeight:700, color:C.text, display:"block", marginBottom:5 }}>{label}{required && <span style={{color:C.indigo}}> *</span>}</label>
+    <div style={{ marginBottom:16 }}>
+      <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:7 }}>{label}{required && <span style={{color:C.indigo}}> *</span>}</label>
       <div style={{ position:"relative" }}>
         <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required}
-          onFocus={()=>setF(true)} onBlur={()=>setF(false)}
-          style={{ width:"100%", padding:"11px 14px", paddingRight: right?"44px":"14px", fontSize:14, color:C.text, border:`1.5px solid ${f?C.indigo:C.border}`, borderRadius:10, outline:"none", boxSizing:"border-box", background:C.bg, transition:"all .15s", boxShadow:f?`0 0 0 3px ${C.indigo}18`:"none" }} />
+          onFocus={()=>setF(true)} onBlur={()=>setF(false)} className="signup-input"
+          style={{ width:"100%", padding:"13px 15px", paddingRight: right?"44px":"15px", fontSize:14, color:C.formText, border:`1px solid ${f?C.indigo:C.border}`, borderRadius:11, outline:"none", boxSizing:"border-box", background:C.bg, transition:"border-color .15s, box-shadow .15s", boxShadow:f?"0 0 0 3px rgba(124,58,237,0.12)":"none" }} />
         {right && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}>{right}</div>}
       </div>
       {hint && <div style={{ fontSize:11, color:C.text3, marginTop:4 }}>{hint}</div>}
@@ -64,8 +64,8 @@ function CountryDropdown({ value, onChange }: { value: Country|null; onChange:(c
   const filtered = q ? ALL_COUNTRIES.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.dial.includes(q)) : null;
   const Item = ({ c }: { c: Country }) => (
     <button type="button" onClick={() => { onChange(c); setOpen(false); setQ(""); }}
-      style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"9px 14px", border:"none", cursor:"pointer", background: value?.code===c.code?"rgba(201,162,75,0.12)":"transparent", color:C.text, fontSize:13, textAlign:"left", transition:"background .1s" }}
-      onMouseEnter={e=>{ if(value?.code!==c.code)(e.currentTarget as HTMLElement).style.background="#141A2E"; }}
+      style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"9px 14px", border:"none", cursor:"pointer", background: value?.code===c.code?"rgba(124,58,237,0.10)":"transparent", color:C.formText, fontSize:13, textAlign:"left", transition:"background .1s" }}
+      onMouseEnter={e=>{ if(value?.code!==c.code)(e.currentTarget as HTMLElement).style.background="#F5F3FF"; }}
       onMouseLeave={e=>{ if(value?.code!==c.code)(e.currentTarget as HTMLElement).style.background="transparent"; }}>
       <span style={{fontSize:18}}>{c.flag}</span>
       <span style={{flex:1}}>{c.name}</span>
@@ -73,19 +73,19 @@ function CountryDropdown({ value, onChange }: { value: Country|null; onChange:(c
     </button>
   );
   return (
-    <div style={{ marginBottom:14 }}>
-      <label style={{ fontSize:12.5, fontWeight:700, color:C.text, display:"block", marginBottom:5 }}>Country <span style={{color:C.indigo}}>*</span></label>
+    <div style={{ marginBottom:16 }}>
+      <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:7 }}>Country <span style={{color:C.indigo}}>*</span></label>
       <div ref={ref} style={{ position:"relative" }}>
         <button type="button" onClick={()=>setOpen(o=>!o)}
-          style={{ width:"100%", padding:"11px 14px", border:`1.5px solid ${open?C.indigo:C.border}`, borderRadius:10, background:C.bg, display:"flex", alignItems:"center", gap:10, cursor:"pointer", fontSize:14, color: value?C.text:C.text3, boxShadow:open?`0 0 0 3px ${C.indigo}18`:"none", transition:"all .15s" }}>
+          style={{ width:"100%", padding:"13px 15px", border:`1px solid ${open?C.indigo:C.border}`, borderRadius:11, background:C.bg, display:"flex", alignItems:"center", gap:10, cursor:"pointer", fontSize:14, color: value?C.formText:C.text3, boxShadow:open?"0 0 0 3px rgba(124,58,237,0.12)":"none", transition:"border-color .15s, box-shadow .15s" }}>
           {value ? <><span style={{fontSize:18}}>{value.flag}</span><span style={{flex:1, textAlign:"left"}}>{value.name}</span><span style={{fontSize:12,color:C.text3}}>{value.dial}</span></> : <span>Select country…</span>}
           <span style={{fontSize:10, color:C.text3}}>{open?"▲":"▼"}</span>
         </button>
         {open && (
-          <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, right:0, zIndex:500, background:"#1C2438", border:`1.5px solid ${C.border}`, borderRadius:12, boxShadow:"0 16px 48px rgba(0,0,0,0.4)", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, right:0, zIndex:500, background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, boxShadow:"0 16px 48px rgba(17,10,40,0.14)", overflow:"hidden" }}>
             <div style={{ padding:"10px 12px", borderBottom:`1px solid ${C.border}` }}>
-              <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search country or dial code…"
-                style={{ width:"100%", padding:"8px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, fontSize:13, outline:"none", fontFamily:"inherit", background:C.bg, color:C.text }} />
+              <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search country or dial code…" className="signup-input"
+                style={{ width:"100%", padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, outline:"none", fontFamily:"inherit", background:C.bg, color:C.formText }} />
             </div>
             <div style={{ maxHeight:260, overflowY:"auto" }}>
               {filtered ? (
@@ -279,26 +279,36 @@ export default function SignupPage() {
   };
 
   const EyeBtn = ({ show, toggle }: { show:boolean; toggle:()=>void }) => (
-    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:C.text3, padding:0, lineHeight:1 }}>
-      {show ? "🙈" : "👁"}
+    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:"#8A8598", padding:0, lineHeight:1, display:"flex" }}>
+      {show ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.87 20.87 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.87 20.87 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      )}
     </button>
   );
 
   // ── Step 3: Success / redirect ───────────────────────────────────
   if (step === 3) return (
-    <main style={{ minHeight:"100vh", background:"#141A2E", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-      <div style={{ background:"#1C2438", borderRadius:24, padding:"48px 40px", maxWidth:480, width:"100%", textAlign:"center", boxShadow:"0 24px 64px rgba(0,0,0,0.4)", border:"1px solid #2a3350" }}>
-        <div style={{ width:72, height:72, borderRadius:"50%", background:"linear-gradient(135deg,#10B981,#059669)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, margin:"0 auto 20px", boxShadow:"0 8px 24px rgba(16,185,129,0.3)" }}>✓</div>
-        <h1 style={{ fontSize:24, fontWeight:900, color:C.text, letterSpacing:"-0.5px", marginBottom:8 }}>{salonName} is ready!</h1>
-        <p style={{ fontSize:14, color:C.text2, lineHeight:1.7, marginBottom:20 }}>
+    <main className="signup-page" style={{ minHeight:"100vh", background:"#F5F3FF", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+      <div style={{ background:"#FFFFFF", borderRadius:20, padding:"48px 40px", maxWidth:460, width:"100%", textAlign:"center", boxShadow:"0 20px 60px -24px rgba(91,33,182,0.20)", border:"1px solid #F0EDF5" }}>
+        <div style={{ width:72, height:72, borderRadius:"50%", background:"#7C3AED", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, margin:"0 auto 20px", boxShadow:"0 8px 24px rgba(124,58,237,0.35)" }}>✓</div>
+        <h1 style={{ fontSize:24, fontWeight:900, color:C.formText, letterSpacing:"-0.5px", marginBottom:8 }}>{salonName} is ready!</h1>
+        <p style={{ fontSize:14, color:C.formText2, lineHeight:1.7, marginBottom:20 }}>
           Email verified. Taking you to your dashboard…
         </p>
         {["Online booking page ready","WhatsApp reminders configured","14-day free trial started","Zero setup fees"].map(f=>(
-          <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.text2, padding:"7px 12px", background:"rgba(16,185,129,0.10)", borderRadius:8, marginBottom:8 }}>
+          <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.formText2, padding:"7px 12px", background:"rgba(16,185,129,0.10)", borderRadius:8, marginBottom:8 }}>
             <span style={{color:C.green, fontWeight:800}}>✓</span> {f}
           </div>
         ))}
-        <a href="/dashboard" style={{ display:"block", marginTop:24, padding:"14px", background:`linear-gradient(135deg,${C.indigo},${C.indigoDark})`, color:"#fff", borderRadius:12, fontWeight:800, fontSize:15, textDecoration:"none" }}>
+        <a href="/dashboard" style={{ display:"block", marginTop:24, padding:"14px", background:"linear-gradient(180deg, #7C3AED, #6D28D9)", color:"#fff", borderRadius:12, fontWeight:700, fontSize:15, textDecoration:"none", boxShadow:"0 8px 20px -6px rgba(124,58,237,0.45)" }}>
           Go to Dashboard →
         </a>
       </div>
@@ -309,73 +319,80 @@ export default function SignupPage() {
   const activeError = step < 2 ? error : otpError;
 
   return (
-    <main style={{ minHeight:"100vh", background:C.bg, display:"flex" }}>
+    <main className="signup-page" style={{ minHeight:"100vh", background:"#F5F3FF", display:"flex" }}>
       {/* Left Panel */}
-      <div style={{ width:380, background:"linear-gradient(160deg,#0E1320,#141A2E 50%,#1C2438)", display:"flex", flexDirection:"column", justifyContent:"center", padding:"48px 40px", flexShrink:0, borderRight:"1px solid #2a3350" }} className="signup-left">
-        <div style={{ marginBottom:40 }}>
-          <img src="/brand/logo-dark.svg" alt="Feature Salon" style={{ height: 40, width: "auto", display: "block", marginBottom: 6, opacity: 0.95 }} />
-        </div>
-        <h2 style={{ fontSize:24, fontWeight:900, color:"#fff", lineHeight:1.3, marginBottom:10 }}>The last booking software you&apos;ll ever need.</h2>
-        <p style={{ fontSize:13.5, color:"rgba(255,255,255,0.55)", lineHeight:1.7, marginBottom:32 }}>Join Health &amp; Wellbeing businesses worldwide managing bookings, staff, and payments — all in one place.</p>
-        <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:36 }}>
-          {["Online booking page in minutes","Automated WhatsApp & SMS reminders","Staff management & scheduling","Stripe payments & deposits","Client CRM & history","Revenue analytics dashboard"].map(f=>(
-            <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:13, color:"rgba(255,255,255,0.8)" }}>
-              <div style={{ width:18, height:18, borderRadius:"50%", background:"rgba(16,185,129,0.25)", border:"1.5px solid rgba(16,185,129,0.5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#10B981", fontWeight:800, flexShrink:0 }}>✓</div>
-              {f}
-            </div>
-          ))}
-        </div>
-        <div style={{ background:"rgba(255,255,255,0.07)", borderRadius:14, padding:"16px 18px", border:"1px solid rgba(255,255,255,0.1)" }}>
-          <p style={{ fontSize:12.5, color:"rgba(255,255,255,0.7)", lineHeight:1.65, margin:0 }}>Be one of the first UK salons on Feature — no commission, no contracts, just straightforward software at a flat monthly price.</p>
+      <div style={{ width:440, position:"relative", overflow:"hidden", background:"linear-gradient(160deg, #5B21B6 0%, #6D28D9 55%, #7C3AED 100%)", display:"flex", flexDirection:"column", justifyContent:"center", padding:"56px 44px", flexShrink:0 }} className="signup-left">
+        <div style={{ position:"absolute", top:-120, right:-120, width:420, height:420, borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:-140, left:-100, width:360, height:360, borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"relative" }}>
+          <div style={{ marginBottom:32 }}>
+            <span style={{ fontSize:22, fontWeight:800, color:"#fff", letterSpacing:"-0.02em" }}>Feature</span>
+          </div>
+          <h2 style={{ fontSize:32, fontWeight:800, color:"#fff", lineHeight:1.12, letterSpacing:"-0.02em", marginBottom:14 }}>Start growing your business with Feature</h2>
+          <p style={{ fontSize:15, color:"#EDE9FF", lineHeight:1.6, marginBottom:28 }}>Everything you need to manage bookings, clients, staff and payments — all in one place.</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:15, marginBottom:32 }}>
+            {["Online booking 24/7","Zero commission","Automatic reminders","Secure payments"].map(f=>(
+              <div key={f} style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:22, height:22, borderRadius:"50%", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="12" height="10" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <span style={{ fontSize:15, fontWeight:500, color:"#fff", lineHeight:1.4 }}>{f}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize:13, color:"#D6C9F7", lineHeight:1.5, margin:0, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.15)" }}>Trusted by UK salons, barbers, gyms, spas and clinics.</p>
         </div>
       </div>
 
       {/* Right Panel */}
-      <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px" }}>
-        <div style={{ width:"100%", maxWidth:460 }}>
+      <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"32px 24px" }}>
+        <div style={{ width:"100%", maxWidth:520 }}>
 
           {/* Progress */}
-          <div style={{ marginBottom:28 }}>
+          <div style={{ marginBottom:20 }}>
             <div style={{ display:"flex", alignItems:"center", marginBottom:6 }}>
               {STEPS.map((s,i)=>(
                 <div key={s} style={{ display:"flex", alignItems:"center", flex: i<STEPS.length-1?1:0 }}>
                   <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-                    <div style={{ width:26, height:26, borderRadius:"50%", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", background: i<step?C.green:i===step?C.indigo:C.border, color: i<=step?"#fff":C.text3, transition:"all .3s", boxShadow: i===step?`0 4px 12px ${C.indigo}40`:"none" }}>
+                    <div style={{ width:26, height:26, borderRadius:"50%", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", background: i<=step?C.indigo:C.border, color: i<=step?"#fff":C.text3, transition:"all .3s", boxShadow: i===step?"0 0 0 4px rgba(124,58,237,0.12)":"none" }}>
                       {i<step?"✓":i+1}
                     </div>
-                    <span style={{ fontSize:9.5, fontWeight:i===step?700:500, color:i===step?C.indigo:C.text3, whiteSpace:"nowrap" }}>{s}</span>
+                    <span style={{ fontSize:12, fontWeight:i===step?600:500, color:i===step?C.formText:C.text3, whiteSpace:"nowrap" }}>{s}</span>
                   </div>
-                  {i<STEPS.length-1 && <div style={{ flex:1, height:2, margin:"0 6px", marginBottom:18, background:i<step?C.green:C.border, transition:"background .3s" }}/>}
+                  {i<STEPS.length-1 && <div style={{ flex:1, height:1.5, margin:"0 6px", marginBottom:18, background:i<step?C.indigo:C.border, transition:"background .3s" }}/>}
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Card */}
+          <div style={{ background:"#FFFFFF", borderRadius:20, padding:"44px 44px", border:"1px solid #F0EDF5", boxShadow:"0 1px 2px rgba(18,16,26,0.04), 0 12px 32px -8px rgba(91,33,182,0.12), 0 30px 60px -30px rgba(18,16,26,0.12)", maxWidth:520, width:"100%", boxSizing:"border-box" }}>
+
           {/* Badge — only on steps 0 and 1 */}
           {step < 2 && (
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
-              <div style={{ fontSize:10, fontWeight:800, color:C.indigo, letterSpacing:"2px", textTransform:"uppercase", background:C.indigoSoft, padding:"3px 10px", borderRadius:99, border:"1px solid rgba(201,162,75,0.30)" }}>14-Day Free Trial</div>
+              <div style={{ fontSize:10, fontWeight:800, color:C.indigo, letterSpacing:"2px", textTransform:"uppercase", background:C.indigoSoft, padding:"3px 10px", borderRadius:99, border:"1px solid rgba(124,58,237,0.30)" }}>14-Day Free Trial</div>
               <div style={{ fontSize:11, color:C.text3 }}>No credit card required</div>
             </div>
           )}
 
-          <h1 style={{ fontSize:26, fontWeight:900, color:C.text, letterSpacing:"-0.8px", marginBottom:4, lineHeight:1.2 }}>
+          <h1 style={{ fontSize:26, fontWeight:900, color:C.formText, letterSpacing:"-0.8px", marginBottom:4, lineHeight:1.2 }}>
             {step===0 ? "Create your account" : step===1 ? "Tell us about your business" : "Check your inbox"}
           </h1>
-          <p style={{ fontSize:13.5, color:C.text2, marginBottom:24 }}>
+          <p style={{ fontSize:13.5, color:C.formText2, marginBottom:20 }}>
             {step===0
               ? "Start your free trial in under 60 seconds."
               : step===1
                 ? "Help us personalise your experience."
-                : <>We sent a 6-digit code to <strong style={{color:C.text}}>{maskEmail(email)}</strong>. Enter it below to verify your email.</>
+                : <>We sent a 6-digit code to <strong style={{color:C.formText}}>{maskEmail(email)}</strong>. Enter it below to verify your email.</>
             }
           </p>
 
           {/* Error banner */}
           {activeError && (
-            <div style={{ background:"rgba(239,68,68,0.10)", border:"1.5px solid rgba(239,68,68,0.25)", borderRadius:10, padding:"11px 14px", marginBottom:16, fontSize:13, color:"#F87171" }}>
+            <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:10, padding:"11px 14px", marginBottom:16, fontSize:13, color:"#DC2626" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom: activeError.includes("already exists")?8:0 }}>⚠ {activeError}</div>
-              {activeError.includes("already exists") && <Link href="/login" style={{ fontSize:13, fontWeight:700, color:C.indigo, textDecoration:"none", background:C.indigoSoft, padding:"5px 12px", borderRadius:7, display:"inline-block", marginTop:4, border:"1px solid rgba(201,162,75,0.30)" }}>→ Sign in</Link>}
+              {activeError.includes("already exists") && <Link href="/login" style={{ fontSize:13, fontWeight:700, color:C.indigo, textDecoration:"none", background:C.indigoSoft, padding:"5px 12px", borderRadius:7, display:"inline-block", marginTop:4, border:"1px solid rgba(124,58,237,0.30)" }}>→ Sign in</Link>}
             </div>
           )}
 
@@ -383,13 +400,13 @@ export default function SignupPage() {
           {step===0 && (
             <form onSubmit={step0}>
               <Inp label="Full Name" value={fullName} onChange={setFullName} placeholder="Sarah Johnson" required />
-              <Inp label="Email Address" type="email" value={email} onChange={setEmail} placeholder="sarah@yoursalon.com" required />
+              <Inp label="Email Address" type="email" value={email} onChange={setEmail} placeholder="sarah@yourbusiness.com" required />
               <div>
                 <Inp label="Password" type={showPw?"text":"password"} value={password} onChange={setPassword} placeholder="Min. 8 characters" required
                   right={<EyeBtn show={showPw} toggle={()=>setShowPw(p=>!p)} />} />
                 {password && (
                   <div style={{ marginTop:-10, marginBottom:14 }}>
-                    <div style={{ height:3, background:"#2a3350", borderRadius:99, overflow:"hidden" }}>
+                    <div style={{ height:3, background:C.border, borderRadius:99, overflow:"hidden" }}>
                       <div style={{ height:"100%", width:pw.w, background:pw.color, transition:"all .3s", borderRadius:99 }}/>
                     </div>
                     <div style={{ fontSize:11, color:pw.color, fontWeight:700, marginTop:4 }}>{pw.label}</div>
@@ -398,11 +415,14 @@ export default function SignupPage() {
               </div>
               <Inp label="Confirm Password" type={showCpw?"text":"password"} value={confirmPw} onChange={setConfirmPw} placeholder="Repeat password" required
                 right={<EyeBtn show={showCpw} toggle={()=>setShowCpw(p=>!p)} />} />
-              <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:20, padding:"11px 14px", background:C.indigoSoft, border:`1.5px solid rgba(201,162,75,0.30)`, borderRadius:10 }}>
-                <span style={{ fontSize:15, marginTop:1 }}>🔒</span>
-                <span style={{ fontSize:12, color:"#C9A24B", lineHeight:1.6 }}>Your data is encrypted and never shared. We comply with GDPR &amp; global data protection law.</span>
+              <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:16, padding:"14px 16px", background:"#F7F5FF", border:"1px solid #EDE9FF", borderRadius:11 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.indigo} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop:2, flexShrink:0 }}>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <span style={{ fontSize:13, color:C.formText2, lineHeight:1.6 }}>Your data is encrypted and never shared. We comply with GDPR &amp; global data protection law.</span>
               </div>
-              <button type="submit" style={{ width:"100%", padding:"13px", background:`linear-gradient(135deg,${C.indigo},${C.indigoDark})`, color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:800, cursor:"pointer", boxShadow:"0 6px 20px rgba(201,162,75,0.35)", transition:"all .15s" }}>
+              <button type="submit" className="btn-primary" style={{ width:"100%", padding:"14px", background:"linear-gradient(180deg, #7C3AED, #6D28D9)", color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 8px 20px -6px rgba(124,58,237,0.45)", transition:"all .15s" }}>
                 Continue →
               </button>
               <div style={{ textAlign:"center", marginTop:16, fontSize:13, color:C.text3 }}>
@@ -419,25 +439,25 @@ export default function SignupPage() {
               <Inp label="Phone Number (optional)" type="tel" value={phone} onChange={setPhone} placeholder={country ? country.dial+" 000 000 0000" : "+44 000 000 0000"} />
               <Inp label="Company Name (optional)" value={company} onChange={setCompany} placeholder="Your registered company name" />
               <div style={{ marginBottom:16 }}>
-                <label style={{ fontSize:12.5, fontWeight:700, color:C.text, display:"block", marginBottom:8 }}>Business Type</label>
+                <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:8 }}>Business Type</label>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }} className="salon-grid">
                   {BUSINESS_TYPES.map(o=>(
                     <button key={o.key} type="button" onClick={()=>setCategory(o.key)}
-                      style={{ padding:"9px 12px", borderRadius:10, fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"left", border:`1.5px solid ${category===o.key?C.indigo:C.border}`, background:category===o.key?C.indigoSoft:C.bg, color:category===o.key?C.indigo:C.text2, transition:"all .15s" }}>
+                      style={{ padding:"9px 12px", borderRadius:10, fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"left", border:`1px solid ${category===o.key?C.indigo:C.border}`, background:category===o.key?C.indigoSoft:C.bg, color:category===o.key?C.indigo:C.formText2, transition:"all .15s" }}>
                       {o.label}
                     </button>
                   ))}
                 </div>
               </div>
-              <label style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:20, cursor:"pointer" }}>
+              <label style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:16, cursor:"pointer" }}>
                 <input type="checkbox" checked={terms} onChange={e=>setTerms(e.target.checked)} style={{ width:16, height:16, marginTop:2, accentColor:C.indigo, flexShrink:0 }} />
-                <span style={{ fontSize:12.5, color:C.text2, lineHeight:1.6 }}>
+                <span style={{ fontSize:12.5, color:C.formText2, lineHeight:1.6 }}>
                   I agree to the <Link href="/terms" style={{ color:C.indigo, textDecoration:"none", fontWeight:700 }}>Terms of Service</Link> and <Link href="/privacy" style={{ color:C.indigo, textDecoration:"none", fontWeight:700 }}>Privacy Policy</Link>
                 </span>
               </label>
               <div style={{ display:"flex", gap:10 }}>
-                <button type="button" onClick={()=>{ setStep(0); setError(""); }} style={{ padding:"13px 20px", borderRadius:12, border:`1.5px solid ${C.border}`, background:C.bg, color:C.text2, fontSize:14, fontWeight:700, cursor:"pointer" }}>← Back</button>
-                <button type="submit" disabled={loading} style={{ flex:1, padding:"13px", background: loading?C.text3:`linear-gradient(135deg,${C.indigo},${C.indigoDark})`, color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:800, cursor: loading?"not-allowed":"pointer", boxShadow: loading?"none":"0 6px 20px rgba(201,162,75,0.35)", transition:"all .15s" }}>
+                <button type="button" onClick={()=>{ setStep(0); setError(""); }} style={{ padding:"13px 20px", borderRadius:12, border:`1px solid ${C.border}`, background:C.bg, color:C.formText2, fontSize:14, fontWeight:700, cursor:"pointer" }}>← Back</button>
+                <button type="submit" disabled={loading} className={loading ? undefined : "btn-primary"} style={{ flex:1, padding:"14px", background: loading?C.text3:"linear-gradient(180deg, #7C3AED, #6D28D9)", color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:700, cursor: loading?"not-allowed":"pointer", boxShadow: loading?"none":"0 8px 20px -6px rgba(124,58,237,0.45)", transition:"all .15s" }}>
                   {loading ? <span>Sending code… <span style={{ display:"inline-block", animation:"spin 1s linear infinite" }}>⟳</span></span> : "Send Verification Code →"}
                 </button>
               </div>
@@ -448,8 +468,8 @@ export default function SignupPage() {
           {step===2 && (
             <div>
               {/* OTP input */}
-              <div style={{ marginBottom:20 }}>
-                <label style={{ fontSize:12.5, fontWeight:700, color:C.text, display:"block", marginBottom:10 }}>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:7 }}>
                   6-digit code <span style={{color:C.indigo}}>*</span>
                 </label>
                 <input
@@ -471,13 +491,14 @@ export default function SignupPage() {
                     setOtpError("");
                   }}
                   onKeyDown={e => { if (e.key === "Enter") verifyOtpAndComplete(); }}
+                  className="signup-input"
                   style={{
                     width:"100%", fontSize:38, fontWeight:800, letterSpacing:14,
                     textAlign:"center", padding:"18px 12px",
-                    border:`1.5px solid ${otpError ? C.red : otp.length===6 ? C.green : C.border}`,
-                    borderRadius:14, background:C.bg, color:C.text, outline:"none",
+                    border:`1px solid ${otpError ? C.red : otp.length===6 ? C.green : C.border}`,
+                    borderRadius:14, background:C.bg, color:C.formText, outline:"none",
                     fontFamily:"monospace", boxSizing:"border-box", caretColor:C.indigo,
-                    transition:"border-color .15s",
+                    transition:"border-color .15s, box-shadow .15s",
                     boxShadow: otp.length===6 ? `0 0 0 3px rgba(16,185,129,0.12)` : "none",
                   }}
                   placeholder="000000"
@@ -485,7 +506,7 @@ export default function SignupPage() {
               </div>
 
               {/* 10-minute hint */}
-              <div style={{ background:"rgba(201,162,75,0.08)", border:"1px solid rgba(201,162,75,0.25)", borderRadius:10, padding:"10px 14px", marginBottom:20, fontSize:12.5, color:"#C9A24B" }}>
+              <div style={{ background:"#F7F5FF", border:"1px solid #EDE9FF", borderRadius:11, padding:"14px 16px", marginBottom:16, fontSize:13, color:C.formText2 }}>
                 ⏱ This code is valid for 10 minutes. Check your spam folder if you don&apos;t see it.
               </div>
 
@@ -493,12 +514,13 @@ export default function SignupPage() {
               <button
                 onClick={verifyOtpAndComplete}
                 disabled={otp.length !== 6 || otpLoading}
+                className={otp.length === 6 && !otpLoading ? "btn-primary" : undefined}
                 style={{
-                  width:"100%", padding:"13px",
-                  background: otp.length!==6 || otpLoading ? C.text3 : `linear-gradient(135deg,${C.indigo},${C.indigoDark})`,
-                  color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:800,
+                  width:"100%", padding:"14px",
+                  background: otp.length!==6 || otpLoading ? C.text3 : "linear-gradient(180deg, #7C3AED, #6D28D9)",
+                  color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:700,
                   cursor: otp.length!==6 || otpLoading ? "not-allowed" : "pointer",
-                  boxShadow: otp.length!==6 || otpLoading ? "none" : "0 6px 20px rgba(201,162,75,0.35)",
+                  boxShadow: otp.length!==6 || otpLoading ? "none" : "0 8px 20px -6px rgba(124,58,237,0.45)",
                   transition:"all .15s", marginBottom:14,
                 }}
               >
@@ -538,8 +560,9 @@ export default function SignupPage() {
             </div>
           )}
 
+          </div>
           {/* Trust badges */}
-          <div style={{ display:"flex", justifyContent:"center", gap:20, marginTop:24, flexWrap:"wrap" }}>
+          <div style={{ display:"flex", justifyContent:"center", gap:20, marginTop:20, flexWrap:"wrap" }}>
             {[{icon:"🔒",text:"SSL Encrypted"},{icon:"🌍",text:"Global Servers"},{icon:"✓",text:"GDPR Compliant"}].map(b=>(
               <div key={b.text} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:C.text3 }}><span>{b.icon}</span>{b.text}</div>
             ))}
@@ -548,6 +571,9 @@ export default function SignupPage() {
       </div>
 
       <style>{`
+        .signup-input::placeholder{color:#A8A2B8;}
+        .btn-primary{transition:transform .15s, box-shadow .15s, background .15s;}
+        .btn-primary:hover{transform:translateY(-1px); box-shadow:0 10px 26px -6px rgba(124,58,237,0.5); background:linear-gradient(180deg, #6D28D9, #5B21B6);}
         @media(max-width:768px){.signup-left{display:none!important;}.salon-grid{grid-template-columns:1fr!important;}}
         @keyframes spin{to{transform:rotate(360deg);}}
       `}</style>
