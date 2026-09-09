@@ -670,7 +670,7 @@ export default function SettingsPage() {
           Automatically send WhatsApp &amp; email reminders to clients.
           All messages include a GDPR opt-out link. Timezone: <strong>Europe/London</strong> (GMT/BST auto).
         </p>
-        <div style={{ background: "#F8FAFF", border: "0.5px solid #E0E7FF", borderRadius: "10px", padding: "16px", marginBottom: "20px" }}>
+        <div style={{ background: "#FBFAFF", border: "0.5px solid #EDE9FE", borderRadius: "10px", padding: "16px", marginBottom: "20px" }}>
           <div style={{ fontSize: "12px", fontWeight: 700, color: "#7C3AED", letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: "12px" }}>
             Message Schedule
           </div>
@@ -778,7 +778,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Country support */}
-        <div style={{ background: "#F8FAFF", border: "0.5px solid #E0E7FF", borderRadius: 10, padding: "12px 14px", marginBottom: 18 }}>
+        <div style={{ background: "#FBFAFF", border: "0.5px solid #EDE9FE", borderRadius: 10, padding: "12px 14px", marginBottom: 18 }}>
           <div style={{ fontSize: "12px", fontWeight: 700, color: "#7C3AED", marginBottom: 6 }}>Supported Countries (Auto-detected)</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {[
@@ -824,7 +824,7 @@ export default function SettingsPage() {
         <div style={{ fontSize: "12.5px", color: "#524D60", marginBottom: "16px" }}>
           Connect your Stripe account to receive automatic payouts from bookings.
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "linear-gradient(135deg,#F0F4FF,#EEF2FF)", border: "1px solid #ECE9F1", borderRadius: 12, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "linear-gradient(135deg,#F5F3FF,#F5F3FF)", border: "1px solid #ECE9F1", borderRadius: 12, marginBottom: 16 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#1E1B4B" }}>Stripe Connect Express</div>
             <div style={{ fontSize: 11.5, color: "#7C3AED", marginTop: 2 }}>2% platform fee · automatic payouts · Stripe-powered</div>

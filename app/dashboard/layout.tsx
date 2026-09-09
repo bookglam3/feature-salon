@@ -40,22 +40,19 @@ function TrialBanner({ salon }: { salon: SalonSub }) {
   };
   return (
     <div style={{
-      background: urgent
-        ? "linear-gradient(90deg,rgba(127,29,29,0.95),rgba(185,28,28,0.95))"
-        : "linear-gradient(90deg,rgba(14,19,32,0.98),rgba(28,36,56,0.98))",
-      backdropFilter: "blur(8px)",
-      color:"#fff", padding:"10px 20px", fontSize:13, fontWeight:600,
+      background: urgent ? "#FEF2F2" : "#F5F3FF",
+      color:"#12101A", padding:"10px 20px", fontSize:13, fontWeight:600,
       display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap",
-      borderBottom: `1px solid ${urgent ? "rgba(239,68,68,0.3)" : "rgba(201,162,75,0.3)"}`,
+      borderBottom: `1px solid ${urgent ? "rgba(239,68,68,0.25)" : "#ECE9F1"}`,
     }}>
-      <span style={{ color: urgent ? "#FCA5A5" : "#C9A24B" }}>
+      <span style={{ color: urgent ? "#B91C1C" : "#5B21B6" }}>
         {urgent ? "⚠️" : "🎁"}{" "}
         {days === 0
           ? "Your free trial has ended — subscribe to keep access"
           : `Free trial: ${days} day${days === 1 ? "" : "s"} remaining`}
         {salon.subscription_plan && ` · ${salon.subscription_plan.charAt(0).toUpperCase() + salon.subscription_plan.slice(1)} plan`}
       </span>
-      <button onClick={openPortal} style={{ background: urgent ? "rgba(239,68,68,0.25)" : "rgba(201,162,75,0.25)", border: `1px solid ${urgent ? "rgba(239,68,68,0.4)" : "rgba(201,162,75,0.4)"}`, color:"#fff", borderRadius:99, padding:"5px 14px", fontSize:12, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>
+      <button onClick={openPortal} style={{ background: urgent ? "#B91C1C" : "#7C3AED", border: "none", color:"#fff", borderRadius:99, padding:"5px 14px", fontSize:12, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap" }}>
         {salon.stripe_customer_id ? "Manage Subscription →" : "Upgrade Now →"}
       </button>
     </div>
@@ -75,9 +72,9 @@ function PastDueBanner(_: { salon: SalonSub }) {
     }
   };
   return (
-    <div style={{ background:"linear-gradient(90deg,rgba(120,53,15,0.95),rgba(161,98,7,0.95))", backdropFilter:"blur(8px)", color:"#fff", padding:"10px 20px", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", borderBottom:"1px solid rgba(245,158,11,0.3)" }}>
-      <span style={{ color:"#FCD34D" }}>⚠️ Payment failed — please update your payment method to avoid losing access</span>
-      <button onClick={openPortal} style={{ background:"rgba(245,158,11,0.25)", border:"1px solid rgba(245,158,11,0.4)", color:"#fff", borderRadius:99, padding:"5px 14px", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+    <div style={{ background:"#FFFBEB", color:"#12101A", padding:"10px 20px", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", borderBottom:"1px solid rgba(245,158,11,0.25)" }}>
+      <span style={{ color:"#92400E" }}>⚠️ Payment failed — please update your payment method to avoid losing access</span>
+      <button onClick={openPortal} style={{ background:"#B45309", border:"none", color:"#fff", borderRadius:99, padding:"5px 14px", fontSize:12, fontWeight:700, cursor:"pointer" }}>
         Fix Payment →
       </button>
     </div>
@@ -125,13 +122,13 @@ function LockedOverlay({ salon }: { salon: SalonSub }) {
   };
 
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.92)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, backdropFilter:"blur(16px)" }}>
-      <div style={{ maxWidth:480, width:"100%", textAlign:"center", background:"rgba(20,18,42,0.95)", border:"1px solid rgba(201,162,75,0.2)", borderRadius:24, padding:"48px 36px", boxShadow:"0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,162,75,0.1)" }}>
+    <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(18,16,26,0.6)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, backdropFilter:"blur(16px)" }}>
+      <div style={{ maxWidth:480, width:"100%", textAlign:"center", background:"#FFFFFF", border:"1px solid #ECE9F1", borderRadius:24, padding:"48px 36px", boxShadow:"0 20px 60px -24px rgba(91,33,182,0.25)" }}>
         <div style={{ fontSize:56, marginBottom:20 }}>🔒</div>
-        <h1 style={{ fontSize:28, fontWeight:900, color:"#2a3350", letterSpacing:"-1px", marginBottom:12 }}>
+        <h1 style={{ fontSize:28, fontWeight:900, color:"#12101A", letterSpacing:"-1px", marginBottom:12 }}>
           Dashboard Locked
         </h1>
-        <p style={{ color:"rgba(255,255,255,0.5)", fontSize:15, lineHeight:1.7, marginBottom:32 }}>
+        <p style={{ color:"#524D60", fontSize:15, lineHeight:1.7, marginBottom:32 }}>
           {salon.subscription_status === "cancelled" || salon.subscription_status === "canceled"
             ? "Your subscription has been cancelled. Reactivate to access your dashboard."
             : "Your subscription has expired. Please renew to continue managing your salon."}
@@ -140,18 +137,18 @@ function LockedOverlay({ salon }: { salon: SalonSub }) {
           <button
             onClick={reactivate}
             disabled={reactivating}
-            style={{ background:"linear-gradient(135deg,#C9A24B 0%,#0E1320 100%)", color:"#fff", border:"none", borderRadius:12, padding:"16px 32px", fontSize:16, fontWeight:800, cursor: reactivating ? "default" : "pointer", boxShadow:"0 8px 32px rgba(201,162,75,0.5)", transition:"all 0.18s", opacity: reactivating ? 0.75 : 1 }}
-            onMouseEnter={e => { if (!reactivating) { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(201,162,75,0.65)"; } }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(201,162,75,0.5)"; }}
+            style={{ background:"linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%)", color:"#fff", border:"none", borderRadius:12, padding:"16px 32px", fontSize:16, fontWeight:800, cursor: reactivating ? "default" : "pointer", boxShadow:"0 8px 24px rgba(124,58,237,0.35)", transition:"all 0.18s", opacity: reactivating ? 0.75 : 1 }}
+            onMouseEnter={e => { if (!reactivating) { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(124,58,237,0.45)"; } }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(124,58,237,0.35)"; }}
           >
             {reactivating ? "Redirecting to checkout…" : knownPlan ? "Reactivate Subscription →" : "Choose a Plan →"}
           </button>
           {error && (
-            <div style={{ fontSize:12.5, color:"#FCA5A5", background:"rgba(239,68,68,0.12)", border:"1px solid rgba(239,68,68,0.3)", borderRadius:10, padding:"12px 14px", textAlign:"left", lineHeight:1.6 }}>
+            <div style={{ fontSize:12.5, color:"#B91C1C", background:"rgba(239,68,68,0.10)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:10, padding:"12px 14px", textAlign:"left", lineHeight:1.6 }}>
               ⚠️ {error}
             </div>
           )}
-          <div style={{ fontSize:13, color:"rgba(255,255,255,0.3)" }}>
+          <div style={{ fontSize:13, color:"#6B6577" }}>
             Plans from £29/month · Cancel anytime
           </div>
         </div>

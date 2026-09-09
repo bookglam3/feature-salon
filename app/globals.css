@@ -4,11 +4,11 @@
 
 :root {
   /* ── Brand ── */
-  --indigo: #6366F1;
-  --indigo-dark: #4338CA;
-  --indigo-mid: #4F46E5;
-  --indigo-light: #EEF2FF;
-  --indigo-pale: #E0E7FF;
+  --indigo: #7C3AED;
+  --indigo-dark: #5B21B6;
+  --indigo-mid: #6D28D9;
+  --indigo-light: #F5F3FF;
+  --indigo-pale: #EDE9FE;
   /* ── Success ── */
   --green: #10B981;
   --green-dark: #065F46;
@@ -25,25 +25,25 @@
   --red-light: #FEF2F2;
   --red-pale: #FECACA;
   /* ── Neutrals ── */
-  --slate-50: #F8FAFC;
-  --slate-100: #F1F5F9;
-  --slate-200: #E2E8F0;
-  --slate-300: #CBD5E1;
-  --slate-400: #64748B;
-  --slate-500: #64748B;
-  --slate-600: #475569;
-  --slate-700: #334155;
-  --slate-800: #1E293B;
-  --slate-900: #0F172A;
+  --slate-50: #FAFAFC;
+  --slate-100: #F5F3FF;
+  --slate-200: #ECE9F1;
+  --slate-300: #D6D1DE;
+  --slate-400: #6B6577;
+  --slate-500: #6B6577;
+  --slate-600: #524D60;
+  --slate-700: #3F3A4D;
+  --slate-800: #2A2536;
+  --slate-900: #12101A;
   /* ── Semantic (light) ── */
-  --bg: #F8F9FC;
+  --bg: #FFFFFF;
   --surface: #FFFFFF;
-  --surface-2: #F8FAFC;
-  --border: #E2E8F0;
-  --border-2: #CBD5E1;
-  --text-1: #0F172A;
-  --text-2: #475569;
-  --text-3: #64748B;
+  --surface-2: #F5F3FF;
+  --border: #ECE9F1;
+  --border-2: #D6D1DE;
+  --text-1: #12101A;
+  --text-2: #524D60;
+  --text-3: #6B6577;
   /* ── Radius ── */
   --r-xs: 4px;
   --r-sm: 8px;
@@ -52,24 +52,24 @@
   --r-xl: 24px;
   --r-full: 9999px;
   /* ── Shadows ── */
-  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
-  --shadow-sm: 0 1px 4px rgba(15,23,42,0.06), 0 2px 8px rgba(15,23,42,0.04);
-  --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 6px rgba(15,23,42,0.05);
-  --shadow-lg: 0 8px 24px rgba(15,23,42,0.10), 0 4px 12px rgba(15,23,42,0.06);
-  --shadow-indigo: 0 4px 14px rgba(99,102,241,0.25);
+  --shadow-xs: 0 1px 2px rgba(18,16,26,0.04);
+  --shadow-sm: 0 1px 4px rgba(18,16,26,0.06), 0 2px 8px rgba(18,16,26,0.04);
+  --shadow-md: 0 4px 12px rgba(18,16,26,0.08), 0 2px 6px rgba(18,16,26,0.05);
+  --shadow-lg: 0 8px 24px rgba(18,16,26,0.10), 0 4px 12px rgba(18,16,26,0.06);
+  --shadow-indigo: 0 4px 14px rgba(124,58,237,0.25);
   --shadow-green: 0 4px 14px rgba(16,185,129,0.20);
   /* ── Font ── */
-  --font: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
   /* ── Sidebar ── */
   --sidebar-w: 256px;
   /* ── Transitions ── */
   --ease: cubic-bezier(0.4,0,0.2,1);
   /* ── Glass ── */
   --glass: rgba(255,255,255,0.8);
-  --glass-border: rgba(226,232,240,0.6);
+  --glass-border: rgba(236,233,241,0.6);
   /* ── Gradients ── */
-  --gradient-brand: linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#4338CA 100%);
-  --gradient-surface: linear-gradient(135deg,#F8FAFF 0%,#F0F4FF 100%);
+  --gradient-brand: linear-gradient(135deg,#7C3AED 0%,#8B5CF6 50%,#5B21B6 100%);
+  --gradient-surface: linear-gradient(135deg,#FBFAFF 0%,#F5F3FF 100%);
 
   /* ── Landing preview (new design) — purple brand tokens ── */
   --lp-purple: #7C3AED;

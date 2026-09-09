@@ -28,10 +28,10 @@ type StaffItem = { id: string; name: string };
 const TIME_SLOTS = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"];
 
 const PLAN_FEATURES: Record<string, { color: string; bg: string; border: string; badge: string; features: string[]; limit: string }> = {
-  Starter: { color: "#aab1c4", bg: "#1C2438", border: "#2a3350", badge: "STARTER", features: ["Up to 50 bookings/mo", "1 staff member", "Basic analytics", "Email notifications", "Public booking page"], limit: "50 bookings/month" },
-  Professional: { color: "#C9A24B", bg: "rgba(201,162,75,0.10)", border: "rgba(201,162,75,0.25)", badge: "PROFESSIONAL", features: ["Unlimited bookings", "Up to 5 staff", "Advanced analytics", "SMS + Email", "Custom offers", "Priority support"], limit: "Unlimited bookings" },
-  Growth: { color: "#10B981", bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.25)", badge: "GROWTH", features: ["Unlimited bookings", "Up to 15 staff", "Revenue reports", "SMS + Email + WhatsApp", "Staff performance", "API access"], limit: "Unlimited bookings" },
-  Enterprise: { color: "#F59E0B", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)", badge: "ENTERPRISE", features: ["Unlimited everything", "Unlimited staff", "White-label option", "Dedicated support", "Custom integrations", "SLA 99.9%"], limit: "Unlimited everything" },
+  Starter: { color: "#6B6577", bg: "#F5F3FF", border: "#ECE9F1", badge: "STARTER", features: ["Up to 50 bookings/mo", "1 staff member", "Basic analytics", "Email notifications", "Public booking page"], limit: "50 bookings/month" },
+  Professional: { color: "#6D28D9", bg: "rgba(124,58,237,0.10)", border: "rgba(124,58,237,0.25)", badge: "PROFESSIONAL", features: ["Unlimited bookings", "Up to 5 staff", "Advanced analytics", "SMS + Email", "Custom offers", "Priority support"], limit: "Unlimited bookings" },
+  Growth: { color: "#047857", bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.25)", badge: "GROWTH", features: ["Unlimited bookings", "Up to 15 staff", "Revenue reports", "SMS + Email + WhatsApp", "Staff performance", "API access"], limit: "Unlimited bookings" },
+  Enterprise: { color: "#B45309", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)", badge: "ENTERPRISE", features: ["Unlimited everything", "Unlimited staff", "White-label option", "Dedicated support", "Custom integrations", "SLA 99.9%"], limit: "Unlimited everything" },
 };
 
 
@@ -360,7 +360,7 @@ export default function DashboardPage() {
 
   /* ── Loading ── */
   if (loading) return (
-    <DashboardShell salonName="" topbar={<header style={{ background: "#1C2438", borderBottom: "1px solid #2a3350", height: 58, display: "flex", alignItems: "center", padding: "0 20px", gap: 14 }}><div style={{ width: 36, height: 12, borderRadius: 6 }} className="skeleton" /><div style={{ width: 140, height: 12, borderRadius: 6 }} className="skeleton" /></header>}>
+    <DashboardShell salonName="" topbar={<header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", height: 58, display: "flex", alignItems: "center", padding: "0 20px", gap: 14 }}><div style={{ width: 36, height: 12, borderRadius: 6 }} className="skeleton" /><div style={{ width: 140, height: 12, borderRadius: 6 }} className="skeleton" /></header>}>
       <SkeletonDashboard />
     </DashboardShell>
   );
@@ -568,13 +568,13 @@ export default function DashboardPage() {
           </ModalActions>
         }
       >
-        <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#A78BFA", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
         </div>
         <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} /></FormGroup>
         <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
         <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
-        <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ margin: "16px 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#A78BFA", letterSpacing: "0.8px", textTransform: "uppercase" }}>Appointment Details</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

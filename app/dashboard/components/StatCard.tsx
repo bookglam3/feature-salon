@@ -35,8 +35,8 @@ const colorMap = {
   },
   slate: {
     accent: "#524D60", light: "#F5F3FF", text: "#524D60",
-    grad: "linear-gradient(135deg,#64748B,#64748B)",
-    glow: "rgba(100,116,139,0.15)", bar: "#64748B",
+    grad: "linear-gradient(135deg,#6B6577,#6B6577)",
+    glow: "rgba(107,101,119,0.15)", bar: "#6B6577",
   },
 };
 

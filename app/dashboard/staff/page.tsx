@@ -282,7 +282,7 @@ export default function StaffPage() {
         {/* Tabs */}
         <div style={{ display: "flex", gap: 2, background: "var(--slate-100)", padding: 3, borderRadius: 8, marginBottom: 20 }}>
           {(["info","services","hours"] as const).map(tab => (
-            <button key={tab} type="button" onClick={() => setFormTab(tab)} style={{ flex: 1, padding: "6px 12px", fontSize: 12.5, borderRadius: 6, border: "none", background: formTab === tab ? "#fff" : "transparent", color: formTab === tab ? "#0F172A" : "var(--text-3)", fontWeight: formTab === tab ? 600 : 400, cursor: "pointer", boxShadow: formTab === tab ? "var(--shadow-xs)" : "none", transition: "all 0.12s", fontFamily: "var(--font)", textTransform: "capitalize" }}>
+            <button key={tab} type="button" onClick={() => setFormTab(tab)} style={{ flex: 1, padding: "6px 12px", fontSize: 12.5, borderRadius: 6, border: "none", background: formTab === tab ? "#fff" : "transparent", color: formTab === tab ? "var(--text-1)" : "var(--text-3)", fontWeight: formTab === tab ? 600 : 400, cursor: "pointer", boxShadow: formTab === tab ? "var(--shadow-xs)" : "none", transition: "all 0.12s", fontFamily: "var(--font)", textTransform: "capitalize" }}>
               {tab}
             </button>
           ))}
@@ -305,7 +305,7 @@ export default function StaffPage() {
                 <label style={{ position: "relative", width: 32, height: 17, cursor: "pointer" }}>
                   <input type="checkbox" checked={formData.active} onChange={e => setFormData({ ...formData, active: e.target.checked })} style={{ opacity: 0, width: 0, height: 0 }} />
                   <span style={{ position: "absolute", inset: 0, background: formData.active ? "var(--green)" : "var(--slate-300)", borderRadius: 99, transition: "background 0.18s" }}>
-                    <span style={{ position: "absolute", width: 11, height: 11, left: formData.active ? 18 : 3, top: 3, background: "#1C2438", borderRadius: "50%", transition: "left 0.18s" }} />
+                    <span style={{ position: "absolute", width: 11, height: 11, left: formData.active ? 18 : 3, top: 3, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s" }} />
                   </span>
                 </label>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)" }}>Active — accepting bookings</span>
@@ -322,7 +322,7 @@ export default function StaffPage() {
               ) : salonServices.map(svc => {
                   const sel = formData.services.includes(svc.name);
                   return (
-                    <button key={svc.id} type="button" onClick={() => toggleService(svc.name)} style={{ padding: "7px 14px", fontSize: 13, borderRadius: 99, border: `1px solid ${sel ? "var(--indigo)" : "var(--border)"}`, background: sel ? "var(--indigo-light)" : "#1C2438", color: sel ? "var(--indigo)" : "var(--text-2)", cursor: "pointer", fontWeight: sel ? 600 : 400, transition: "all 0.12s", fontFamily: "var(--font)" }}>
+                    <button key={svc.id} type="button" onClick={() => toggleService(svc.name)} style={{ padding: "7px 14px", fontSize: 13, borderRadius: 99, border: `1px solid ${sel ? "var(--indigo)" : "var(--border)"}`, background: sel ? "var(--indigo-light)" : "var(--surface)", color: sel ? "var(--indigo)" : "var(--text-2)", cursor: "pointer", fontWeight: sel ? 600 : 400, transition: "all 0.12s", fontFamily: "var(--font)" }}>
                       {svc.name}
                     </button>
                   );
@@ -341,7 +341,7 @@ export default function StaffPage() {
                     <label style={{ position: "relative", width: 28, height: 15, cursor: "pointer", flexShrink: 0 }}>
                       <input type="checkbox" checked={h.enabled} onChange={e => updateHour(day, "enabled", e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
                       <span style={{ position: "absolute", inset: 0, background: h.enabled ? "var(--indigo)" : "var(--slate-300)", borderRadius: 99, transition: "background 0.18s" }}>
-                        <span style={{ position: "absolute", width: 9, height: 9, left: h.enabled ? 16 : 3, top: 3, background: "#1C2438", borderRadius: "50%", transition: "left 0.18s" }} />
+                        <span style={{ position: "absolute", width: 9, height: 9, left: h.enabled ? 16 : 3, top: 3, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s" }} />
                       </span>
                     </label>
                     {h.enabled ? (

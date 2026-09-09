@@ -34,7 +34,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   const colors = {
     success: { bg: "rgba(16,185,129,0.10)", border: "#6EE7B7", text: "#065F46", icon: "✓" },
     error:   { bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.25)", text: "#991B1B", icon: "✕" },
-    info:    { bg: "rgba(201,162,75,0.10)", border: "rgba(201,162,75,0.25)", text: "#3730A3", icon: "i" },
+    info:    { bg: "rgba(124,58,237,0.10)", border: "rgba(124,58,237,0.25)", text: "#5B21B6", icon: "i" },
   };
   const c = colors[toast.type];
 

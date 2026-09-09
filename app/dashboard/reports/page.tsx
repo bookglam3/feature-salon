@@ -190,7 +190,7 @@ function ReportsContent() {
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a"); a.href = url; a.download = "revenue-report.csv"; a.click();
         }}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(201,162,75,0.3)" }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.30)" }}>
         📥 Export CSV
       </button>
     </header>

@@ -196,7 +196,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
         .ds-notif-dot {
           position: absolute; top: 7px; right: 7px;
           width: 6px; height: 6px; border-radius: 50%;
-          background: #EF4444; border: 1.5px solid #141A2E;
+          background: #EF4444; border: 1.5px solid #FFFFFF;
           box-shadow: 0 0 6px rgba(239,68,68,0.7);
           animation: notifPulse 2s ease-in-out infinite;
         }
@@ -459,7 +459,7 @@ export function HamburgerBtn({ onClick }: { onClick?: () => void }) {
         display: "flex", flexDirection: "column", gap: 4,
         transition: "all 0.18s", alignItems: "center",
       }}
-      onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,162,75,0.12)"; e.currentTarget.style.borderColor = "rgba(201,162,75,0.25)"; }}
+      onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.10)"; e.currentTarget.style.borderColor = "rgba(124,58,237,0.25)"; }}
       onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
     >
       <span style={{ display: "block", width: 16, height: 1.5, background: "rgba(255,255,255,0.55)", borderRadius: 2 }} />

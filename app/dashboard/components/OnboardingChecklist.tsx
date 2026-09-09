@@ -27,10 +27,10 @@ function getOnboardingTerms(bt?: string) {
 }
 
 const C = {
-  indigo: "#C9A24B", indigoDark: "#0E1320", indigoSoft: "rgba(201,162,75,0.10)",
-  green: "#10B981", greenSoft: "rgba(16,185,129,0.10)", greenBorder: "rgba(16,185,129,0.25)",
-  text: "#F7F5EF", text2: "#aab1c4", text3: "#64748B",
-  border: "#2a3350", surface: "#FFFFFF",
+  indigo: "#7C3AED", indigoDark: "#6D28D9", indigoSoft: "rgba(124,58,237,0.10)",
+  green: "#047857", greenSoft: "rgba(16,185,129,0.10)", greenBorder: "rgba(16,185,129,0.25)",
+  text: "#12101A", text2: "#524D60", text3: "#6B6577",
+  border: "#ECE9F1", surface: "#FFFFFF",
 };
 
 export default function OnboardingChecklist({ services, staff, bookingLink, salonSlug, businessType }: ChecklistProps) {
@@ -114,7 +114,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
           display: "flex", alignItems: "center", gap: 10,
           background: `linear-gradient(135deg,${C.indigo},${C.indigoDark})`,
           color: "#fff", border: "none", borderRadius: 14, padding: "12px 18px",
-          cursor: "pointer", boxShadow: "0 8px 24px rgba(201,162,75,0.4)",
+          cursor: "pointer", boxShadow: "0 8px 24px rgba(124,58,237,0.30)",
           fontSize: 13.5, fontWeight: 700, fontFamily: "inherit",
         }}>
           <span style={{ fontSize: 18 }}>🚀</span>
@@ -122,7 +122,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
           <div style={{
             width: 32, height: 6, borderRadius: 99, background: "rgba(255,255,255,0.2)", overflow: "hidden",
           }}>
-            <div style={{ width: `${pct}%`, height: "100%", background: "#1C2438", borderRadius: 99, transition: "width 0.4s" }} />
+            <div style={{ width: `${pct}%`, height: "100%", background: "#7C3AED", borderRadius: 99, transition: "width 0.4s" }} />
           </div>
         </button>
       )}
@@ -132,7 +132,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
         <div style={{
           background: C.surface, borderRadius: 20, overflow: "hidden",
           boxShadow: "0 16px 48px rgba(15,23,42,0.16), 0 4px 16px rgba(15,23,42,0.08)",
-          border: "1px solid #E0E7FF",
+          border: "1px solid #EDE9FE",
           animation: "slideUp 0.25s ease",
         }}>
           {/* Header */}
@@ -164,7 +164,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
           </div>
 
           {/* Progress bar */}
-          <div style={{ height: 4, background: "#E0E7FF" }}>
+          <div style={{ height: 4, background: "#EDE9FE" }}>
             <div style={{ width: `${pct}%`, height: "100%", background: C.green, transition: "width 0.5s ease" }} />
           </div>
 
@@ -175,7 +175,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
                 display: "flex", alignItems: "center", gap: 12,
                 padding: "10px 12px", borderRadius: 12,
                 border: `1.5px solid ${s.done ? C.greenBorder : C.border}`,
-                background: s.done ? C.greenSoft : "#F8FAFF",
+                background: s.done ? C.greenSoft : "#FBFAFF",
                 transition: "all 0.2s",
               }}>
                 {/* Step icon / check */}
@@ -194,7 +194,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
                     fontSize: 12.5, fontWeight: 700,
-                    color: s.done ? "#10B981" : C.text,
+                    color: s.done ? C.green : C.text,
                     textDecoration: s.done ? "line-through" : "none",
                     textDecorationColor: "rgba(16,185,129,0.25)",
                   }}>

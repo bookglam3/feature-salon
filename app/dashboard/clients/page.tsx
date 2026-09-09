@@ -207,7 +207,7 @@ export default function ClientsPage() {
                 onFocusCapture={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#FFFFFF"; }}
                 onBlurCapture={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.background = "#F5F3FF"; }}
               >
-                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#64748B" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#64748B" strokeWidth="1.75" strokeLinecap="round"/></svg>
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#6B6577" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#6B6577" strokeWidth="1.75" strokeLinecap="round"/></svg>
                 <input type="text" placeholder={`Search ${vc.clientPlural.toLowerCase()}…`} value={search} onChange={e => setSearch(e.target.value)}
                   style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#12101A", fontFamily: "var(--font)", width: "100%" }} />
               </div>

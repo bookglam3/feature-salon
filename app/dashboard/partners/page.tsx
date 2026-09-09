@@ -547,7 +547,7 @@ function PartnersPageInner() {
 
                   {/* Referral code (approved only) */}
                   {agent.referral_code && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#F0F4FF", borderRadius: "var(--r-sm)", marginBottom: 12, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#F5F3FF", borderRadius: "var(--r-sm)", marginBottom: 12, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 11.5, fontWeight: 700, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.5px" }}>Referral Code:</span>
                       <code style={{ fontSize: 13, fontWeight: 800, color: "#7C3AED", background: "#EDE9FF", padding: "2px 10px", borderRadius: 6 }}>
                         {agent.referral_code}
