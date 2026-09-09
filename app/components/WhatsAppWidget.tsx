@@ -100,7 +100,7 @@ export default function WhatsAppWidget() {
               Start WhatsApp Chat →
             </a>
             <div style={{ textAlign: "center", marginTop: 10 }}>
-              <Link href="/signup" style={{ fontSize: 12.5, color: "#6366F1", fontWeight: 600, textDecoration: "none" }}>
+              <Link href="/signup" style={{ fontSize: 12.5, color: "#4F46E5", fontWeight: 600, textDecoration: "none" }}>
                 Or start free trial instead →
               </Link>
             </div>

@@ -64,7 +64,7 @@ export default function EmptyState({ icon, lucideIcon, title, description, actio
       }}>{title}</div>
 
       <div style={{
-        fontSize: 13, color: "#9A94A8",
+        fontSize: 13, color: "#6B6577",
         maxWidth: 260, lineHeight: 1.65, fontWeight: 400,
       }}>{description}</div>
 

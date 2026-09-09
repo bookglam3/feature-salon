@@ -198,7 +198,7 @@ function CheckoutForm({ amount, chargeAmount, methodLabel, bookingId, reviewToke
       <button type="submit" disabled={!stripe || processing} className="btn" style={{ marginTop: 24 }}>
         {processing ? "Processing..." : `Pay £${chargeAmount.toFixed(2)} — ${methodLabel}`}
       </button>
-      <p style={{ textAlign:"center",fontSize:12,color:"#94A3B8",marginTop:12,display:"flex",alignItems:"center",justifyContent:"center",gap:4 }}>
+      <p style={{ textAlign:"center",fontSize:12,color:"#64748B",marginTop:12,display:"flex",alignItems:"center",justifyContent:"center",gap:4 }}>
         <span>🔒</span> Secured by Stripe · SSL Encrypted
       </p>
     </form>
@@ -386,14 +386,14 @@ export default function BookingPage() {
     (salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
     salonPm.deposit_online && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#10B981" },
     salonPm.custom_deposit && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
-    salonPm.pay_at_salon   && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#94A3B8" },
+    salonPm.pay_at_salon   && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#64748B" },
   ].filter(Boolean) as { id: string; label: string; sub: string; pct: number; color: string }[];
 
   // Fallback: if the salon's only enabled method was full online payment, hiding
   // it for a "from" service would leave zero bookable options. Force Pay at
   // Salon on instead of silently falling through to a broken $0/pending booking.
   const paymentOptions = (anyFromService && paymentOptionsRaw.length === 0)
-    ? [{ id: "pay_at_salon", label: "Pay at Salon", sub: "No payment required now", pct: 0, color: "#94A3B8" }]
+    ? [{ id: "pay_at_salon", label: "Pay at Salon", sub: "No payment required now", pct: 0, color: "#64748B" }]
     : paymentOptionsRaw;
 
   // Auto-select first available option
@@ -645,7 +645,7 @@ export default function BookingPage() {
         .progress-step{flex:1;height:4px;background:#E2E8F0;border-radius:2px;transition:all 0.3s;}
         .progress-step.active{background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);box-shadow:0 2px 8px rgba(102,126,234,0.4);}
         .progress-labels{display:flex;justify-content:space-between;margin-bottom:24px;}
-        .progress-label{font-size:12px;font-weight:600;color:#94A3B8;transition:color 0.3s;}
+        .progress-label{font-size:12px;font-weight:600;color:#64748B;transition:color 0.3s;}
         .progress-label.active{color:#667eea;}
         h2{font-size:24px;font-weight:800;letter-spacing:-0.6px;margin-bottom:20px;color:#0F172A;}
         .item-card{border:2px solid #E2E8F0;border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;background:white;transition:all 0.2s;display:flex;align-items:center;gap:16px;}
@@ -749,7 +749,7 @@ export default function BookingPage() {
                         <h3>{s.name}</h3>
                         <p>{s.price_is_from ? "from " : ""}£{s.price}</p>
                         {metaParts.length > 0 && <span className="item-meta">{metaParts.join(" · ")}</span>}
-                        {s.description && <span style={{display:"block",fontSize:12,color:"#94A3B8",fontStyle:"italic",marginTop:2}}>{s.description}</span>}
+                        {s.description && <span style={{display:"block",fontSize:12,color:"#64748B",fontStyle:"italic",marginTop:2}}>{s.description}</span>}
                       </div>
                     </div>
                     );
@@ -899,7 +899,7 @@ export default function BookingPage() {
                       >
                         <span style={{ fontSize: 20, lineHeight: 1 }}>{getCountryByCode(countryCode).flag}</span>
                         <span>{getCountryByCode(countryCode).dial}</span>
-                        <span style={{ fontSize: 10, color: "#94A3B8" }}>▼</span>
+                        <span style={{ fontSize: 10, color: "#64748B" }}>▼</span>
                       </button>
                       {/* Number input */}
                       <input
@@ -934,7 +934,7 @@ export default function BookingPage() {
                           >
                             <span style={{ fontSize: 20 }}>{c.flag}</span>
                             <span style={{ flex: 1 }}>{c.name}</span>
-                            <span style={{ color: "#94A3B8", fontWeight: 600 }}>{c.dial}</span>
+                            <span style={{ color: "#64748B", fontWeight: 600 }}>{c.dial}</span>
                           </button>
                         ))}
                       </div>
@@ -942,7 +942,7 @@ export default function BookingPage() {
                   </div>
                   {errors.phone
                     ? <span className="error-text">{errors.phone}</span>
-                    : <span style={{ fontSize: 12, color: "#94A3B8", marginTop: 5, display: "block" }}>{getCountryByCode(countryCode).hint} · Auto-detected from your location</span>
+                    : <span style={{ fontSize: 12, color: "#64748B", marginTop: 5, display: "block" }}>{getCountryByCode(countryCode).hint} · Auto-detected from your location</span>
                   }
                 </div>
 
@@ -962,8 +962,8 @@ export default function BookingPage() {
                             </div>
                             <div style={{textAlign:"right",flexShrink:0}}>
                               <div style={{fontSize:18,fontWeight:800,color:opt.color}}>{anyFromService ? "from " : ""}£{amt.toFixed(2)}</div>
-                              {opt.pct < 100 && opt.pct > 0 && <div style={{fontSize:11,color:"#94A3B8"}}>today</div>}
-                              {opt.pct === 0 && <div style={{fontSize:11,color:"#94A3B8"}}>at salon</div>}
+                              {opt.pct < 100 && opt.pct > 0 && <div style={{fontSize:11,color:"#64748B"}}>today</div>}
+                              {opt.pct === 0 && <div style={{fontSize:11,color:"#64748B"}}>at salon</div>}
                             </div>
                           </div>
                         </div>
@@ -1025,7 +1025,7 @@ export default function BookingPage() {
                       type="button"
                       onClick={handleSendOtp}
                       disabled={otpLoading}
-                      style={{ background: "none", border: "none", color: "#94A3B8", fontWeight: 600, cursor: "pointer", fontSize: 13, marginTop: 4, display: "block", width: "100%" }}
+                      style={{ background: "none", border: "none", color: "#64748B", fontWeight: 600, cursor: "pointer", fontSize: 13, marginTop: 4, display: "block", width: "100%" }}
                     >
                       Resend Code
                     </button>
@@ -1105,7 +1105,7 @@ export default function BookingPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid #E2E8F0" }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg,#667eea,#764ba2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>✂️</div>
                       <div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Service</div>
+                        <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Service</div>
                         <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{confirmedBooking.service}</div>
                       </div>
                     </div>
@@ -1113,7 +1113,7 @@ export default function BookingPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid #E2E8F0" }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg,#667eea,#764ba2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📅</div>
                       <div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Date</div>
+                        <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Date</div>
                         <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{confirmedBooking.date}</div>
                       </div>
                     </div>
@@ -1121,7 +1121,7 @@ export default function BookingPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid #E2E8F0" }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg,#667eea,#764ba2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🕐</div>
                       <div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Time</div>
+                        <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Time</div>
                         <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{confirmedBooking.time}</div>
                       </div>
                     </div>
@@ -1129,10 +1129,10 @@ export default function BookingPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0" }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg,#10B981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>💳</div>
                       <div>
-                        <div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Payment</div>
+                        <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Payment</div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
                           {confirmedBooking.paymentStatus === "free" ? (
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#6366F1", background: "rgba(99,102,241,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(99,102,241,0.2)" }}>Free Service — No Payment</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "#4F46E5", background: "rgba(99,102,241,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(99,102,241,0.2)" }}>Free Service — No Payment</span>
                           ) : (
                             <span style={{ fontSize: 13, fontWeight: 700, color: "#10B981", background: "rgba(16,185,129,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(16,185,129,0.2)" }}>Pay at Salon — {confirmedBooking.servicePriceIsFrom ? "from " : ""}£{confirmedBooking.servicePrice.toFixed(2)} due at salon</span>
                           )}
@@ -1143,7 +1143,7 @@ export default function BookingPage() {
                 </div>
 
                 {/* Confirmation note */}
-                <p style={{ fontSize: 13, color: "#94A3B8", fontWeight: 500, lineHeight: 1.6 }}>A confirmation has been sent to your email and phone. Please arrive a few minutes early.</p>
+                <p style={{ fontSize: 13, color: "#64748B", fontWeight: 500, lineHeight: 1.6 }}>A confirmation has been sent to your email and phone. Please arrive a few minutes early.</p>
 
                 {/* Action buttons */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
@@ -1190,7 +1190,7 @@ export default function BookingPage() {
                   {salonReviews.length > 0 && (
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: 30, fontWeight: 900, color: "#F59E0B", letterSpacing: "-1px", lineHeight: 1 }}>{avg.toFixed(1)}</div>
-                      <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>out of 5</div>
+                      <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>out of 5</div>
                     </div>
                   )}
                 </div>
@@ -1199,7 +1199,7 @@ export default function BookingPage() {
                   <div style={{ padding: "36px 24px", textAlign: "center" }}>
                     <div style={{ fontSize: 32, marginBottom: 8 }}>⭐</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>No reviews yet</div>
-                    <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 4 }}>Be the first to leave a review after your visit</div>
+                    <div style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>Be the first to leave a review after your visit</div>
                   </div>
                 ) : (
                   <div>
@@ -1208,7 +1208,7 @@ export default function BookingPage() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
                           <div>
                             <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{reviewerDisplayName(r.client_name)}</div>
-                            <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>
+                            <div style={{ fontSize: 11, color: "#64748B", marginTop: 1 }}>
                               {new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                             </div>
                           </div>

@@ -176,7 +176,7 @@ export default function ClientsPage() {
         <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>{vc.clientPlural}</div>
-          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{clients.length} {vc.clientPlural.toLowerCase()} in CRM</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{clients.length} {vc.clientPlural.toLowerCase()} in CRM</div>
         </div>
       </div>
       <button onClick={() => router.push("/dashboard/clients/import")}
@@ -207,7 +207,7 @@ export default function ClientsPage() {
                 onFocusCapture={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#FFFFFF"; }}
                 onBlurCapture={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.background = "#F5F3FF"; }}
               >
-                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#94A3B8" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round"/></svg>
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="#64748B" strokeWidth="1.75"/><path d="M13 13L17 17" stroke="#64748B" strokeWidth="1.75" strokeLinecap="round"/></svg>
                 <input type="text" placeholder={`Search ${vc.clientPlural.toLowerCase()}…`} value={search} onChange={e => setSearch(e.target.value)}
                   style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#12101A", fontFamily: "var(--font)", width: "100%" }} />
               </div>
@@ -218,14 +218,14 @@ export default function ClientsPage() {
                 <option value="bookings">Most Bookings</option>
                 <option value="name">Name A–Z</option>
               </select>
-              <span style={{ fontSize: 12, color: "#9A94A8", whiteSpace: "nowrap", fontWeight: 600 }}>{filtered.length} {vc.clientPlural.toLowerCase()}</span>
+              <span style={{ fontSize: 12, color: "#6B6577", whiteSpace: "nowrap", fontWeight: 600 }}>{filtered.length} {vc.clientPlural.toLowerCase()}</span>
             </div>
 
             {filtered.length === 0 ? (
               <div style={{ padding: "56px 24px", textAlign: "center" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>👤</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", marginBottom: 6 }}>{search ? `No ${vc.clientPlural.toLowerCase()} found` : `No ${vc.clientPlural.toLowerCase()} yet`}</div>
-                <div style={{ fontSize: 13, color: "#9A94A8" }}>{vc.clientPlural} appear here after their first booking</div>
+                <div style={{ fontSize: 13, color: "#6B6577" }}>{vc.clientPlural} appear here after their first booking</div>
               </div>
             ) : (
               <div style={{ overflowX: "auto" }}>
@@ -233,7 +233,7 @@ export default function ClientsPage() {
                   <thead>
                     <tr style={{ background: "#F5F3FF" }}>
                       {[vc.clientSingular,"Contact","Bookings","Spent","Last Visit",""].map(h => (
-                        <th key={h} style={{ fontSize: 10.5, color: "#9A94A8", textAlign: "left", padding: "11px 16px", fontWeight: 800, borderBottom: "1.5px solid #ECE9F1", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
+                        <th key={h} style={{ fontSize: 10.5, color: "#6B6577", textAlign: "left", padding: "11px 16px", fontWeight: 800, borderBottom: "1.5px solid #ECE9F1", letterSpacing: "0.7px", textTransform: "uppercase" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -252,20 +252,20 @@ export default function ClientsPage() {
                               <Avatar name={c.name} size={34} />
                               <div>
                                 <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{c.name}</div>
-                                {favService(c) && <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 1 }}>⭐ {favService(c)}</div>}
+                                {favService(c) && <div style={{ fontSize: 10.5, color: "#6B6577", marginTop: 1 }}>⭐ {favService(c)}</div>}
                               </div>
                             </div>
                           </td>
                           <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
-                            <div style={{ fontSize: 12.5, color: "#6B6577" }}>{c.email || "—"}</div>
-                            <div style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 1 }}>{c.phone || "—"}</div>
+                            <div style={{ fontSize: 12.5, color: "#524D60" }}>{c.email || "—"}</div>
+                            <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>{c.phone || "—"}</div>
                           </td>
                           <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
                             <span style={{ background: "rgba(124,58,237,0.10)", color: "#7C3AED", fontSize: 12, padding: "3px 10px", borderRadius: 99, fontWeight: 800, border: "1px solid rgba(124,58,237,0.25)" }}>{c.bookings}</span>
                           </td>
                           <td style={{ padding: "13px 16px", fontSize: 13.5, fontWeight: 800, color: "#12101A", borderBottom: "1px solid #ECE9F1" }}>£{c.spent.toFixed(0)}</td>
                           <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
-                            <div style={{ fontSize: 12.5, color: "#6B6577" }}>{new Date(c.lastVisit).toLocaleDateString("en-GB")}</div>
+                            <div style={{ fontSize: 12.5, color: "#524D60" }}>{new Date(c.lastVisit).toLocaleDateString("en-GB")}</div>
                             <div style={{ fontSize: 10.5, color: ds > 60 ? "var(--red)" : ds > 30 ? "var(--amber)" : "var(--green)", marginTop: 1, fontWeight: 700 }}>
                               {ds === 0 ? "Today" : `${ds}d ago`}
                             </div>
@@ -291,11 +291,11 @@ export default function ClientsPage() {
                   <Avatar name={selected.name} size={44} />
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.3px" }}>{selected.name}</div>
-                    <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 2 }}>{selected.email}</div>
+                    <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>{selected.email}</div>
                   </div>
                 </div>
                 <button onClick={() => setSelected(null)}
-                  style={{ background: "#F5F3FF", border: "none", cursor: "pointer", width: 30, height: 30, borderRadius: "50%", fontSize: 14, color: "#6B6577", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.12s" }}
+                  style={{ background: "#F5F3FF", border: "none", cursor: "pointer", width: 30, height: 30, borderRadius: "50%", fontSize: 14, color: "#524D60", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.12s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "#ECE9F1"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; }}
                 >✕</button>
@@ -317,7 +317,7 @@ export default function ClientsPage() {
                 )}
                 {salon?.slug && (
                   <a href={`/book/${salon.slug}`} target="_blank" rel="noopener"
-                    style={{ flex: 1, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
+                    style={{ flex: 1, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
                     📅 Book Again
                   </a>
                 )}
@@ -332,14 +332,14 @@ export default function ClientsPage() {
                 ].map(s => (
                   <div key={s.label} style={{ background: "#F5F3FF", padding: "13px 14px", textAlign: "center" }}>
                     <div style={{ fontSize: 17, fontWeight: 900, color: "#12101A", letterSpacing: "-0.5px" }}>{s.value}</div>
-                    <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 2, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{s.label}</div>
+                    <div style={{ fontSize: 10.5, color: "#6B6577", marginTop: 2, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
               {/* Notes */}
               <div style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1", flexShrink: 0 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", marginBottom: 8, letterSpacing: "1px", textTransform: "uppercase" }}>Notes</div>
+                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#6B6577", marginBottom: 8, letterSpacing: "1px", textTransform: "uppercase" }}>Notes</div>
                 <textarea value={note} onChange={e => setNote(e.target.value)} rows={2}
                   placeholder="Add notes about this client…"
                   style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontFamily: "var(--font)", resize: "none", outline: "none", color: "#12101A", boxSizing: "border-box", background: "#F5F3FF" }} />
@@ -354,13 +354,13 @@ export default function ClientsPage() {
 
               {/* Booking history */}
               <div style={{ padding: "12px 18px 6px", flexShrink: 0 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", letterSpacing: "1px", textTransform: "uppercase" }}>Booking History</div>
+                <div style={{ fontSize: 10.5, fontWeight: 800, color: "#6B6577", letterSpacing: "1px", textTransform: "uppercase" }}>Booking History</div>
               </div>
               <div style={{ flex: 1, overflowY: "auto" }}>
                 {histLoading ? (
-                  <div style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>Loading…</div>
+                  <div style={{ padding: 32, textAlign: "center", color: "#6B6577", fontSize: 13 }}>Loading…</div>
                 ) : history.length === 0 ? (
-                  <div style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>No bookings found</div>
+                  <div style={{ padding: 32, textAlign: "center", color: "#6B6577", fontSize: 13 }}>No bookings found</div>
                 ) : history.map(b => {
                   const sc = statusColor(b.status);
                   return (
@@ -369,7 +369,7 @@ export default function ClientsPage() {
                         <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A", marginBottom: 3 }}>
                           {b.serviceName || "Service"}
                         </div>
-                        <div style={{ fontSize: 11.5, color: "#9A94A8" }}>
+                        <div style={{ fontSize: 11.5, color: "#6B6577" }}>
                           {new Date(b.date_time).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
                           {b.staff?.name && ` · ${b.staff.name}`}
                         </div>

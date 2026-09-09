@@ -100,7 +100,7 @@ function buildEmailHtml(subject: string, message: string): string {
       <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;" dir="${rtl ? "rtl" : "ltr"}">${escapeHtml(subject)}</h1>
     </div>
     <div style="padding:28px;font-size:14px;color:#374151;line-height:1.7;" dir="${rtl ? "rtl" : "ltr"}">${bodyHtml}</div>
-    <div style="padding:14px 28px;background:#F9FAFB;text-align:center;border-top:1px solid #E5E7EB;font-size:11px;color:#9CA3AF;">
+    <div style="padding:14px 28px;background:#F9FAFB;text-align:center;border-top:1px solid #E5E7EB;font-size:11px;color:#6B7280;">
       Sent by Feature Salon · noreply@featuresalon.co.uk
     </div>
   </div>

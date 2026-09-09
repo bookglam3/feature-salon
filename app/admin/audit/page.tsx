@@ -330,7 +330,7 @@ export default function AuditLogPage() {
 
                         {/* Resource */}
                         <td style={{ padding: "13px 16px" }}>
-                          <div style={{ fontSize: 12.5, color: "#94A3B8", fontWeight: 500 }}>{log.resource}</div>
+                          <div style={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>{log.resource}</div>
                           {log.resource_id && (
                             <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 2, fontFamily: "monospace" }}>
                               {log.resource_id.slice(0, 8)}…
@@ -341,7 +341,7 @@ export default function AuditLogPage() {
                         {/* Details */}
                         <td style={{ padding: "13px 16px", maxWidth: 280 }}>
                           <div style={{
-                            fontSize: 12.5, color: "#94A3B8", lineHeight: 1.5,
+                            fontSize: 12.5, color: "#64748B", lineHeight: 1.5,
                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                           }}>
                             {log.details ?? "—"}

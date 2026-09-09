@@ -106,18 +106,18 @@ function ReviewsContent() {
         <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>Reviews</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Client feedback & reputation</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Client feedback & reputation</div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={copyReviewLink} style={{ padding: "9px 16px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Share Link</button>
+        <button onClick={copyReviewLink} style={{ padding: "9px 16px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Share Link</button>
       </div>
     </header>
   );
 
   if (loading) return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
-      <div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading reviews…</div>
+      <div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading reviews…</div>
     </DashboardShell>
   );
 
@@ -149,7 +149,7 @@ function ReviewsContent() {
                   <div style={{ flex: 1, height: 8, background: "#ECE9F1", borderRadius: 99 }}>
                     <div style={{ height: "100%", borderRadius: 99, background: "#F59E0B", width: `${pct}%`, transition: "width 0.6s ease" }} />
                   </div>
-                  <div style={{ width: 28, fontSize: 12.5, fontWeight: 700, color: "#6B6577", textAlign: "right" }}>{count}</div>
+                  <div style={{ width: 28, fontSize: 12.5, fontWeight: 700, color: "#524D60", textAlign: "right" }}>{count}</div>
                 </div>
               );
             })}
@@ -159,7 +159,7 @@ function ReviewsContent() {
         {/* Reviews list */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {reviews.length === 0 && (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>⭐</div>
               <div style={{ fontSize: 16, fontWeight: 700 }}>No reviews yet</div>
               <div style={{ fontSize: 13, marginTop: 4 }}>Share your booking link to collect reviews</div>
@@ -175,7 +175,7 @@ function ReviewsContent() {
                     </div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A" }}>{review.client_name}</div>
-                      <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>{new Date(review.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</div>
+                      <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>{new Date(review.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -183,22 +183,22 @@ function ReviewsContent() {
                     {/* Published toggle */}
                     <label style={{ position: "relative", width: 32, height: 18, cursor: "pointer" }}>
                       <input type="checkbox" checked={review.is_published} onChange={() => handleToggle(review.id, review.is_published)} style={{ opacity: 0, width: 0, height: 0 }} />
-                      <span style={{ position: "absolute", inset: 0, background: review.is_published ? "#10B981" : "#6B6577", borderRadius: 99, transition: "background 0.18s" }}>
+                      <span style={{ position: "absolute", inset: 0, background: review.is_published ? "#10B981" : "#524D60", borderRadius: 99, transition: "background 0.18s" }}>
                         <span style={{ position: "absolute", width: 12, height: 12, left: review.is_published ? 17 : 3, top: 3, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s" }} />
                       </span>
                     </label>
-                    <button onClick={() => handleDelete(review.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "#6B6577", padding: 0, transition: "color 0.12s" }}
+                    <button onClick={() => handleDelete(review.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "#524D60", padding: 0, transition: "color 0.12s" }}
                       onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; }}>🗑</button>
+                      onMouseLeave={e => { e.currentTarget.style.color = "#524D60"; }}>🗑</button>
                   </div>
                 </div>
-                <p style={{ fontSize: 14, color: "#6B6577", lineHeight: 1.7, margin: 0 }}>{review.comment}</p>
+                <p style={{ fontSize: 14, color: "#524D60", lineHeight: 1.7, margin: 0 }}>{review.comment}</p>
 
                 {/* Reply section */}
                 {review.reply ? (
                   <div style={{ marginTop: 14, padding: "12px 16px", background: "#F5F3FF", borderRadius: 12, borderLeft: "3px solid #7C3AED" }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>Your reply</div>
-                    <p style={{ fontSize: 13.5, color: "#6B6577", margin: 0, lineHeight: 1.6 }}>{review.reply}</p>
+                    <p style={{ fontSize: 13.5, color: "#524D60", margin: 0, lineHeight: 1.6 }}>{review.reply}</p>
                     <button onClick={() => { setReplyingTo(review.id); setReplyText(review.reply || ""); }} style={{ marginTop: 6, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "#7C3AED", fontWeight: 700, padding: 0 }}>Edit reply</button>
                   </div>
                 ) : (
@@ -217,7 +217,7 @@ function ReviewsContent() {
                       style={{ width: "100%", padding: "10px 14px", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                       <button onClick={() => handleReply(review.id)} style={{ padding: "8px 18px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save Reply</button>
-                      <button onClick={() => setReplyingTo(null)} style={{ padding: "8px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
+                      <button onClick={() => setReplyingTo(null)} style={{ padding: "8px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Cancel</button>
                     </div>
                   </div>
                 )}

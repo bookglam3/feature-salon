@@ -19,11 +19,11 @@ const SECTION_COLORS: Record<string, {
   border: string;
   labelColor: string;
 }> = {
-  Main:       { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
-  Finance:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
-  Engagement: { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
-  Content:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
-  System:     { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#9A94A8" },
+  Main:       { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#6B6577" },
+  Finance:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#6B6577" },
+  Engagement: { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#6B6577" },
+  Content:    { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#6B6577" },
+  System:     { grad: "linear-gradient(135deg,#7C3AED,#6D28D9)",  dimBg: "rgba(124,58,237,0.10)",  glow: "rgba(124,58,237,0.35)", border: "#7C3AED", labelColor: "#6B6577" },
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           display: flex; align-items: center; gap: 10px;
           padding: 5px 8px; border-radius: 11px;
           font-size: 13px; font-weight: 500;
-          color: #6B6577;
+          color: #524D60;
           background: transparent;
           text-decoration: none; margin-bottom: 1px;
           transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
@@ -221,7 +221,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
           width: 100%; padding: 8px 12px; border-radius: 9px;
           border: 1px solid #ECE9F1;
           background: #F5F3FF;
-          color: #6B6577;
+          color: #524D60;
           font-size: 12px; font-weight: 600; cursor: pointer;
           transition: all 0.18s;
           font-family: var(--font);
@@ -250,19 +250,19 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                 alt="Feature"
                 style={{ height: 28, width: "auto", display: "block" }}
               />
-              <div style={{ fontSize: 8.5, fontWeight: 600, color: "#9A94A8", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: 5 }}>{vc.productName}</div>
+              <div style={{ fontSize: 8.5, fontWeight: 600, color: "#6B6577", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: 5 }}>{vc.productName}</div>
             </div>
           </div>
           {onClose && (
             <button onClick={onClose} style={{
               background: "#F5F3FF", border: "1px solid #ECE9F1",
               cursor: "pointer", width: 28, height: 28, borderRadius: 8,
-              fontSize: 12, color: "#6B6577",
+              fontSize: 12, color: "#524D60",
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.15s", flexShrink: 0,
             }}
               onMouseEnter={e => { e.currentTarget.style.background = "#EDE9FF"; e.currentTarget.style.color = "#6D28D9"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#6B6577"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#524D60"; }}
             >✕</button>
           )}
         </div>
@@ -294,9 +294,9 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#12101A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {activeSalon?.name || "Select Branch"}
                 </div>
-                <div style={{ fontSize: 9.5, color: "#9A94A8", marginTop: 1 }}>Branch</div>
+                <div style={{ fontSize: 9.5, color: "#6B6577", marginTop: 1 }}>Branch</div>
               </div>
-              <div style={{ fontSize: 10, color: "#9A94A8", transition: "transform 0.2s", transform: branchOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▼</div>
+              <div style={{ fontSize: 10, color: "#6B6577", transition: "transform 0.2s", transform: branchOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▼</div>
             </button>
 
             {/* Dropdown */}
@@ -328,10 +328,10 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                       width: 22, height: 22, borderRadius: 6, flexShrink: 0,
                       background: s.id === activeSalon?.id ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "#ECE9F1",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 9, fontWeight: 900, color: s.id === activeSalon?.id ? "#fff" : "#6B6577",
+                      fontSize: 9, fontWeight: 900, color: s.id === activeSalon?.id ? "#fff" : "#524D60",
                     }}>{s.name.slice(0, 1).toUpperCase()}</div>
                     <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                      <div style={{ fontSize: 12, fontWeight: s.id === activeSalon?.id ? 700 : 500, color: s.id === activeSalon?.id ? "#6D28D9" : "#6B6577", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: s.id === activeSalon?.id ? 700 : 500, color: s.id === activeSalon?.id ? "#6D28D9" : "#524D60", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
                     </div>
                     {s.id === activeSalon?.id && <div style={{ fontSize: 10, color: "#7C3AED" }}>✓</div>}
                   </button>
@@ -382,7 +382,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                           background: active ? s.grad : s.dimBg,
                           boxShadow: active ? `0 0 12px ${s.glow}, inset 0 1px 0 rgba(255,255,255,0.15)` : "none",
                           border: `1px solid ${active ? "rgba(124,58,237,0.25)" : "#ECE9F1"}`,
-                          color: active ? "#fff" : "#9A94A8",
+                          color: active ? "#fff" : "#6B6577",
                         }}
                       >
                         {Icon && (

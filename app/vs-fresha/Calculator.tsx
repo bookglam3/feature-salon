@@ -10,7 +10,7 @@ const C = {
   text2: "#CBD5E1",
   muted: "#aab1c4",
   gold: "#C9A24B",
-  dim: "#64748B",
+  dim: "#94A3B8",
   green: "#10B981",
 };
 
@@ -207,7 +207,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#EF4444", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
+              <span style={{ color: "#F87171", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               20% on {newClients} new clients (min £6 each)
@@ -229,7 +229,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#EF4444", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
+              <span style={{ color: "#F87171", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               30% on {newClients} new clients via Boost (min £5 each)

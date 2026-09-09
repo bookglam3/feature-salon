@@ -69,7 +69,7 @@ function ResetContent() {
         </div>
 
         {checking ? (
-          <div style={{ textAlign: "center", color: "#94A3B8", padding: "24px 0" }}>
+          <div style={{ textAlign: "center", color: "#64748B", padding: "24px 0" }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
             Verifying reset link…
           </div>
@@ -106,7 +106,7 @@ function ResetContent() {
                   placeholder="Repeat your password" required style={inputStyle} />
               </div>
               <button type="submit" disabled={loading}
-                style={{ width: "100%", padding: "12px", background: loading ? "#94A3B8" : "#4F6EF7", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: loading ? "not-allowed" : "pointer" }}>
+                style={{ width: "100%", padding: "12px", background: loading ? "#64748B" : "#4F6EF7", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: loading ? "not-allowed" : "pointer" }}>
                 {loading ? "Saving…" : "Set New Password"}
               </button>
             </form>

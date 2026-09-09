@@ -62,19 +62,19 @@ export async function POST(req: NextRequest) {
     <div style="padding:28px 28px 8px;">
       <table style="width:100%;border-collapse:collapse;">
         <tr>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;width:38%;">Business name</td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;width:38%;">Business name</td>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:700;color:#0F172A;">${salonName}</td>
         </tr>
         <tr>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;">Type</td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Type</td>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;">${typeLabel}</td>
         </tr>
         <tr>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;">Email</td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Email</td>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;"><a href="mailto:${email}" style="color:#6366F1;text-decoration:none;">${email}</a></td>
         </tr>
         <tr>
-          <td style="padding:11px 0;font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;">Signed up</td>
+          <td style="padding:11px 0;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Signed up</td>
           <td style="padding:11px 0;font-size:14px;color:#0F172A;">${signupDate}</td>
         </tr>
       </table>
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       </a>
     </div>
 
-    <div style="padding:14px 28px;background:#F9FAFB;text-align:center;border-top:1px solid #E5E7EB;font-size:11px;color:#9CA3AF;">
+    <div style="padding:14px 28px;background:#F9FAFB;text-align:center;border-top:1px solid #E5E7EB;font-size:11px;color:#6B7280;">
       Feature · noreply@featuresalon.co.uk
     </div>
   </div>

@@ -279,7 +279,7 @@ function PartnersPageInner() {
         <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>Partner Applications</div>
-          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{stats.pending} pending review</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{stats.pending} pending review</div>
         </div>
       </div>
       <a
@@ -302,11 +302,11 @@ function PartnersPageInner() {
           <div style={{ padding: "18px 22px", borderBottom: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>All Salons</div>
-              <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 2 }}>{allSalons.length} total · filter by country</div>
+              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>{allSalons.length} total · filter by country</div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <input value={salonSearch} onChange={e => setSalonSearch(e.target.value)} placeholder="Search name, email, IP…" style={{ padding: "7px 12px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 13, color: "#12101A", outline: "none", width: 220 }} />
-              <span style={{ fontSize: 12, color: "#9A94A8" }}>{visibleSalons.length} shown</span>
+              <span style={{ fontSize: 12, color: "#6B6577" }}>{visibleSalons.length} shown</span>
             </div>
           </div>
 
@@ -318,7 +318,7 @@ function PartnersPageInner() {
                 : allSalons.filter(s => s.country_code === t.key).length;
               return (
                 <button key={t.key} onClick={() => setCountryFilter(t.key)}
-                  style={{ padding: "6px 14px", borderRadius: 99, fontSize: 12.5, fontWeight: countryFilter === t.key ? 800 : 500, whiteSpace: "nowrap", cursor: "pointer", border: `1px solid ${countryFilter === t.key ? "rgba(124,58,237,0.5)" : "#ECE9F1"}`, background: countryFilter === t.key ? "rgba(124,58,237,0.18)" : "transparent", color: countryFilter === t.key ? "#7C3AED" : "#6B6577", transition: "all 0.15s" }}
+                  style={{ padding: "6px 14px", borderRadius: 99, fontSize: 12.5, fontWeight: countryFilter === t.key ? 800 : 500, whiteSpace: "nowrap", cursor: "pointer", border: `1px solid ${countryFilter === t.key ? "rgba(124,58,237,0.5)" : "#ECE9F1"}`, background: countryFilter === t.key ? "rgba(124,58,237,0.18)" : "transparent", color: countryFilter === t.key ? "#7C3AED" : "#524D60", transition: "all 0.15s" }}
                 >{t.label} <span style={{ opacity: 0.6, fontSize: 11 }}>({count})</span></button>
               );
             })}
@@ -327,13 +327,13 @@ function PartnersPageInner() {
           {/* Table */}
           <div style={{ overflowX: "auto" }}>
             {salonLoading ? (
-              <div style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>Loading salons…</div>
+              <div style={{ padding: 32, textAlign: "center", color: "#6B6577", fontSize: 13 }}>Loading salons…</div>
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>
                 <thead>
                   <tr>
                     {["Salon", "Owner Email", "Plan", "Status", "Last Login Location", "IP", "Device", "Joined", "Actions"].map(h => (
-                      <th key={h} style={{ padding: "10px 14px", fontSize: 9.5, fontWeight: 800, color: "#9A94A8", textAlign: "left", letterSpacing: "0.8px", textTransform: "uppercase", background: "#F5F3FF", borderBottom: "1px solid #F5F3FF", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} style={{ padding: "10px 14px", fontSize: 9.5, fontWeight: 800, color: "#6B6577", textAlign: "left", letterSpacing: "0.8px", textTransform: "uppercase", background: "#F5F3FF", borderBottom: "1px solid #F5F3FF", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -350,17 +350,17 @@ function PartnersPageInner() {
                       >
                         <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF" }}>
                           <div style={{ fontSize: 13, fontWeight: 800, color: "#12101A" }}>{s.name}</div>
-                          <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 2 }}>/book/{s.slug}</div>
+                          <div style={{ fontSize: 10.5, color: "#6B6577", marginTop: 2 }}>/book/{s.slug}</div>
                         </td>
-                        <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF", fontSize: 12, color: "#6B6577", maxWidth: 180 }}>{s.owner_email}</td>
+                        <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF", fontSize: 12, color: "#524D60", maxWidth: 180 }}>{s.owner_email}</td>
                         <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF" }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 99, background: "#ECE9F1", color: "#6B6577", textTransform: "capitalize" }}>{s.subscription_plan || s.plan || "starter"}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 99, background: "#ECE9F1", color: "#524D60", textTransform: "capitalize" }}>{s.subscription_plan || s.plan || "starter"}</span>
                         </td>
                         <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF" }}>
                           <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 99, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, whiteSpace: "nowrap" }}>{badge.label}</span>
                         </td>
-                        <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF", fontSize: 12.5, color: "#6B6577", whiteSpace: "nowrap" }}>
-                          {s.last_country ? `${flag} ${s.last_city || ""}, ${s.last_country}` : <span style={{ color: "#9A94A8" }}>No login yet</span>}
+                        <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF", fontSize: 12.5, color: "#524D60", whiteSpace: "nowrap" }}>
+                          {s.last_country ? `${flag} ${s.last_city || ""}, ${s.last_country}` : <span style={{ color: "#6B6577" }}>No login yet</span>}
                         </td>
                         <td style={{ padding: "11px 14px", borderBottom: "1px solid #F5F3FF" }}>
                           {s.last_ip ? <span style={{ fontFamily: "monospace", fontSize: 12, color: "#0891B2", background: "rgba(6,182,212,0.08)", padding: "2px 7px", borderRadius: 5, border: "1px solid rgba(6,182,212,0.2)" }}>{s.last_ip}</span> : <span style={{ color: "#ECE9F1", fontSize: 12 }}>—</span>}
@@ -382,7 +382,7 @@ function PartnersPageInner() {
                     );
                   })}
                   {visibleSalons.length === 0 && (
-                    <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "#9A94A8", fontSize: 13 }}>No salons found for this filter</td></tr>
+                    <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "#6B6577", fontSize: 13 }}>No salons found for this filter</td></tr>
                   )}
                 </tbody>
               </table>
@@ -395,15 +395,15 @@ function PartnersPageInner() {
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
             <div style={{ background: "#13111F", border: "1px solid #ECE9F1", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440, boxShadow: "0 24px 80px rgba(0,0,0,0.7)" }}>
               <div style={{ fontSize: 17, fontWeight: 800, color: "#12101A", marginBottom: 4 }}>Edit Salon</div>
-              <div style={{ fontSize: 12, color: "#9A94A8", marginBottom: 22 }}>{editSalon.name} · {editSalon.owner_email}</div>
+              <div style={{ fontSize: 12, color: "#6B6577", marginBottom: 22 }}>{editSalon.name} · {editSalon.owner_email}</div>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Salon Name</label>
+                <label style={{ fontSize: 11.5, color: "#524D60", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Salon Name</label>
                 <input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 14, color: "#12101A", outline: "none", boxSizing: "border-box" }} />
               </div>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Subscription Status</label>
+                <label style={{ fontSize: 11.5, color: "#524D60", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Subscription Status</label>
                 <select value={editForm.subscription_status} onChange={e => setEditForm(f => ({ ...f, subscription_status: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 14, color: "#12101A", outline: "none" }}>
                   <option value="trial">🎁 Trial</option>
                   <option value="trialing">⏳ Trialing</option>
@@ -415,7 +415,7 @@ function PartnersPageInner() {
               </div>
 
               <div style={{ marginBottom: 22 }}>
-                <label style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Plan</label>
+                <label style={{ fontSize: 11.5, color: "#524D60", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Plan</label>
                 <select value={editForm.subscription_plan} onChange={e => setEditForm(f => ({ ...f, subscription_plan: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 14, color: "#12101A", outline: "none" }}>
                   <option value="starter">Starter — £29/mo</option>
                   <option value="pro">Pro — £59/mo</option>
@@ -425,7 +425,7 @@ function PartnersPageInner() {
               </div>
 
               <div style={{ marginBottom: 22 }}>
-                <label style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Timezone</label>
+                <label style={{ fontSize: 11.5, color: "#524D60", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>Timezone</label>
                 <select value={editForm.timezone} onChange={e => setEditForm(f => ({ ...f, timezone: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 14, color: "#12101A", outline: "none" }}>
                   <option value="Europe/London">🇬🇧 UK — Europe/London (GMT/BST)</option>
                   <option value="Asia/Karachi">🇵🇰 Pakistan — Asia/Karachi (PKT +5)</option>
@@ -435,7 +435,7 @@ function PartnersPageInner() {
               </div>
 
               <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={() => setEditSalon(null)} style={{ flex: 1, padding: 11, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button onClick={() => setEditSalon(null)} style={{ flex: 1, padding: 11, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                 <button onClick={handleSaveSalon} disabled={editSaving} style={{ flex: 1, padding: 11, background: editSaving ? "rgba(124,58,237,0.4)" : "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: editSaving ? "not-allowed" : "pointer", boxShadow: "0 4px 16px rgba(124,58,237,0.4)" }}>
                   {editSaving ? "Saving…" : "Save Changes"}
                 </button>
@@ -455,7 +455,7 @@ function PartnersPageInner() {
           ].map(s => (
             <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: "var(--r-lg)", padding: "14px 16px" }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginBottom: 2 }}>{s.value}</div>
-              <div style={{ fontSize: 11.5, color: "#9A94A8", fontWeight: 500 }}>{s.label}</div>
+              <div style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -465,7 +465,7 @@ function PartnersPageInner() {
           <div style={{ display: "flex", background: "#F5F3FF", borderRadius: "var(--r-sm)", padding: 3, gap: 2 }}>
             {(["all", "pending", "approved", "rejected"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
-                style={{ padding: "6px 14px", fontSize: 12.5, borderRadius: 6, border: "none", background: filter === f ? "#fff" : "transparent", color: filter === f ? "#12101A" : "#9A94A8", fontWeight: filter === f ? 600 : 400, cursor: "pointer", textTransform: "capitalize", transition: "all 0.12s", boxShadow: filter === f ? "var(--shadow-xs)" : "none" }}
+                style={{ padding: "6px 14px", fontSize: 12.5, borderRadius: 6, border: "none", background: filter === f ? "#fff" : "transparent", color: filter === f ? "#12101A" : "#6B6577", fontWeight: filter === f ? 600 : 400, cursor: "pointer", textTransform: "capitalize", transition: "all 0.12s", boxShadow: filter === f ? "var(--shadow-xs)" : "none" }}
               >
                 {f}
               </button>
@@ -486,7 +486,7 @@ function PartnersPageInner() {
           <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: "var(--r-lg)", padding: "48px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>🤝</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", marginBottom: 6 }}>No applications yet</div>
-            <div style={{ fontSize: 13, color: "#9A94A8" }}>Share <strong>/partner</strong> with potential agents to start receiving applications.</div>
+            <div style={{ fontSize: 13, color: "#6B6577" }}>Share <strong>/partner</strong> with potential agents to start receiving applications.</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -511,7 +511,7 @@ function PartnersPageInner() {
                       </div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>{agent.full_name}</div>
-                        <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 1 }}>
+                        <div style={{ fontSize: 12, color: "#6B6577", marginTop: 1 }}>
                           📍 {agent.city} · 📞 {agent.phone}
                         </div>
                       </div>
@@ -520,7 +520,7 @@ function PartnersPageInner() {
                       <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99, background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
                         {st.label}
                       </span>
-                      <span style={{ fontSize: 11, color: "#9A94A8" }}>
+                      <span style={{ fontSize: 11, color: "#6B6577" }}>
                         {new Date(agent.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                       </span>
                     </div>
@@ -534,25 +534,25 @@ function PartnersPageInner() {
                       agent.own_vehicle ? "🚗 Has vehicle" : "🚶 No vehicle",
                       agent.whatsapp ? `💬 WhatsApp: ${agent.whatsapp}` : "",
                     ].filter(Boolean).map(chip => (
-                      <span key={chip} style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 99, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1" }}>
+                      <span key={chip} style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 99, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1" }}>
                         {chip}
                       </span>
                     ))}
                   </div>
 
                   {/* Why hire */}
-                  <div style={{ fontSize: 13, color: "#6B6577", lineHeight: 1.6, marginBottom: 12, padding: "10px 12px", background: "#F5F3FF", borderRadius: "var(--r-sm)", borderLeft: "3px solid #DDD6FE" }}>
+                  <div style={{ fontSize: 13, color: "#524D60", lineHeight: 1.6, marginBottom: 12, padding: "10px 12px", background: "#F5F3FF", borderRadius: "var(--r-sm)", borderLeft: "3px solid #DDD6FE" }}>
                     {agent.why_hire.length > 180 ? agent.why_hire.slice(0, 180) + "…" : agent.why_hire}
                   </div>
 
                   {/* Referral code (approved only) */}
                   {agent.referral_code && (
                     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#F0F4FF", borderRadius: "var(--r-sm)", marginBottom: 12, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#9A94A8", textTransform: "uppercase", letterSpacing: "0.5px" }}>Referral Code:</span>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.5px" }}>Referral Code:</span>
                       <code style={{ fontSize: 13, fontWeight: 800, color: "#7C3AED", background: "#EDE9FF", padding: "2px 10px", borderRadius: 6 }}>
                         {agent.referral_code}
                       </code>
-                      <span style={{ fontSize: 12, color: "#9A94A8" }}>→ {agent.referred_salons} signups</span>
+                      <span style={{ fontSize: 12, color: "#6B6577" }}>→ {agent.referred_salons} signups</span>
                       <button
                         onClick={() => copyCode(agent.referral_code!)}
                         style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: copiedCode === agent.referral_code ? "var(--green)" : "#7C3AED", background: "none", border: "none", cursor: "pointer", padding: "2px 6px" }}
@@ -564,7 +564,7 @@ function PartnersPageInner() {
 
                   {/* Admin notes */}
                   {agent.admin_notes && (
-                    <div style={{ fontSize: 12.5, color: "#6B6577", padding: "8px 12px", background: "#F5F3FF", borderRadius: "var(--r-sm)", marginBottom: 12, borderLeft: "3px solid #FDE68A" }}>
+                    <div style={{ fontSize: 12.5, color: "#524D60", padding: "8px 12px", background: "#F5F3FF", borderRadius: "var(--r-sm)", marginBottom: 12, borderLeft: "3px solid #FDE68A" }}>
                       📝 <strong>Note:</strong> {agent.admin_notes}
                     </div>
                   )}
@@ -590,7 +590,7 @@ function PartnersPageInner() {
                     {agent.status !== "pending" && (
                       <button
                         onClick={() => openReview(agent, "approved")}
-                        style={{ padding: "7px 16px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: "var(--r-sm)", fontSize: 12.5, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font)" }}
+                        style={{ padding: "7px 16px", background: "#FFFFFF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: "var(--r-sm)", fontSize: 12.5, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font)" }}
                       >
                         📝 Edit Notes
                       </button>
@@ -614,7 +614,7 @@ function PartnersPageInner() {
           <>
             <div style={{ padding: "12px 14px", background: "#F5F3FF", borderRadius: "var(--r-sm)", marginBottom: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A" }}>{selected.full_name}</div>
-              <div style={{ fontSize: 12.5, color: "#9A94A8", marginTop: 2 }}>{selected.city} · {selected.phone}</div>
+              <div style={{ fontSize: 12.5, color: "#6B6577", marginTop: 2 }}>{selected.city} · {selected.phone}</div>
             </div>
 
             {reviewStatus === "approved" && !selected.referral_code && (
@@ -662,7 +662,7 @@ function PartnersPageInner() {
           <div style={{ padding: "18px 22px", borderBottom: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Salon Login History</div>
-              <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 2 }}>{loginLogs.length} recent logins · IP + location tracked</div>
+              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>{loginLogs.length} recent logins · IP + location tracked</div>
             </div>
             <input
               value={logsFilter}
@@ -678,7 +678,7 @@ function PartnersPageInner() {
               <thead>
                 <tr>
                   {["Salon", "Email", "IP Address", "Location", "ISP", "Device", "Time"].map(h => (
-                    <th key={h} style={{ padding: "10px 16px", fontSize: 10, fontWeight: 800, color: "#9A94A8", textAlign: "left", letterSpacing: "0.8px", textTransform: "uppercase", background: "#F5F3FF", borderBottom: "1px solid #F5F3FF" }}>{h}</th>
+                    <th key={h} style={{ padding: "10px 16px", fontSize: 10, fontWeight: 800, color: "#6B6577", textAlign: "left", letterSpacing: "0.8px", textTransform: "uppercase", background: "#F5F3FF", borderBottom: "1px solid #F5F3FF" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -697,23 +697,23 @@ function PartnersPageInner() {
                         style={{ transition: "background 0.1s" }}
                       >
                         <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 13, fontWeight: 700, color: "#12101A" }}>{log.salon_name || "—"}</td>
-                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 12, color: "#6B6577" }}>{log.owner_email}</td>
+                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 12, color: "#524D60" }}>{log.owner_email}</td>
                         <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF" }}>
                           <span style={{ fontFamily: "monospace", fontSize: 12.5, color: "#0891B2", background: "rgba(6,182,212,0.08)", padding: "2px 8px", borderRadius: 5, border: "1px solid rgba(6,182,212,0.2)" }}>{log.ip_address}</span>
                         </td>
-                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 12.5, color: "#6B6577" }}>{flag} {log.city}{log.city && log.country ? ", " : ""}{log.country}</td>
-                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 11.5, color: "#9A94A8" }}>{log.isp || "—"}</td>
+                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 12.5, color: "#524D60" }}>{flag} {log.city}{log.city && log.country ? ", " : ""}{log.country}</td>
+                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 11.5, color: "#6B6577" }}>{log.isp || "—"}</td>
                         <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF" }}>
                           <span style={{ fontSize: 11.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99, background: isMobile ? "rgba(236,72,153,0.12)" : "rgba(124,58,237,0.12)", color: isMobile ? "#F472B6" : "#7C3AED", border: `1px solid ${isMobile ? "rgba(236,72,153,0.25)" : "rgba(124,58,237,0.25)"}` }}>{log.device || "Unknown"}</span>
                         </td>
-                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 11.5, color: "#9A94A8", whiteSpace: "nowrap" }}>
+                        <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 11.5, color: "#6B6577", whiteSpace: "nowrap" }}>
                           {new Date(log.logged_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                         </td>
                       </tr>
                     );
                   })}
                 {loginLogs.length === 0 && (
-                  <tr><td colSpan={7} style={{ padding: "32px", textAlign: "center", color: "#9A94A8", fontSize: 13 }}>No login history yet — logs appear after first salon login</td></tr>
+                  <tr><td colSpan={7} style={{ padding: "32px", textAlign: "center", color: "#6B6577", fontSize: 13 }}>No login history yet — logs appear after first salon login</td></tr>
                 )}
               </tbody>
             </table>

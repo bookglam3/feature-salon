@@ -25,10 +25,10 @@ export default function TermsOfServicePage() {
       <div style={{ background: "linear-gradient(135deg,#EEF2FF 0%,#F5F3FF 100%)", borderBottom: "1px solid #ECE9F1", padding: "52px 24px 44px", textAlign: "center" }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Legal</div>
         <h1 style={{ fontSize: 38, fontWeight: 900, color: "#12101A", letterSpacing: "-1px", margin: "0 0 14px" }}>Terms of Service</h1>
-        <p style={{ fontSize: 15, color: "#6B6577", maxWidth: 520, margin: "0 auto 16px" }}>
+        <p style={{ fontSize: 15, color: "#524D60", maxWidth: 520, margin: "0 auto 16px" }}>
           Please read these terms carefully before using Feature. By creating an account, you agree to be bound by them.
         </p>
-        <p style={{ fontSize: 13, color: "#6B6577" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
+        <p style={{ fontSize: 13, color: "#524D60" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
       </div>
 
       {/* Content */}
@@ -172,8 +172,8 @@ export default function TermsOfServicePage() {
         {/* Footer nav */}
         <div style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid #ECE9F1", display: "flex", gap: 24, flexWrap: "wrap" }}>
           <Link href="/privacy" style={{ color: "#7C3AED", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Privacy Policy →</Link>
-          <Link href="/" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
-          <Link href="/signup" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
+          <Link href="/" style={{ color: "#524D60", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
+          <Link href="/signup" style={{ color: "#524D60", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
         </div>
       </div>
     </div>
@@ -186,7 +186,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 style={{ fontSize: 19, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", marginBottom: 14, paddingBottom: 10, borderBottom: "2px solid #EEF2FF" }}>
         {title}
       </h2>
-      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#6B6577" }}>
+      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#524D60" }}>
         {children}
       </div>
     </section>

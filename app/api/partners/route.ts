@@ -230,7 +230,7 @@ export async function PATCH(req: NextRequest) {
             </div>
           </div>
           <div style="padding:16px 32px;background:#F8FAFF;text-align:center;border-top:1px solid #E8EDFF">
-            <p style="font-size:12px;color:#9CA3AF;margin:0">Feature Salon · noreply@featuresalon.co.uk</p>
+            <p style="font-size:12px;color:#6B7280;margin:0">Feature Salon · noreply@featuresalon.co.uk</p>
           </div>
         </div>`;
     } else if (status === "rejected") {
@@ -254,7 +254,7 @@ export async function PATCH(req: NextRequest) {
             <p style="font-size:14px;color:#6B7280;line-height:1.7">You're welcome to reapply in the future as our requirements evolve. We appreciate your interest in Feature Salon.</p>
           </div>
           <div style="padding:16px 32px;background:#F9FAFB;text-align:center;border-top:1px solid #E5E7EB">
-            <p style="font-size:12px;color:#9CA3AF;margin:0">Feature Salon · noreply@featuresalon.co.uk</p>
+            <p style="font-size:12px;color:#6B7280;margin:0">Feature Salon · noreply@featuresalon.co.uk</p>
           </div>
         </div>`;
     }

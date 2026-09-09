@@ -87,14 +87,14 @@ export default function ReferralsPage() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Referral Program</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Track client referrals & rewards</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Track client referrals & rewards</div>
         </div>
       </div>
       <button onClick={() => setShowModal(true)} style={{ padding: "9px 18px", background: "linear-gradient(135deg,#10B981,#059669)", color: "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>+ New Referral</button>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
@@ -110,7 +110,7 @@ export default function ReferralsPage() {
           ].map(s => (
             <div key={s.label} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color }} />
-              <div style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>{s.label}</div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>{s.label}</div>
               <div style={{ fontSize: 28, fontWeight: 900, color: "#12101A" }}>{s.value}</div>
             </div>
           ))}
@@ -127,7 +127,7 @@ export default function ReferralsPage() {
               <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#10B981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, flexShrink: 0 }}>{s.step}</div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "#12101A" }}>{s.icon} {s.title}</div>
-                <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2, lineHeight: 1.5 }}>{s.desc}</div>
+                <div style={{ fontSize: 12, color: "#524D60", marginTop: 2, lineHeight: 1.5 }}>{s.desc}</div>
               </div>
             </div>
           ))}
@@ -136,7 +136,7 @@ export default function ReferralsPage() {
         {/* Table */}
         <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
           {referrals.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🔗</div>
               <div style={{ fontWeight: 700 }}>No referrals yet</div>
               <div style={{ fontSize: 13, marginTop: 4 }}>Create a referral for a client and share their unique link</div>
@@ -146,7 +146,7 @@ export default function ReferralsPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
                 <thead><tr style={{ background: "#F5F3FF" }}>
                   {["Referrer", "Friend", "Code", "Status", "Date", "Actions"].map(h => (
-                    <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#6B6577", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
+                    <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#524D60", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
@@ -158,11 +158,11 @@ export default function ReferralsPage() {
                         onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <div style={{ fontSize: 13.5, fontWeight: 800, color: "#12101A" }}>{r.referrer_name}</div>
-                          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{r.referrer_email || "—"}</div>
+                          <div style={{ fontSize: 11.5, color: "#524D60" }}>{r.referrer_email || "—"}</div>
                         </td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{r.referee_name || "—"}</div>
-                          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{r.referee_email || "—"}</div>
+                          <div style={{ fontSize: 11.5, color: "#524D60" }}>{r.referee_email || "—"}</div>
                         </td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 800, color: "#7C3AED", background: "rgba(124,58,237,0.10)", padding: "3px 8px", borderRadius: 6 }}>{r.code}</span>
@@ -173,7 +173,7 @@ export default function ReferralsPage() {
                             {Object.entries(STATUS_MAP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                           </select>
                         </td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#6B6577" }}>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <button onClick={() => copyLink(r.code)} style={{ padding: "6px 12px", background: "rgba(124,58,237,0.10)", color: "#7C3AED", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Copy Link</button>
                         </td>
@@ -196,23 +196,23 @@ export default function ReferralsPage() {
                 <strong>Who is referring?</strong> (existing client)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Name *</label>
+                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Name *</label>
                   <input value={form.referrer_name} onChange={e => setForm(p => ({ ...p, referrer_name: e.target.value }))} placeholder="Sarah" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
-                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Email</label>
+                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Email</label>
                   <input type="email" value={form.referrer_email} onChange={e => setForm(p => ({ ...p, referrer_email: e.target.value }))} placeholder="sarah@email.com" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
               </div>
               <div style={{ padding: "14px 16px", background: "rgba(124,58,237,0.10)", borderRadius: 12, fontSize: 13, color: "#7C3AED" }}>
                 <strong>Who are they referring?</strong> (optional — fill later)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Friend Name</label>
+                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Friend Name</label>
                   <input value={form.referee_name} onChange={e => setForm(p => ({ ...p, referee_name: e.target.value }))} placeholder="John" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
-                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Friend Email</label>
+                <div><label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Friend Email</label>
                   <input type="email" value={form.referee_email} onChange={e => setForm(p => ({ ...p, referee_email: e.target.value }))} placeholder="john@email.com" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleAdd} disabled={!form.referrer_name} style={{ flex: 2, padding: 12, background: "linear-gradient(135deg,#10B981,#059669)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer", opacity: !form.referrer_name ? 0.5 : 1 }}>Create Referral</button>
             </div>
           </div>

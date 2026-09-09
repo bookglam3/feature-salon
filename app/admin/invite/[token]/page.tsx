@@ -129,7 +129,7 @@ export default function AcceptInvitePage() {
                 <p style={{ color: "#FCA5A5", margin: 0, fontSize: 14, lineHeight: 1.7 }}>{errorMsg}</p>
               </div>
               <a href="mailto:hello@featuresalon.co.uk"
-                style={{ fontSize: 13, color: "#6366F1", textDecoration: "none" }}>
+                style={{ fontSize: 13, color: "#4F46E5", textDecoration: "none" }}>
                 Contact support →
               </a>
             </div>

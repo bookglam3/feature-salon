@@ -22,7 +22,7 @@ const STATUS_MAP = {
   waiting:   { label: "Waiting",   bg: "rgba(245,158,11,0.10)", color: "#F59E0B" },
   contacted: { label: "Contacted", bg: "rgba(124,58,237,0.10)", color: "#7C3AED" },
   booked:    { label: "Booked ✓",  bg: "rgba(16,185,129,0.10)", color: "#10B981" },
-  removed:   { label: "Removed",   bg: "#F5F3FF", color: "#6B6577" },
+  removed:   { label: "Removed",   bg: "#F5F3FF", color: "#524D60" },
 };
 
 export default function WaitlistPage() {
@@ -107,14 +107,14 @@ export default function WaitlistPage() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Waitlist</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Manage clients waiting for slots</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Manage clients waiting for slots</div>
         </div>
       </div>
       <button onClick={() => setShowModal(true)} style={{ padding: "9px 18px", background: "linear-gradient(135deg,#F59E0B,#D97706)", color: "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.3)" }}>+ Add to Waitlist</button>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
@@ -125,7 +125,7 @@ export default function WaitlistPage() {
             <div key={key} onClick={() => setFilter(key as typeof filter)} style={{ background: filter === key ? "#F5F3FF" : "#FFFFFF", border: `2px solid ${filter === key ? color : "#ECE9F1"}`, borderRadius: 16, padding: "18px 16px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "all 0.15s" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: color, opacity: filter === key ? 1 : 0.3 }} />
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</span>
                 <span style={{ fontSize: 18 }}>{icon}</span>
               </div>
               <div style={{ fontSize: 28, fontWeight: 900, color: "#12101A" }}>{key === "all" ? entries.length : entries.filter(e => e.status === key).length}</div>
@@ -136,7 +136,7 @@ export default function WaitlistPage() {
         {/* List */}
         <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>⏳</div>
               <div style={{ fontWeight: 700 }}>No entries in waitlist</div>
             </div>
@@ -146,7 +146,7 @@ export default function WaitlistPage() {
                 <thead>
                   <tr style={{ background: "#F5F3FF" }}>
                     {["#", "Client", "Preferred Date/Time", "Notes", "Status", "Actions"].map(h => (
-                      <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#6B6577", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
+                      <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#524D60", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -157,16 +157,16 @@ export default function WaitlistPage() {
                       <tr key={e.id} style={{ transition: "background 0.1s" }}
                         onMouseEnter={ev => { (ev.currentTarget as HTMLTableRowElement).style.background = "#F5F3FF"; }}
                         onMouseLeave={ev => { (ev.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 13, color: "#6B6577", fontWeight: 700 }}>{i + 1}</td>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 13, color: "#524D60", fontWeight: 700 }}>{i + 1}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <div style={{ fontSize: 13.5, fontWeight: 800, color: "#12101A" }}>{e.client_name}</div>
-                          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{e.client_phone || e.client_email || "—"}</div>
+                          <div style={{ fontSize: 11.5, color: "#524D60" }}>{e.client_phone || e.client_email || "—"}</div>
                         </td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#6B6577" }}>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>
                           {e.preferred_date ? new Date(e.preferred_date + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "Flexible"}
                           {e.preferred_time ? ` at ${e.preferred_time}` : ""}
                         </td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#6B6577", maxWidth: 200 }}>{e.notes || "—"}</td>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60", maxWidth: 200 }}>{e.notes || "—"}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <select value={e.status} onChange={ev => updateStatus(e.id, ev.target.value as WaitlistEntry["status"])}
                             style={{ padding: "5px 10px", borderRadius: 8, border: "1.5px solid #ECE9F1", fontSize: 12, fontWeight: 700, cursor: "pointer", background: sm.bg, color: sm.color, outline: "none" }}>
@@ -180,7 +180,7 @@ export default function WaitlistPage() {
                               <button
                                 onClick={() => handleNotify(e)}
                                 disabled={notifying === e.id}
-                                style={{ padding: "5px 10px", background: notifying === e.id ? "#D6D1DE" : "linear-gradient(135deg,#7C3AED,#6D28D9)", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: notifying === e.id ? "not-allowed" : "pointer", color: notifying === e.id ? "#9A94A8" : "#FFFFFF", whiteSpace: "nowrap" }}
+                                style={{ padding: "5px 10px", background: notifying === e.id ? "#D6D1DE" : "linear-gradient(135deg,#7C3AED,#6D28D9)", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: notifying === e.id ? "not-allowed" : "pointer", color: notifying === e.id ? "#6B6577" : "#FFFFFF", whiteSpace: "nowrap" }}
                               >
                                 {notifying === e.id ? "Sending…" : "Notify"}
                               </button>
@@ -210,28 +210,28 @@ export default function WaitlistPage() {
                 { key: "client_email", label: "Email", placeholder: "sarah@email.com", type: "email" },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>{f.label}</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>{f.label}</label>
                   <input type={f.type} value={form[f.key as keyof typeof form]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder}
                     style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
               ))}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Preferred Date</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Preferred Date</label>
                   <input type="date" value={form.preferred_date} onChange={e => setForm(p => ({ ...p, preferred_date: e.target.value }))} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Preferred Time</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Preferred Time</label>
                   <input type="time" value={form.preferred_time} onChange={e => setForm(p => ({ ...p, preferred_time: e.target.value }))} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Notes</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Notes</label>
                 <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Service requested, special requirements…" rows={2} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", resize: "none", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleAdd} style={{ flex: 2, padding: 12, background: "linear-gradient(135deg,#F59E0B,#D97706)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer" }}>Add to Waitlist</button>
             </div>
           </div>

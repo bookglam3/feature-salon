@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     </div>
   </div>
   <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:14px 28px;text-align:center;">
-    <p style="font-size:11px;color:#94A3B8;margin:0;">${salonName} · Powered by Feature Salon</p>
+    <p style="font-size:11px;color:#64748B;margin:0;">${salonName} · Powered by Feature Salon</p>
   </div>
 </div>
 </body></html>`;

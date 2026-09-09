@@ -152,7 +152,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "system-ui,sans-serif" }}>
-      <div style={{ textAlign: "center", color: "#94A3B8" }}>
+      <div style={{ textAlign: "center", color: "#64748B" }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
         <div style={{ fontSize: 16, fontWeight: 600 }}>Loading your appointment…</div>
       </div>
@@ -161,7 +161,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
 
   if (!appt) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "system-ui,sans-serif" }}>
-      <div style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
+      <div style={{ textAlign: "center", color: "#64748B", padding: 24 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>❌</div>
         <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", marginBottom: 8 }}>Appointment Not Found</div>
         <div style={{ fontSize: 14, color: "#64748B" }}>This link may be invalid or expired.</div>
@@ -219,7 +219,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div style={{ background: "#fff", borderRadius: 20, padding: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.07)", marginBottom: 20 }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 14 }}>Your Appointment</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 14 }}>Your Appointment</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               { label: "Client",  value: appt.client_name },
@@ -323,7 +323,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
               <button onClick={handleReschedule} disabled={!newDate || !newTime || submitting}
-                style={{ marginTop: 16, width: "100%", padding: 14, background: !newDate || !newTime ? "#E2E8F0" : "linear-gradient(135deg,#6366F1,#4F46E5)", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, color: !newDate || !newTime ? "#94A3B8" : "#fff", cursor: !newDate || !newTime ? "not-allowed" : "pointer", boxShadow: !newDate || !newTime ? "none" : "0 4px 20px rgba(99,102,241,0.4)" }}>
+                style={{ marginTop: 16, width: "100%", padding: 14, background: !newDate || !newTime ? "#E2E8F0" : "linear-gradient(135deg,#6366F1,#4F46E5)", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, color: !newDate || !newTime ? "#64748B" : "#fff", cursor: !newDate || !newTime ? "not-allowed" : "pointer", boxShadow: !newDate || !newTime ? "none" : "0 4px 20px rgba(99,102,241,0.4)" }}>
                 {submitting ? "Saving…" : "Confirm Reschedule →"}
               </button>
             </div>
@@ -341,7 +341,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
           </div>
         )}
 
-        <div style={{ textAlign: "center", marginTop: 24, fontSize: 12, color: "#94A3B8" }}>
+        <div style={{ textAlign: "center", marginTop: 24, fontSize: 12, color: "#64748B" }}>
           Powered by <strong>Feature Salon</strong>
         </div>
       </div>
@@ -351,7 +351,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
 
 export default function ReschedulePage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8" }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B" }}>Loading…</div>}>
       <RescheduleContent params={params} />
     </Suspense>
   );

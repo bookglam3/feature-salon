@@ -283,7 +283,7 @@ export default function DashboardSidebar() {
                       <div
                         className="w-[5px] h-[5px] rounded-full shrink-0"
                         style={{
-                          background: `linear-gradient(135deg,${s.grad.includes("violet") ? "#C9A24B,#C9A24B" : s.grad.includes("emerald") ? "#059669,#34D399" : s.grad.includes("blue") ? "#2563EB,#60A5FA" : s.grad.includes("pink") ? "#DB2777,#F472B6" : "#475569,#94A3B8"})`,
+                          background: `linear-gradient(135deg,${s.grad.includes("violet") ? "#C9A24B,#C9A24B" : s.grad.includes("emerald") ? "#059669,#34D399" : s.grad.includes("blue") ? "#2563EB,#60A5FA" : s.grad.includes("pink") ? "#DB2777,#F472B6" : "#475569,#64748B"})`,
                           boxShadow: `0 0 7px ${s.glow}`,
                         }}
                       />

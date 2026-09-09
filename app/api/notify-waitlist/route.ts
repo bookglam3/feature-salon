@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
       </div>
 
       <p style="font-size:13px;color:#F59E0B;font-weight:600;text-align:center;margin:0 0 8px;">⚡ Act fast — slots fill up quickly!</p>
-      <p style="font-size:13px;color:#94A3B8;text-align:center;margin:0;">If this slot no longer works for you, feel free to ignore this email.</p>
+      <p style="font-size:13px;color:#64748B;text-align:center;margin:0;">If this slot no longer works for you, feel free to ignore this email.</p>
     </div>
 
     <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:16px 28px;text-align:center;">

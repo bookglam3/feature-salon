@@ -73,7 +73,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
   if (status === "loading") {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-        <div style={{ textAlign: "center", color: "#6B6577" }}>
+        <div style={{ textAlign: "center", color: "#524D60" }}>
           <div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⏳</div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>Checking access…</div>
         </div>
@@ -88,7 +88,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
           <h2 style={{ fontSize: 17, fontWeight: 700, color: "#12101A", margin: "0 0 8px", letterSpacing: "-0.3px" }}>
             Couldn&apos;t verify access
           </h2>
-          <p style={{ fontSize: 13.5, color: "#6B6577", lineHeight: 1.6, margin: "0 0 20px" }}>
+          <p style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.6, margin: "0 0 20px" }}>
             We couldn&apos;t check your plan just now. This is usually temporary — please try again.
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -98,7 +98,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
             >Try again</button>
             <button
               onClick={() => router.push("/dashboard")}
-              style={{ padding: "10px 20px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
+              style={{ padding: "10px 20px", background: "#FFFFFF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
             >Back to Dashboard</button>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
         <h1 style={{ fontSize: 26, fontWeight: 900, color: "#12101A", letterSpacing: "-0.8px", margin: "0 0 10px" }}>
           {meta.label} is Locked
         </h1>
-        <p style={{ fontSize: 14.5, color: "#6B6577", lineHeight: 1.7, margin: "0 0 28px" }}>
+        <p style={{ fontSize: 14.5, color: "#524D60", lineHeight: 1.7, margin: "0 0 28px" }}>
           You&apos;re currently on the{" "}
           <span style={{ fontWeight: 800, color: currentInfo.color }}>{currentInfo.name}</span> plan.
           Upgrade to <span style={{ fontWeight: 800, color: requiredInfo.color }}>{requiredInfo.name}</span> or higher to unlock {meta.icon} {meta.label}.
@@ -186,9 +186,9 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
 
         <button
           onClick={() => router.push("/dashboard")}
-          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#6B6577", fontWeight: 600, padding: 0 }}
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#524D60", fontWeight: 600, padding: 0 }}
           onMouseEnter={e => { e.currentTarget.style.color = "#12101A"; }}
-          onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "#524D60"; }}
         >
           ← Back to Dashboard
         </button>

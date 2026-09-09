@@ -24,7 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_transit: "#F59E0B",
   pending: "#7C3AED",
   failed: "#EF4444",
-  canceled: "#9A94A8",
+  canceled: "#6B6577",
 };
 
 function fmt(amount: number, currency = "gbp") {
@@ -132,7 +132,7 @@ export default function EarningsPage() {
         <HamburgerBtn onClick={() => { }} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", letterSpacing: "-0.4px" }}>Earnings & Payouts</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Stripe Connect — salon payout management</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Stripe Connect — salon payout management</div>
         </div>
       </div>
       {status?.connected && (
@@ -147,7 +147,7 @@ export default function EarningsPage() {
   if (loading) return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-        <div style={{ textAlign: "center", color: "#6B6577" }}>
+        <div style={{ textAlign: "center", color: "#524D60" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>💰</div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>Loading earnings…</div>
         </div>
@@ -168,7 +168,7 @@ export default function EarningsPage() {
           <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 24, padding: "60px 40px", textAlign: "center", maxWidth: 560, margin: "60px auto" }}>
             <div style={{ fontSize: 64, marginBottom: 20 }}>🏦</div>
             <h2 style={{ fontSize: 26, fontWeight: 900, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.5px" }}>Connect Your Stripe Account</h2>
-            <p style={{ fontSize: 14, color: "#6B6577", lineHeight: 1.7, margin: "0 0 32px" }}>
+            <p style={{ fontSize: 14, color: "#524D60", lineHeight: 1.7, margin: "0 0 32px" }}>
               Receive automatic payouts directly to your bank account for every booking. Automatic payouts with a low <strong style={{ color: "#7C3AED" }}>2% platform fee</strong>.
             </p>
             {/* Feature list */}
@@ -194,7 +194,7 @@ export default function EarningsPage() {
                 ❌ {connectError}
               </div>
             )}
-            <p style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 12 }}>
+            <p style={{ fontSize: 11.5, color: "#6B6577", marginTop: 12 }}>
               Secure onboarding via Stripe Express. Takes ~2 minutes.
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function EarningsPage() {
                   {status.charges_enabled ? "Stripe Account Active — Payouts Enabled" : "Onboarding Incomplete — Complete verification in Stripe"}
                 </div>
                 {status.onboarded_at && (
-                  <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 2 }}>
                     Connected {new Date(status.onboarded_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                   </div>
                 )}
@@ -233,11 +233,11 @@ export default function EarningsPage() {
                 <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, padding: "22px 20px", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: s.color }} />
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
                     <span style={{ fontSize: 20 }}>{s.icon}</span>
                   </div>
                   <div style={{ fontSize: 28, fontWeight: 900, color: s.color, letterSpacing: "-1px", marginBottom: 4 }}>{s.value}</div>
-                  <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{s.desc}</div>
+                  <div style={{ fontSize: 11.5, color: "#6B6577" }}>{s.desc}</div>
                 </div>
               ))}
             </div>
@@ -249,8 +249,8 @@ export default function EarningsPage() {
                 { from: "Client pays £100", to: "Platform fee: £2", via: "→" },
                 { from: "Remaining balance", to: "Auto to your bank", via: "→" },
               ].map((step, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#6B6577" }}>
-                  <span style={{ color: "#6B6577", fontWeight: 700 }}>{step.from}</span>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#524D60" }}>
+                  <span style={{ color: "#524D60", fontWeight: 700 }}>{step.from}</span>
                   <span style={{ color: "#7C3AED", fontWeight: 800 }}>{step.via}</span>
                   <span style={{ color: "#059669", fontWeight: 700 }}>{step.to}</span>
                 </div>
@@ -268,7 +268,7 @@ export default function EarningsPage() {
               </div>
 
               {(!status.payouts || status.payouts.length === 0) ? (
-                <div style={{ textAlign: "center", padding: "60px 0", color: "#9A94A8" }}>
+                <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
                   <div style={{ fontSize: 40, marginBottom: 10 }}>📭</div>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>No payouts yet</div>
                   <div style={{ fontSize: 12, marginTop: 4 }}>Payouts appear here after your first booking payment</div>
@@ -279,7 +279,7 @@ export default function EarningsPage() {
                     <thead>
                       <tr style={{ background: "#F5F3FF" }}>
                         {["Amount", "Status", "Arrival Date", "Created", "Description"].map(h => (
-                          <th key={h} style={{ fontSize: 10, fontWeight: 700, color: "#9A94A8", textAlign: "left", padding: "10px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid rgba(124,58,237,0.1)" }}>{h}</th>
+                          <th key={h} style={{ fontSize: 10, fontWeight: 700, color: "#6B6577", textAlign: "left", padding: "10px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid rgba(124,58,237,0.1)" }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -290,13 +290,13 @@ export default function EarningsPage() {
                           onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
                           <td style={{ padding: "12px 16px", fontSize: 15, fontWeight: 900, color: "#059669" }}>{fmt(p.amount, p.currency)}</td>
                           <td style={{ padding: "12px 16px" }}>
-                            <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 10px", borderRadius: 99, background: `${STATUS_COLORS[p.status] || "#9A94A8"}20`, color: STATUS_COLORS[p.status] || "#9A94A8", textTransform: "capitalize" }}>
+                            <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 10px", borderRadius: 99, background: `${STATUS_COLORS[p.status] || "#6B6577"}20`, color: STATUS_COLORS[p.status] || "#6B6577", textTransform: "capitalize" }}>
                               {p.status === "in_transit" ? "In Transit" : p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                             </span>
                           </td>
-                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#6B6577" }}>{fmtDate(p.arrival_date)}</td>
-                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#6B6577" }}>{fmtDate(p.created)}</td>
-                          <td style={{ padding: "12px 16px", fontSize: 12.5, color: "#6B6577" }}>{p.description || "Automatic payout"}</td>
+                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#524D60" }}>{fmtDate(p.arrival_date)}</td>
+                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#524D60" }}>{fmtDate(p.created)}</td>
+                          <td style={{ padding: "12px 16px", fontSize: 12.5, color: "#524D60" }}>{p.description || "Automatic payout"}</td>
                         </tr>
                       ))}
                     </tbody>

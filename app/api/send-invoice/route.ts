@@ -101,10 +101,10 @@ function buildInvoiceEmail({
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
         <thead>
           <tr style="background:#F8FAFC;">
-            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#94A3B8;text-align:left;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Service / Item</th>
-            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#94A3B8;text-align:center;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Qty</th>
-            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#94A3B8;text-align:right;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Price</th>
-            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#94A3B8;text-align:right;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Total</th>
+            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#64748B;text-align:left;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Service / Item</th>
+            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#64748B;text-align:center;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Qty</th>
+            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#64748B;text-align:right;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Price</th>
+            <th style="padding:10px 12px;font-size:11px;font-weight:700;color:#64748B;text-align:right;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #E2E8F0;">Total</th>
           </tr>
         </thead>
         <tbody>${itemRows}</tbody>

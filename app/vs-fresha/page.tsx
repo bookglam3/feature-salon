@@ -44,9 +44,9 @@ const C = {
   text2: "#CBD5E1",
   muted: "#aab1c4",
   gold: "#C9A24B",
-  dim: "#64748B",
+  dim: "#524D60",
   green: "#10B981",
-  red: "#EF4444",
+  red: "#F87171",
 };
 
 interface TableRow {
@@ -150,7 +150,7 @@ export default function VsFresha() {
             See what a marketplace commission could cost you — and compare it to one flat monthly price.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="#calculator" style={{ background: C.gold, color: "#fff", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 10, textDecoration: "none", display: "inline-block" }}>
+            <a href="#calculator" style={{ background: C.gold, color: "#12101A", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 10, textDecoration: "none", display: "inline-block" }}>
               Try the calculator ↓
             </a>
             <Link href="/signup" style={{ background: C.surface, color: C.text2, fontSize: 14, fontWeight: 600, padding: "12px 24px", borderRadius: 10, textDecoration: "none", border: `1px solid ${C.border}`, display: "inline-block" }}>
@@ -163,8 +163,8 @@ export default function VsFresha() {
       {/* Comparison table */}
       <section style={{ maxWidth: 900, margin: "0 auto", padding: "56px 24px 48px" }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Side-by-side</div>
-          <h2 style={{ fontSize: "clamp(22px,3.5vw,32px)", fontWeight: 800, color: C.text, letterSpacing: "-0.3px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#524D60", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Side-by-side</div>
+          <h2 style={{ fontSize: "clamp(22px,3.5vw,32px)", fontWeight: 800, color: "#12101A", letterSpacing: "-0.3px" }}>
             How the costs stack up
           </h2>
         </div>
@@ -174,7 +174,7 @@ export default function VsFresha() {
             <thead>
               <tr>
                 <th style={{ padding: "12px 18px", textAlign: "left", background: "#0E1320", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", width: "28%" }}></th>
-                <th style={{ padding: "14px 18px", textAlign: "center", background: "rgba(201,162,75,0.12)", color: C.gold, fontWeight: 900, border: "1px solid rgba(201,162,75,0.35)", fontSize: 15 }}>
+                <th style={{ padding: "14px 18px", textAlign: "center", background: "rgba(201,162,75,0.12)", color: "#6B4F17", fontWeight: 900, border: "1px solid rgba(201,162,75,0.35)", fontSize: 15 }}>
                   Feature
                 </th>
                 <th style={{ padding: "14px 18px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>
@@ -239,7 +239,7 @@ export default function VsFresha() {
       {/* Why flat rate section */}
       <section style={{ maxWidth: 820, margin: "0 auto", padding: "56px 24px 64px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h2 style={{ fontSize: "clamp(22px,3.5vw,30px)", fontWeight: 800, color: C.text, letterSpacing: "-0.3px" }}>
+          <h2 style={{ fontSize: "clamp(22px,3.5vw,30px)", fontWeight: 800, color: "#12101A", letterSpacing: "-0.3px" }}>
             Why owners choose a flat rate
           </h2>
         </div>

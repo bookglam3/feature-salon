@@ -16,21 +16,21 @@ export const metadata: Metadata = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "salon no-show reduction": "#10B981",
-  "salon no-shows": "#10B981",
-  "barbershop booking": "#8B5CF6",
-  "whatsapp reminders": "#25D366",
-  "booksy alternative": "#F59E0B",
-  "best salon booking software": "#6366F1",
-  "salon deposits": "#3B82F6",
-  "no commission booking software": "#F97316",
-  "clinic booking software": "#14B8A6",
-  "gym booking software": "#EF4444",
-  "fresha alternative": "#6366F1",
-  "fresha alternative 2026": "#6366F1",
-  "best salon software uk": "#F59E0B",
-  "online salon booking": "#3B82F6",
-  "treatwell alternative": "#EF4444",
+  "salon no-show reduction": "#047857",
+  "salon no-shows": "#047857",
+  "barbershop booking": "#6D28D9",
+  "whatsapp reminders": "#166534",
+  "booksy alternative": "#92400E",
+  "best salon booking software": "#4F46E5",
+  "salon deposits": "#1D4ED8",
+  "no commission booking software": "#9A3412",
+  "clinic booking software": "#0F766E",
+  "gym booking software": "#B91C1C",
+  "fresha alternative": "#4F46E5",
+  "fresha alternative 2026": "#4F46E5",
+  "best salon software uk": "#92400E",
+  "online salon booking": "#1D4ED8",
+  "treatwell alternative": "#B91C1C",
 };
 
 export default function BlogIndexPage() {
@@ -52,8 +52,8 @@ export default function BlogIndexPage() {
       </nav>
 
       {/* Breadcrumb */}
-      <div style={{ padding: "12px 24px", maxWidth: 1100, margin: "0 auto", fontSize: 13, color: "#94A3B8" }}>
-        <Link href="/" style={{ color: "#6366F1", textDecoration: "none" }}>Home</Link>
+      <div style={{ padding: "12px 24px", maxWidth: 1100, margin: "0 auto", fontSize: 13, color: "#64748B" }}>
+        <Link href="/" style={{ color: "#4F46E5", textDecoration: "none" }}>Home</Link>
         <span style={{ margin: "0 8px" }}>›</span>
         <span style={{ color: "#0F172A", fontWeight: 600 }}>Blog</span>
       </div>
@@ -61,7 +61,7 @@ export default function BlogIndexPage() {
       {/* Hero */}
       <section style={{ background: "linear-gradient(135deg,#0F0B2D 0%,#3730A3 60%,#6366F1 100%)", padding: "64px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ display: "inline-block", background: "rgba(255,255,255,0.12)", color: "#C7D2FE", fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 99, marginBottom: 20, letterSpacing: "1px", textTransform: "uppercase" }}>
+          <div style={{ display: "inline-block", background: "rgba(255,255,255,0.95)", color: "#3730A3", fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 99, marginBottom: 20, letterSpacing: "1px", textTransform: "uppercase" }}>
             FEATURE SALON BLOG
           </div>
           <h1 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 900, color: "#fff", marginBottom: 16, lineHeight: 1.15 }}>
@@ -75,7 +75,7 @@ export default function BlogIndexPage() {
 
       {/* Featured post */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 0" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#94A3B8", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 20 }}>
           FEATURED POST
         </div>
         <Link href={`/blog/${featured.slug}`} style={{ textDecoration: "none", display: "block" }}>
@@ -105,7 +105,7 @@ export default function BlogIndexPage() {
               <p style={{ fontSize: 16, color: "#475569", lineHeight: 1.7, marginBottom: 20 }}>
                 {featured.excerpt}
               </p>
-              <div style={{ display: "flex", gap: 20, fontSize: 13, color: "#94A3B8" }}>
+              <div style={{ display: "flex", gap: 20, fontSize: 13, color: "#64748B" }}>
                 <span>📅 {new Date(featured.publishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span>
                 <span>⏱ {featured.readingTime} min read</span>
               </div>
@@ -119,7 +119,7 @@ export default function BlogIndexPage() {
 
       {/* Post grid */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 64px" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#94A3B8", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 28 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 28 }}>
           ALL POSTS
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: 24 }}>
@@ -149,7 +149,7 @@ export default function BlogIndexPage() {
                 <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6, marginBottom: 20 }}>
                   {post.excerpt}
                 </p>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#94A3B8", borderTop: "1px solid #F1F5F9", paddingTop: 14, marginTop: "auto" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#64748B", borderTop: "1px solid #F1F5F9", paddingTop: 14, marginTop: "auto" }}>
                   <span>📅 {new Date(post.publishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
                   <span>⏱ {post.readingTime} min read</span>
                 </div>

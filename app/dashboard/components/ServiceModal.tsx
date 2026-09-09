@@ -141,7 +141,7 @@ function ServiceModalForm({
   };
 
   const sectionLabelStyle: React.CSSProperties = {
-    fontSize: 11, fontWeight: 700, color: "#6B6577",
+    fontSize: 11, fontWeight: 700, color: "#524D60",
     letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: 12, marginTop: 20,
   };
 
@@ -176,7 +176,7 @@ function ServiceModalForm({
         </span>
       </label>
       {form.price_is_from && (
-        <p style={{ fontSize: 11.5, color: "#6B6577", lineHeight: 1.5, marginBottom: 16, marginLeft: 24 }}>
+        <p style={{ fontSize: 11.5, color: "#524D60", lineHeight: 1.5, marginBottom: 16, marginLeft: 24 }}>
           Full online payment is unavailable for variable-priced services — clients booking this service can only pay a deposit or pay at the salon.
         </p>
       )}
@@ -210,7 +210,7 @@ function ServiceModalForm({
             {creatingCategory ? "Adding…" : "Add"}
           </button>
           <button type="button" onClick={() => { setShowNewCategory(false); setNewCategoryName(""); setCategoryError(""); }}
-            style={{ padding: "10px 12px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
+            style={{ padding: "10px 12px", background: "#FFFFFF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
             ✕
           </button>
         </div>

@@ -109,7 +109,7 @@ export default function ReviewPage() {
   /* Loading */
   if (vs.state === "loading") return (
     <Shell>
-      <div style={{ textAlign: "center", color: "#94A3B8", fontSize: 15, padding: "24px 0" }}>Loading…</div>
+      <div style={{ textAlign: "center", color: "#64748B", fontSize: 15, padding: "24px 0" }}>Loading…</div>
     </Shell>
   );
 
@@ -179,7 +179,7 @@ export default function ReviewPage() {
       {/* Star rating */}
       <div style={{ marginBottom: 28 }}>
         <div style={{
-          fontSize: 11, fontWeight: 800, color: "#94A3B8", textAlign: "center",
+          fontSize: 11, fontWeight: 800, color: "#64748B", textAlign: "center",
           marginBottom: 14, textTransform: "uppercase", letterSpacing: "1.2px",
         }}>
           Your Rating *
@@ -197,7 +197,7 @@ export default function ReviewPage() {
       {/* Comment */}
       <div style={{ marginBottom: 24 }}>
         <div style={{
-          fontSize: 11, fontWeight: 800, color: "#94A3B8", marginBottom: 10,
+          fontSize: 11, fontWeight: 800, color: "#64748B", marginBottom: 10,
           textTransform: "uppercase", letterSpacing: "1.2px",
         }}>
           Comments{" "}
@@ -241,7 +241,7 @@ export default function ReviewPage() {
         style={{
           width: "100%", padding: "16px", borderRadius: 14, border: "none",
           background: rating === 0 ? "#F1F5F9" : "linear-gradient(135deg,#667eea 0%,#764ba2 100%)",
-          color: rating === 0 ? "#94A3B8" : "#fff",
+          color: rating === 0 ? "#64748B" : "#fff",
           fontSize: 16, fontWeight: 700,
           cursor: rating === 0 || submitting ? "not-allowed" : "pointer",
           boxShadow: rating === 0 ? "none" : "0 8px 20px rgba(102,126,234,0.38)",
@@ -251,7 +251,7 @@ export default function ReviewPage() {
         {submitting ? "Submitting…" : "Submit Review"}
       </button>
 
-      <p style={{ textAlign: "center", fontSize: 12, color: "#94A3B8", marginTop: 14, lineHeight: 1.6 }}>
+      <p style={{ textAlign: "center", fontSize: 12, color: "#64748B", marginTop: 14, lineHeight: 1.6 }}>
         Your first name only is shown publicly. Reviews help real clients find great businesses.
       </p>
     </Shell>

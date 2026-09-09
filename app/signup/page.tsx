@@ -5,7 +5,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { POPULAR_COUNTRIES, ALL_COUNTRIES, type Country } from "../lib/countries";
 
-const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#10B981", red:"#EF4444", text:"#F7F5EF", text2:"#aab1c4", text3:"#8A8598", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#6B6577" };
+const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#10B981", red:"#EF4444", text:"#F7F5EF", text2:"#aab1c4", text3:"#6B6577", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#524D60" };
 const STEPS = ["Account", "Your Business", "Verify Email", "Done!"];
 
 const BUSINESS_TYPES = [
@@ -279,7 +279,7 @@ export default function SignupPage() {
   };
 
   const EyeBtn = ({ show, toggle }: { show:boolean; toggle:()=>void }) => (
-    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:"#8A8598", padding:0, lineHeight:1, display:"flex" }}>
+    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:"#6B6577", padding:0, lineHeight:1, display:"flex" }}>
       {show ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.87 20.87 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.87 20.87 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/>

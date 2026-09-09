@@ -192,14 +192,14 @@ function buildOnboardingEmail({ salonName, ownerEmail, resetLink }: {
       <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:2px;">⏳ This link expires in 24 hours</div>
       <div style="font-size:12px;color:#92400E;">Contact your Feature Salon administrator if it expires.</div>
     </div>
-    <p style="font-size:12px;color:#9CA3AF;margin:0;">
+    <p style="font-size:12px;color:#6B7280;margin:0;">
       Can&apos;t click the button? Copy this link into your browser:<br/>
       <a href="${resetLink}" style="color:#6366F1;word-break:break-all;font-size:11px;">${resetLink}</a>
     </p>
     <p style="font-size:12px;color:#D1D5DB;margin:20px 0 0;">Account email: ${ownerEmail}</p>
   </div>
   <div style="background:#F9FAFB;border-top:1px solid #E5E7EB;padding:16px;text-align:center;">
-    <p style="font-size:11px;color:#9CA3AF;margin:0;">Feature Salon · featuresalon.co.uk<br/>If you didn&apos;t expect this, you can safely ignore it.</p>
+    <p style="font-size:11px;color:#6B7280;margin:0;">Feature Salon · featuresalon.co.uk<br/>If you didn&apos;t expect this, you can safely ignore it.</p>
   </div>
 </div>
 </body></html>`;

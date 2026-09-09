@@ -29,7 +29,7 @@ function getOnboardingTerms(bt?: string) {
 const C = {
   indigo: "#C9A24B", indigoDark: "#0E1320", indigoSoft: "rgba(201,162,75,0.10)",
   green: "#10B981", greenSoft: "rgba(16,185,129,0.10)", greenBorder: "rgba(16,185,129,0.25)",
-  text: "#F7F5EF", text2: "#aab1c4", text3: "#94A3B8",
+  text: "#F7F5EF", text2: "#aab1c4", text3: "#64748B",
   border: "#2a3350", surface: "#FFFFFF",
 };
 

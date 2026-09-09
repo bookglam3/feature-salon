@@ -63,7 +63,7 @@ function WizardProgress({ step, labels }: { step: number; labels: string[] }) {
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
         {labels.map((label, i) => (
-          <span key={label} style={{ fontSize: 10, fontWeight: 700, color: i <= step ? "#7C3AED" : "#9A94A8", letterSpacing: "0.2px", textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center", flex: 1 }}>{label}</span>
+          <span key={label} style={{ fontSize: 10, fontWeight: 700, color: i <= step ? "#7C3AED" : "#6B6577", letterSpacing: "0.2px", textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center", flex: 1 }}>{label}</span>
         ))}
       </div>
     </div>
@@ -319,7 +319,7 @@ export default function BookingsPage() {
         <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>{vc.bookingPlural}</div>
-          <div style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 1 }}>{appointments.length} total {vc.bookingPlural.toLowerCase()}</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>{appointments.length} total {vc.bookingPlural.toLowerCase()}</div>
         </div>
       </div>
       {/* flexWrap: same inline-override technique already used on this
@@ -351,7 +351,7 @@ export default function BookingsPage() {
           descendant styling lives here; everything else is inline. */}
       <style>{`
         .bk-tab { padding: 5px 13px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600;
-          cursor: pointer; transition: all 0.15s ease; background: transparent; color: #6B6577; font-family: var(--font); }
+          cursor: pointer; transition: all 0.15s ease; background: transparent; color: #524D60; font-family: var(--font); }
         .bk-tab:hover { color: #12101A; }
         .bk-tab.active { background: #EDE9FF; color: #6D28D9; border: 1px solid #DDD6FE; box-shadow: 0 1px 3px rgba(124,58,237,0.12); }
         .bk-btn-primary { display: inline-flex; align-items: center; gap: 7px;
@@ -361,19 +361,19 @@ export default function BookingsPage() {
           letter-spacing: -0.1px; font-family: var(--font); }
         .bk-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.40); }
         @media (max-width: 767px) { .bk-btn-primary { padding: 9px 14px; font-size: 12.5px; } }
-        .bk-btn-ghost { display: inline-flex; align-items: center; gap: 6px; background: #FFFFFF; color: #6B6577;
+        .bk-btn-ghost { display: inline-flex; align-items: center; gap: 6px; background: #FFFFFF; color: #524D60;
           border: 1px solid #ECE9F1; border-radius: 10px; padding: 7px 14px; font-size: 12.5px; font-weight: 600;
           cursor: pointer; white-space: nowrap; transition: all 0.15s ease; font-family: var(--font); }
         .bk-btn-ghost:hover { background: #EDE9FF; color: #7C3AED; border-color: #DDD6FE; }
         .bk-input { background: #FFFFFF; border: 1px solid #ECE9F1; border-radius: 11px; padding: 9px 13px;
           font-size: 13px; color: #12101A; font-family: var(--font); outline: none;
           transition: border-color 0.18s, box-shadow 0.18s; width: 100%; }
-        .bk-input::placeholder { color: #9A94A8; }
+        .bk-input::placeholder { color: #6B6577; }
         .bk-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
         .bk-table { width: 100%; border-collapse: collapse; }
         .bk-table thead tr { background: #F5F3FF; border-bottom: 1px solid #ECE9F1; }
         .bk-table th { text-align: left; padding: 11px 18px; font-size: 10.5px; font-weight: 800;
-          color: #6B6577; letter-spacing: 0.9px; text-transform: uppercase; white-space: nowrap; }
+          color: #524D60; letter-spacing: 0.9px; text-transform: uppercase; white-space: nowrap; }
         .bk-table td { padding: 13px 18px; font-size: 13px; color: #12101A;
           border-bottom: 1px solid #ECE9F1; vertical-align: middle; }
         .bk-table tr:last-child td { border-bottom: none; }
@@ -417,9 +417,9 @@ export default function BookingsPage() {
                       <tr key={a.id}>
                         <td><StatusPill status={a.status} /></td>
                         <td style={{ fontWeight: 700, color: "#12101A" }}>{a.client_name}</td>
-                        <td style={{ color: "#6B6577" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
-                        <td style={{ color: "#6B6577" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
-                        <td style={{ color: "#6B6577", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
+                        <td style={{ color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ color: "#524D60" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
+                        <td style={{ color: "#524D60", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
                         <td style={{ fontWeight: 700, color: "#059669" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 4 }}>
@@ -458,7 +458,7 @@ export default function BookingsPage() {
                 const isToday = day.toDateString() === new Date().toDateString();
                 return (
                   <div key={i} style={{ padding: "10px 8px", textAlign: "center", borderRight: i < 6 ? "1px solid #F5F3FF" : "none" }}>
-                    <div style={{ fontSize: 10, color: "#9A94A8", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <div style={{ fontSize: 10, color: "#6B6577", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][day.getDay()]}
                     </div>
                     <div style={{ width: 28, height: 28, borderRadius: "50%", background: isToday ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "transparent", color: isToday ? "#fff" : "#ECE9F1", fontSize: 13, fontWeight: isToday ? 800 : 500, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: isToday ? "0 4px 12px rgba(124,58,237,0.45)" : "none" }}>
@@ -481,7 +481,7 @@ export default function BookingsPage() {
                       >
                         <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED" }}>{new Date(a.date_time).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
                         <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600 }}>{a.client_name}</div>
-                        <div style={{ fontSize: 10, color: "#6B6577" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
+                        <div style={{ fontSize: 10, color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
                       </div>
                     ))}
                   </div>
@@ -612,7 +612,7 @@ export default function BookingsPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: 12.5, fontWeight: 600, color: "#12101A" }}>Patch Test Consent</div>
-                  <div style={{ fontSize: 11, color: "#6B6577", marginTop: 1 }}>Client consents to patch test before treatment</div>
+                  <div style={{ fontSize: 11, color: "#524D60", marginTop: 1 }}>Client consents to patch test before treatment</div>
                 </div>
               </div>
               <FormGroup label="Additional Notes">
@@ -637,12 +637,12 @@ export default function BookingsPage() {
             <div>
               <div style={wizardTapCardStyle(formData.service_id === "")} onClick={() => setFormData({ ...formData, service_id: "" })}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>No service selected</div>
-                <div style={{ fontSize: 11.5, color: "#6B6577" }}>Optional — you can add this later</div>
+                <div style={{ fontSize: 11.5, color: "#524D60" }}>Optional — you can add this later</div>
               </div>
               {sortedServices.map(s => (
                 <div key={s.id} style={wizardTapCardStyle(formData.service_id === s.id)} onClick={() => setFormData({ ...formData, service_id: s.id })}>
                   <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{s.name}</div>
-                  <div style={{ fontSize: 11.5, color: "#6B6577" }}>{s.price_is_from ? "from " : ""}£{s.price}{s.duration_minutes ? ` · ${s.duration_minutes} mins` : ""}</div>
+                  <div style={{ fontSize: 11.5, color: "#524D60" }}>{s.price_is_from ? "from " : ""}£{s.price}{s.duration_minutes ? ` · ${s.duration_minutes} mins` : ""}</div>
                 </div>
               ))}
             </div>
@@ -652,7 +652,7 @@ export default function BookingsPage() {
             <div>
               <div style={wizardTapCardStyle(formData.staff_id === "")} onClick={() => setFormData({ ...formData, staff_id: "" })}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>👥 Any Available {vc.staffSingular}</div>
-                <div style={{ fontSize: 11.5, color: "#6B6577" }}>We will assign whoever is free</div>
+                <div style={{ fontSize: 11.5, color: "#524D60" }}>We will assign whoever is free</div>
               </div>
               {staff.map(s => (
                 <div key={s.id} style={wizardTapCardStyle(formData.staff_id === s.id)} onClick={() => setFormData({ ...formData, staff_id: s.id })}>
@@ -767,7 +767,7 @@ export default function BookingsPage() {
                             </div>
                             <div>
                               <div style={{ fontSize: 12.5, fontWeight: 600, color: "#12101A" }}>Patch Test Consent</div>
-                              <div style={{ fontSize: 11, color: "#6B6577", marginTop: 1 }}>Client consents to patch test before treatment</div>
+                              <div style={{ fontSize: 11, color: "#524D60", marginTop: 1 }}>Client consents to patch test before treatment</div>
                             </div>
                           </div>
                           <FormGroup label="Additional Notes">
@@ -800,7 +800,7 @@ export default function BookingsPage() {
                   { label: vc.clientSingular, value: formData.client_name || "—" },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #ECE9F1" }}>
-                    <span style={{ fontSize: 12, color: "#6B6577", fontWeight: 600 }}>{row.label}</span>
+                    <span style={{ fontSize: 12, color: "#524D60", fontWeight: 600 }}>{row.label}</span>
                     <span style={{ fontSize: 12.5, color: "#12101A", fontWeight: 700 }}>{row.value}</span>
                   </div>
                 ))}

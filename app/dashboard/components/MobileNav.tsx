@@ -109,7 +109,7 @@ export default function MobileNav() {
           font-size: 9.5px; letter-spacing: 0.1px;
           white-space: nowrap; font-weight: 500;
           transition: all 0.18s;
-          color: #9A94A8;
+          color: #6B6577;
         }
         .mnav-item.active .mnav-label {
           font-weight: 800;
@@ -134,7 +134,7 @@ export default function MobileNav() {
               key={item.path}
               href={item.path}
               className={`mnav-item${active ? " active" : ""}`}
-              style={{ color: active ? activeColor : "#9A94A8" }}
+              style={{ color: active ? activeColor : "#6B6577" }}
             >
               {/* Accent bar at top */}
               <div
@@ -154,12 +154,12 @@ export default function MobileNav() {
                 <Icon
                   size={18}
                   strokeWidth={active ? 2 : 1.6}
-                  color={active ? "#fff" : "#9A94A8"}
+                  color={active ? "#fff" : "#6B6577"}
                 />
               </div>
 
               {/* Label */}
-              <span className="mnav-label" style={{ color: active ? activeColor : "#9A94A8" }}>
+              <span className="mnav-label" style={{ color: active ? activeColor : "#6B6577" }}>
                 {labelFor(item.key)}
               </span>
             </Link>

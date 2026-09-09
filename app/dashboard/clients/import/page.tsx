@@ -239,14 +239,14 @@ export default function ImportClientsPage() {
     }
   };
 
-  if (loadingProfile) return <DashboardShell salonName=""><div style={{ padding: 40, color: "#6B6577" }}>Loading…</div></DashboardShell>;
+  if (loadingProfile) return <DashboardShell salonName=""><div style={{ padding: 40, color: "#524D60" }}>Loading…</div></DashboardShell>;
 
   const Topbar = (
     <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 30 }}>
       <HamburgerBtn />
       <div>
         <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>Import {vc.clientPlural}</div>
-        <div style={{ fontSize: 11.5, color: "#9A94A8" }}>Bring in your client list from Fresha, Phorest, Booksy or any CSV export</div>
+        <div style={{ fontSize: 11.5, color: "#6B6577" }}>Bring in your client list from Fresha, Phorest, Booksy or any CSV export</div>
       </div>
     </header>
   );
@@ -259,7 +259,7 @@ export default function ImportClientsPage() {
         {step === "upload" && (
           <div style={cardStyle}>
             <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", marginBottom: 6 }}>Upload your client CSV</div>
-            <p style={{ fontSize: 13, color: "#9A94A8", marginBottom: 20, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: "#6B6577", marginBottom: 20, lineHeight: 1.6 }}>
               Export your client list as a CSV from Fresha, Phorest or Booksy, then upload it here. Max 5MB / {MAX_ROWS.toLocaleString()} rows.
             </p>
 
@@ -276,7 +276,7 @@ export default function ImportClientsPage() {
             >
               <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A", marginBottom: 4 }}>Click to browse or drag a .csv file here</div>
-              <div style={{ fontSize: 12, color: "#9A94A8" }}>Only .csv files are supported</div>
+              <div style={{ fontSize: 12, color: "#6B6577" }}>Only .csv files are supported</div>
               <input ref={fileInputRef} type="file" accept=".csv,text/csv" style={{ display: "none" }} onChange={onFileInputChange} />
             </div>
 
@@ -294,15 +294,15 @@ export default function ImportClientsPage() {
             <div style={{ ...cardStyle, marginBottom: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A" }}>Map your columns</div>
-                <button onClick={resetAll} style={{ background: "none", border: "none", color: "#9A94A8", fontSize: 12.5, cursor: "pointer" }}>← Choose a different file</button>
+                <button onClick={resetAll} style={{ background: "none", border: "none", color: "#6B6577", fontSize: 12.5, cursor: "pointer" }}>← Choose a different file</button>
               </div>
-              <p style={{ fontSize: 12.5, color: "#9A94A8", marginBottom: 18 }}>
-                <strong style={{ color: "#6B6577" }}>{fileName}</strong> — {dataRows.length.toLocaleString()} rows detected
+              <p style={{ fontSize: 12.5, color: "#6B6577", marginBottom: 18 }}>
+                <strong style={{ color: "#524D60" }}>{fileName}</strong> — {dataRows.length.toLocaleString()} rows detected
               </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 6 }}>
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 600, color: "#6B6577", marginBottom: 6 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 600, color: "#524D60", marginBottom: 6 }}>
                     <input type="checkbox" checked={mapping.useSplitName} onChange={e => setMapping(m => ({ ...m, useSplitName: e.target.checked }))} />
                     My file has separate First name / Last name columns
                   </label>
@@ -310,7 +310,7 @@ export default function ImportClientsPage() {
 
                 {!mapping.useSplitName ? (
                   <div>
-                    <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Name *</label>
+                    <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Name *</label>
                     <select style={selectStyle} value={mapping.name} onChange={e => setMapping(m => ({ ...m, name: e.target.value }))}>
                       <option value="">— Not mapped —</option>
                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
@@ -319,14 +319,14 @@ export default function ImportClientsPage() {
                 ) : (
                   <>
                     <div>
-                      <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>First name *</label>
+                      <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>First name *</label>
                       <select style={selectStyle} value={mapping.firstName} onChange={e => setMapping(m => ({ ...m, firstName: e.target.value }))}>
                         <option value="">— Not mapped —</option>
                         {headers.map(h => <option key={h} value={h}>{h}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Last name</label>
+                      <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Last name</label>
                       <select style={selectStyle} value={mapping.lastName} onChange={e => setMapping(m => ({ ...m, lastName: e.target.value }))}>
                         <option value="">— Not mapped —</option>
                         {headers.map(h => <option key={h} value={h}>{h}</option>)}
@@ -336,35 +336,35 @@ export default function ImportClientsPage() {
                 )}
 
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Email</label>
+                  <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Email</label>
                   <select style={selectStyle} value={mapping.email} onChange={e => setMapping(m => ({ ...m, email: e.target.value }))}>
                     <option value="">— Not mapped —</option>
                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Phone</label>
+                  <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Phone</label>
                   <select style={selectStyle} value={mapping.phone} onChange={e => setMapping(m => ({ ...m, phone: e.target.value }))}>
                     <option value="">— Not mapped —</option>
                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Notes <span style={{ color: "#9A94A8" }}>(optional)</span></label>
+                  <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Notes <span style={{ color: "#6B6577" }}>(optional)</span></label>
                   <select style={selectStyle} value={mapping.notes} onChange={e => setMapping(m => ({ ...m, notes: e.target.value }))}>
                     <option value="">— Not mapped —</option>
                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Date of birth <span style={{ color: "#9A94A8" }}>(optional)</span></label>
+                  <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Date of birth <span style={{ color: "#6B6577" }}>(optional)</span></label>
                   <select style={selectStyle} value={mapping.dateOfBirth} onChange={e => setMapping(m => ({ ...m, dateOfBirth: e.target.value }))}>
                     <option value="">— Not mapped —</option>
                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "#9A94A8", marginBottom: 5 }}>Last visit <span style={{ color: "#9A94A8" }}>(optional)</span></label>
+                  <label style={{ display: "block", fontSize: 12, color: "#6B6577", marginBottom: 5 }}>Last visit <span style={{ color: "#6B6577" }}>(optional)</span></label>
                   <select style={selectStyle} value={mapping.lastVisit} onChange={e => setMapping(m => ({ ...m, lastVisit: e.target.value }))}>
                     <option value="">— Not mapped —</option>
                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
@@ -379,12 +379,12 @@ export default function ImportClientsPage() {
 
             {/* Preview */}
             <div style={{ ...cardStyle, marginBottom: 16, overflowX: "auto" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: "#6B6577", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.5px" }}>Preview — first {previewRows.length} rows</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: "#524D60", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.5px" }}>Preview — first {previewRows.length} rows</div>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
                 <thead>
                   <tr>
                     {["Name", "Email", "Phone", "Notes", "DOB", "Last Visit"].map(h => (
-                      <th key={h} style={{ textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#9A94A8", padding: "8px 10px", borderBottom: "1px solid #ECE9F1", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
+                      <th key={h} style={{ textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#6B6577", padding: "8px 10px", borderBottom: "1px solid #ECE9F1", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -392,11 +392,11 @@ export default function ImportClientsPage() {
                   {previewRows.map((r, i) => (
                     <tr key={i}>
                       <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#12101A", borderBottom: "1px solid #ECE9F1" }}>{r.name || "—"}</td>
-                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{r.email || "—"}</td>
-                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{r.phone || "—"}</td>
-                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{r.notes || "—"}</td>
-                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{r.dateOfBirth || "—"}</td>
-                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#6B6577", borderBottom: "1px solid #ECE9F1" }}>{r.lastVisit || "—"}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#524D60", borderBottom: "1px solid #ECE9F1" }}>{r.email || "—"}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#524D60", borderBottom: "1px solid #ECE9F1" }}>{r.phone || "—"}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#524D60", borderBottom: "1px solid #ECE9F1" }}>{r.notes || "—"}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#524D60", borderBottom: "1px solid #ECE9F1" }}>{r.dateOfBirth || "—"}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 12.5, color: "#524D60", borderBottom: "1px solid #ECE9F1" }}>{r.lastVisit || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -442,19 +442,19 @@ export default function ImportClientsPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
               <div style={{ background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
                 <div style={{ fontSize: 24, fontWeight: 900, color: "#10B981" }}>{result.imported}</div>
-                <div style={{ fontSize: 11, color: "#9A94A8", marginTop: 4, fontWeight: 600 }}>Imported</div>
+                <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4, fontWeight: 600 }}>Imported</div>
               </div>
               <div style={{ background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
                 <div style={{ fontSize: 24, fontWeight: 900, color: "#F59E0B" }}>{result.duplicates}</div>
-                <div style={{ fontSize: 11, color: "#9A94A8", marginTop: 4, fontWeight: 600 }}>Already Existed</div>
+                <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4, fontWeight: 600 }}>Already Existed</div>
               </div>
               <div style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
                 <div style={{ fontSize: 24, fontWeight: 900, color: "#EF4444" }}>{result.skippedInvalid}</div>
-                <div style={{ fontSize: 11, color: "#9A94A8", marginTop: 4, fontWeight: 600 }}>Skipped (Invalid)</div>
+                <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4, fontWeight: 600 }}>Skipped (Invalid)</div>
               </div>
             </div>
 
-            <p style={{ fontSize: 12.5, color: "#9A94A8", marginBottom: 20 }}>
+            <p style={{ fontSize: 12.5, color: "#6B6577", marginBottom: 20 }}>
               {result.totalRows.toLocaleString()} rows processed from {fileName}.
             </p>
 
@@ -463,11 +463,11 @@ export default function ImportClientsPage() {
                 View {vc.clientPlural} →
               </button>
               {result.skippedRows.length > 0 && (
-                <button onClick={() => downloadSkippedCSV(result.skippedRows)} style={{ padding: "11px 20px", background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={() => downloadSkippedCSV(result.skippedRows)} style={{ padding: "11px 20px", background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
                   ⬇ Download Skipped Rows CSV
                 </button>
               )}
-              <button onClick={resetAll} style={{ padding: "11px 20px", background: "none", color: "#9A94A8", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={resetAll} style={{ padding: "11px 20px", background: "none", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>
                 Import Another File
               </button>
             </div>

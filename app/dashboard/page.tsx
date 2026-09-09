@@ -62,7 +62,7 @@ function QuickAction({ lucideIcon, label, color, onClick }: { lucideIcon: React.
       <div style={{ width: 44, height: 44, borderRadius: 13, background: `${color}18`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: color, transition: "transform 0.2s" }}>
         {lucideIcon}
       </div>
-      <span style={{ fontSize: 11, fontWeight: 700, color: "#6B6577", whiteSpace: "nowrap", letterSpacing: "0.1px" }}>{label}</span>
+      <span style={{ fontSize: 11, fontWeight: 700, color: "#524D60", whiteSpace: "nowrap", letterSpacing: "0.1px" }}>{label}</span>
     </button>
   );
 }
@@ -77,7 +77,7 @@ function MiniStat({ label, value, color, lucideIcon, sub, trend }: { label: stri
       <div style={{ position: "absolute", top: 16, right: 16, width: 31, height: 31, borderRadius: 9, background: `${color}14`, display: "flex", alignItems: "center", justifyContent: "center", color: color }}>
         {lucideIcon}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#6B6577", paddingRight: 40, lineHeight: 1.3 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#524D60", paddingRight: 40, lineHeight: 1.3 }}>{label}</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 7, flexWrap: "wrap", marginTop: "auto" }}>
         <div style={{ fontSize: 25, fontWeight: 700, color: "#12101A", letterSpacing: "-0.4px", lineHeight: 1 }}>{value}</div>
         {/* Rendered only when a real prior-period basis exists (trend === null
@@ -91,7 +91,7 @@ function MiniStat({ label, value, color, lucideIcon, sub, trend }: { label: stri
           <span>{trend >= 0 ? "\u2191" : "\u2193"}</span>{Math.abs(trend)}% vs last week
         </div>
       ) : sub ? (
-        <div style={{ fontSize: 9, color: "#9A94A8", marginTop: 6, fontWeight: 500 }}>{sub}</div>
+        <div style={{ fontSize: 9, color: "#6B6577", marginTop: 6, fontWeight: 500 }}>{sub}</div>
       ) : null}
     </div>
   );
@@ -115,7 +115,7 @@ function RevenueMiniChart({ appointments, serviceDisplay }: { appointments: Appo
       {dayRevenue.map((rev, i) => (
         <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
           <div title={`£${rev}`} style={{ width: "100%", borderRadius: "5px 5px 0 0", height: `${Math.max((rev / max) * 52, 4)}px`, background: rev === max && rev > 0 ? "linear-gradient(180deg,#ac7bff,#7440dd)" : "#e9e1f6", boxShadow: "none", transition: "all 0.3s ease", cursor: "default" }} />
-          <span style={{ fontSize: 9, color: i === todayIdx ? "#6D28D9" : "#9A94A8", fontWeight: i === todayIdx ? 700 : 500 }}>{days[i]}</span>
+          <span style={{ fontSize: 9, color: i === todayIdx ? "#6D28D9" : "#6B6577", fontWeight: i === todayIdx ? 700 : 500 }}>{days[i]}</span>
         </div>
       ))}
     </div>
@@ -160,7 +160,7 @@ function ApptRow({ appt, serviceName, price, onClick }: { appt: Appointment; ser
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{appt.client_name}</div>
-        <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {serviceName || "No service"}{appt.staff?.name ? ` \u00b7 ${appt.staff.name}` : ""}
         </div>
       </div>
@@ -171,7 +171,7 @@ function ApptRow({ appt, serviceName, price, onClick }: { appt: Appointment; ser
           <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>£{price}</div>
         )}
         <span className="bk-row-menu" aria-hidden="true"
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, color: "#9A94A8", fontSize: 13, letterSpacing: "0.5px", transition: "all 0.14s ease" }}>
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, color: "#6B6577", fontSize: 13, letterSpacing: "0.5px", transition: "all 0.14s ease" }}>
           &#8942;
         </span>
       </div>
@@ -380,7 +380,7 @@ export default function DashboardPage() {
         <HamburgerBtn />
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 14.5, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{greeting}, {salon?.name?.split(" ")[0]}</div>
-          <div className="dash-greeting-date" style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
+          <div className="dash-greeting-date" style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -388,9 +388,9 @@ export default function DashboardPage() {
         <div className="dash-topbar-badge" style={{ padding: "5px 14px", borderRadius: 99, background: "#EDE9FF", border: "1px solid rgba(124,58,237,0.20)", fontSize: 10.5, fontWeight: 900, color: "#6D28D9", letterSpacing: "1px" }}>{planInfo.badge}</div>
         {/* Export */}
         <button onClick={handleExportCSV} title="Export CSV" className="dash-topbar-export"
-          style={{ width: 38, height: 38, borderRadius: 10, background: "#F5F3FF", border: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#6B6577", transition: "all 0.18s" }}
+          style={{ width: 38, height: 38, borderRadius: 10, background: "#F5F3FF", border: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#524D60", transition: "all 0.18s" }}
           onMouseEnter={e => { e.currentTarget.style.background = "#EDE9FF"; e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.color = "#6D28D9"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#6B6577"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#524D60"; }}
         ><Download size={15} strokeWidth={2} /></button>
         {/* New Booking */}
         <button onClick={() => setShowModal(true)} className="dash-topbar-newbtn"
@@ -418,28 +418,28 @@ export default function DashboardPage() {
         {/* ── 1. Greeting ───────────────────────────────────────── */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20, flexWrap: "wrap", marginBottom: 26 }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10.5, fontWeight: 600, color: "#9A94A8", letterSpacing: "0.2px", marginBottom: 7 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 600, color: "#6B6577", letterSpacing: "0.2px", marginBottom: 7 }}>
               {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </div>
             <h1 style={{ fontSize: 22, fontWeight: 700, color: "#12101A", letterSpacing: "-0.5px", margin: 0, lineHeight: 1.2 }}>
               {greeting}, {salon?.name?.split(" ")[0]}!
             </h1>
-            <p style={{ fontSize: 12.5, color: "#6B6577", margin: "6px 0 0" }}>
+            <p style={{ fontSize: 12.5, color: "#524D60", margin: "6px 0 0" }}>
               Here&apos;s what&apos;s happening with your business today.
             </p>
           </div>
           {/* Booking-link actions preserved from the old banner — handleCopyLink stays wired */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button onClick={handleCopyLink}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: copied ? "rgba(37,148,102,0.08)" : "#FFFFFF", color: copied ? "#259466" : "#6B6577", border: `1px solid ${copied ? "rgba(37,148,102,0.25)" : "#ECE9F1"}`, borderRadius: 9, fontSize: 11.5, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: copied ? "rgba(37,148,102,0.08)" : "#FFFFFF", color: copied ? "#259466" : "#524D60", border: `1px solid ${copied ? "rgba(37,148,102,0.25)" : "#ECE9F1"}`, borderRadius: 9, fontSize: 11.5, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}>
               <Link2 size={12} strokeWidth={2} />{copied ? "Copied!" : "Copy link"}
             </button>
             <button onClick={() => window.open(`/book/${salon?.slug}`, "_blank")}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 11.5, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: "#FFFFFF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 11.5, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}>
               <ExternalLink size={12} strokeWidth={2} />Preview
             </button>
             <a href="/dashboard/reports"
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 11.5, fontWeight: 600, textDecoration: "none", transition: "all 0.15s" }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", background: "#FFFFFF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 11.5, fontWeight: 600, textDecoration: "none", transition: "all 0.15s" }}>
               <BarChart2 size={12} strokeWidth={2} />Reports
             </a>
           </div>
@@ -465,7 +465,7 @@ export default function DashboardPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", gap: 12, flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>Today&apos;s schedule</div>
-              <div style={{ fontSize: 10, color: "#9A94A8", marginTop: 3 }}>{todayAppts.length} {todayAppts.length === 1 ? vc.bookingSingular.toLowerCase() : vc.bookingPlural.toLowerCase()} scheduled</div>
+              <div style={{ fontSize: 10, color: "#6B6577", marginTop: 3 }}>{todayAppts.length} {todayAppts.length === 1 ? vc.bookingSingular.toLowerCase() : vc.bookingPlural.toLowerCase()} scheduled</div>
             </div>
             <a href="/dashboard/calendar" style={{ fontSize: 10, fontWeight: 700, color: "#7C3AED", textDecoration: "none" }}>View calendar →</a>
           </div>
@@ -489,17 +489,17 @@ export default function DashboardPage() {
         <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 14, padding: "18px 20px", marginBottom: 24, boxShadow: "0 1px 2px rgba(18,16,26,0.03)" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 4 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>This week</div>
-            <div style={{ fontSize: 10, color: "#9A94A8" }}>Daily revenue · confirmed only</div>
+            <div style={{ fontSize: 10, color: "#6B6577" }}>Daily revenue · confirmed only</div>
           </div>
           <RevenueMiniChart appointments={appointments} serviceDisplay={serviceDisplay} />
           {/* Totals — both figures are existing memos, not new maths */}
           <div style={{ display: "flex", gap: 28, flexWrap: "wrap", marginTop: 18, paddingTop: 16, borderTop: "1px solid #eeecf2" }}>
             <div>
-              <div style={{ fontSize: 10, color: "#9A94A8", marginBottom: 4 }}>Total {vc.bookingPlural.toLowerCase()}</div>
+              <div style={{ fontSize: 10, color: "#6B6577", marginBottom: 4 }}>Total {vc.bookingPlural.toLowerCase()}</div>
               <div style={{ fontSize: 19, fontWeight: 700, color: "#12101A", letterSpacing: "-0.4px", lineHeight: 1 }}>{appointments.length}</div>
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "#9A94A8", marginBottom: 4 }}>Revenue (confirmed)</div>
+              <div style={{ fontSize: 10, color: "#6B6577", marginBottom: 4 }}>Revenue (confirmed)</div>
               <div style={{ fontSize: 19, fontWeight: 700, color: "#259466", letterSpacing: "-0.4px", lineHeight: 1 }}>£{totalRevenue}</div>
             </div>
           </div>
@@ -507,7 +507,7 @@ export default function DashboardPage() {
 
         {/* ── 5. Quick Actions ───────────────────────────────────── */}
         <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, padding: "20px 22px", marginBottom: 20, boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)" }}>
-          <div style={{ fontSize: 11, fontWeight: 900, color: "#9A94A8", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 16 }}>Quick Actions</div>
+          <div style={{ fontSize: 11, fontWeight: 900, color: "#6B6577", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 16 }}>Quick Actions</div>
           <div className="dash-quick-scroll" style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 2 }}>
             <QuickAction lucideIcon={<CalendarPlus size={20} strokeWidth={1.8} />} label={`New ${vc.bookingSingular}`} color="#7C3AED" onClick={() => setShowModal(true)} />
             <QuickAction lucideIcon={<UserPlus size={20} strokeWidth={1.8} />} label={`Add ${vc.clientSingular}`} color="#7C3AED" onClick={() => router.push("/dashboard/clients")} />
@@ -521,9 +521,9 @@ export default function DashboardPage() {
         {salon?.slug && (
           <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 14, padding: "18px 20px", marginBottom: 24, boxShadow: "0 1px 2px rgba(18,16,26,0.03)" }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>Your booking link</div>
-            <div style={{ fontSize: 10, color: "#9A94A8", marginTop: 3, marginBottom: 13 }}>Share this so clients can book themselves in</div>
+            <div style={{ fontSize: 10, color: "#6B6577", marginTop: 3, marginBottom: 13 }}>Share this so clients can book themselves in</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <div style={{ flex: 1, minWidth: 200, padding: "9px 13px", background: "#F8F7FB", border: "1px solid #eeecf2", borderRadius: 9, fontSize: 11.5, color: "#6B6577", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div style={{ flex: 1, minWidth: 200, padding: "9px 13px", background: "#F8F7FB", border: "1px solid #eeecf2", borderRadius: 9, fontSize: 11.5, color: "#524D60", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {origin}/book/{salon.slug}
               </div>
               <button onClick={handleCopyLink}

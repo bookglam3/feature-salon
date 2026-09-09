@@ -147,13 +147,13 @@ function BroadcastContent() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Broadcast Messages</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Send bulk messages to all clients</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Send bulk messages to all clients</div>
         </div>
       </div>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
@@ -166,13 +166,13 @@ function BroadcastContent() {
 
             {/* Channel selector */}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 8 }}>Channel</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 8 }}>Channel</label>
               <div style={{ display: "flex", gap: 10 }}>
                 {(["whatsapp", "sms", "email"] as const).map(ch => (
                   <button key={ch} onClick={() => setForm(f => ({ ...f, channel: ch }))}
                     style={{ flex: 1, padding: "10px 4px", borderRadius: 12, border: `2px solid ${form.channel === ch ? channelColor[ch] : "#ECE9F1"}`, background: form.channel === ch ? `${channelColor[ch]}12` : "#FFFFFF", cursor: "pointer", transition: "all 0.12s", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                     <span style={{ fontSize: 22 }}>{channelIcon[ch]}</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 800, color: form.channel === ch ? channelColor[ch] : "#6B6577", textTransform: "capitalize" }}>{ch}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 800, color: form.channel === ch ? channelColor[ch] : "#524D60", textTransform: "capitalize" }}>{ch}</span>
                   </button>
                 ))}
               </div>
@@ -182,14 +182,14 @@ function BroadcastContent() {
             <div style={{ marginBottom: 16, padding: "12px 16px", background: "#F5F3FF", borderRadius: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 12.5, fontWeight: 700, color: "#12101A" }}>Recipients</div>
-                <div style={{ fontSize: 11.5, color: "#6B6577" }}>All {recipientCount} clients</div>
+                <div style={{ fontSize: 11.5, color: "#524D60" }}>All {recipientCount} clients</div>
               </div>
               <div style={{ fontSize: 22, fontWeight: 900, color: "#7C3AED" }}>{recipientCount}</div>
             </div>
 
             {/* Title */}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Campaign Title *</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Campaign Title *</label>
               <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Summer Discount Campaign"
                 style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
             </div>
@@ -197,19 +197,19 @@ function BroadcastContent() {
             {/* Message */}
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577" }}>Message *</label>
-                <span style={{ fontSize: 11, color: "#6B6577" }}>{form.message.length} chars</span>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60" }}>Message *</label>
+                <span style={{ fontSize: 11, color: "#524D60" }}>{form.message.length} chars</span>
               </div>
               <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Type your message… Use {name} for client name, {salon} for salon name" rows={5}
                 style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 13.5, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.6 }} />
-              <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4 }}>Variables: {"{"}<b>name</b>{"}"}, {"{"}<b>salon</b>{"}"}, {"{"}<b>link</b>{"}"}</div>
+              <div style={{ fontSize: 11, color: "#524D60", marginTop: 4 }}>Variables: {"{"}<b>name</b>{"}"}, {"{"}<b>salon</b>{"}"}, {"{"}<b>link</b>{"}"}</div>
             </div>
 
             {/* Preview */}
             {form.message && (
               <div style={{ marginBottom: 16, padding: "14px 16px", background: "#F5F3FF", borderRadius: 12, border: "1.5px solid #ECE9F1" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#6B6577", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Preview (for &quot;Sarah&quot;)</div>
-                <div style={{ fontSize: 13.5, color: "#6B6577", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#524D60", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Preview (for &quot;Sarah&quot;)</div>
+                <div style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.7 }}>
                   {form.message.replace(/{name}/g, "Sarah").replace(/{salon}/g, salonName).replace(/{link}/g, "featuresalon.com/book")}
                 </div>
               </div>
@@ -230,7 +230,7 @@ function BroadcastContent() {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {getTemplates(businessType).map((t: ReturnType<typeof getTemplates>[0], i: number) => (
                 <button key={i} onClick={() => applyTemplate(t)}
-                  style={{ padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, textAlign: "left", fontSize: 13, fontWeight: 600, color: "#6B6577", cursor: "pointer", transition: "all 0.12s" }}
+                  style={{ padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, textAlign: "left", fontSize: 13, fontWeight: 600, color: "#524D60", cursor: "pointer", transition: "all 0.12s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.10)"; e.currentTarget.style.borderColor = "rgba(124,58,237,0.25)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.borderColor = "#ECE9F1"; }}>
                   {t.label}
@@ -244,7 +244,7 @@ function BroadcastContent() {
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#12101A" }}>Sent History</div>
             <div style={{ maxHeight: 320, overflowY: "auto" }}>
               {history.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "30px 0", color: "#6B6577", fontSize: 13 }}>No broadcasts sent yet</div>
+                <div style={{ textAlign: "center", padding: "30px 0", color: "#524D60", fontSize: 13 }}>No broadcasts sent yet</div>
               ) : history.map(h => (
                 <div key={h.id} style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -253,8 +253,8 @@ function BroadcastContent() {
                       {channelIcon[h.channel as keyof typeof channelIcon]} {h.channel}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11.5, color: "#6B6577", marginBottom: 4 }}>{h.recipient_count} recipients</div>
-                  <div style={{ fontSize: 11, color: "#6B6577" }}>{new Date(h.created_at).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" })}</div>
+                  <div style={{ fontSize: 11.5, color: "#524D60", marginBottom: 4 }}>{h.recipient_count} recipients</div>
+                  <div style={{ fontSize: 11, color: "#524D60" }}>{new Date(h.created_at).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" })}</div>
                 </div>
               ))}
             </div>

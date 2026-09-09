@@ -125,7 +125,7 @@ export default function Verify2FAPage() {
           <div style={{ marginTop: 18, textAlign: "center" }}>
             <button type="button" onClick={() => { setUseBackup(b => !b); setCode(""); setError(""); }} style={{
               background: "none", border: "none", cursor: "pointer",
-              color: "#6366F1", fontSize: 12.5, fontWeight: 600,
+              color: "#4F46E5", fontSize: 12.5, fontWeight: 600,
             }}>
               {useBackup ? "← Use authenticator app instead" : "Use a backup code instead →"}
             </button>

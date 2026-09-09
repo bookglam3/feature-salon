@@ -73,7 +73,7 @@ export default function BookPage() {
       {/* Salon List */}
       <div style={{ padding: "0 20px 32px", maxWidth: "600px", margin: "0 auto" }}>
         {filteredSalons.length === 0 ? (
-          <div style={{ background: "#fff", borderRadius: "12px", padding: "48px", textAlign: "center", color: "#94A3B8" }}>
+          <div style={{ background: "#fff", borderRadius: "12px", padding: "48px", textAlign: "center", color: "#64748B" }}>
             {searchTerm ? "No salons found matching your search." : "No salons available yet."}
           </div>
         ) : (

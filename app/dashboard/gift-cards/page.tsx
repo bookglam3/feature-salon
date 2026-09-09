@@ -125,7 +125,7 @@ function GiftCardsContent() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Gift Cards & Discount Codes</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Boost revenue with promotions</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Boost revenue with promotions</div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
@@ -135,7 +135,7 @@ function GiftCardsContent() {
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading…</div></DashboardShell>;
 
 
   return (
@@ -153,7 +153,7 @@ function GiftCardsContent() {
             <div key={s.label} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color }} />
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
                 <span style={{ fontSize: 18 }}>{s.icon}</span>
               </div>
               <div style={{ fontSize: 26, fontWeight: 900, color: "#12101A" }}>{s.value}</div>
@@ -164,7 +164,7 @@ function GiftCardsContent() {
         {/* Tabs */}
         <div style={{ background: "#ECE9F1", borderRadius: 12, padding: 4, display: "inline-flex", gap: 2, marginBottom: 20 }}>
           {(["discount", "gift"] as const).map(id => (
-            <button key={id} onClick={() => setTab(id)} style={{ padding: "8px 20px", borderRadius: 10, border: "none", background: tab === id ? "#fff" : "transparent", color: tab === id ? "#7C3AED" : "#6B6577", fontWeight: tab === id ? 800 : 500, fontSize: 13, cursor: "pointer", boxShadow: tab === id ? "0 1px 4px rgba(0,0,0,0.08)" : "none", transition: "all 0.12s" }}>
+            <button key={id} onClick={() => setTab(id)} style={{ padding: "8px 20px", borderRadius: 10, border: "none", background: tab === id ? "#fff" : "transparent", color: tab === id ? "#7C3AED" : "#524D60", fontWeight: tab === id ? 800 : 500, fontSize: 13, cursor: "pointer", boxShadow: tab === id ? "0 1px 4px rgba(0,0,0,0.08)" : "none", transition: "all 0.12s" }}>
               {id === "discount" ? `Discount Codes (${codes.length})` : `Gift Cards (${gifts.length})`}
             </button>
           ))}
@@ -173,7 +173,7 @@ function GiftCardsContent() {
         {/* Discount Codes */}
         {tab === "discount" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {codes.length === 0 && <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}><div style={{ fontSize: 48, marginBottom: 12 }}>🏷️</div><div style={{ fontWeight: 700 }}>No discount codes yet</div></div>}
+            {codes.length === 0 && <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60" }}><div style={{ fontSize: 48, marginBottom: 12 }}>🏷️</div><div style={{ fontWeight: 700 }}>No discount codes yet</div></div>}
             {codes.map(code => {
               const expired = code.expires_at && new Date(code.expires_at) < new Date();
               const exhausted = code.max_uses && code.uses >= code.max_uses;
@@ -183,21 +183,21 @@ function GiftCardsContent() {
                     <div style={{ background: "rgba(124,58,237,0.10)", border: "2px dashed rgba(124,58,237,0.25)", borderRadius: 10, padding: "8px 16px", fontFamily: "monospace", fontSize: 16, fontWeight: 900, color: "#7C3AED", letterSpacing: 2 }}>{code.code}</div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A" }}>{code.type === "percentage" ? `${code.value}% off` : `£${code.value} off`}</div>
-                      <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>
                         {code.uses} uses{code.max_uses ? ` / ${code.max_uses} max` : ""} · {expired ? "⚠️ Expired" : code.expires_at ? `Expires ${new Date(code.expires_at).toLocaleDateString("en-GB")}` : "No expiry"}
                       </div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <button onClick={() => { navigator.clipboard.writeText(code.code); toast.success("Code copied!"); }} style={{ padding: "6px 12px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#6B6577" }}>Copy</button>
+                    <button onClick={() => { navigator.clipboard.writeText(code.code); toast.success("Code copied!"); }} style={{ padding: "6px 12px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#524D60" }}>Copy</button>
                     <label style={{ position: "relative", width: 32, height: 18, cursor: "pointer" }}>
                       <input type="checkbox" checked={code.is_active} onChange={() => toggleCode(code.id, code.is_active)} style={{ opacity: 0, width: 0, height: 0 }} />
-                      <span style={{ position: "absolute", inset: 0, background: code.is_active ? "#10B981" : "#6B6577", borderRadius: 99, transition: "background 0.18s" }}>
+                      <span style={{ position: "absolute", inset: 0, background: code.is_active ? "#10B981" : "#524D60", borderRadius: 99, transition: "background 0.18s" }}>
                         <span style={{ position: "absolute", width: 12, height: 12, left: code.is_active ? 17 : 3, top: 3, background: "#FFFFFF", borderRadius: "50%", transition: "left 0.18s" }} />
                       </span>
                     </label>
-                    <button onClick={() => deleteCode(code.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#6B6577" }}
-                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; }}>🗑</button>
+                    <button onClick={() => deleteCode(code.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#524D60" }}
+                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#524D60"; }}>🗑</button>
                   </div>
                 </div>
               );
@@ -208,7 +208,7 @@ function GiftCardsContent() {
         {/* Gift Cards */}
         {tab === "gift" && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
-            {gifts.length === 0 && <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577", gridColumn: "1/-1" }}><div style={{ fontSize: 48, marginBottom: 12 }}>🎁</div><div style={{ fontWeight: 700 }}>No gift cards yet</div></div>}
+            {gifts.length === 0 && <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60", gridColumn: "1/-1" }}><div style={{ fontSize: 48, marginBottom: 12 }}>🎁</div><div style={{ fontWeight: 700 }}>No gift cards yet</div></div>}
             {gifts.map(g => (
               <div key={g.id} style={{ background: "linear-gradient(135deg,#5B21B6,#7C3AED)", borderRadius: 20, padding: "24px 22px", color: "#fff", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: -40, right: -40, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
@@ -244,38 +244,38 @@ function GiftCardsContent() {
             <div style={{ fontSize: 18, fontWeight: 900, color: "#12101A", marginBottom: 20 }}>New Discount Code</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Code</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Code</label>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input value={codeForm.code} onChange={e => setCodeForm({ ...codeForm, code: e.target.value.toUpperCase() })} style={{ flex: 1, padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, fontFamily: "monospace", fontWeight: 700, outline: "none" }} />
-                  <button onClick={() => setCodeForm({ ...codeForm, code: genCode("DEAL") })} style={{ padding: "10px 14px", background: "#ECE9F1", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#6B6577", whiteSpace: "nowrap" }}>Random</button>
+                  <button onClick={() => setCodeForm({ ...codeForm, code: genCode("DEAL") })} style={{ padding: "10px 14px", background: "#ECE9F1", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#524D60", whiteSpace: "nowrap" }}>Random</button>
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Type</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Type</label>
                   <select value={codeForm.type} onChange={e => setCodeForm({ ...codeForm, type: e.target.value as "percentage" | "fixed" })} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit" }}>
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed (£)</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Value *</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Value *</label>
                   <input type="number" value={codeForm.value} onChange={e => setCodeForm({ ...codeForm, value: e.target.value })} placeholder={codeForm.type === "percentage" ? "e.g. 20" : "e.g. 10"} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Max Uses (optional)</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Max Uses (optional)</label>
                   <input type="number" value={codeForm.max_uses} onChange={e => setCodeForm({ ...codeForm, max_uses: e.target.value })} placeholder="Unlimited" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Expires (optional)</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Expires (optional)</label>
                   <input type="date" value={codeForm.expires_at} onChange={e => setCodeForm({ ...codeForm, expires_at: e.target.value })} style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={() => setShowCodeModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowCodeModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleAddCode} style={{ flex: 2, padding: 12, background: "linear-gradient(135deg,#7C3AED,#6D28D9)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.3)" }}>Create Code</button>
             </div>
           </div>
@@ -289,20 +289,20 @@ function GiftCardsContent() {
             <div style={{ fontSize: 18, fontWeight: 900, color: "#12101A", marginBottom: 20 }}>New Gift Card</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Recipient Name *</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Recipient Name *</label>
                 <input value={giftForm.recipient_name} onChange={e => setGiftForm({ ...giftForm, recipient_name: e.target.value })} placeholder="Sarah Johnson" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Email (optional)</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Email (optional)</label>
                 <input type="email" value={giftForm.recipient_email} onChange={e => setGiftForm({ ...giftForm, recipient_email: e.target.value })} placeholder="sarah@email.com" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#6B6577", display: "block", marginBottom: 6 }}>Amount (£) *</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 6 }}>Amount (£) *</label>
                 <input type="number" value={giftForm.amount} onChange={e => setGiftForm({ ...giftForm, amount: e.target.value })} placeholder="e.g. 50" style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={() => setShowGiftModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowGiftModal(false)} style={{ flex: 1, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleAddGift} style={{ flex: 2, padding: 12, background: "linear-gradient(135deg,#10B981,#059669)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>Create Gift Card</button>
             </div>
           </div>

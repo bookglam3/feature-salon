@@ -129,7 +129,7 @@ export default function Modal({ open, onClose, title, children, footer, maxWidth
           -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
         }
         .modal-inner input::placeholder,
-        .modal-inner textarea::placeholder { color: #9A94A8 !important; }
+        .modal-inner textarea::placeholder { color: #6B6577 !important; }
       `}</style>
       <div
         ref={ref}
@@ -189,10 +189,10 @@ function header(title: string, onClose: () => void) {
             width: 30, height: 30, borderRadius: "50%", border: "1px solid #ECE9F1",
             background: "#F5F3FF", cursor: "pointer", display: "flex",
             alignItems: "center", justifyContent: "center", fontSize: 14,
-            color: "#6B6577", transition: "all 0.12s",
+            color: "#524D60", transition: "all 0.12s",
           }}
           onMouseEnter={e => { e.currentTarget.style.background = "#EDE9FF"; e.currentTarget.style.color = "#6D28D9"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#6B6577"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#524D60"; }}
         >✕</button>
       </div>
     </>
@@ -203,11 +203,11 @@ function header(title: string, onClose: () => void) {
 export function FormGroup({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#6B6577", marginBottom: 6, letterSpacing: "-0.1px" }}>
+      <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#524D60", marginBottom: 6, letterSpacing: "-0.1px" }}>
         {label}
       </label>
       {children}
-      {hint && <p style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 4 }}>{hint}</p>}
+      {hint && <p style={{ fontSize: 11.5, color: "#6B6577", marginTop: 4 }}>{hint}</p>}
     </div>
   );
 }
@@ -288,13 +288,13 @@ export function BtnSecondary({ children, ...props }: React.ButtonHTMLAttributes<
       style={{
         flex: 1, padding: "11px 20px",
         background: "#FFFFFF",
-        color: "#6B6577",
+        color: "#524D60",
         border: "1px solid #ECE9F1", borderRadius: 10,
         fontSize: 14, fontWeight: 500, cursor: "pointer", transition: "all 0.12s",
         ...props.style,
       }}
       onMouseEnter={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.color = "#12101A"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#6B6577"; }}
+      onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#524D60"; }}
     >{children}</button>
   );
 }

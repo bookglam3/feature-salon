@@ -90,17 +90,17 @@ function ClientPortalContent() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Client Portal</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Manage client profiles & self-service</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Manage client profiles & self-service</div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, padding: "7px 14px" }}>
-        <span style={{ fontSize: 14, color: "#6B6577" }}>🔍</span>
+        <span style={{ fontSize: 14, color: "#524D60" }}>🔍</span>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients..." style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#12101A", fontFamily: "inherit", width: 180 }} />
       </div>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading clients…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading clients…</div></DashboardShell>;
 
   const COLORS = ["#7C3AED","#10B981","#F59E0B","#EC4899","#7C3AED","#06B6D4"];
 
@@ -119,7 +119,7 @@ function ClientPortalContent() {
             <div key={s.label} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color }} />
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px" }}>{s.label}</span>
                 <span style={{ fontSize: 18 }}>{s.icon}</span>
               </div>
               <div style={{ fontSize: 26, fontWeight: 900, color: "#12101A" }}>{s.value}</div>
@@ -130,7 +130,7 @@ function ClientPortalContent() {
         {/* Clients table */}
         <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
           <div style={{ padding: "16px 22px", borderBottom: "1px solid #ECE9F1", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>All Clients <span style={{ fontSize: 12, fontWeight: 600, color: "#6B6577" }}>({filtered.length})</span></div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>All Clients <span style={{ fontSize: 12, fontWeight: 600, color: "#524D60" }}>({filtered.length})</span></div>
             <button onClick={() => {
               const csv = [["Name","Email","Phone","Bookings","Revenue","Last Visit"],
                 ...filtered.map(c => [c.name, c.email, c.phone, c.count, `£${c.revenue}`, new Date(c.last_visit).toLocaleDateString("en-GB")])
@@ -138,10 +138,10 @@ function ClientPortalContent() {
               const blob = new Blob([csv], { type: "text/csv" });
               const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "clients.csv"; a.click();
               toast.success("Clients exported!");
-            }} style={{ padding: "7px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer", color: "#6B6577" }}>Export</button>
+            }} style={{ padding: "7px 14px", background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer", color: "#524D60" }}>Export</button>
           </div>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577" }}>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>👥</div>
               <div style={{ fontWeight: 700 }}>{search ? "No clients match your search" : "No clients yet"}</div>
             </div>
@@ -151,7 +151,7 @@ function ClientPortalContent() {
                 <thead>
                   <tr style={{ background: "#F5F3FF" }}>
                     {["Client","Contact","Bookings","Revenue","Last Visit","Type","Actions"].map(h => (
-                      <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#6B6577", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
+                      <th key={h} style={{ fontSize: 10, fontWeight: 900, color: "#524D60", textAlign: "left", padding: "11px 16px", letterSpacing: "0.8px", textTransform: "uppercase", borderBottom: "1px solid #ECE9F1" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -172,13 +172,13 @@ function ClientPortalContent() {
                             <div style={{ fontSize: 13.5, fontWeight: 800, color: "#12101A" }}>{c.name}</div>
                           </div>
                         </td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#6B6577" }}>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>
                           <div>{c.email || "—"}</div>
-                          <div style={{ color: "#6B6577", fontSize: 11.5 }}>{c.phone || "—"}</div>
+                          <div style={{ color: "#524D60", fontSize: 11.5 }}>{c.phone || "—"}</div>
                         </td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#12101A" }}>{c.count}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#10B981" }}>£{c.revenue}</td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#6B6577" }}>{new Date(c.last_visit).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{new Date(c.last_visit).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: isVIP ? "rgba(245,158,11,0.10)" : isNew ? "rgba(124,58,237,0.10)" : "rgba(16,185,129,0.06)", color: isVIP ? "#F59E0B" : isNew ? "#7C3AED" : "#10B981" }}>
                             {isVIP ? "⭐ VIP" : isNew ? "🆕 New" : "🔄 Regular"}
@@ -203,7 +203,7 @@ function ClientPortalContent() {
           <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440, boxShadow: "0 32px 80px rgba(0,0,0,0.2)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 18, fontWeight: 900, color: "#12101A" }}>Client Profile</div>
-              <button onClick={() => setSelected(null)} style={{ background: "#ECE9F1", border: "none", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, color: "#6B6577", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+              <button onClick={() => setSelected(null)} style={{ background: "#ECE9F1", border: "none", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, color: "#524D60", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, padding: "16px", background: "#F5F3FF", borderRadius: 14 }}>
               <div style={{ width: 52, height: 52, borderRadius: 16, background: COLORS[selected.name?.charCodeAt(0) % COLORS.length || 0], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, color: "#fff" }}>
@@ -211,8 +211,8 @@ function ClientPortalContent() {
               </div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 900, color: "#12101A" }}>{selected.name}</div>
-                <div style={{ fontSize: 12.5, color: "#6B6577", marginTop: 2 }}>{selected.email}</div>
-                <div style={{ fontSize: 12, color: "#6B6577" }}>{selected.phone}</div>
+                <div style={{ fontSize: 12.5, color: "#524D60", marginTop: 2 }}>{selected.email}</div>
+                <div style={{ fontSize: 12, color: "#524D60" }}>{selected.phone}</div>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
@@ -223,14 +223,14 @@ function ClientPortalContent() {
                 { label: "Client Type", value: selected.count >= 5 || selected.revenue >= 200 ? "⭐ VIP" : selected.count === 1 ? "🆕 New" : "🔄 Regular", color: "#EC4899" },
               ].map(s => (
                 <div key={s.label} style={{ background: "#F5F3FF", borderRadius: 12, padding: "14px 16px", border: `1.5px solid ${s.color}20` }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>{s.label}</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>{s.label}</div>
                   <div style={{ fontSize: 16, fontWeight: 900, color: s.color }}>{s.value}</div>
                 </div>
               ))}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => { sendPortalLink(selected); setSelected(null); }} style={{ flex: 1, padding: 12, background: "linear-gradient(135deg,#7C3AED,#6D28D9)", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#fff", cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.3)" }}>Copy Portal Link</button>
-              <button onClick={() => setSelected(null)} style={{ padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Close</button>
+              <button onClick={() => setSelected(null)} style={{ padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13.5, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Close</button>
             </div>
           </div>
         </div>

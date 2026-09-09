@@ -37,12 +37,12 @@ Reference doc for restyling the remaining dashboard page bodies. Established fro
 | Accent, light tint (badges, active pills, hover fills) | `rgba(201,162,75,0.08–0.15)` | `#EDE9FF` or `rgba(124,58,237, same-alpha)` |
 | Accent, softest tint (hover backgrounds, row stripes) | `rgba(255,255,255,0.02–0.05)` used as a subtle surface | `#F5F3FF` |
 | Primary text | `#F7F5EF` | `#12101A` |
-| Muted text | `rgba(255,255,255,0.4–0.55)`, `#aab1c4` | `#6B6577` |
-| Faint/tertiary text | `rgba(255,255,255,0.22–0.35)` | `#9A94A8` |
+| Muted / body text | `rgba(255,255,255,0.4–0.55)`, `#aab1c4` | `#524D60` (8.11:1) |
+| Faint/tertiary text | `rgba(255,255,255,0.22–0.35)` | `#6B6577` (5.60:1) |
 | Input background | `rgba(255,255,255,0.04–0.06)`, dark surfaces | `#FFFFFF` or `#F5F3FF` |
 | Input border | `rgba(255,255,255,0.07–0.1)` | `#ECE9F1` |
 | Input focus | border `rgba(201,162,75,0.5)`, ring `rgba(201,162,75,0.12)` | border `#7C3AED`, ring `0 0 0 3px rgba(124,58,237,0.12)` |
-| Placeholder | `rgba(255,255,255,0.2–0.45)` | `#9A94A8` |
+| Placeholder | `rgba(255,255,255,0.2–0.45)` | `#6B6577` (5.60:1) |
 | Primary button | `linear-gradient(135deg,#C9A24B,#0E1320)` or similar gold gradient | `linear-gradient(135deg,#7C3AED,#6D28D9)`, text `#fff`, shadow `rgba(124,58,237,0.30–0.45)` |
 | Active tab/pill | bg `rgba(201,162,75,0.2–0.25)`, text `#C9A24B` | bg `#EDE9FF`, text `#6D28D9` |
 | Toggle switch (off state, on a light card) | `#aab1c4` track | `#D6D1DE` track, white `#FFFFFF` thumb (keep green `#10B981` for the ON state — semantic) |
@@ -86,7 +86,7 @@ These convey status, not brand, and stay exactly as they are on every page:
 - **Emoji icons ignore CSS `color` entirely** — a coloured emoji (🔒, 👁, gold-tinted glyphs, etc.) cannot be recoloured via `style`. If a page has an emoji that needs to become purple/grey to match the theme, it must be replaced with an inline SVG (small `<svg>` with `stroke`/`fill`) — flag this to the user rather than trying to force a CSS fix that won't work, or leaving it silently unrecoloured.
 - **Data-conditional styling stays wired to its condition, only its *colour values* change.** Example: the staff-avatar palette `const colors = [...]` array (`page.tsx`) is indexed by `s.name.charCodeAt(0) % colors.length` — recolour the five hex values, never touch the indexing expression. Same pattern applies to any `status === X ? colorA : colorB` ternary: change `colorA`/`colorB`, never the condition.
 - **`Modal.tsx` portals to `document.body`, so it sits OUTSIDE `.ds-layout`.** Every `var(--slate-*)` / `var(--indigo)` / `var(--text-*)` used *inside* a `<Modal>` therefore resolves to the `:root` LIGHT value, not the dark `.ds-layout` override — the opposite of what the same token does in the page body. Now that the modal panel is white this works *in your favour* for text tokens (they resolve dark), but `var(--indigo)` inside a modal is still the stale blue-indigo `#6366F1` rather than brand purple. **Use literal colours inside modal content, never tokens** — that's the only way to get a predictable result on both sides of the portal boundary. `Modal.tsx` itself is now fully literal for this reason.
-- **A third, older palette exists on some pages** — blue-slate (`#1E293B` text, `#475569`/`#64748B` muted, `#94A3B8` faint, `#CBD5E1`/`#E2E8F0`/`#E8EAF0` borders, `#F8FAFC` surface). It predates the navy/gold rebrand, so a page can look "already light" while still clashing with the purple system. Map it to the §1 destinations (`#12101A` / `#6B6577` / `#9A94A8` / `#ECE9F1` / `#F5F3FF`, `#CBD5E1`→`#D6D1DE` since it doubles as a disabled tone). Precedent: `services/page.tsx`.
+- **A third, older palette exists on some pages** — blue-slate (`#1E293B` text, `#475569`/`#64748B` muted, `#94A3B8` faint, `#CBD5E1`/`#E2E8F0`/`#E8EAF0` borders, `#F8FAFC` surface). It predates the navy/gold rebrand, so a page can look "already light" while still clashing with the purple system. Map it to the §1 destinations (`#12101A` / `#524D60` / `#6B6577` / `#ECE9F1` / `#F5F3FF`, `#CBD5E1`→`#D6D1DE` since it doubles as a disabled tone). Precedent: `services/page.tsx`.
 - **`Modal.tsx` is now a LIGHT shell** (white `#FFFFFF` panel, `#ECE9F1` border, dark translucent `rgba(18,16,26,0.5)` scrim). Its exported primitives — `FormGroup`, `Input`, `Select`, `BtnPrimary`, `BtnSecondary` — are light too. **This inverts the old rule:** modal content should now be styled *dark-on-light*, same as a page body. Any caller still using light-on-dark literals (`#F7F5EF`, `rgba(255,255,255,0.4–0.7)`) inside a `<Modal>` will render near-invisible on white and must be converted. Callers that use `var(--text-*)` tokens are already correct — because Modal portals to `document.body` (outside `.ds-layout`) those resolve to the `:root` light values, i.e. dark text.
   - **All callers converted.** `components/ServiceModal.tsx` (Add/Edit Service) and `bookings/page.tsx` (New Booking modal only — lines ~460–781) are now dark-on-light. `staff/page.tsx` and `partners/page.tsx` were already correct via `var(--text-*)` tokens.
   - **`bookings/page.tsx` is split-theme on purpose:** its `<Modal>` block is light, its `.elite-*` page body is still dark, pending the `.elite-*` decision. When restyling that body, edit only *outside* the `<Modal>` — and re-check the boundary line numbers first, since they shift. The gold/dark literals (`#C9A24B`, `#2a3350`, `#F7F5EF`, `#0E1320`) appear on **both** sides, so a `replace_all` on this file will corrupt one side or the other. Use a line-bounded edit and verify with `diff` that the untouched range is byte-identical.
@@ -106,3 +106,32 @@ These convey status, not brand, and stay exactly as they are on every page:
    - Re-grep for the old dark/gold hex values in the touched file(s) — zero remaining, except intentionally-left dark contexts (e.g. `Modal.tsx` content).
    - Confirm the dev server compiles the route with no console errors.
 6. **Report**: exactly what changed, any judgment calls made (and why), anything flagged per §3 (emoji-needs-SVG, shared component also touched, `.elite-*` decision needed, etc.), and explicit confirmation that zero logic/handlers/queries were touched.
+
+---
+
+## Text contrast is a hard constraint (WCAG AA)
+
+The grey ramp below is the **only** approved set of text greys. `#9A94A8` (2.93:1) and
+`#94A3B8` (2.56:1) were removed from the codebase entirely — do not reintroduce them as text.
+
+| Role | Value | On `#FFFFFF` | On `#F5F3FF` |
+|---|---|---|---|
+| Primary / headings | `#12101A` | 18.84:1 | 17.18:1 |
+| Body / secondary | `#524D60` | 8.11:1 | 7.39:1 |
+| Faint / tertiary, placeholder | `#6B6577` | 5.60:1 | 5.10:1 |
+
+`#D6D1DE` (disabled fill) and `#ECE9F1` (borders) are **not text** and are exempt.
+
+**Two traps a static hex audit cannot see — check both before shipping a colour:**
+
+1. **Tinted badges.** A pill styled `background: X + "18", color: X` blends its own hue over
+   white, so the text sits on a *pale version of itself* and the ratio collapses (e.g. `#10B981`
+   on its own 9% tint = 2.24:1). Compute the blend, not the hex-vs-white value. Approved pill
+   text: `#047857` `#6D28D9` `#166534` `#92400E` `#4F46E5` `#1D4ED8` `#9A3412` `#0F766E` `#B91C1C`.
+2. **Light text on dark grounds.** Some surfaces are still intentionally dark — the four
+   comparison blog posts (`bg: #141A2E`, `surface: #1C2438`), `admin/audit`'s `#1F2937` badges,
+   and the settings logo-upload spinner overlay. Darkening text there *breaks* it. Always
+   confirm the actual background before changing a colour.
+
+Verify with `npx lighthouse@12 <url> --only-categories=accessibility` against `npm run dev`.
+Dashboard routes sit behind auth and cannot be reached by Lighthouse — audit those statically.

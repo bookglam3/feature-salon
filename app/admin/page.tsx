@@ -45,7 +45,7 @@ const T = {
   border: "#E2E8F0",
   text: "#0F172A",
   text2: "#64748B",
-  text3: "#94A3B8",
+  text3: "#64748B",
   indigo: "#6366F1",
   indigoSoft: "#EEF2FF",
   green: "#10B981",
@@ -648,13 +648,13 @@ export default function AdminPage() {
                         <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", borderRadius: 9, padding: "9px 14px", border: "1px solid #FDE68A" }}>
                           <div>
                             <div style={{ fontSize: 13, fontWeight: 600, color: "#1E293B" }}>{s.name}</div>
-                            <div style={{ fontSize: 11.5, color: "#94A3B8", marginTop: 1 }}>{s.owner_email}</div>
+                            <div style={{ fontSize: 11.5, color: "#64748B", marginTop: 1 }}>{s.owner_email}</div>
                           </div>
                           <div style={{ textAlign: "right" }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#D97706" }}>
                               Ends {s.trial_ends_at ? new Date(s.trial_ends_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
                             </div>
-                            <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "capitalize" }}>{s.business_type || "salon"} · {s.plan}</div>
+                            <div style={{ fontSize: 11, color: "#64748B", textTransform: "capitalize" }}>{s.business_type || "salon"} · {s.plan}</div>
                           </div>
                         </div>
                       ))}
@@ -674,11 +674,11 @@ export default function AdminPage() {
                         <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", borderRadius: 9, padding: "9px 14px", border: "1px solid #FECACA" }}>
                           <div>
                             <div style={{ fontSize: 13, fontWeight: 600, color: "#1E293B" }}>{s.name}</div>
-                            <div style={{ fontSize: 11.5, color: "#94A3B8", marginTop: 1 }}>{s.owner_email}</div>
+                            <div style={{ fontSize: 11.5, color: "#64748B", marginTop: 1 }}>{s.owner_email}</div>
                           </div>
                           <div style={{ textAlign: "right" }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626" }}>Past Due</div>
-                            <div style={{ fontSize: 11, color: "#94A3B8" }}>{s.stripe_customer_id ? `Stripe: ${s.stripe_customer_id.slice(0, 12)}…` : "No Stripe ID"}</div>
+                            <div style={{ fontSize: 11, color: "#64748B" }}>{s.stripe_customer_id ? `Stripe: ${s.stripe_customer_id.slice(0, 12)}…` : "No Stripe ID"}</div>
                           </div>
                         </div>
                       ))}

@@ -22,7 +22,7 @@ function BarChart({ data, color, label }: { data: number[]; color: string; label
   const max = Math.max(...data, 1);
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#6B6577", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#524D60", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120 }}>
         {data.map((val, i) => (
           <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
@@ -37,7 +37,7 @@ function BarChart({ data, color, label }: { data: number[]; color: string; label
               }}
               onMouseLeave={() => { document.getElementById("chart-tip")?.remove(); }}
             />
-            <span style={{ fontSize: 9.5, color: "#6B6577", fontWeight: 600 }}>{MONTHS[i % 12]}</span>
+            <span style={{ fontSize: 9.5, color: "#524D60", fontWeight: 600 }}>{MONTHS[i % 12]}</span>
           </div>
         ))}
       </div>
@@ -52,11 +52,11 @@ function StatCard({ icon, label, value, sub, color }: { icon: string; label: str
       onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "#ECE9F1"; }}>
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${color},${color}66)`, borderRadius: "18px 18px 0 0" }} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <span style={{ fontSize: 10, fontWeight: 800, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</span>
+        <span style={{ fontSize: 10, fontWeight: 800, color: "#524D60", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</span>
         <div style={{ width: 38, height: 38, borderRadius: 12, background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
       </div>
       <div style={{ fontSize: 28, fontWeight: 900, color: "#12101A", letterSpacing: "-1px", lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 12, color: "#6B6577", marginTop: 6 }}>{sub}</div>}
+      {sub && <div style={{ fontSize: 12, color: "#524D60", marginTop: 6 }}>{sub}</div>}
     </div>
   );
 }
@@ -177,7 +177,7 @@ function ReportsContent() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>Revenue Analytics</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Track your business growth</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Track your business growth</div>
         </div>
       </div>
       <button
@@ -198,7 +198,7 @@ function ReportsContent() {
 
   if (loading) return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
-      <div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading analytics…</div>
+      <div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading analytics…</div>
     </DashboardShell>
   );
 
@@ -233,11 +233,11 @@ function ReportsContent() {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #ECE9F1" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Top Services</div>
-              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>By revenue generated</div>
+              <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>By revenue generated</div>
             </div>
             <div style={{ padding: 16 }}>
               {topServices.length === 0
-                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#6B6577" }}>No data yet</div>
+                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#524D60" }}>No data yet</div>
                 : topServices.map(([name, data], i) => {
                   const maxRev = topServices[0][1].revenue || 1;
                   return (
@@ -249,7 +249,7 @@ function ReportsContent() {
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 13, fontWeight: 800, color: "#10B981" }}>£{data.revenue}</div>
-                          <div style={{ fontSize: 10.5, color: "#6B6577" }}>{data.count} bookings</div>
+                          <div style={{ fontSize: 10.5, color: "#524D60" }}>{data.count} bookings</div>
                         </div>
                       </div>
                       <div style={{ height: 6, background: "#ECE9F1", borderRadius: 99 }}>
@@ -265,11 +265,11 @@ function ReportsContent() {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #ECE9F1" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Staff Performance</div>
-              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>By revenue generated</div>
+              <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>By revenue generated</div>
             </div>
             <div style={{ padding: 16 }}>
               {topStaff.length === 0
-                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#6B6577" }}>No data yet</div>
+                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#524D60" }}>No data yet</div>
                 : topStaff.map(([name, data], i) => {
                   const maxRev = topStaff[0][1].revenue || 1;
                   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -284,7 +284,7 @@ function ReportsContent() {
                         <div style={{ height: 6, background: "#ECE9F1", borderRadius: 99 }}>
                           <div style={{ height: "100%", borderRadius: 99, background: COLORS[i], width: `${(data.revenue / maxRev) * 100}%`, transition: "width 0.6s ease" }} />
                         </div>
-                        <div style={{ fontSize: 10.5, color: "#6B6577", marginTop: 3 }}>{data.count} bookings</div>
+                        <div style={{ fontSize: 10.5, color: "#524D60", marginTop: 3 }}>{data.count} bookings</div>
                       </div>
                     </div>
                   );
@@ -299,18 +299,18 @@ function ReportsContent() {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #ECE9F1" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Peak Hours</div>
-              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>Busiest times of day</div>
+              <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>Busiest times of day</div>
             </div>
             <div style={{ padding: 16 }}>
               {peakHours.length === 0
-                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#6B6577" }}>No data yet</div>
+                ? <div style={{ textAlign: "center", padding: "30px 0", color: "#524D60" }}>No data yet</div>
                 : peakHours.map(([hour, count]) => {
                   const maxCount = parseInt(peakHours[0][1] as unknown as string) || 1;
                   const hNum = parseInt(hour);
                   const label = `${hNum}:00 – ${hNum + 1}:00`;
                   return (
                     <div key={hour} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                      <div style={{ width: 80, fontSize: 12.5, fontWeight: 700, color: "#6B6577", flexShrink: 0 }}>{label}</div>
+                      <div style={{ width: 80, fontSize: 12.5, fontWeight: 700, color: "#524D60", flexShrink: 0 }}>{label}</div>
                       <div style={{ flex: 1, height: 8, background: "#ECE9F1", borderRadius: 99 }}>
                         <div style={{ height: "100%", borderRadius: 99, background: "#7C3AED", width: `${(count / maxCount) * 100}%`, transition: "width 0.6s ease" }} />
                       </div>
@@ -325,7 +325,7 @@ function ReportsContent() {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #ECE9F1" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Booking Status</div>
-              <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>Overview of all bookings</div>
+              <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>Overview of all bookings</div>
             </div>
             <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
               {[
@@ -343,7 +343,7 @@ function ReportsContent() {
                       </div>
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <span style={{ fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99, background: s.bg, color: s.color }}>{s.count}</span>
-                        <span style={{ fontSize: 12, color: "#6B6577" }}>{pct.toFixed(1)}%</span>
+                        <span style={{ fontSize: 12, color: "#524D60" }}>{pct.toFixed(1)}%</span>
                       </div>
                     </div>
                     <div style={{ height: 10, background: "#ECE9F1", borderRadius: 99 }}>

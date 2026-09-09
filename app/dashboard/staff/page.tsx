@@ -195,7 +195,7 @@ export default function StaffPage() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>{vc.staffPlural} Management</div>
-          <div style={{ fontSize: 11.5, color: "#9A94A8" }}>{staffList.length} {vc.staffPlural.toLowerCase()}</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577" }}>{staffList.length} {vc.staffPlural.toLowerCase()}</div>
         </div>
       </div>
       <button onClick={() => { setEditingStaff(null); setFormData({ ...EMPTY_FORM, role: vc.staffSingular.toLowerCase() }); setShowForm(true); }} style={{ background: "#7C3AED", color: "#fff", fontSize: 13, fontWeight: 600, padding: "8px 16px", borderRadius: "var(--r-sm)", border: "none", cursor: "pointer", boxShadow: "0 4px 14px rgba(124,58,237,0.25)", whiteSpace: "nowrap", transition: "all 0.14s" }}
@@ -236,7 +236,7 @@ export default function StaffPage() {
                     <Avatar name={s.name} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>{s.name}</div>
-                      <div style={{ fontSize: 12, color: "#9A94A8", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.email}</div>
+                      <div style={{ fontSize: 12, color: "#6B6577", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.email}</div>
                     </div>
                     <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99, background: s.active ? "var(--green-light)" : "var(--red-light)", color: s.active ? "var(--green)" : "var(--red)", border: `1px solid ${s.active ? "var(--green-pale)" : "var(--red-pale)"}`, whiteSpace: "nowrap" }}>
                       {s.active ? "Active" : "Inactive"}
@@ -245,29 +245,29 @@ export default function StaffPage() {
 
                   <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "#EDE9FF", color: "#7C3AED", border: "1px solid #DDD6FE", textTransform: "capitalize" }}>{s.role}</span>
-                    {activeDays.length > 0 && <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 99, background: "#F5F3FF", color: "#6B6577", border: "1px solid #ECE9F1" }}>{activeDays.join(", ")}</span>}
+                    {activeDays.length > 0 && <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 99, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1" }}>{activeDays.join(", ")}</span>}
                   </div>
 
                   {s.services?.length > 0 && (
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
                       {s.services.slice(0,3).map((sv: string) => (
-                        <span key={sv} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 4, background: "#F5F3FF", border: "1px solid #ECE9F1", color: "#6B6577" }}>{serviceNameMap[sv] ?? sv}</span>
+                        <span key={sv} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 4, background: "#F5F3FF", border: "1px solid #ECE9F1", color: "#524D60" }}>{serviceNameMap[sv] ?? sv}</span>
                       ))}
-                      {s.services.length > 3 && <span style={{ fontSize: 10.5, color: "#9A94A8" }}>+{s.services.length - 3} more</span>}
+                      {s.services.length > 3 && <span style={{ fontSize: 10.5, color: "#6B6577" }}>+{s.services.length - 3} more</span>}
                     </div>
                   )}
 
                   <div style={{ display: "flex", gap: 6, paddingTop: 12, borderTop: "1px solid #ECE9F1" }}>
-                    <button onClick={() => handleEdit(s)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#6B6577", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
+                    <button onClick={() => handleEdit(s)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#524D60", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.color = "#7C3AED"; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#6B6577"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#524D60"; }}
                     >Edit</button>
                     <button onClick={() => handleToggle(s.id, s.active)} style={{ flex: 1, padding: "7px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: s.active ? "var(--red)" : "var(--green)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}>
                       {s.active ? "Deactivate" : "Activate"}
                     </button>
-                    <button onClick={() => handleDelete(s.id)} style={{ padding: "7px 10px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#9A94A8", fontSize: 12.5, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
+                    <button onClick={() => handleDelete(s.id)} style={{ padding: "7px 10px", borderRadius: "var(--r-sm)", border: "1px solid #ECE9F1", background: "#FFFFFF", color: "#6B6577", fontSize: 12.5, cursor: "pointer", transition: "all 0.12s", fontFamily: "var(--font)" }}
                       onMouseEnter={e => { e.currentTarget.style.color = "var(--red)"; e.currentTarget.style.borderColor = "var(--red-pale)"; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = "#9A94A8"; e.currentTarget.style.borderColor = "#ECE9F1"; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = "#6B6577"; e.currentTarget.style.borderColor = "#ECE9F1"; }}
                     >🗑</button>
                   </div>
                 </div>

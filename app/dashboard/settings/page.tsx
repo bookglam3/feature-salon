@@ -83,7 +83,7 @@ function PaymentMethodRow({
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: checked ? "#12101A" : "#12101A" }}>{title}</div>
-            <div style={{ fontSize: 12, color: checked ? "#6B6577" : "#6B6577", marginTop: 2 }}>{description}</div>
+            <div style={{ fontSize: 12, color: checked ? "#524D60" : "#524D60", marginTop: 2 }}>{description}</div>
           </div>
         </div>
         <Toggle id={id} checked={checked} onChange={onChange} />
@@ -106,7 +106,7 @@ function BookingPreview({ pm, price = 65 }: { pm: PaymentMethods; price?: number
     pm.full_online    && { label: "Pay Full Amount",     sub: "Pay 100% now — nothing due at the salon", amount: `£${price}`, color: "#7C3AED" },
     pm.deposit_online && { label: "50% Deposit",          sub: "Pay half now, remainder at salon",         amount: `£${(price * 0.5).toFixed(2)}`, color: "#10B981" },
     pm.custom_deposit && { label: `${depositPct}% Deposit`, sub: `Pay ${depositPct}% now, remainder at salon`, amount: `£${depositAmt}`, color: "#F59E0B" },
-    pm.pay_at_salon   && { label: "Pay at Salon",         sub: "No payment required now",                  amount: "£0",    color: "#6B6577" },
+    pm.pay_at_salon   && { label: "Pay at Salon",         sub: "No payment required now",                  amount: "£0",    color: "#524D60" },
   ].filter(Boolean) as { label: string; sub: string; amount: string; color: string }[];
 
   if (!options.length) {
@@ -131,12 +131,12 @@ function BookingPreview({ pm, price = 65 }: { pm: PaymentMethods; price?: number
         }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A" }}>{opt.label}</div>
-            <div style={{ fontSize: 11, color: "#6B6577", marginTop: 2 }}>{opt.sub}</div>
+            <div style={{ fontSize: 11, color: "#524D60", marginTop: 2 }}>{opt.sub}</div>
           </div>
           <div style={{ fontSize: 16, fontWeight: 800, color: opt.color }}>{opt.amount}</div>
         </div>
       ))}
-      <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4, textAlign: "center" }}>
+      <div style={{ fontSize: 11, color: "#524D60", marginTop: 4, textAlign: "center" }}>
         Example service price: £{price}
       </div>
     </div>
@@ -365,7 +365,7 @@ export default function SettingsPage() {
     boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)",
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: "12px", color: "#6B6577", display: "block", marginBottom: "6px", fontWeight: 500,
+    fontSize: "12px", color: "#524D60", display: "block", marginBottom: "6px", fontWeight: 500,
   };
   const inputStyle: React.CSSProperties = {
     padding: "10px 14px", fontSize: "14px", border: "1px solid #ECE9F1",
@@ -399,7 +399,7 @@ export default function SettingsPage() {
         <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>Settings</div>
-          <div style={{ fontSize: 11.5, color: "#9A94A8", marginTop: 1 }}>Manage your {vc.productName.replace(" OS","")}</div>
+          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 1 }}>Manage your {vc.productName.replace(" OS","")}</div>
         </div>
       </div>
     </header>
@@ -440,7 +440,7 @@ export default function SettingsPage() {
       {/* ── Salon Brand ── */}
       <div style={cardStyle}>
         <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A", marginBottom: "4px" }}>{vc.productName.replace(" OS","")} Brand</div>
-        <p style={{ fontSize: "13px", color: "#6B6577", marginBottom: "20px" }}>
+        <p style={{ fontSize: "13px", color: "#524D60", marginBottom: "20px" }}>
           Your logo and name appear on the public booking page.
         </p>
 
@@ -495,7 +495,7 @@ export default function SettingsPage() {
               {logoUrl && (
                 <button type="button" onClick={() => { setLogoUrl(""); setLogoUrlInput(""); }} style={{ fontSize: 12, color: "#EF4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>✕ Remove logo</button>
               )}
-              <p style={{ fontSize: 11, color: "#6B6577", margin: "8px 0 0", lineHeight: 1.5 }}>PNG, JPG, WEBP · Max 5MB<br />Click or drag & drop on the circle</p>
+              <p style={{ fontSize: 11, color: "#524D60", margin: "8px 0 0", lineHeight: 1.5 }}>PNG, JPG, WEBP · Max 5MB<br />Click or drag & drop on the circle</p>
             </div>
           </div>
 
@@ -518,7 +518,7 @@ export default function SettingsPage() {
           {/* Fallback: paste logo URL directly */}
           <div style={{ marginTop: 14 }}>
             <label style={{ ...labelStyle, marginBottom: 4 }}>
-              Or paste logo URL directly <span style={{ color: "#6B6577", fontWeight: 400 }}>(if upload doesn&apos;t work)</span>
+              Or paste logo URL directly <span style={{ color: "#524D60", fontWeight: 400 }}>(if upload doesn&apos;t work)</span>
             </label>
             <input
               id="logo-url-input"
@@ -541,7 +541,7 @@ export default function SettingsPage() {
         </div>
 
         <div style={{ marginBottom: "16px" }}>
-          <label htmlFor="salon-desc" style={labelStyle}>Description <span style={{ color: "#6B6577", fontWeight: 400 }}>(shows under salon name on booking page)</span></label>
+          <label htmlFor="salon-desc" style={labelStyle}>Description <span style={{ color: "#524D60", fontWeight: 400 }}>(shows under salon name on booking page)</span></label>
           <input
             id="salon-desc"
             value={description}
@@ -553,7 +553,7 @@ export default function SettingsPage() {
 
         <style>{`
           @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-          input::placeholder{color:#9A94A8}
+          input::placeholder{color:#6B6577}
         `}</style>
         <button onClick={handleSaveBrand} disabled={saving || logoUploading} {...saveBtn(saved, saving, "Save Brand")} />
       </div>
@@ -563,7 +563,7 @@ export default function SettingsPage() {
         <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A", marginBottom: "4px" }}>
           Payment Methods
         </div>
-        <p style={{ fontSize: "13px", color: "#6B6577", marginBottom: "20px" }}>
+        <p style={{ fontSize: "13px", color: "#524D60", marginBottom: "20px" }}>
           Choose which payment options clients can use when booking. Changes apply instantly on your booking page.
         </p>
 
@@ -592,7 +592,7 @@ export default function SettingsPage() {
           onChange={v => updatePm("custom_deposit", v)}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <label htmlFor="deposit-pct" style={{ fontSize: 12, color: "#6B6577", fontWeight: 500 }}>
+            <label htmlFor="deposit-pct" style={{ fontSize: 12, color: "#524D60", fontWeight: 500 }}>
               Deposit Percentage
             </label>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -610,7 +610,7 @@ export default function SettingsPage() {
               />
               <span style={{ fontSize: 14, fontWeight: 700, color: "#7C3AED" }}>%</span>
             </div>
-            <span style={{ fontSize: 12, color: "#6B6577" }}>
+            <span style={{ fontSize: 12, color: "#524D60" }}>
               Client pays {pm.deposit_percent}% now, {100 - pm.deposit_percent}% at salon
             </span>
           </div>
@@ -660,13 +660,13 @@ export default function SettingsPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
           <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>Automated Reminders</div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: "12px", color: remindersEnabled ? "#10B981" : "#9A94A8", fontWeight: 600 }}>
+            <span style={{ fontSize: "12px", color: remindersEnabled ? "#10B981" : "#6B6577", fontWeight: 600 }}>
               {remindersEnabled ? "On" : "Off"}
             </span>
             <Toggle id="reminders-toggle" checked={remindersEnabled} onChange={handleToggleReminders} />
           </div>
         </div>
-        <p style={{ fontSize: "13px", color: "#6B6577", marginBottom: "20px" }}>
+        <p style={{ fontSize: "13px", color: "#524D60", marginBottom: "20px" }}>
           Automatically send WhatsApp &amp; email reminders to clients.
           All messages include a GDPR opt-out link. Timezone: <strong>Europe/London</strong> (GMT/BST auto).
         </p>
@@ -683,7 +683,7 @@ export default function SettingsPage() {
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: i < 3 ? "0.5px solid #EEF0F8" : "none" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "#12101A" }}>{row.time}</div>
-                <div style={{ fontSize: "12px", color: "#6B6577", margin: "2px 0" }}>{row.msg}</div>
+                <div style={{ fontSize: "12px", color: "#524D60", margin: "2px 0" }}>{row.msg}</div>
                 <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 600, color: "#7C3AED", background: "rgba(124,58,237,0.10)", padding: "2px 8px", borderRadius: 6, marginTop: 4 }}>{row.channel}</span>
               </div>
             </div>
@@ -691,7 +691,7 @@ export default function SettingsPage() {
         </div>
         <div style={{ marginBottom: "16px" }}>
           <label htmlFor="review-link" style={labelStyle}>
-            Google Reviews Link <span style={{ color: "#6B6577", fontWeight: 400 }}>(optional)</span>
+            Google Reviews Link <span style={{ color: "#524D60", fontWeight: 400 }}>(optional)</span>
           </label>
           <input
             id="review-link" type="url"
@@ -699,7 +699,7 @@ export default function SettingsPage() {
             value={reviewLink} onChange={e => setReviewLink(e.target.value)}
             style={{ ...inputStyle, maxWidth: "400px" }} {...inputFocus}
           />
-          <p style={{ fontSize: "11.5px", color: "#6B6577", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "11.5px", color: "#524D60", margin: "6px 0 0" }}>
             Sent in the 1h post-visit thank-you WhatsApp &amp; email.
           </p>
         </div>
@@ -718,13 +718,13 @@ export default function SettingsPage() {
             <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>WhatsApp Reminders</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: "12px", color: whatsappEnabled ? "#10B981" : "#9A94A8", fontWeight: 600 }}>
+            <span style={{ fontSize: "12px", color: whatsappEnabled ? "#10B981" : "#6B6577", fontWeight: 600 }}>
               {waSaved ? "Saved ✓" : whatsappEnabled ? "On" : "Off"}
             </span>
             <Toggle id="whatsapp-toggle" checked={whatsappEnabled} onChange={handleToggleWhatsApp} />
           </div>
         </div>
-        <p style={{ fontSize: "13px", color: "#6B6577", margin: "6px 0 20px" }}>
+        <p style={{ fontSize: "13px", color: "#524D60", margin: "6px 0 20px" }}>
           Send automated WhatsApp messages via Twilio. Clients must have WhatsApp and their number must be active.
           Messages are sent in <strong>English</strong> with GDPR opt-out included.
         </p>
@@ -770,7 +770,7 @@ export default function SettingsPage() {
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: i < 3 ? "0.5px solid #D1FAE5" : "none" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "#12101A" }}>{row.time}</div>
-                <div style={{ fontSize: "12px", color: "#6B6577", margin: "2px 0" }}>{row.msg}</div>
+                <div style={{ fontSize: "12px", color: "#524D60", margin: "2px 0" }}>{row.msg}</div>
                 <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 600, color: "#10B981", background: "rgba(16,185,129,0.12)", padding: "2px 8px", borderRadius: 6, marginTop: 4 }}>WhatsApp</span>
               </div>
             </div>
@@ -792,7 +792,7 @@ export default function SettingsPage() {
               </span>
             ))}
           </div>
-          <div style={{ fontSize: "11.5px", color: "#6B6577", marginTop: 8 }}>
+          <div style={{ fontSize: "11.5px", color: "#524D60", marginTop: 8 }}>
             Country code is auto-detected from the phone number entered at booking.
           </div>
         </div>
@@ -811,7 +811,7 @@ export default function SettingsPage() {
       <div style={{ ...cardStyle, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <div>
           <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>Services</div>
-          <div style={{ fontSize: "12px", color: "#6B6577", marginTop: 2 }}>{services.length} service{services.length !== 1 ? "s" : ""} · categories, pricing &amp; gender restrictions now live on their own page</div>
+          <div style={{ fontSize: "12px", color: "#524D60", marginTop: 2 }}>{services.length} service{services.length !== 1 ? "s" : ""} · categories, pricing &amp; gender restrictions now live on their own page</div>
         </div>
         <button onClick={() => router.push("/dashboard/services")} style={{ padding: "10px 20px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", cursor: "pointer", fontWeight: 700, whiteSpace: "nowrap" }}>
           Manage Services →
@@ -821,7 +821,7 @@ export default function SettingsPage() {
       {/* ── Payout Settings ── */}
       <div style={cardStyle}>
         <div style={{ fontSize: "14px", fontWeight: 700, color: "#12101A", marginBottom: "4px" }}>Payout Settings</div>
-        <div style={{ fontSize: "12.5px", color: "#6B6577", marginBottom: "16px" }}>
+        <div style={{ fontSize: "12.5px", color: "#524D60", marginBottom: "16px" }}>
           Connect your Stripe account to receive automatic payouts from bookings.
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "linear-gradient(135deg,#F0F4FF,#EEF2FF)", border: "1px solid #ECE9F1", borderRadius: 12, marginBottom: 16 }}>
@@ -841,11 +841,11 @@ export default function SettingsPage() {
       {/* ── Account / Password ── */}
       <div style={cardStyle}>
         <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A", marginBottom: "4px" }}>Account</div>
-        <p style={{ fontSize: "13px", color: "#6B6577", marginBottom: "20px" }}>Manage your login credentials.</p>
+        <p style={{ fontSize: "13px", color: "#524D60", marginBottom: "20px" }}>Manage your login credentials.</p>
 
         <div style={{ marginBottom: 20, padding: "12px 16px", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#6B6577", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 2 }}>Logged in as</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#524D60", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 2 }}>Logged in as</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: "#12101A" }}>{userEmail}</div>
           </div>
         </div>
@@ -859,14 +859,14 @@ export default function SettingsPage() {
             <label style={labelStyle}>Current Password</label>
             <div style={{ position: "relative" }}>
               <input type={showPw.current ? "text" : "password"} value={pwForm.current} onChange={e => setPwForm({ ...pwForm, current: e.target.value })} placeholder="Your current password" style={{ ...inputStyle, maxWidth: "100%", paddingRight: 44 }} />
-              <button type="button" onClick={() => setShowPw(p => ({ ...p, current: !p.current }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#6B6577" }}>{showPw.current ? "🙈" : "👁️"}</button>
+              <button type="button" onClick={() => setShowPw(p => ({ ...p, current: !p.current }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#524D60" }}>{showPw.current ? "🙈" : "👁️"}</button>
             </div>
           </div>
           <div>
             <label style={labelStyle}>New Password</label>
             <div style={{ position: "relative" }}>
               <input type={showPw.newPw ? "text" : "password"} value={pwForm.newPw} onChange={e => setPwForm({ ...pwForm, newPw: e.target.value })} placeholder="Min. 8 characters" style={{ ...inputStyle, maxWidth: "100%", paddingRight: 44 }} />
-              <button type="button" onClick={() => setShowPw(p => ({ ...p, newPw: !p.newPw }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#6B6577" }}>{showPw.newPw ? "🙈" : "👁️"}</button>
+              <button type="button" onClick={() => setShowPw(p => ({ ...p, newPw: !p.newPw }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#524D60" }}>{showPw.newPw ? "🙈" : "👁️"}</button>
             </div>
             {pwForm.newPw && pwForm.newPw.length < 8 && <div style={{ fontSize: 11.5, color: "#F59E0B", marginTop: 4 }}>At least 8 characters required</div>}
           </div>
@@ -874,7 +874,7 @@ export default function SettingsPage() {
             <label style={labelStyle}>Confirm New Password</label>
             <div style={{ position: "relative" }}>
               <input type={showPw.confirm ? "text" : "password"} value={pwForm.confirm} onChange={e => setPwForm({ ...pwForm, confirm: e.target.value })} placeholder="Repeat new password" style={{ ...inputStyle, maxWidth: "100%", paddingRight: 44, borderColor: pwForm.confirm && pwForm.newPw !== pwForm.confirm ? "#EF4444" : undefined }} />
-              <button type="button" onClick={() => setShowPw(p => ({ ...p, confirm: !p.confirm }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#6B6577" }}>{showPw.confirm ? "🙈" : "👁️"}</button>
+              <button type="button" onClick={() => setShowPw(p => ({ ...p, confirm: !p.confirm }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#524D60" }}>{showPw.confirm ? "🙈" : "👁️"}</button>
             </div>
             {pwForm.confirm && pwForm.newPw !== pwForm.confirm && <div style={{ fontSize: 11.5, color: "#EF4444", marginTop: 4 }}>Passwords do not match</div>}
           </div>

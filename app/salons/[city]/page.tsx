@@ -242,10 +242,10 @@ export default async function CityPage({
       </nav>
 
       {/* ── Breadcrumb ── */}
-      <div style={{ padding: "12px 24px", maxWidth: 1100, margin: "0 auto", fontSize: 13, color: "#94A3B8" }}>
-        <Link href="/" style={{ color: "#6366F1", textDecoration: "none" }}>Home</Link>
+      <div style={{ padding: "12px 24px", maxWidth: 1100, margin: "0 auto", fontSize: 13, color: "#64748B" }}>
+        <Link href="/" style={{ color: "#4F46E5", textDecoration: "none" }}>Home</Link>
         <span style={{ margin: "0 8px" }}>›</span>
-        <span style={{ color: "#94A3B8" }}>UK Cities</span>
+        <span style={{ color: "#64748B" }}>UK Cities</span>
         <span style={{ margin: "0 8px" }}>›</span>
         <span style={{ color: "#0F172A", fontWeight: 600 }}>{data.name}</span>
       </div>
@@ -360,8 +360,8 @@ export default async function CityPage({
                 background: p.featured ? "#EEF2FF" : "#fff",
                 minWidth: 160, textAlign: "center",
               }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#6366F1", marginBottom: 8, textTransform: "uppercase" }}>{p.plan}</div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: "#0F172A", marginBottom: 12 }}>{p.price}<span style={{ fontSize: 13, fontWeight: 400, color: "#94A3B8" }}>/mo</span></div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#4F46E5", marginBottom: 8, textTransform: "uppercase" }}>{p.plan}</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "#0F172A", marginBottom: 12 }}>{p.price}<span style={{ fontSize: 13, fontWeight: 400, color: "#64748B" }}>/mo</span></div>
                 {p.features.map((f) => (
                   <div key={f} style={{ fontSize: 13, color: "#475569", marginBottom: 4 }}>✓ {f}</div>
                 ))}
@@ -369,7 +369,7 @@ export default async function CityPage({
             ))}
           </div>
           <Link href="/signup" className="btn-primary btn-lg">Start free 14-day trial →</Link>
-          <p style={{ fontSize: 13, color: "#94A3B8", marginTop: 12 }}>No credit card required · Cancel anytime</p>
+          <p style={{ fontSize: 13, color: "#64748B", marginTop: 12 }}>No credit card required · Cancel anytime</p>
         </div>
       </section>
 

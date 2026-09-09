@@ -28,7 +28,7 @@ export default function LpFooter() {
           <div className="lp-footer-col">
             <h5>Contact</h5>
             <a href="mailto:features@featuresalon.co.uk">features@featuresalon.co.uk</a>
-            <address style={{ fontStyle: "normal", display: "block", fontSize: 14, color: "#6B6577", lineHeight: 1.5 }}>
+            <address style={{ fontStyle: "normal", display: "block", fontSize: 14, color: "#524D60", lineHeight: 1.5 }}>
               FEATURES TECH LTD<br />
               71-75 Shelton Street, Covent Garden<br />
               London WC2H 9JQ

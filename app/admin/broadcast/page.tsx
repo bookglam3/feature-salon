@@ -9,7 +9,7 @@ const TEMPLATE_STORE_KEY = "fs_broadcast_templates_v1";
 const T = {
   bg: "#F6F8FC", surface: "#FFFFFF", nav: "#0A0F1C",
   navBorder: "rgba(255,255,255,0.07)", navText: "rgba(255,255,255,0.45)", navActive: "#FFFFFF",
-  border: "#E2E8F0", text: "#0F172A", text2: "#64748B", text3: "#94A3B8",
+  border: "#E2E8F0", text: "#0F172A", text2: "#64748B", text3: "#64748B",
   indigo: "#6366F1", indigoSoft: "#EEF2FF",
   green: "#10B981", greenSoft: "#ECFDF5",
   amber: "#F59E0B", amberSoft: "#FFFBEB",
@@ -661,7 +661,7 @@ export default function BroadcastPage() {
                           success: { bg: "#ECFDF5", color: "#059669", label: "Success" },
                           partial: { bg: "#FFFBEB", color: "#D97706", label: "Partial" },
                           failed:  { bg: "#FEF2F2", color: "#DC2626", label: "Failed" },
-                          sending: { bg: "#EEF2FF", color: "#6366F1", label: "Sending" },
+                          sending: { bg: "#EEF2FF", color: "#4F46E5", label: "Sending" },
                         };
                         const lm = logMeta[log.status] || logMeta.success;
                         return (

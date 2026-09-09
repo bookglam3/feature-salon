@@ -176,7 +176,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           font-size: 13px; color: #12101A;
           font-family: var(--font); width: 100%;
         }
-        .ds-topbar-search input::placeholder { color: #9A94A8; }
+        .ds-topbar-search input::placeholder { color: #6B6577; }
         @media (max-width: 480px) { .ds-topbar-search { display: none; } }
 
         /* Notification button */
@@ -186,7 +186,7 @@ export default function DashboardShell({ children, salonName, topbar }: Dashboar
           background: #F5F3FF;
           display: flex; align-items: center; justify-content: center;
           cursor: pointer; position: relative; transition: all 0.18s;
-          flex-shrink: 0; color: #6B6577;
+          flex-shrink: 0; color: #524D60;
         }
         .ds-notif-btn:hover {
           border-color: #7C3AED;
@@ -397,7 +397,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
 
       {/* Center: Search */}
       <div className="ds-topbar-search">
-        <Search size={13} strokeWidth={2} color="#9A94A8" />
+        <Search size={13} strokeWidth={2} color="#6B6577" />
         <input
           value={searchVal}
           onChange={e => setSearchVal(e.target.value)}
@@ -406,7 +406,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
         {searchVal && (
           <button
             onClick={() => setSearchVal("")}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6577", fontSize: 14, padding: 0, lineHeight: 1 }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#524D60", fontSize: 14, padding: 0, lineHeight: 1 }}
           >×</button>
         )}
       </div>
@@ -435,7 +435,7 @@ function PremiumTopBar({ onMenuClick, salonName, plan }: {
           }}>
             {salonName || vc.productName.replace(" OS","")}
           </span>
-          <ChevronDown size={11} strokeWidth={2} color="#9A94A8" />
+          <ChevronDown size={11} strokeWidth={2} color="#6B6577" />
         </div>
       </div>
     </header>

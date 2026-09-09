@@ -67,7 +67,7 @@ const bf = (e:React.FocusEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaEl
 const bb = (e:React.FocusEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => { e.currentTarget.style.borderColor="#E5E7EB"; e.currentTarget.style.boxShadow="none"; };
 
 function F({label,children,hint}:{label:string;children:React.ReactNode;hint?:string}) {
-  return <div style={{marginBottom:16}}><label style={{display:"block",fontSize:12.5,fontWeight:600,color:"#374151",marginBottom:5}}>{label}</label>{children}{hint&&<p style={{fontSize:11.5,color:"#9CA3AF",marginTop:4}}>{hint}</p>}</div>;
+  return <div style={{marginBottom:16}}><label style={{display:"block",fontSize:12.5,fontWeight:600,color:"#374151",marginBottom:5}}>{label}</label>{children}{hint&&<p style={{fontSize:11.5,color:"#6B7280",marginTop:4}}>{hint}</p>}</div>;
 }
 function I(p:React.InputHTMLAttributes<HTMLInputElement>) { return <input {...p} style={si(p.style as React.CSSProperties)} onFocus={bf} onBlur={bb} />; }
 function S(p:React.SelectHTMLAttributes<HTMLSelectElement>) { return <select {...p} style={{...si(),appearance:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:"no-repeat",backgroundPosition:"right 14px center",paddingRight:38,...(p.style as React.CSSProperties)}} onFocus={bf} onBlur={bb}/>; }
@@ -207,7 +207,7 @@ export default function PartnerPage() {
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
               <F label="Phone Number *">
                 <I placeholder={c.phone} value={form.phone} onChange={e=>set("phone",e.target.value)}/>
-                <p style={{fontSize:11,color:"#9CA3AF",marginTop:3}}>Country code: {c.phoneCode}</p>
+                <p style={{fontSize:11,color:"#6B7280",marginTop:3}}>Country code: {c.phoneCode}</p>
               </F>
               <F label="WhatsApp (optional)"><I placeholder={c.phone} value={form.whatsapp} onChange={e=>set("whatsapp",e.target.value)}/></F>
             </div>
@@ -267,7 +267,7 @@ export default function PartnerPage() {
                   <span style={{position:"absolute",width:14,height:14,left:form.own_vehicle?19:3,top:3,background:"#fff",borderRadius:"50%",transition:"left 0.18s"}}/>
                 </span>
               </label>
-              <div><div style={{fontSize:13.5,fontWeight:600,color:"#111827"}}>I have my own vehicle</div><div style={{fontSize:12,color:"#9CA3AF"}}>Motorbike or car for field visits</div></div>
+              <div><div style={{fontSize:13.5,fontWeight:600,color:"#111827"}}>I have my own vehicle</div><div style={{fontSize:12,color:"#6B7280"}}>Motorbike or car for field visits</div></div>
             </div>
             <F label="Why should we hire you? *" hint="Minimum 20 characters — share your skills and motivation">
               <T placeholder="Describe your motivation, relevant skills, and why you'd make a great Feature partner…" value={form.why_hire} onChange={e=>set("why_hire",e.target.value)} rows={5}/>
@@ -318,7 +318,7 @@ export default function PartnerPage() {
               :<button onClick={submit} disabled={saving} style={{flex:2,padding:"13px",background:saving?"#aab1c4":`linear-gradient(135deg,${IND},#3B55E0)`,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",boxShadow:saving?"none":"0 8px 24px rgba(79,110,247,0.28)"}}>{saving?"Submitting…":"Submit Application ✓"}</button>
             }
           </div>
-          <p style={{textAlign:"center",fontSize:11.5,color:"#9CA3AF",marginTop:12}}>🔒 Your data is encrypted and protected under {form.country==="GB"?"UK GDPR":form.country==="AE"?"UAE Data Protection Law":form.country==="SA"?"Saudi PDPL":"Pakistan Data Protection"} regulations.</p>
+          <p style={{textAlign:"center",fontSize:11.5,color:"#6B7280",marginTop:12}}>🔒 Your data is encrypted and protected under {form.country==="GB"?"UK GDPR":form.country==="AE"?"UAE Data Protection Law":form.country==="SA"?"Saudi PDPL":"Pakistan Data Protection"} regulations.</p>
         </div>
       </div>
     </>

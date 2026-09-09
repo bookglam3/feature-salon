@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const prose: React.CSSProperties = {
   fontSize: 17,
-  color: "#aab1c4",
+  color: "#524D60",
   lineHeight: 1.85,
   marginBottom: 28,
 };
@@ -44,8 +44,8 @@ export default function AboutPage() {
           <Link href="/#who">Who it&apos;s for</Link>
           <Link href="/#features">Features</Link>
           <Link href="/#pricing">Pricing</Link>
-          <Link href="/about" style={{ color: "#F7F5EF", fontWeight: 700 }}>About</Link>
-          <Link href="/partner" style={{ color: "#C9A24B", fontWeight: 600 }}>Become a Partner</Link>
+          <Link href="/about" style={{ color: "#12101A", fontWeight: 700 }}>About</Link>
+          <Link href="/partner" style={{ color: "#7C3AED", fontWeight: 600 }}>Become a Partner</Link>
           <Link href="/login">Login</Link>
           <Link href="/signup" className="btn-primary">Start free trial</Link>
         </div>
@@ -60,7 +60,7 @@ export default function AboutPage() {
             fontFamily: "var(--font-playfair, Georgia, serif)",
             fontSize: "clamp(30px, 4.5vw, 50px)",
             fontWeight: 400,
-            color: "#F7F5EF",
+            color: "#12101A",
             lineHeight: 1.22,
             letterSpacing: "-1.2px",
             margin: 0,
@@ -89,9 +89,9 @@ export default function AboutPage() {
             ...prose,
             marginBottom: 0,
             fontStyle: "italic",
-            color: "#F7F5EF",
+            color: "#12101A",
             fontSize: 19,
-            borderLeft: "3px solid #C9A24B",
+            borderLeft: "3px solid #7C3AED",
             paddingLeft: 22,
             lineHeight: 1.7,
           }}>
@@ -111,11 +111,11 @@ export default function AboutPage() {
               key={i}
               style={{
                 padding: "28px 0",
-                borderBottom: i < beliefs.length - 1 ? "0.5px solid #2a3350" : "none",
+                borderBottom: i < beliefs.length - 1 ? "0.5px solid #ECE9F1" : "none",
               }}
             >
               <p style={{ ...prose, marginBottom: 0 }}>
-                <strong style={{ color: "#F7F5EF", fontWeight: 700 }}>{b.bold}</strong>
+                <strong style={{ color: "#12101A", fontWeight: 700 }}>{b.bold}</strong>
                 {b.rest}
               </p>
             </div>

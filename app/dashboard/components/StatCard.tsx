@@ -34,9 +34,9 @@ const colorMap = {
     glow: "rgba(239,68,68,0.18)", bar: "#F87171",
   },
   slate: {
-    accent: "#6B6577", light: "#F5F3FF", text: "#6B6577",
-    grad: "linear-gradient(135deg,#64748B,#94A3B8)",
-    glow: "rgba(100,116,139,0.15)", bar: "#94A3B8",
+    accent: "#524D60", light: "#F5F3FF", text: "#524D60",
+    grad: "linear-gradient(135deg,#64748B,#64748B)",
+    glow: "rgba(100,116,139,0.15)", bar: "#64748B",
   },
 };
 
@@ -103,7 +103,7 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div style={{
-          fontSize: 10.5, fontWeight: 800, color: "#6B6577",
+          fontSize: 10.5, fontWeight: 800, color: "#524D60",
           letterSpacing: "0.8px", textTransform: "uppercase",
         }}>{label}</div>
         <div style={{
@@ -142,7 +142,7 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
       {/* Sub + trend */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         {sub && (
-          <div style={{ fontSize: 11.5, color: "#6B6577", fontWeight: 500, flex: 1 }}>{sub}</div>
+          <div style={{ fontSize: 11.5, color: "#524D60", fontWeight: 500, flex: 1 }}>{sub}</div>
         )}
         {trend !== undefined && (
           <div style={{

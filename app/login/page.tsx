@@ -91,7 +91,7 @@ export default function LoginPage() {
           <Link href="/">
             <img src="/brand/logo-light-no-tagline.svg" alt="Feature Salon" style={{ height: 48, width: "auto", display: "inline-block" }} />
           </Link>
-          <h1 style={{ fontSize: "14px", color: "#6B6577", marginTop: "8px", fontWeight: "normal" }}>
+          <h1 style={{ fontSize: "14px", color: "#524D60", marginTop: "8px", fontWeight: "normal" }}>
             {resetMode ? "Reset your password" : "Sign in to your salon"}
           </h1>
         </div>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>📧</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#12101A", marginBottom: 8 }}>Check your inbox</div>
-              <div style={{ fontSize: 13.5, color: "#6B6577", lineHeight: 1.7 }}>
+              <div style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.7 }}>
                 We sent a reset link to <strong>{resetEmail}</strong>.<br />
                 Check spam if it doesn&apos;t arrive within 2 mins.
               </div>
@@ -143,7 +143,7 @@ export default function LoginPage() {
               </button>
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <button type="button" onClick={() => { setResetMode(false); setError(""); }}
-                  style={{ fontSize: 13.5, color: "#6B6577", background: "none", border: "none", cursor: "pointer", minHeight: 44 }}>
+                  style={{ fontSize: 13.5, color: "#524D60", background: "none", border: "none", cursor: "pointer", minHeight: 44 }}>
                   ← Back to sign in
                 </button>
               </div>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                 {loading ? "Signing in…" : "Sign in"}
               </button>
             </form>
-            <div style={{ textAlign: "center", margin: "24px 0 0", fontSize: "13.5px", color: "#6B6577" }}>
+            <div style={{ textAlign: "center", margin: "24px 0 0", fontSize: "13.5px", color: "#524D60" }}>
               Don&apos;t have an account?{" "}
               <Link href="/signup" style={{ color: "#7C3AED", textDecoration: "none", fontWeight: 700 }}>Start free trial →</Link>
             </div>

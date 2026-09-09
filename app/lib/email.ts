@@ -241,8 +241,8 @@ export async function sendBookingEmails({
           </div>
         </div>
 
-        <p style="font-size:13px;color:#94A3B8;margin:0 0 4px;line-height:1.6;">We look forward to welcoming you.</p>
-        <p style="font-size:13px;color:#94A3B8;margin:0;line-height:1.6;">— The ${salonName} Team</p>
+        <p style="font-size:13px;color:#64748B;margin:0 0 4px;line-height:1.6;">We look forward to welcoming you.</p>
+        <p style="font-size:13px;color:#64748B;margin:0;line-height:1.6;">— The ${salonName} Team</p>
       </div>
 
       <!-- Footer -->
@@ -561,4 +561,4 @@ export async function sendNoShowAlertEmail({
     </body>
     </html>`,
   });
-}
+}

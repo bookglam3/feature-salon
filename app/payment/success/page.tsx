@@ -34,7 +34,7 @@ function SuccessContent() {
 
         {/* Booking summary */}
         <div style={{ padding: 24, background: "linear-gradient(135deg,#F8FAFC,#F1F5F9)", borderRadius: 20, textAlign: "left", border: "1px solid #E2E8F0", marginBottom: 24 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Booking Summary</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Booking Summary</div>
           {[
             { label: "Client",  value: name },
             { label: "Service", value: service },
@@ -55,7 +55,7 @@ function SuccessContent() {
           )}
         </div>
 
-        <p style={{ fontSize: 13, color: "#94A3B8", marginBottom: 20 }}>A confirmation email has been sent to your inbox.</p>
+        <p style={{ fontSize: 13, color: "#64748B", marginBottom: 20 }}>A confirmation email has been sent to your inbox.</p>
 
         {/* Action buttons */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

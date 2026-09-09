@@ -126,10 +126,10 @@ export default async function BlogPostPage({
       </nav>
 
       {/* Breadcrumb */}
-      <div style={{ padding: "12px 24px", maxWidth: 800, margin: "0 auto", fontSize: 13, color: "#94A3B8" }}>
-        <Link href="/" style={{ color: "#6366F1", textDecoration: "none" }}>Home</Link>
+      <div style={{ padding: "12px 24px", maxWidth: 800, margin: "0 auto", fontSize: 13, color: "#64748B" }}>
+        <Link href="/" style={{ color: "#4F46E5", textDecoration: "none" }}>Home</Link>
         <span style={{ margin: "0 8px" }}>›</span>
-        <Link href="/blog" style={{ color: "#6366F1", textDecoration: "none" }}>Blog</Link>
+        <Link href="/blog" style={{ color: "#4F46E5", textDecoration: "none" }}>Blog</Link>
         <span style={{ margin: "0 8px" }}>›</span>
         <span style={{ color: "#0F172A", fontWeight: 600 }}>{post.title}</span>
       </div>
@@ -146,10 +146,10 @@ export default async function BlogPostPage({
             }}>
               {post.keyword}
             </span>
-            <span style={{ fontSize: 13, color: "#94A3B8" }}>
+            <span style={{ fontSize: 13, color: "#64748B" }}>
               📅 {new Date(post.publishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </span>
-            <span style={{ fontSize: 13, color: "#94A3B8" }}>⏱ {post.readingTime} min read</span>
+            <span style={{ fontSize: 13, color: "#64748B" }}>⏱ {post.readingTime} min read</span>
           </div>
 
           <h1 style={{
@@ -205,13 +205,13 @@ export default async function BlogPostPage({
             Ready to transform your salon?
           </h3>
           <p style={{ fontSize: 15, color: "#475569", marginBottom: 20 }}>
-            Try <Link href="/" style={{ color: "#6366F1", fontWeight: 600 }}>Feature Salon</Link> free for 14 days — automated bookings, reminders, and payments with no commission fees.
+            Try <Link href="/" style={{ color: "#4F46E5", fontWeight: 600 }}>Feature Salon</Link> free for 14 days — automated bookings, reminders, and payments with no commission fees.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/signup" className="btn-primary">Start free trial — no card needed</Link>
             <Link href="/pricing" style={{
               padding: "12px 24px", background: "#fff",
-              color: "#6366F1", border: "1.5px solid #6366F1",
+              color: "#4F46E5", border: "1.5px solid #4F46E5",
               borderRadius: 10, textDecoration: "none",
               fontSize: 14, fontWeight: 700,
             }}>
@@ -234,7 +234,7 @@ export default async function BlogPostPage({
           }}>✍️</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{post.author}</div>
-            <div style={{ fontSize: 12, color: "#94A3B8" }}>
+            <div style={{ fontSize: 12, color: "#64748B" }}>
               Published {new Date(post.publishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
               {" · "}Updated {new Date(post.updatedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </div>
@@ -253,7 +253,7 @@ export default async function BlogPostPage({
                   background: "#fff", border: "1.5px solid #E2E8F0",
                   borderRadius: 12, padding: "18px 16px",
                 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#6366F1", marginBottom: 8 }}>{p.readingTime} min read</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#4F46E5", marginBottom: 8 }}>{p.readingTime} min read</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A", lineHeight: 1.4 }}>{p.title}</div>
                 </div>
               </Link>

@@ -16,7 +16,7 @@ const T = {
   bg: "#F6F8FC", surface: "#FFFFFF", nav: "#0A0F1C",
   navBorder: "rgba(255,255,255,0.07)", navText: "rgba(255,255,255,0.45)",
   navActive: "#FFFFFF", border: "#E2E8F0", text: "#0F172A",
-  text2: "#64748B", text3: "#94A3B8", indigo: "#6366F1",
+  text2: "#64748B", text3: "#64748B", indigo: "#6366F1",
   indigoSoft: "#EEF2FF", green: "#10B981", greenSoft: "#ECFDF5",
   amber: "#F59E0B", amberSoft: "#FFFBEB", red: "#EF4444",
   redSoft: "#FEF2F2", shadow: "0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04)",
