@@ -281,7 +281,7 @@ export default function ImportClientsPage() {
             </div>
 
             {uploadError && (
-              <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#DC2626" }}>
+              <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#B91C1C" }}>
                 ⚠️ {uploadError}
               </div>
             )}
@@ -413,7 +413,7 @@ export default function ImportClientsPage() {
               </label>
 
               {submitError && (
-                <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#DC2626" }}>
+                <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#B91C1C" }}>
                   ⚠️ {submitError}
                 </div>
               )}
@@ -441,7 +441,7 @@ export default function ImportClientsPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
               <div style={{ background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
-                <div style={{ fontSize: 24, fontWeight: 900, color: "#10B981" }}>{result.imported}</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#047857" }}>{result.imported}</div>
                 <div style={{ fontSize: 11, color: "#6B6577", marginTop: 4, fontWeight: 600 }}>Imported</div>
               </div>
               <div style={{ background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>

@@ -61,14 +61,14 @@ const jsonLdBreadcrumb = JSON.stringify({
 });
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#64748B",
+  bg: "#FFFFFF",
+  surface: "#F5F3FF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
 };
 
 const h2Style: React.CSSProperties = {
@@ -119,7 +119,7 @@ export default function ReduceNoShowsPage() {
         {/* Header */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
-            <span style={{ background: "rgba(201,162,75,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(201,162,75,0.25)" }}>
+            <span style={{ background: "rgba(124,58,237,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(124,58,237,0.25)" }}>
               salon no-shows
             </span>
             <span style={{ fontSize: 13, color: C.muted }}>📅 31 May 2026</span>
@@ -218,7 +218,7 @@ export default function ReduceNoShowsPage() {
 
           {/* Section 8 — How Feature helps */}
           <section style={sectionStyle}>
-            <div style={{ background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 18, padding: "28px 28px" }}>
+            <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "28px 28px" }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: C.gold, marginBottom: 14, marginTop: 0 }}>
                 How Feature helps
               </h3>
@@ -238,7 +238,7 @@ export default function ReduceNoShowsPage() {
 
         {/* Author box */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", background: C.surface, borderRadius: 12, padding: "16px 20px", border: `1px solid ${C.border}`, marginTop: 48 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#0E1320)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#FFFFFF)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
             ✍️
           </div>
           <div>

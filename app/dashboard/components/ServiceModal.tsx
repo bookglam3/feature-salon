@@ -203,7 +203,7 @@ function ServiceModalForm({
               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleCreateCategory(); } }}
               autoFocus
             />
-            {categoryError && <p style={{ fontSize: 11.5, color: "#DC2626", marginTop: 4 }}>{categoryError}</p>}
+            {categoryError && <p style={{ fontSize: 11.5, color: "#B91C1C", marginTop: 4 }}>{categoryError}</p>}
           </div>
           <button type="button" onClick={handleCreateCategory} disabled={creatingCategory || !newCategoryName.trim()}
             style={{ padding: "10px 14px", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: creatingCategory || !newCategoryName.trim() ? 0.5 : 1, whiteSpace: "nowrap" }}>
@@ -223,7 +223,7 @@ function ServiceModalForm({
       </FormGroup>
 
       {error && (
-        <div style={{ marginTop: 4, marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#DC2626" }}>
+        <div style={{ marginTop: 4, marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, fontSize: 12.5, color: "#B91C1C" }}>
           ⚠️ {error}
         </div>
       )}

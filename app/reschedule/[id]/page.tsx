@@ -330,7 +330,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
 
             <div style={{ textAlign: "center" }}>
               <button onClick={handleCancel} disabled={submitting}
-                style={{ padding: "10px 24px", background: "#FEF2F2", color: "#DC2626", border: "1.5px solid #FECACA", borderRadius: 12, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
+                style={{ padding: "10px 24px", background: "#FEF2F2", color: "#B91C1C", border: "1.5px solid #FECACA", borderRadius: 12, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
                 ✕ Cancel Appointment
               </button>
             </div>

@@ -55,7 +55,7 @@ const TYPE_META: Record<string, { icon: string; label: string; desc: string; col
   birthday:    { icon: "🎂", label: "Birthday Message",     desc: "Auto-send on client's birthday",           color: "#EC4899" },
   winback:     { icon: "💔", label: "Win-Back Campaign",    desc: "Re-engage clients who haven't visited",    color: "#F59E0B" },
   anniversary: { icon: "🎉", label: "Loyalty Anniversary",  desc: "Celebrate 1 year with your salon",         color: "#7C3AED" },
-  referral:    { icon: "🔗", label: "Referral Prompt",      desc: "Encourage clients to refer friends",       color: "#10B981" },
+  referral:    { icon: "🔗", label: "Referral Prompt",      desc: "Encourage clients to refer friends",       color: "#047857" },
 };
 
 export default function AutomationsPage() {
@@ -124,7 +124,7 @@ export default function AutomationsPage() {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 12 }}>
-        <span style={{ fontSize: 12, fontWeight: 800, color: "#10B981" }}>✓ {automations.filter(a => a.is_active).length} Active</span>
+        <span style={{ fontSize: 12, fontWeight: 800, color: "#047857" }}>✓ {automations.filter(a => a.is_active).length} Active</span>
       </div>
     </header>
   );

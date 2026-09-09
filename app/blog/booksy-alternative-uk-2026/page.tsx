@@ -61,14 +61,14 @@ const jsonLdBreadcrumb = JSON.stringify({
 });
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#64748B",
+  bg: "#FFFFFF",
+  surface: "#F5F3FF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
 };
 
 const h2Style: React.CSSProperties = {
@@ -96,28 +96,28 @@ const TABLE: TableRow[] = [
     label: "Monthly subscription",
     feat: "£29 flat (whole business)",
     booksy: "~£40 + ~£5 per staff member",
-    featColor: "#10B981",
+    featColor: "#047857",
   },
   {
     label: "Commission on bookings",
     feat: "None",
     booksy: '30% on new "Boost" clients (min £5)',
-    featColor: "#10B981",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    booksyColor: "#B91C1C",
   },
   {
     label: "Per-staff fees",
     feat: "No",
     booksy: "Yes",
-    featColor: "#10B981",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    booksyColor: "#B91C1C",
   },
   {
     label: "WhatsApp reminders",
     feat: "Yes",
     booksy: "No",
-    featColor: "#10B981",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    booksyColor: "#B91C1C",
   },
   {
     label: "Consumer marketplace",
@@ -128,14 +128,14 @@ const TABLE: TableRow[] = [
     label: "Card payments",
     feat: "Yes (Stripe)",
     booksy: "Yes",
-    featColor: "#10B981",
-    booksyColor: "#10B981",
+    featColor: "#047857",
+    booksyColor: "#047857",
   },
   {
     label: "UK-built",
     feat: "Yes",
     booksy: "Global",
-    featColor: "#10B981",
+    featColor: "#047857",
   },
 ];
 
@@ -182,7 +182,7 @@ export default function BooksyAlternativePage() {
         {/* Header */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
-            <span style={{ background: "rgba(201,162,75,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(201,162,75,0.25)" }}>
+            <span style={{ background: "rgba(124,58,237,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(124,58,237,0.25)" }}>
               booksy alternative
             </span>
             <span style={{ fontSize: 13, color: C.muted }}>📅 1 Jun 2026</span>
@@ -211,7 +211,7 @@ export default function BooksyAlternativePage() {
               The first is <strong style={{ color: C.text }}>cost stacking</strong>. Booksy runs at around &pound;40/month, plus roughly &pound;5 per additional staff member, and several useful features (marketing, extra tools) can sit in higher tiers or add-ons. For a small shop, the all-in monthly figure can climb past what the headline suggests.
             </p>
             <p>
-              The second is the <strong style={{ color: C.text }}>marketplace commission</strong>. Booksy&apos;s &ldquo;Boost&rdquo; feature promotes you in its consumer app to find new clients &mdash; and takes <strong style={{ color: "#EF4444" }}>30% of a new client&apos;s first appointment (minimum &pound;5)</strong> in return. On a &pound;30 service, that&apos;s around &pound;9 handed over for one new booking. Boost is optional, but owners often report it being easy to leave on, and a regular who rebooks through a new account can occasionally get counted as &ldquo;new.&rdquo;
+              The second is the <strong style={{ color: C.text }}>marketplace commission</strong>. Booksy&apos;s &ldquo;Boost&rdquo; feature promotes you in its consumer app to find new clients &mdash; and takes <strong style={{ color: "#B91C1C" }}>30% of a new client&apos;s first appointment (minimum &pound;5)</strong> in return. On a &pound;30 service, that&apos;s around &pound;9 handed over for one new booking. Boost is optional, but owners often report it being easy to leave on, and a regular who rebooks through a new account can occasionally get counted as &ldquo;new.&rdquo;
             </p>
             <p>
               The third is simply <strong style={{ color: C.text }}>predictability</strong>. Between subscription, per-staff fees, Boost commission, and payment processing, some owners find it hard to know what they&apos;ll actually pay in a given month.
@@ -264,9 +264,9 @@ export default function BooksyAlternativePage() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, minWidth: 460 }}>
                 <thead>
                   <tr>
-                    <th style={{ padding: "12px 16px", textAlign: "left", background: "#0E1320", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", width: "36%" }}></th>
-                    <th style={{ padding: "12px 20px", textAlign: "center", background: "rgba(201,162,75,0.14)", color: C.gold, fontWeight: 800, border: "1px solid rgba(201,162,75,0.35)", fontSize: 14 }}>Feature</th>
-                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Booksy</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", background: "#FFFFFF", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", width: "36%" }}></th>
+                    <th style={{ padding: "12px 20px", textAlign: "center", background: "rgba(124,58,237,0.14)", color: C.gold, fontWeight: 800, border: "1px solid rgba(124,58,237,0.35)", fontSize: 14 }}>Feature</th>
+                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#FFFFFF", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Booksy</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -275,7 +275,7 @@ export default function BooksyAlternativePage() {
                       <td style={{ padding: "12px 16px", color: C.text, fontWeight: 600, border: `1px solid ${C.border}`, fontSize: 13 }}>
                         {row.label}
                       </td>
-                      <td style={{ padding: "12px 16px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(201,162,75,0.2)", background: i % 2 === 0 ? "rgba(201,162,75,0.07)" : "rgba(201,162,75,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13 }}>
+                      <td style={{ padding: "12px 16px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(124,58,237,0.2)", background: i % 2 === 0 ? "rgba(124,58,237,0.07)" : "rgba(124,58,237,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13 }}>
                         {row.feat}
                       </td>
                       <td style={{ padding: "12px 16px", textAlign: "center", color: row.booksyColor ?? C.text2, border: `1px solid ${C.border}`, fontWeight: row.booksyColor ? 700 : 400, fontSize: 13 }}>
@@ -296,10 +296,10 @@ export default function BooksyAlternativePage() {
             <h2 style={h2Style}>Where Feature fits</h2>
             <p>Feature is built on the flat model, for owners who&apos;d rather have certainty than a commission bill:</p>
 
-            <div style={{ background: C.surface, border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {FEATURE_POINTS.map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: "#10B981", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>&#10003;</span>
+                  <span style={{ color: "#047857", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>&#10003;</span>
                   <span style={{ color: C.text2 }}>{item}</span>
                 </div>
               ))}
@@ -312,7 +312,7 @@ export default function BooksyAlternativePage() {
 
           {/* CTA */}
           <section style={sectionStyle}>
-            <div style={{ background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
+            <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: C.gold, marginBottom: 14, marginTop: 0 }}>
                 See the difference for yourself
               </h3>
@@ -332,7 +332,7 @@ export default function BooksyAlternativePage() {
 
         {/* Author box */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", background: C.surface, borderRadius: 12, padding: "16px 20px", border: `1px solid ${C.border}`, marginTop: 48 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#0E1320)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#FFFFFF)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
             &#9997;&#65039;
           </div>
           <div>

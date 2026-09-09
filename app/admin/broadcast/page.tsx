@@ -349,7 +349,7 @@ export default function BroadcastPage() {
       <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Access Denied</div>
       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", textAlign: "center", maxWidth: 340 }}>
         Logged in as: <strong style={{ color: "#F59E0B" }}>{loggedInAs || "not logged in"}</strong><br/>
-        Required: <strong style={{ color: "#10B981" }}>{ADMIN_EMAIL}</strong>
+        Required: <strong style={{ color: "#047857" }}>{ADMIN_EMAIL}</strong>
       </div>
       <a href="/login" style={{ marginTop: 8, padding: "10px 24px", borderRadius: 10, background: "#6366F1", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Login →</a>
     </div>
@@ -660,7 +660,7 @@ export default function BroadcastPage() {
                         const logMeta: Record<string, { bg: string; color: string; label: string }> = {
                           success: { bg: "#ECFDF5", color: "#059669", label: "Success" },
                           partial: { bg: "#FFFBEB", color: "#D97706", label: "Partial" },
-                          failed:  { bg: "#FEF2F2", color: "#DC2626", label: "Failed" },
+                          failed:  { bg: "#FEF2F2", color: "#B91C1C", label: "Failed" },
                           sending: { bg: "#EEF2FF", color: "#4F46E5", label: "Sending" },
                         };
                         const lm = logMeta[log.status] || logMeta.success;

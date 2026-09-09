@@ -114,35 +114,35 @@ const TABLE: TableRow[] = [
     feat: "None",
     fresha: "20% on new marketplace clients",
     booksy: '30% on new "Boost" clients',
-    featColor: "#10B981",
-    freshaColor: "#EF4444",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    freshaColor: "#B91C1C",
+    booksyColor: "#B91C1C",
   },
   {
     label: "Per-staff fees",
     feat: "No",
     fresha: "Yes",
     booksy: "Yes",
-    featColor: "#10B981",
-    freshaColor: "#EF4444",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    freshaColor: "#B91C1C",
+    booksyColor: "#B91C1C",
   },
   {
     label: "WhatsApp reminders",
     feat: "Yes",
     fresha: "No",
     booksy: "No",
-    featColor: "#10B981",
-    freshaColor: "#EF4444",
-    booksyColor: "#EF4444",
+    featColor: "#047857",
+    freshaColor: "#B91C1C",
+    booksyColor: "#B91C1C",
   },
   {
     label: "SMS reminders",
     feat: "Yes",
     fresha: "Varies",
     booksy: "Yes",
-    featColor: "#10B981",
-    booksyColor: "#10B981",
+    featColor: "#047857",
+    booksyColor: "#047857",
   },
   {
     label: "Consumer marketplace",
@@ -155,28 +155,28 @@ const TABLE: TableRow[] = [
     feat: "Yes (Stripe)",
     fresha: "Yes",
     booksy: "Yes",
-    featColor: "#10B981",
-    freshaColor: "#10B981",
-    booksyColor: "#10B981",
+    featColor: "#047857",
+    freshaColor: "#047857",
+    booksyColor: "#047857",
   },
   {
     label: "UK-built",
     feat: "Yes",
     fresha: "Global",
     booksy: "Global",
-    featColor: "#10B981",
+    featColor: "#047857",
   },
 ];
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#64748B",
+  bg: "#FFFFFF",
+  surface: "#F5F3FF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
 };
 
 const h2Style: React.CSSProperties = {
@@ -227,7 +227,7 @@ export default function FreshaAlternative2026Page() {
         {/* Header */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
-            <span style={{ background: "rgba(201,162,75,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(201,162,75,0.25)" }}>
+            <span style={{ background: "rgba(124,58,237,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(124,58,237,0.25)" }}>
               fresha alternative 2026
             </span>
             <span style={{ fontSize: 13, color: C.muted }}>📅 31 May 2026</span>
@@ -270,14 +270,14 @@ export default function FreshaAlternative2026Page() {
             <div style={{ background: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 14, padding: "20px 24px", marginBottom: 16, marginTop: 20 }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10 }}>Fresha</div>
               <p style={{ margin: 0 }}>
-                Now a paid subscription — roughly £14.95/month for a solo professional, or about £9.95 per team member on the team plan. On top of that sits the part that catches people out: a <strong style={{ color: "#EF4444" }}>20% commission (minimum around £6) on new clients who find you through the Fresha marketplace.</strong> Then payment processing of roughly 1.2% + 20p per transaction in the UK. Reporting and loyalty features are often paid add-ons, and the card terminal is a separate cost.
+                Now a paid subscription — roughly £14.95/month for a solo professional, or about £9.95 per team member on the team plan. On top of that sits the part that catches people out: a <strong style={{ color: "#B91C1C" }}>20% commission (minimum around £6) on new clients who find you through the Fresha marketplace.</strong> Then payment processing of roughly 1.2% + 20p per transaction in the UK. Reporting and loyalty features are often paid add-ons, and the card terminal is a separate cost.
               </p>
             </div>
 
             <div style={{ background: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 14, padding: "20px 24px", marginBottom: 20 }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10 }}>Booksy</div>
               <p style={{ margin: 0 }}>
-                Around £40/month, plus about £5 per additional team member. Its marketplace commission, charged through the &ldquo;Boost&rdquo; feature, is <strong style={{ color: "#EF4444" }}>30% of a new client&apos;s first appointment (minimum £5)</strong> — so a £25 haircut from a Boosted new client hands roughly £7.50 to Booksy. Processing fees apply on top.
+                Around £40/month, plus about £5 per additional team member. Its marketplace commission, charged through the &ldquo;Boost&rdquo; feature, is <strong style={{ color: "#B91C1C" }}>30% of a new client&apos;s first appointment (minimum £5)</strong> — so a £25 haircut from a Boosted new client hands roughly £7.50 to Booksy. Processing fees apply on top.
               </p>
             </div>
 
@@ -329,7 +329,7 @@ export default function FreshaAlternative2026Page() {
             <h2 style={h2Style}>Where Feature fits in</h2>
             <p>Feature is a UK-built booking platform designed around the flat model, for owners who&apos;d rather have certainty than a commission bill.</p>
 
-            <div style={{ background: C.surface, border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {[
                 "One flat price of £29/month for your whole business — no per-staff fees, no paid add-ons for the core tools, and no commission on any booking, ever.",
                 "WhatsApp and SMS reminders built in, to cut the no-shows that quietly cost you the most.",
@@ -337,7 +337,7 @@ export default function FreshaAlternative2026Page() {
                 "Built for the UK, and flexible enough to run a salon, barber, gym, or clinic in its own words.",
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: "#10B981", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>✓</span>
+                  <span style={{ color: "#047857", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>✓</span>
                   <span style={{ color: C.text2 }}>{item}</span>
                 </div>
               ))}
@@ -355,10 +355,10 @@ export default function FreshaAlternative2026Page() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, minWidth: 540 }}>
                 <thead>
                   <tr>
-                    <th style={{ padding: "12px 16px", textAlign: "left", background: "#0E1320", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
-                    <th style={{ padding: "12px 20px", textAlign: "center", background: "rgba(201,162,75,0.14)", color: C.gold, fontWeight: 800, border: "1px solid rgba(201,162,75,0.35)", fontSize: 14 }}>Feature</th>
-                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Fresha</th>
-                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Booksy</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", background: "#FFFFFF", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
+                    <th style={{ padding: "12px 20px", textAlign: "center", background: "rgba(124,58,237,0.14)", color: C.gold, fontWeight: 800, border: "1px solid rgba(124,58,237,0.35)", fontSize: 14 }}>Feature</th>
+                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#FFFFFF", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Fresha</th>
+                    <th style={{ padding: "12px 16px", textAlign: "center", background: "#FFFFFF", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>Booksy</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -367,7 +367,7 @@ export default function FreshaAlternative2026Page() {
                       <td style={{ padding: "12px 16px", color: C.text, fontWeight: 600, border: `1px solid ${C.border}`, fontSize: 13 }}>
                         {row.label}
                       </td>
-                      <td style={{ padding: "12px 16px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(201,162,75,0.2)", background: i % 2 === 0 ? "rgba(201,162,75,0.07)" : "rgba(201,162,75,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13 }}>
+                      <td style={{ padding: "12px 16px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(124,58,237,0.2)", background: i % 2 === 0 ? "rgba(124,58,237,0.07)" : "rgba(124,58,237,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13 }}>
                         {row.feat}
                       </td>
                       <td style={{ padding: "12px 16px", textAlign: "center", color: row.freshaColor ?? C.text2, border: `1px solid ${C.border}`, fontWeight: row.freshaColor ? 700 : 400, fontSize: 13 }}>
@@ -416,7 +416,7 @@ export default function FreshaAlternative2026Page() {
             <p>
               If you&apos;ve ever felt like your booking software was on someone else&apos;s side, it&apos;s worth seeing how a flat-rate, commission-free platform feels.
             </p>
-            <div style={{ background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center", margin: "28px 0 20px" }}>
+            <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center", margin: "28px 0 20px" }}>
               <p style={{ fontSize: 17, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
                 Start your 14-day free trial — no card, no commission, no catch.
               </p>
@@ -433,7 +433,7 @@ export default function FreshaAlternative2026Page() {
 
         {/* Author box */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", background: C.surface, borderRadius: 12, padding: "16px 20px", border: `1px solid ${C.border}`, marginTop: 48 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#0E1320)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#FFFFFF)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
             ✍️
           </div>
           <div>

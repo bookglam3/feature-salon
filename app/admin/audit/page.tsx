@@ -41,11 +41,11 @@ function actionStyle(action: string) {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  super_admin:   "#EF4444",
-  ops_manager:   "#6366F1",
-  support_agent: "#F59E0B",
-  sales_agent:   "#10B981",
-  developer:     "#06B6D4",
+  super_admin:   "#B91C1C",
+  ops_manager:   "#4F46E5",
+  support_agent: "#92400E",
+  sales_agent:   "#047857",
+  developer:     "#155E75",
 };
 
 function fmtTime(iso: string) {

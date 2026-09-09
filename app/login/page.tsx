@@ -111,7 +111,7 @@ export default function LoginPage() {
           </div>
         )}
         {error && error !== "EMAIL_NOT_CONFIRMED" && error !== "RESENT" && (
-          <div style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", padding: "12px 16px", marginBottom: "20px", fontSize: "13.5px", color: "#DC2626", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", padding: "12px 16px", marginBottom: "20px", fontSize: "13.5px", color: "#B91C1C", display: "flex", alignItems: "center", gap: 8 }}>
             <span>⚠</span> {error}
           </div>
         )}

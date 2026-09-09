@@ -21,7 +21,7 @@ interface WaitlistEntry {
 const STATUS_MAP = {
   waiting:   { label: "Waiting",   bg: "rgba(245,158,11,0.10)", color: "#F59E0B" },
   contacted: { label: "Contacted", bg: "rgba(124,58,237,0.10)", color: "#7C3AED" },
-  booked:    { label: "Booked ✓",  bg: "rgba(16,185,129,0.10)", color: "#10B981" },
+  booked:    { label: "Booked ✓",  bg: "rgba(16,185,129,0.10)", color: "#047857" },
   removed:   { label: "Removed",   bg: "#F5F3FF", color: "#524D60" },
 };
 
@@ -185,8 +185,8 @@ export default function WaitlistPage() {
                                 {notifying === e.id ? "Sending…" : "Notify"}
                               </button>
                             )}
-                            {e.client_phone && <button onClick={() => { navigator.clipboard.writeText(e.client_phone); toast.success("Phone copied!"); }} style={{ padding: "5px 10px", background: "#F5F3FF", border: "1.5px solid #BBF7D0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#10B981" }}>📞</button>}
-                            <button onClick={() => deleteEntry(e.id)} style={{ padding: "5px 10px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#DC2626" }}>✕</button>
+                            {e.client_phone && <button onClick={() => { navigator.clipboard.writeText(e.client_phone); toast.success("Phone copied!"); }} style={{ padding: "5px 10px", background: "#F5F3FF", border: "1.5px solid #BBF7D0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#047857" }}>📞</button>}
+                            <button onClick={() => deleteEntry(e.id)} style={{ padding: "5px 10px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#B91C1C" }}>✕</button>
                           </div>
                         </td>
                       </tr>

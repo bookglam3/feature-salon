@@ -53,10 +53,10 @@ export async function POST(req: NextRequest) {
 <body style="margin:0;padding:0;background:#F4F4F5;font-family:Arial,sans-serif;">
   <div style="max-width:560px;margin:32px auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E5E7EB;">
 
-    <div style="background:linear-gradient(135deg,#141A2E 0%,#1C2438 100%);padding:32px 28px;text-align:center;border-bottom:3px solid #C9A24B;">
-      <p style="color:rgba(255,255,255,0.5);margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Feature</p>
-      <h1 style="color:#C9A24B;margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px;">🎉 New signup!</h1>
-      <p style="color:rgba(255,255,255,0.6);margin:8px 0 0;font-size:14px;">${salonName} just joined Feature</p>
+    <div style="background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 100%);padding:32px 28px;text-align:center;border-bottom:3px solid #4C1D95;">
+      <p style="color:#EDE9FE;margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Feature</p>
+      <h1 style="color:#FFFFFF;margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px;">🎉 New signup!</h1>
+      <p style="color:#F5F3FF;margin:8px 0 0;font-size:14px;">${salonName} just joined Feature</p>
     </div>
 
     <div style="padding:28px 28px 8px;">

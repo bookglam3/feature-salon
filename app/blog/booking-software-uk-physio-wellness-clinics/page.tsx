@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const bg      = "#141A2E";
-const surface = "#1C2438";
-const border  = "#2a3350";
-const gold    = "#C9A24B";
-const text    = "#F7F5EF";
-const text2   = "#CBD5E1";
-const muted   = "#aab1c4";
+const bg      = "#FFFFFF";
+const surface = "#F5F3FF";
+const border  = "#ECE9F1";
+const gold    = "#7C3AED";
+const text    = "#12101A";
+const text2   = "#524D60";
+const muted   = "#6B6577";
 
 export const metadata: Metadata = {
   title: "Booking Software for UK Physio & Wellness Clinics (2026) | Feature",
@@ -54,14 +54,14 @@ export default function PhysioClinicBookingPage() {
       <main style={{ background: bg, minHeight: "100vh", color: text, fontFamily: "system-ui, sans-serif" }}>
 
         {/* Nav */}
-        <nav style={{ background: "#0E1320", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+        <nav style={{ background: "#FFFFFF", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 20, color: gold, textDecoration: "none", letterSpacing: "-0.5px" }}>feature</Link>
           <div style={{ display: "flex", gap: 24, alignItems: "center", fontSize: 14 }}>
             <Link href="/#features" style={{ color: muted, textDecoration: "none" }}>Features</Link>
             <Link href="/pricing" style={{ color: muted, textDecoration: "none" }}>Pricing</Link>
             <Link href="/blog" style={{ color: muted, textDecoration: "none" }}>Blog</Link>
             <Link href="/login" style={{ color: muted, textDecoration: "none" }}>Login</Link>
-            <Link href="/signup" style={{ background: gold, color: "#0E1320", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
+            <Link href="/signup" style={{ background: gold, color: "#FFFFFF", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
           </div>
         </nav>
 
@@ -76,7 +76,7 @@ export default function PhysioClinicBookingPage() {
 
         {/* Article header */}
         <header style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 32px" }}>
-          <div style={{ display: "inline-block", background: "rgba(201,162,75,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
+          <div style={{ display: "inline-block", background: "rgba(124,58,237,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
             CLINIC BOOKING SOFTWARE
           </div>
           <h1 style={{ fontSize: "clamp(26px,4.5vw,40px)", fontWeight: 800, color: text, margin: "0 0 20px", lineHeight: 1.2, letterSpacing: "-0.5px" }}>
@@ -137,7 +137,7 @@ export default function PhysioClinicBookingPage() {
             </h2>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>1</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>1</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Online booking straight into your diary</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Patients book themselves, choosing the right appointment type and practitioner, without the back-and-forth phone calls &mdash; and the system respects each practitioner&rsquo;s availability and your cancellation policy.</div>
@@ -145,7 +145,7 @@ export default function PhysioClinicBookingPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>2</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>2</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Reminders that cut no-shows</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Missed appointments are lost revenue and a wasted slot another patient could have used. Automated WhatsApp and SMS reminders are far more effective than email, which patients often miss.</div>
@@ -153,7 +153,7 @@ export default function PhysioClinicBookingPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>3</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>3</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Simple payments and deposits</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Taking payment or a deposit at booking (via mainstream processing like Stripe) protects your time and reduces no-shows.</div>
@@ -161,7 +161,7 @@ export default function PhysioClinicBookingPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>4</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>4</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>The right language and a UK fit</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Software that says &ldquo;patients&rdquo;, &ldquo;practitioners&rdquo; and &ldquo;appointments&rdquo; &mdash; not salon terms &mdash; and that handles GBP, UK workflows and GDPR properly.</div>
@@ -169,7 +169,7 @@ export default function PhysioClinicBookingPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 0 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>5</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>5</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>No paying for what you won&rsquo;t use</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>If you don&rsquo;t need SOAP notes or insurance modules, don&rsquo;t pay for a platform built around them.</div>
@@ -186,8 +186,8 @@ export default function PhysioClinicBookingPage() {
               Let&rsquo;s be straight, because honesty matters more than a sale.
             </p>
 
-            <div style={{ background: "#180f2a", border: "1px solid #3a2550", borderRadius: 12, padding: "22px 26px", marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#c084fc", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>NOT FOR EVERY CLINIC</div>
+            <div style={{ background: "#F5F3FF", border: "1px solid #F5F3FF", borderRadius: 12, padding: "22px 26px", marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#6D28D9", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>NOT FOR EVERY CLINIC</div>
               <p style={{ fontSize: 15, color: text2, lineHeight: 1.75, margin: 0 }}>
                 <strong style={{ color: text }}>Feature is a booking platform, not a clinical practice-management system.</strong> It does not currently offer SOAP clinical notes, exercise-prescription video libraries, or insurance billing. If your clinic depends on detailed clinical documentation and insurance claims, a dedicated physio platform like Cliniko or Jane will serve you better &mdash; and we&rsquo;d genuinely point you there.
               </p>
@@ -219,12 +219,12 @@ export default function PhysioClinicBookingPage() {
           </section>
 
           {/* Disclaimer */}
-          <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, fontStyle: "italic", marginBottom: 48 }}>
+          <p style={{ fontSize: 13, color: "#6B6577", lineHeight: 1.6, fontStyle: "italic", marginBottom: 48 }}>
             Competitor details as reported in 2026 &mdash; always check each provider&rsquo;s current features and pricing, as they change.
           </p>
 
           {/* CTA box */}
-          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #1e2a4a 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
+          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #F5F3FF 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: text, margin: "0 0 10px" }}>
               See if it fits your clinic
             </h3>
@@ -233,7 +233,7 @@ export default function PhysioClinicBookingPage() {
             </p>
             <Link
               href="/signup"
-              style={{ display: "inline-block", background: gold, color: "#0E1320", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
+              style={{ display: "inline-block", background: gold, color: "#FFFFFF", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
             >
               Start free trial
             </Link>
@@ -261,7 +261,7 @@ export default function PhysioClinicBookingPage() {
         </article>
 
         {/* Footer */}
-        <footer style={{ background: "#0E1320", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
+        <footer style={{ background: "#FFFFFF", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 22, color: gold, textDecoration: "none", display: "block", marginBottom: 12 }}>feature</Link>
           <p style={{ fontSize: 13, color: muted, marginBottom: 16 }}>
             UK-built booking software for salons, clinics, gyms &amp; studios.

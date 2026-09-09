@@ -20,10 +20,10 @@ interface ConnectStatus {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  paid: "#10B981",
-  in_transit: "#F59E0B",
+  paid: "#047857",
+  in_transit: "#92400E",
   pending: "#7C3AED",
-  failed: "#EF4444",
+  failed: "#B91C1C",
   canceled: "#6B6577",
 };
 
@@ -190,7 +190,7 @@ export default function EarningsPage() {
               {connecting ? "Redirecting to Stripe…" : "Connect Stripe Account"}
             </button>
             {connectError && (
-              <div style={{ marginTop: 12, padding: "12px 16px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 10, fontSize: 12.5, color: "#DC2626", fontWeight: 600 }}>
+              <div style={{ marginTop: 12, padding: "12px 16px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 10, fontSize: 12.5, color: "#B91C1C", fontWeight: 600 }}>
                 ❌ {connectError}
               </div>
             )}

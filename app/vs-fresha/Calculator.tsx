@@ -207,7 +207,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#DC2626", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
+              <span style={{ color: "#B91C1C", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               20% on {newClients} new clients (min £6 each)
@@ -229,7 +229,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#DC2626", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
+              <span style={{ color: "#B91C1C", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               30% on {newClients} new clients via Boost (min £5 each)

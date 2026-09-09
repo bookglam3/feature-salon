@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/check-theme.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/test-slot-logic.mjs"
+    "test": "node scripts/test-slot-logic.mjs",
+    "check:theme": "node scripts/check-theme.mjs"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.3.0",

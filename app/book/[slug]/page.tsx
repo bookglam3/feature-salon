@@ -384,7 +384,7 @@ export default function BookingPage() {
 
   const paymentOptionsRaw = [
     (salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
-    salonPm.deposit_online && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#10B981" },
+    salonPm.deposit_online && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#047857" },
     salonPm.custom_deposit && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
     salonPm.pay_at_salon   && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#64748B" },
   ].filter(Boolean) as { id: string; label: string; sub: string; pct: number; color: string }[];
@@ -1053,7 +1053,7 @@ export default function BookingPage() {
               <>
                 <button onClick={()=>setStep(3)} className="back-btn">← Back to Details</button>
                 {STRIPE_KEY_MISSING && (
-                  <div style={{ padding:"14px 16px",background:"#FEF2F2",borderRadius:12,border:"1px solid #FECACA",marginBottom:16,fontSize:13,color:"#DC2626",fontWeight:600 }}>
+                  <div style={{ padding:"14px 16px",background:"#FEF2F2",borderRadius:12,border:"1px solid #FECACA",marginBottom:16,fontSize:13,color: "#B91C1C",fontWeight:600 }}>
                     ⚠️ Online payments are not configured. Please contact the salon to pay in person.
                   </div>
                 )}
@@ -1134,7 +1134,7 @@ export default function BookingPage() {
                           {confirmedBooking.paymentStatus === "free" ? (
                             <span style={{ fontSize: 13, fontWeight: 700, color: "#4F46E5", background: "rgba(99,102,241,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(99,102,241,0.2)" }}>Free Service — No Payment</span>
                           ) : (
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#10B981", background: "rgba(16,185,129,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(16,185,129,0.2)" }}>Pay at Salon — {confirmedBooking.servicePriceIsFrom ? "from " : ""}£{confirmedBooking.servicePrice.toFixed(2)} due at salon</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "#047857", background: "rgba(16,185,129,0.1)", padding: "4px 10px", borderRadius: 20, border: "1px solid rgba(16,185,129,0.2)" }}>Pay at Salon — {confirmedBooking.servicePriceIsFrom ? "from " : ""}£{confirmedBooking.servicePrice.toFixed(2)} due at salon</span>
                           )}
                         </div>
                       </div>

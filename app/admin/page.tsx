@@ -76,7 +76,7 @@ const statusMeta: Record<string, { bg: string; color: string; label: string }> =
   active: { bg: "#ECFDF5", color: "#059669", label: "Active" },
   trial: { bg: "#FFFBEB", color: "#D97706", label: "Trial" },
   trialing: { bg: "#FFFBEB", color: "#D97706", label: "Trialing" },
-  past_due: { bg: "#FEF2F2", color: "#DC2626", label: "Past Due" },
+  past_due: { bg: "#FEF2F2", color: "#B91C1C", label: "Past Due" },
   cancelled: { bg: "#F1F5F9", color: "#64748B", label: "Cancelled" },
   pending: { bg: "#FFFBEB", color: "#C2410C", label: "Pending" },
   approved: { bg: "#ECFDF5", color: "#065F46", label: "Approved" },
@@ -593,11 +593,11 @@ export default function AdminPage() {
             <div style={{
               marginBottom: 20, padding: "12px 16px",
               background: T.redSoft, border: `1px solid #FECACA`,
-              borderRadius: 10, color: "#DC2626", fontSize: 13,
+              borderRadius: 10, color: "#B91C1C", fontSize: 13,
               display: "flex", alignItems: "center", gap: 8,
             }}>
               ⚠ {error}
-              <button onClick={() => setError("")} style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", color: "#DC2626", fontSize: 16 }}>×</button>
+              <button onClick={() => setError("")} style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", color: "#B91C1C", fontSize: 16 }}>×</button>
             </div>
           )}
 
@@ -677,7 +677,7 @@ export default function AdminPage() {
                             <div style={{ fontSize: 11.5, color: "#64748B", marginTop: 1 }}>{s.owner_email}</div>
                           </div>
                           <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626" }}>Past Due</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#B91C1C" }}>Past Due</div>
                             <div style={{ fontSize: 11, color: "#64748B" }}>{s.stripe_customer_id ? `Stripe: ${s.stripe_customer_id.slice(0, 12)}…` : "No Stripe ID"}</div>
                           </div>
                         </div>
@@ -1382,11 +1382,11 @@ export default function AdminPage() {
                 missing_selfie:   { label: "No Selfie",    color: "#C2410C", bg: "#FFF7ED" },
                 missing_id_photo: { label: "No ID Photo",  color: "#B45309", bg: "#FFFBEB" },
                 missing_id_number:{ label: "No ID Number", color: "#7C3AED", bg: "#F5F3FF" },
-                duplicate_cnic:   { label: "Duplicate CNIC", color: "#DC2626", bg: "#FEF2F2" },
+                duplicate_cnic:   { label: "Duplicate CNIC", color: "#B91C1C", bg: "#FEF2F2" },
               };
               const VSTATUS: Record<string, { label: string; color: string; bg: string }> = {
                 pending:  { label: "Pending",  color: "#C2410C", bg: "#FFF7ED" },
-                flagged:  { label: "Flagged",  color: "#DC2626", bg: "#FEF2F2" },
+                flagged:  { label: "Flagged",  color: "#B91C1C", bg: "#FEF2F2" },
                 verified: { label: "Verified", color: "#065F46", bg: "#ECFDF5" },
                 rejected: { label: "Rejected", color: "#991B1B", bg: "#FEF2F2" },
               };

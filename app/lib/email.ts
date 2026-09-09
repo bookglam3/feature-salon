@@ -177,7 +177,7 @@ export async function sendBookingEmails({
   const paymentBadge = (() => {
     if (paymentStatus === "paid")         return { label: "Paid in Full",     color: "#059669", bg: "#D1FAE5" };
     if (paymentStatus === "deposit_paid") return { label: "Deposit Paid (50%)", color: "#D97706", bg: "#FEF3C7" };
-    return                                       { label: "Unpaid",             color: "#DC2626", bg: "#FEE2E2" };
+    return                                       { label: "Unpaid",             color: "#B91C1C", bg: "#FEE2E2" };
   })();
 
   const amountPaid = depositOnly && price ? (price * 0.5).toFixed(2) : price?.toFixed(2);

@@ -35,7 +35,7 @@ export const PLAN_RANK: Record<Plan, number> = {
 export const PLAN_LABELS: Record<Plan, { name: string; price: string; color: string }> = {
   starter:   { name: "Starter",    price: "£29/mo",  color: "#64748B" },
   pro:       { name: "Pro",        price: "£59/mo",  color: "#6366F1" },
-  business:  { name: "Business",   price: "£99/mo",  color: "#10B981" },
+  business:  { name: "Business",   price: "£99/mo",  color: "#047857" },
   enterprise:{ name: "Enterprise", price: "Custom",  color: "#F59E0B" },
 };
 

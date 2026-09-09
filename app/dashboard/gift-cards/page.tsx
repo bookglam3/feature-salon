@@ -146,7 +146,7 @@ function GiftCardsContent() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
           {[
             { label: "Active Codes", value: codes.filter(c => c.is_active).length, icon: "🏷️", color: "#7C3AED" },
-            { label: "Total Uses", value: codes.reduce((s, c) => s + c.uses, 0), icon: "📊", color: "#10B981" },
+            { label: "Total Uses", value: codes.reduce((s, c) => s + c.uses, 0), icon: "📊", color: "#047857" },
             { label: "Gift Cards", value: gifts.length, icon: "🎁", color: "#F59E0B" },
             { label: "Gift Value", value: `£${gifts.reduce((s, g) => s + g.remaining, 0)}`, icon: "💰", color: "#EC4899" },
           ].map(s => (

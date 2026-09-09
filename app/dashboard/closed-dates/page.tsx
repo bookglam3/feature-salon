@@ -118,7 +118,7 @@ export default function ClosedDatesPage() {
           {[
             { label:"Total Closures", value:closedDates.length, icon:"🚫", color:"#EF4444" },
             { label:"Upcoming", value:upcoming.length, icon:"📅", color:"#F59E0B" },
-            { label:"Past Closures", value:past.length, icon:"✅", color:"#10B981" },
+            { label:"Past Closures", value:past.length, icon:"✅", color: "#047857" },
           ].map(s => (
             <div key={s.label} style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:16, padding:"18px 20px", position:"relative", overflow:"hidden" }}>
               <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:s.color }} />
@@ -162,9 +162,9 @@ export default function ClosedDatesPage() {
                     onMouseEnter={e => { if (!isPast) e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : "#F5F3FF"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = closed ? "rgba(239,68,68,0.10)" : isToday ? "rgba(124,58,237,0.10)" : "#FFFFFF"; }}
                   >
-                    <div style={{ fontSize:13, fontWeight: isToday ? 900 : 600, color: closed ? "#DC2626" : isToday ? "#7C3AED" : isPast ? "#524D60" : "#12101A", marginBottom:4 }}>{day.getDate()}</div>
+                    <div style={{ fontSize:13, fontWeight: isToday ? 900 : 600, color: closed ? "#B91C1C" : isToday ? "#7C3AED" : isPast ? "#524D60" : "#12101A", marginBottom:4 }}>{day.getDate()}</div>
                     {closed && (
-                      <div style={{ fontSize:9.5, fontWeight:700, color:"#DC2626", background:"rgba(239,68,68,0.10)", padding:"2px 6px", borderRadius:5, lineHeight:1.4 }}>
+                      <div style={{ fontSize:9.5, fontWeight:700, color: "#B91C1C", background:"rgba(239,68,68,0.10)", padding:"2px 6px", borderRadius:5, lineHeight:1.4 }}>
                         🚫 {closed.reason || "Closed"}
                       </div>
                     )}
@@ -189,11 +189,11 @@ export default function ClosedDatesPage() {
                 {upcoming.map(c => (
                   <div key={c.id} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 14px", background:"rgba(239,68,68,0.10)", border:"1.5px solid #FECACA", borderRadius:12 }}>
                     <div>
-                      <div style={{ fontSize:13, fontWeight:800, color:"#DC2626" }}>{new Date(c.date + "T00:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}</div>
+                      <div style={{ fontSize:13, fontWeight:800, color: "#B91C1C" }}>{new Date(c.date + "T00:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}</div>
                       <div style={{ fontSize:11.5, color:"#EF4444", marginTop:2 }}>{c.reason || "No reason given"}</div>
                     </div>
-                    <button onClick={() => handleRemove(c.id, c.date)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#DC2626" }}
-                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#DC2626"; }}>🗑</button>
+                    <button onClick={() => handleRemove(c.id, c.date)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color: "#B91C1C" }}
+                      onMouseEnter={e => { e.currentTarget.style.color = "#EF4444"; }} onMouseLeave={e => { e.currentTarget.style.color = "#B91C1C"; }}>🗑</button>
                   </div>
                 ))}
               </div>

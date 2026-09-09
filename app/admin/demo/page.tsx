@@ -30,7 +30,7 @@ const STATUS_META: Record<string, { bg: string; color: string; label: string }> 
   active:    { bg: "#ECFDF5", color: "#059669", label: "Active" },
   trial:     { bg: "#FFFBEB", color: "#D97706", label: "Trial" },
   trialing:  { bg: "#FFFBEB", color: "#D97706", label: "Trialing" },
-  past_due:  { bg: "#FEF2F2", color: "#DC2626", label: "Past Due" },
+  past_due:  { bg: "#FEF2F2", color: "#B91C1C", label: "Past Due" },
   cancelled: { bg: "#F1F5F9", color: "#64748B", label: "Cancelled" },
 };
 

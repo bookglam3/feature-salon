@@ -61,14 +61,14 @@ const jsonLdBreadcrumb = JSON.stringify({
 });
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#64748B",
+  bg: "#FFFFFF",
+  surface: "#F5F3FF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
 };
 
 const h2Style: React.CSSProperties = {
@@ -154,7 +154,7 @@ export default function BarbershopBookingPage() {
         {/* Header */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
-            <span style={{ background: "rgba(201,162,75,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(201,162,75,0.25)" }}>
+            <span style={{ background: "rgba(124,58,237,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(124,58,237,0.25)" }}>
               barbershop booking
             </span>
             <span style={{ fontSize: 13, color: C.muted }}>📅 31 May 2026</span>
@@ -226,10 +226,10 @@ export default function BarbershopBookingPage() {
               Feature is a UK-built booking platform with a deliberately simple model for barbershops that would rather have certainty than a commission bill:
             </p>
 
-            <div style={{ background: C.surface, border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {FEATURE_POINTS.map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: "#10B981", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>✓</span>
+                  <span style={{ color: "#047857", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>✓</span>
                   <span style={{ color: C.text2 }}>{item}</span>
                 </div>
               ))}
@@ -246,7 +246,7 @@ export default function BarbershopBookingPage() {
 
           {/* CTA section */}
           <section style={sectionStyle}>
-            <div style={{ background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
+            <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: C.gold, marginBottom: 14, marginTop: 0 }}>
                 Try it for your shop
               </h3>
@@ -266,7 +266,7 @@ export default function BarbershopBookingPage() {
 
         {/* Author box */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", background: C.surface, borderRadius: 12, padding: "16px 20px", border: `1px solid ${C.border}`, marginTop: 48 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#0E1320)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#FFFFFF)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
             ✍️
           </div>
           <div>

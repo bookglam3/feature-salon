@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const bg      = "#141A2E";
-const surface = "#1C2438";
-const border  = "#2a3350";
-const gold    = "#C9A24B";
-const text    = "#F7F5EF";
-const text2   = "#CBD5E1";
-const muted   = "#aab1c4";
+const bg      = "#FFFFFF";
+const surface = "#F5F3FF";
+const border  = "#ECE9F1";
+const gold    = "#7C3AED";
+const text    = "#12101A";
+const text2   = "#524D60";
+const muted   = "#6B6577";
 
 export const metadata: Metadata = {
   title: "The Best Salon Booking Software in the UK (2026): An Honest Buyer's Guide | Feature",
@@ -84,14 +84,14 @@ export default function BestSalonBookingSoftwarePage() {
       <main style={{ background: bg, minHeight: "100vh", color: text, fontFamily: "system-ui, sans-serif" }}>
 
         {/* Nav */}
-        <nav style={{ background: "#0E1320", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+        <nav style={{ background: "#FFFFFF", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 20, color: gold, textDecoration: "none", letterSpacing: "-0.5px" }}>feature</Link>
           <div style={{ display: "flex", gap: 24, alignItems: "center", fontSize: 14 }}>
             <Link href="/#features" style={{ color: muted, textDecoration: "none" }}>Features</Link>
             <Link href="/pricing" style={{ color: muted, textDecoration: "none" }}>Pricing</Link>
             <Link href="/blog" style={{ color: muted, textDecoration: "none" }}>Blog</Link>
             <Link href="/login" style={{ color: muted, textDecoration: "none" }}>Login</Link>
-            <Link href="/signup" style={{ background: gold, color: "#0E1320", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
+            <Link href="/signup" style={{ background: gold, color: "#FFFFFF", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
           </div>
         </nav>
 
@@ -106,7 +106,7 @@ export default function BestSalonBookingSoftwarePage() {
 
         {/* Article header */}
         <header style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 32px" }}>
-          <div style={{ display: "inline-block", background: "rgba(201,162,75,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
+          <div style={{ display: "inline-block", background: "rgba(124,58,237,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
             BUYER&rsquo;S GUIDE
           </div>
           <h1 style={{ fontSize: "clamp(26px,4.5vw,40px)", fontWeight: 800, color: text, margin: "0 0 20px", lineHeight: 1.2, letterSpacing: "-0.5px" }}>
@@ -192,7 +192,7 @@ export default function BestSalonBookingSoftwarePage() {
               { heading: "The right fit for your size", body: "A solo stylist needs something simple; a multi-chair salon needs per-staff calendars; a clinic needs the right terminology. Don't pay for complexity you won't use." },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 18 }}>
-                <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>{i + 1}</div>
+                <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>{i + 1}</div>
                 <div>
                   <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>{item.heading}</div>
                   <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>{item.body}</div>
@@ -209,7 +209,7 @@ export default function BestSalonBookingSoftwarePage() {
             <div style={{ overflowX: "auto", borderRadius: 12, border: `1px solid ${border}` }}>
               <table style={{ width: "100%", borderCollapse: "collapse", background: surface, fontSize: 14 }}>
                 <thead>
-                  <tr style={{ background: "#141e38" }}>
+                  <tr style={{ background: "#F5F3FF" }}>
                     <th style={th}></th>
                     <th style={thGold}>Feature</th>
                     <th style={th}>Fresha</th>
@@ -218,7 +218,7 @@ export default function BestSalonBookingSoftwarePage() {
                 </thead>
                 <tbody>
                   {rows.map(([label, feat, fresha, booksy], i) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? surface : "#19203a" }}>
+                    <tr key={i} style={{ background: i % 2 === 0 ? surface : "#F5F3FF" }}>
                       <td style={{ ...td, fontWeight: 600, color: text, whiteSpace: "nowrap" }}>{label}</td>
                       <td style={tdGold}>{feat}</td>
                       <td style={td}>{fresha}</td>
@@ -228,7 +228,7 @@ export default function BestSalonBookingSoftwarePage() {
                 </tbody>
               </table>
             </div>
-            <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, fontStyle: "italic", marginTop: 12 }}>
+            <p style={{ fontSize: 13, color: "#6B6577", lineHeight: 1.6, fontStyle: "italic", marginTop: 12 }}>
               Competitor pricing as reported in 2026 &mdash; always check each provider&rsquo;s current pricing page, as rates change.
             </p>
           </section>
@@ -247,7 +247,7 @@ export default function BestSalonBookingSoftwarePage() {
           </section>
 
           {/* CTA box */}
-          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #1e2a4a 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
+          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #F5F3FF 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: text, margin: "0 0 10px" }}>
               Try the flat-rate option free
             </h3>
@@ -256,7 +256,7 @@ export default function BestSalonBookingSoftwarePage() {
             </p>
             <Link
               href="/signup"
-              style={{ display: "inline-block", background: gold, color: "#0E1320", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
+              style={{ display: "inline-block", background: gold, color: "#FFFFFF", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
             >
               Start free trial
             </Link>
@@ -284,7 +284,7 @@ export default function BestSalonBookingSoftwarePage() {
         </article>
 
         {/* Footer */}
-        <footer style={{ background: "#0E1320", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
+        <footer style={{ background: "#FFFFFF", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 22, color: gold, textDecoration: "none", display: "block", marginBottom: 12 }}>feature</Link>
           <p style={{ fontSize: 13, color: muted, marginBottom: 16 }}>
             UK-built booking software for salons, clinics, gyms &amp; studios.

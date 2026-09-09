@@ -213,7 +213,7 @@ export default function OnboardingChecklist({ services, staff, bookingLink, salo
                   </button>
                 )}
                 {s.done && (
-                  <div style={{ fontSize: 11, color: "#10B981", fontWeight: 800, flexShrink: 0 }}>Done</div>
+                  <div style={{ fontSize: 11, color: "#047857", fontWeight: 800, flexShrink: 0 }}>Done</div>
                 )}
               </div>
             ))}

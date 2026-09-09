@@ -104,14 +104,14 @@ function BookingPreview({ pm, price = 65 }: { pm: PaymentMethods; price?: number
 
   const options = [
     pm.full_online    && { label: "Pay Full Amount",     sub: "Pay 100% now — nothing due at the salon", amount: `£${price}`, color: "#7C3AED" },
-    pm.deposit_online && { label: "50% Deposit",          sub: "Pay half now, remainder at salon",         amount: `£${(price * 0.5).toFixed(2)}`, color: "#10B981" },
+    pm.deposit_online && { label: "50% Deposit",          sub: "Pay half now, remainder at salon",         amount: `£${(price * 0.5).toFixed(2)}`, color: "#047857" },
     pm.custom_deposit && { label: `${depositPct}% Deposit`, sub: `Pay ${depositPct}% now, remainder at salon`, amount: `£${depositAmt}`, color: "#F59E0B" },
     pm.pay_at_salon   && { label: "Pay at Salon",         sub: "No payment required now",                  amount: "£0",    color: "#524D60" },
   ].filter(Boolean) as { label: string; sub: string; amount: string; color: string }[];
 
   if (!options.length) {
     return (
-      <div style={{ padding: "16px", background: "#FEF2F2", borderRadius: 10, border: "1px solid #FECACA", fontSize: 12, color: "#DC2626" }}>
+      <div style={{ padding: "16px", background: "#FEF2F2", borderRadius: 10, border: "1px solid #FECACA", fontSize: 12, color: "#B91C1C" }}>
         ⚠️ No payment methods enabled &mdash; clients won&apos;t be able to complete bookings.
       </div>
     );
@@ -410,9 +410,9 @@ export default function SettingsPage() {
       <div style={{ padding: "28px 24px", maxWidth: 740 }}>
 
       {saveError && (
-        <div style={{ background: "#FEF2F2", border: "1px solid #DC2626", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#DC2626", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ background: "#FEF2F2", border: "1px solid #DC2626", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#B91C1C", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>⚠️ {saveError}</span>
-          <button onClick={() => setSaveError("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#DC2626", fontSize: 16 }}>×</button>
+          <button onClick={() => setSaveError("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#B91C1C", fontSize: 16 }}>×</button>
         </div>
       )}
 
@@ -461,7 +461,7 @@ export default function SettingsPage() {
             >
               {logoUploading ? (
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ width: 24, height: 24, border: "3px solid #9A94A8", borderTop: "3px solid white", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 4px" }} />
+                  <div style={{ /* theme-allow: spinner ring sits on the dark upload overlay, not on white */ width: 24, height: 24, border: "3px solid #9A94A8", borderTop: "3px solid white", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 4px" }} />
                   <span style={{ fontSize: 10, color: "#fff", fontWeight: 700 }}>Uploading...</span>
                 </div>
               ) : logoUrl ? (
@@ -510,7 +510,7 @@ export default function SettingsPage() {
 
           {/* Error message */}
           {logoError && (
-            <div style={{ marginTop: 10, padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 10, fontSize: 12.5, color: "#DC2626", lineHeight: 1.6 }}>
+            <div style={{ marginTop: 10, padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 10, fontSize: 12.5, color: "#B91C1C", lineHeight: 1.6 }}>
               ⚠️ {logoError}
             </div>
           )}
@@ -660,7 +660,7 @@ export default function SettingsPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
           <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>Automated Reminders</div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: "12px", color: remindersEnabled ? "#10B981" : "#6B6577", fontWeight: 600 }}>
+            <span style={{ fontSize: "12px", color: remindersEnabled ? "#047857" : "#6B6577", fontWeight: 600 }}>
               {remindersEnabled ? "On" : "Off"}
             </span>
             <Toggle id="reminders-toggle" checked={remindersEnabled} onChange={handleToggleReminders} />
@@ -718,7 +718,7 @@ export default function SettingsPage() {
             <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>WhatsApp Reminders</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: "12px", color: whatsappEnabled ? "#10B981" : "#6B6577", fontWeight: 600 }}>
+            <span style={{ fontSize: "12px", color: whatsappEnabled ? "#047857" : "#6B6577", fontWeight: 600 }}>
               {waSaved ? "Saved ✓" : whatsappEnabled ? "On" : "Off"}
             </span>
             <Toggle id="whatsapp-toggle" checked={whatsappEnabled} onChange={handleToggleWhatsApp} />
@@ -751,7 +751,7 @@ export default function SettingsPage() {
               <div>2. Verify your Meta Business Account</div>
               <div>3. Set your Twilio WhatsApp sender</div>
               <div>4. Update <code style={{ background: "#DCFCE7", padding: "1px 5px", borderRadius: 4 }}>TWILIO_WHATSAPP_FROM</code> in Vercel env</div>
-              <div style={{ marginTop: 6, color: "#10B981", fontWeight: 600 }}>✅ Then ALL clients get messages</div>
+              <div style={{ marginTop: 6, color: "#047857", fontWeight: 600 }}>✅ Then ALL clients get messages</div>
             </div>
           </div>
         </div>
@@ -771,7 +771,7 @@ export default function SettingsPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "#12101A" }}>{row.time}</div>
                 <div style={{ fontSize: "12px", color: "#524D60", margin: "2px 0" }}>{row.msg}</div>
-                <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 600, color: "#10B981", background: "rgba(16,185,129,0.12)", padding: "2px 8px", borderRadius: 6, marginTop: 4 }}>WhatsApp</span>
+                <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 600, color: "#047857", background: "rgba(16,185,129,0.12)", padding: "2px 8px", borderRadius: 6, marginTop: 4 }}>WhatsApp</span>
               </div>
             </div>
           ))}
@@ -850,8 +850,8 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {pwError && <div style={{ padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 10, fontSize: 13, color: "#DC2626", marginBottom: 14 }}>⚠️ {pwError}</div>}
-        {pwSuccess && <div style={{ padding: "10px 14px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 10, fontSize: 13, color: "#10B981", marginBottom: 14 }}>✅ Password changed!</div>}
+        {pwError && <div style={{ padding: "10px 14px", background: "#F5F3FF", border: "1.5px solid #FECACA", borderRadius: 10, fontSize: 13, color: "#B91C1C", marginBottom: 14 }}>⚠️ {pwError}</div>}
+        {pwSuccess && <div style={{ padding: "10px 14px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 10, fontSize: 13, color: "#047857", marginBottom: 14 }}>✅ Password changed!</div>}
 
         <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A", marginBottom: 12 }}>Change Password</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360, marginBottom: 20 }}>

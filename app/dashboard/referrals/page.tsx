@@ -21,7 +21,7 @@ interface Referral {
 const STATUS_MAP = {
   pending:   { label: "Pending",   bg: "rgba(245,158,11,0.10)", color: "#F59E0B" },
   completed: { label: "Completed", bg: "rgba(124,58,237,0.10)", color: "#7C3AED" },
-  rewarded:  { label: "Rewarded ✓", bg: "rgba(16,185,129,0.10)", color: "#10B981" },
+  rewarded:  { label: "Rewarded ✓", bg: "rgba(16,185,129,0.10)", color: "#047857" },
 };
 
 function genCode(name: string) {
@@ -104,7 +104,7 @@ export default function ReferralsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
           {[
             { label: "Total Referrals", value: referrals.length, color: "#7C3AED" },
-            { label: "Completed", value: totalCompleted, color: "#10B981" },
+            { label: "Completed", value: totalCompleted, color: "#047857" },
             { label: "Rewarded", value: totalRewarded, color: "#F59E0B" },
             { label: "Conversion", value: referrals.length ? `${Math.round((totalCompleted/referrals.length)*100)}%` : "0%", color: "#EC4899" },
           ].map(s => (
@@ -192,7 +192,7 @@ export default function ReferralsPage() {
           <div onClick={e => e.stopPropagation()} style={{ background: "#FFFFFF", borderRadius: 20, padding: 28, width: "100%", maxWidth: 460, boxShadow: "0 32px 80px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#12101A", marginBottom: 20 }}>New Referral</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ padding: "14px 16px", background: "#F5F3FF", borderRadius: 12, fontSize: 13, color: "#10B981" }}>
+              <div style={{ padding: "14px 16px", background: "#F5F3FF", borderRadius: 12, fontSize: 13, color: "#047857" }}>
                 <strong>Who is referring?</strong> (existing client)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

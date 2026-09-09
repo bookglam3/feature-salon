@@ -85,7 +85,7 @@ export default function TipsPage() {
         {/* Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
           {[
-            { label: "Total Tips", value: `£${totalTips.toFixed(2)}`, icon: "💸", color: "#10B981" },
+            { label: "Total Tips", value: `£${totalTips.toFixed(2)}`, icon: "💸", color: "#047857" },
             { label: "This Month", value: `£${tips.filter(t => new Date(t.created_at).getMonth() === new Date().getMonth()).reduce((s,t) => s + t.amount, 0).toFixed(2)}`, icon: "📅", color: "#7C3AED" },
             { label: "Total Count", value: tips.length, icon: "🧾", color: "#F59E0B" },
           ].map(s => (
@@ -123,7 +123,7 @@ export default function TipsPage() {
                       <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{new Date(tip.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
                       <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{tip.client_name}</td>
                       <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{tip.staff?.name || "—"}</td>
-                      <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 16, fontWeight: 900, color: "#10B981" }}>£{tip.amount.toFixed(2)}</td>
+                      <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 16, fontWeight: 900, color: "#047857" }}>£{tip.amount.toFixed(2)}</td>
                       <td style={{ padding: "11px 16px", borderBottom: "1px solid #ECE9F1" }}>
                         <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: `${methodColor[tip.method]}18`, color: methodColor[tip.method], textTransform: "capitalize" }}>{tip.method}</span>
                       </td>
@@ -150,7 +150,7 @@ export default function TipsPage() {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                           <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{s.name}</div>
-                          <div style={{ fontSize: 14, fontWeight: 900, color: "#10B981" }}>£{s.total.toFixed(2)}</div>
+                          <div style={{ fontSize: 14, fontWeight: 900, color: "#047857" }}>£{s.total.toFixed(2)}</div>
                         </div>
                         <div style={{ height: 5, background: "#ECE9F1", borderRadius: 99 }}>
                           <div style={{ height: "100%", borderRadius: 99, background: col, width: `${(s.total / staffTips[0].total) * 100}%` }} />

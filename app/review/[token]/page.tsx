@@ -228,7 +228,7 @@ export default function ReviewPage() {
       {formErr && (
         <div style={{
           padding: "12px 16px", background: "#FEF2F2", borderRadius: 10,
-          border: "1px solid #FECACA", color: "#DC2626", fontSize: 13,
+          border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13,
           fontWeight: 600, marginBottom: 16,
         }}>
           {formErr}

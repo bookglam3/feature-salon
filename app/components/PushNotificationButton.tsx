@@ -58,7 +58,7 @@ export default function PushNotificationButton({ salonId }: { salonId: string })
   const cfg = {
     idle:       { label: "Enable Notifications", icon: <Bell size={13} strokeWidth={2} />,     color: "#7C3AED", bg: "rgba(124,58,237,0.10)",   cursor: "pointer" as const },
     loading:    { label: "Enabling…",            icon: <Bell size={13} strokeWidth={2} />,     color: "#7C3AED", bg: "rgba(124,58,237,0.10)",   cursor: "default" as const },
-    subscribed: { label: "Notifications On",     icon: <Check size={13} strokeWidth={2.5} />, color: "#10B981", bg: "rgba(16,185,129,0.10)",  cursor: "default" as const },
+    subscribed: { label: "Notifications On",     icon: <Check size={13} strokeWidth={2.5} />, color: "#047857", bg: "rgba(16,185,129,0.10)",  cursor: "default" as const },
     denied:     { label: "Notifications Blocked",icon: <BellOff size={13} strokeWidth={2} />, color: "#64748B", bg: "rgba(100,116,139,0.10)", cursor: "default" as const },
     unsupported:{ label: "",                     icon: null,                                   color: "#64748B", bg: "transparent",             cursor: "default" as const },
   }[status];

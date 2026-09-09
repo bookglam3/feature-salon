@@ -112,7 +112,7 @@ function ClientPortalContent() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
           {[
             { label: "Total Clients", value: clients.length, icon: "👥", color: "#7C3AED" },
-            { label: "Returning", value: clients.filter(c => c.count > 1).length, icon: "🔄", color: "#10B981" },
+            { label: "Returning", value: clients.filter(c => c.count > 1).length, icon: "🔄", color: "#047857" },
             { label: "Total Revenue", value: `£${clients.reduce((s,c) => s + c.revenue, 0)}`, icon: "💰", color: "#F59E0B" },
             { label: "Avg. Bookings", value: clients.length ? (clients.reduce((s,c) => s + c.count, 0) / clients.length).toFixed(1) : "0", icon: "📋", color: "#EC4899" },
           ].map(s => (
@@ -177,7 +177,7 @@ function ClientPortalContent() {
                           <div style={{ color: "#524D60", fontSize: 11.5 }}>{c.phone || "—"}</div>
                         </td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#12101A" }}>{c.count}</td>
-                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#10B981" }}>£{c.revenue}</td>
+                        <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 800, color: "#047857" }}>£{c.revenue}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{new Date(c.last_visit).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
                         <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}>
                           <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: isVIP ? "rgba(245,158,11,0.10)" : isNew ? "rgba(124,58,237,0.10)" : "rgba(16,185,129,0.06)", color: isVIP ? "#F59E0B" : isNew ? "#7C3AED" : "#10B981" }}>
@@ -218,7 +218,7 @@ function ClientPortalContent() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
               {[
                 { label: "Total Bookings", value: selected.count, color: "#7C3AED" },
-                { label: "Total Spent", value: `£${selected.revenue}`, color: "#10B981" },
+                { label: "Total Spent", value: `£${selected.revenue}`, color: "#047857" },
                 { label: "Last Visit", value: new Date(selected.last_visit).toLocaleDateString("en-GB", { day: "numeric", month: "short" }), color: "#F59E0B" },
                 { label: "Client Type", value: selected.count >= 5 || selected.revenue >= 200 ? "⭐ VIP" : selected.count === 1 ? "🆕 New" : "🔄 Regular", color: "#EC4899" },
               ].map(s => (

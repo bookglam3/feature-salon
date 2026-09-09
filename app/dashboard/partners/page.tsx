@@ -267,8 +267,8 @@ function PartnersPageInner() {
     trialing:  { bg: "rgba(124,58,237,0.12)",  color: "#7C3AED", border: "rgba(124,58,237,0.3)",  label: "⏳ Trialing" },
     active:    { bg: "rgba(16,185,129,0.12)",  color: "#059669", border: "rgba(16,185,129,0.3)",  label: "✅ Active" },
     past_due:  { bg: "rgba(245,158,11,0.12)",  color: "#B45309", border: "rgba(245,158,11,0.3)",  label: "⚠️ Past Due" },
-    cancelled: { bg: "rgba(239,68,68,0.12)",   color: "#DC2626", border: "rgba(239,68,68,0.3)",   label: "❌ Cancelled" },
-    unpaid:    { bg: "rgba(239,68,68,0.12)",   color: "#DC2626", border: "rgba(239,68,68,0.3)",   label: "🔴 Unpaid" },
+    cancelled: { bg: "rgba(239,68,68,0.12)",   color: "#B91C1C", border: "rgba(239,68,68,0.3)",   label: "❌ Cancelled" },
+    unpaid:    { bg: "rgba(239,68,68,0.12)",   color: "#B91C1C", border: "rgba(239,68,68,0.3)",   label: "🔴 Unpaid" },
   };
 
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;

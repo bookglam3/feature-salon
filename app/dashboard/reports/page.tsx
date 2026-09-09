@@ -248,7 +248,7 @@ function ReportsContent() {
                           {name}
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "#10B981" }}>£{data.revenue}</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "#047857" }}>£{data.revenue}</div>
                           <div style={{ fontSize: 10.5, color: "#524D60" }}>{data.count} bookings</div>
                         </div>
                       </div>
@@ -279,7 +279,7 @@ function ReportsContent() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                           <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>{name}</div>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "#10B981" }}>£{data.revenue}</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "#047857" }}>£{data.revenue}</div>
                         </div>
                         <div style={{ height: 6, background: "#ECE9F1", borderRadius: 99 }}>
                           <div style={{ height: "100%", borderRadius: 99, background: COLORS[i], width: `${(data.revenue / maxRev) * 100}%`, transition: "width 0.6s ease" }} />
@@ -329,7 +329,7 @@ function ReportsContent() {
             </div>
             <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
               {[
-                { label: "Confirmed", count: appointments.filter(a => a.status === "confirmed").length, color: "#10B981", bg: "rgba(16,185,129,0.10)" },
+                { label: "Confirmed", count: appointments.filter(a => a.status === "confirmed").length, color: "#047857", bg: "rgba(16,185,129,0.10)" },
                 { label: "Pending",   count: appointments.filter(a => a.status === "pending").length,   color: "#F59E0B", bg: "rgba(245,158,11,0.10)" },
                 { label: "Cancelled", count: appointments.filter(a => a.status === "cancelled").length, color: "#EF4444", bg: "rgba(239,68,68,0.10)" },
               ].map(s => {

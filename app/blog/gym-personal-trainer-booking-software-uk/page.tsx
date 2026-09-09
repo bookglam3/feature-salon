@@ -61,14 +61,14 @@ const jsonLdBreadcrumb = JSON.stringify({
 });
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#64748B",
+  bg: "#FFFFFF",
+  surface: "#F5F3FF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
 };
 
 const h2Style: React.CSSProperties = {
@@ -164,10 +164,10 @@ export default function GymPTBookingPage() {
         {/* Header */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
-            <span style={{ background: "rgba(201,162,75,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(201,162,75,0.25)" }}>
+            <span style={{ background: "rgba(124,58,237,0.15)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 99, border: "1px solid rgba(124,58,237,0.25)" }}>
               gym booking software
             </span>
-            <span style={{ fontSize: 13, color: C.muted }}>&#128197; 1 Jun 2026</span>
+            <span style={{ fontSize: 13, color: C.muted }}>&#0F766E; 1 Jun 2026</span>
             <span style={{ fontSize: 13, color: C.muted }}>&#9200; 5 min read</span>
           </div>
 
@@ -245,10 +245,10 @@ export default function GymPTBookingPage() {
               Feature is a UK-built booking platform with a deliberately simple, predictable model &mdash; well suited to independent trainers, small studios and gyms that want clean booking without a commission bill:
             </p>
 
-            <div style={{ background: C.surface, border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {FEATURE_POINTS.map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: "#10B981", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>&#10003;</span>
+                  <span style={{ color: "#047857", fontWeight: 900, flexShrink: 0, fontSize: 16, marginTop: 3 }}>&#10003;</span>
                   <span style={{ color: C.text2 }}>{item}</span>
                 </div>
               ))}
@@ -265,7 +265,7 @@ export default function GymPTBookingPage() {
 
           {/* CTA */}
           <section style={sectionStyle}>
-            <div style={{ background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
+            <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center" }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: C.gold, marginBottom: 14, marginTop: 0 }}>
                 Try it for your gym or studio
               </h3>
@@ -285,7 +285,7 @@ export default function GymPTBookingPage() {
 
         {/* Author box */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", background: C.surface, borderRadius: 12, padding: "16px 20px", border: `1px solid ${C.border}`, marginTop: 48 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#0E1320)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${C.gold},#FFFFFF)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
             &#9997;&#65039;
           </div>
           <div>

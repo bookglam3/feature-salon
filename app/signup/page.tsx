@@ -5,7 +5,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { POPULAR_COUNTRIES, ALL_COUNTRIES, type Country } from "../lib/countries";
 
-const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#10B981", red:"#EF4444", text:"#F7F5EF", text2:"#aab1c4", text3:"#6B6577", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#524D60" };
+const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#047857", red:"#EF4444", text:"#12101A", text2:"#524D60", text3:"#6B6577", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#524D60" };
 const STEPS = ["Account", "Your Business", "Verify Email", "Done!"];
 
 const BUSINESS_TYPES = [
@@ -26,7 +26,7 @@ const BUSINESS_TYPES = [
 function pwStrength(p: string) {
   if (p.length < 6) return { label:"Weak", color:"#EF4444", w:"30%" };
   if (p.length < 10 || !/[0-9]/.test(p)) return { label:"Fair", color:"#F59E0B", w:"60%" };
-  return { label:"Strong", color:"#10B981", w:"100%" };
+  return { label:"Strong", color: "#047857", w:"100%" };
 }
 
 function maskEmail(email: string): string {
@@ -390,7 +390,7 @@ export default function SignupPage() {
 
           {/* Error banner */}
           {activeError && (
-            <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:10, padding:"11px 14px", marginBottom:16, fontSize:13, color:"#DC2626" }}>
+            <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:10, padding:"11px 14px", marginBottom:16, fontSize:13, color: "#B91C1C" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom: activeError.includes("already exists")?8:0 }}>⚠ {activeError}</div>
               {activeError.includes("already exists") && <Link href="/login" style={{ fontSize:13, fontWeight:700, color:C.indigo, textDecoration:"none", background:C.indigoSoft, padding:"5px 12px", borderRadius:7, display:"inline-block", marginTop:4, border:"1px solid rgba(124,58,237,0.30)" }}>→ Sign in</Link>}
             </div>

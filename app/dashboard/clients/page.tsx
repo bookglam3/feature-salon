@@ -164,8 +164,8 @@ export default function ClientsPage() {
   };
   const daysSince = (d: Date) => Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
   const statusColor = (s: string) =>
-    s === "confirmed" ? { bg: "rgba(16,185,129,0.10)", color: "#10B981", border: "rgba(16,185,129,0.25)" }
-    : s === "cancelled" ? { bg: "rgba(239,68,68,0.10)", color: "#DC2626", border: "rgba(239,68,68,0.25)" }
+    s === "confirmed" ? { bg: "rgba(16,185,129,0.10)", color: "#047857", border: "rgba(16,185,129,0.25)" }
+    : s === "cancelled" ? { bg: "rgba(239,68,68,0.10)", color: "#B91C1C", border: "rgba(239,68,68,0.25)" }
     : { bg: "rgba(245,158,11,0.10)", color: "#F59E0B", border: "rgba(245,158,11,0.25)" };
 
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
@@ -305,7 +305,7 @@ export default function ClientsPage() {
               <div style={{ padding: "12px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", gap: 8, flexShrink: 0 }}>
                 {selected.phone && (
                   <a href={`https://wa.me/${selected.phone.replace(/\D/g,"")}`} target="_blank" rel="noopener"
-                    style={{ flex: 1, background: "rgba(16,185,129,0.10)", color: "#10B981", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
+                    style={{ flex: 1, background: "rgba(16,185,129,0.10)", color: "#047857", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
                     💬 WhatsApp
                   </a>
                 )}

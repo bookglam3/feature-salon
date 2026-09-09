@@ -6,6 +6,8 @@ import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { useToast } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
+import StatCard from "../components/StatCard";
+import EmptyState from "../components/EmptyState";
 
 interface LoyaltyClient {
   id: string;
@@ -22,13 +24,25 @@ function getTiers(bt?: string | null) {
     : "visit";
   return [
     { name:"Bronze",  min:0,    max:199,  color:"#CD7F32", icon:"🥉", perks:"5% discount on next visit" },
-    { name:"Silver",  min:200,  max:499,  color:"#9A94A8", icon:"🥈", perks:"10% discount + priority booking" },
+    { name:"Silver",  min:200,  max:499,  color:"#6B6577", icon:"🥈", perks:"10% discount + priority booking" },
     { name:"Gold",    min:500,  max:999,  color:"#F59E0B", icon:"🥇", perks:`15% discount + free ${freeWord}` },
     { name:"Platinum",min:1000, max:Infinity, color:"#7C3AED", icon:"💎", perks:"20% off + VIP access" },
   ];
 }
 
 type Tier = { name:string; min:number; max:number; color:string; icon:string; perks:string };
+
+/* Initials avatar — loyalty_points carries no photo field. */
+const AVATAR_COLORS = ["#7C3AED", "#6D28D9", "#8B5CF6", "#A78BFA", "#EC4899"];
+function Avatar({ name, size = 38 }: { name: string; size?: number }) {
+  const bg = AVATAR_COLORS[(name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+  const initials = (name || "?").split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <div style={{ width:size, height:size, borderRadius:"50%", background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:size*0.34, fontWeight:800, color:"#fff", flexShrink:0 }}>
+      {initials}
+    </div>
+  );
+}
 
 function getTier(points: number, tiers: Tier[]) {
   return tiers.find(t => points >= t.min && points <= t.max) || tiers[0];
@@ -58,6 +72,8 @@ function LoyaltyContent() {
   const [saving, setSaving] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
   const [pointsPerPound, setPointsPerPound] = useState(10);
+  /* Real repeat-visit figures, from confirmed appointments (see load()). */
+  const [repeatStats, setRepeatStats] = useState<{ repeat: number; total: number } | null>(null);
   const tiers = getTiers(businessType);
 
   useEffect(() => {
@@ -90,6 +106,24 @@ function LoyaltyContent() {
           setClients(seeded || []);
         }
       }
+      /* Repeat-visit rate — additive read, no writes. A client counts as
+         "repeat" when they have 2+ confirmed bookings. Distinct clients are
+         keyed the same way the seeding above keys them (email, else name). */
+      const { data: allAppts } = await supabase
+        .from("appointments")
+        .select("client_name, client_email")
+        .eq("salon_id", profile.salon.id)
+        .eq("status", "confirmed");
+      const visitCounts = new Map<string, number>();
+      (allAppts || []).forEach((a: { client_name: string | null; client_email: string | null }) => {
+        const key = a.client_email || a.client_name;
+        if (!key) return;
+        visitCounts.set(key, (visitCounts.get(key) || 0) + 1);
+      });
+      const total = visitCounts.size;
+      const repeat = Array.from(visitCounts.values()).filter(n => n >= 2).length;
+      setRepeatStats({ repeat, total });
+
       setLoading(false);
     };
     load();
@@ -132,6 +166,14 @@ function LoyaltyContent() {
   };
 
   const totalPoints = clients.reduce((s,c) => s + c.points, 0);
+  /* Real, and previously never surfaced: total points clients have redeemed. */
+  const totalRedeemed = clients.reduce((s,c) => s + (c.total_redeemed || 0), 0);
+  /* null until the query resolves, and null when there are no clients at all —
+     so we render "—" rather than a misleading 0%. */
+  const repeatRate = repeatStats && repeatStats.total > 0
+    ? Math.round((repeatStats.repeat / repeatStats.total) * 100)
+    : null;
+  const topClients = useMemo(() => [...clients].sort((a,b) => b.points - a.points).slice(0, 8), [clients]);
 
   const Topbar = (
     <header style={{ background:"#FFFFFF", borderBottom:"1px solid #ECE9F1", padding:"0 24px", height:66, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:30, boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}>
@@ -139,75 +181,88 @@ function LoyaltyContent() {
         <HamburgerBtn onClick={() => {}} />
         <div>
           <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>Loyalty Points</div>
-          <div style={{ fontSize:11.5, color:"#9A94A8", marginTop:1 }}>Reward your loyal clients</div>
+          <div style={{ fontSize:11.5, color:"#6B6577", marginTop:1 }}>Reward your loyal clients</div>
         </div>
       </div>
       <div style={{ display:"flex", gap:8 }}>
-        <button onClick={() => setShowSetup(true)} style={{ padding:"9px 14px", background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13, fontWeight:700, color:"#6B6577", cursor:"pointer" }}>⚙️ Settings</button>
+        <button onClick={() => setShowSetup(true)} style={{ padding:"9px 14px", background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13, fontWeight:700, color:"#524D60", cursor:"pointer" }}>⚙️ Settings</button>
         <div style={{ display:"flex", alignItems:"center", gap:8, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:10, padding:"7px 14px" }}>
-          <span style={{ fontSize:14, color:"#9A94A8" }}>🔍</span>
+          <span style={{ fontSize:14, color:"#6B6577" }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ background:"none", border:"none", outline:"none", fontSize:13, color:"#12101A", fontFamily:"inherit", width:160 }} />
         </div>
       </div>
     </header>
   );
 
-  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding:40, textAlign:"center", color:"#9A94A8" }}>Loading loyalty…</div></DashboardShell>;
+  if (loading) return <DashboardShell salonName={salonName} topbar={Topbar}><div style={{ padding:40, textAlign:"center", color:"#6B6577" }}>Loading loyalty…</div></DashboardShell>;
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
+      <style>{`.loy-row:hover { background:#FAF9FC; }`}</style>
       <div style={{ padding:"28px 24px", maxWidth:1360, margin:"0 auto" }}>
 
-        {/* Stats */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
-          {[
-            { label:"Total Members", value:clients.length, icon:"👥", color:"#7C3AED" },
-            { label:"Points Outstanding", value:totalPoints.toLocaleString(), icon:"💎", color:"#F59E0B" },
-            { label:"Gold+ Members", value:clients.filter(c=>c.points>=500).length, icon:"🥇", color:"#F59E0B" },
-            { label:"Pts/£ Rate", value:`${pointsPerPound} pts`, icon:"💰", color:"#10B981" },
-          ].map(s => (
-            <div key={s.label} style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:16, padding:"18px 16px", position:"relative", overflow:"hidden" }}>
-              <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:s.color }} />
-              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <span style={{ fontSize:10, fontWeight:800, color:"#9A94A8", textTransform:"uppercase", letterSpacing:"0.8px" }}>{s.label}</span>
-                <span style={{ fontSize:18 }}>{s.icon}</span>
-              </div>
-              <div style={{ fontSize:26, fontWeight:900, color:"#12101A" }}>{s.value}</div>
-            </div>
-          ))}
+        {/* ── 1. Stat cards — every figure from real loyalty data ── */}
+        <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:13, marginBottom:22 }}>
+          <StatCard label="Loyalty members" value={clients.length} icon="👥" color="indigo"
+            sub={clients.length === 1 ? "enrolled client" : "enrolled clients"} />
+          <StatCard label="Points outstanding" value={totalPoints.toLocaleString()} icon="💎" color="amber"
+            sub="unredeemed balance" />
+          <StatCard label="Rewards redeemed" value={totalRedeemed.toLocaleString()} icon="🎁" color="green"
+            sub={totalRedeemed === 0 ? "no redemptions yet" : "points redeemed"} />
+          <StatCard label="Repeat visit rate" value={repeatRate === null ? "—" : `${repeatRate}%`} icon="🔁" color="indigo"
+            sub={repeatStats && repeatStats.total > 0
+              ? `${repeatStats.repeat} of ${repeatStats.total} clients rebooked`
+              : "no confirmed bookings yet"} />
         </div>
 
-        {/* Tiers info */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
-          {tiers.map((tier: Tier) => (
-            <div key={tier.name} style={{ background:"#FFFFFF", border:`1.5px solid ${tier.color}30`, borderRadius:16, padding:"16px", borderTop:`3px solid ${tier.color}` }}>
-              <div style={{ fontSize:22, marginBottom:6 }}>{tier.icon}</div>
-              <div style={{ fontSize:13, fontWeight:800, color:tier.color, marginBottom:2 }}>{tier.name}</div>
-              <div style={{ fontSize:11, color:"#9A94A8", marginBottom:6 }}>{tier.min}{tier.max === Infinity ? "+" : `–${tier.max}`} pts</div>
-              <div style={{ fontSize:11.5, color:"#6B6577", lineHeight:1.5 }}>{tier.perks}</div>
-              <div style={{ fontSize:11, fontWeight:700, color:tier.color, marginTop:8 }}>{clients.filter(c => getTier(c.points, tiers).name === tier.name).length} clients</div>
+        {/* ── 2. Top loyal clients — real rows, points DESC ── */}
+        <div style={{ background:"#FFFFFF", border:"1px solid #ECE9F1", borderRadius:14, overflow:"hidden", marginBottom:22, boxShadow:"0 1px 2px rgba(18,16,26,0.03)" }}>
+          <div style={{ padding:"16px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+            <div>
+              <div style={{ fontSize:14, fontWeight:700, color:"#12101A", letterSpacing:"-0.2px" }}>Top loyal clients</div>
+              <div style={{ fontSize:10, color:"#6B6577", marginTop:3 }}>Ranked by points balance</div>
             </div>
-          ))}
+          </div>
+          {topClients.length === 0 ? (
+            <EmptyState icon="🏆" title="No loyalty members yet"
+              description="Members are created automatically from confirmed bookings" />
+          ) : (
+            topClients.map((c, i) => {
+              const tier = getTier(c.points, tiers);
+              return (
+                <div key={c.id} className="loy-row" onClick={() => { setSelectedClient(c); setShowModal(true); }}
+                  style={{ display:"flex", alignItems:"center", gap:13, padding:"12px 20px", borderTop:"1px solid #eeecf2", cursor:"pointer", transition:"background 0.14s" }}>
+                  <span style={{ width:18, fontSize:11.5, fontWeight:700, color:"#6B6577", flexShrink:0 }}>{i + 1}</span>
+                  <Avatar name={c.client_name} />
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13.5, fontWeight:700, color:"#12101A", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{c.client_name || "Unnamed client"}</div>
+                    <div style={{ fontSize:11.5, color:"#524D60", marginTop:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{c.client_email}</div>
+                  </div>
+                  <TierBadge points={c.points} tiers={tiers} />
+                  <div style={{ fontSize:14, fontWeight:700, color:tier.color, letterSpacing:"-0.2px", flexShrink:0, minWidth:54, textAlign:"right" }}>
+                    {c.points.toLocaleString()}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Client table */}
         <div style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
           <div style={{ padding:"16px 22px", borderBottom:"1px solid #ECE9F1" }}>
-            <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>All Members <span style={{ fontSize:12, color:"#9A94A8", fontWeight:600 }}>({filtered.length})</span></div>
+            <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>All Members <span style={{ fontSize:12, color:"#6B6577", fontWeight:600 }}>({filtered.length})</span></div>
           </div>
           {filtered.length === 0 ? (
-            <div style={{ textAlign:"center", padding:"60px 0", color:"#9A94A8" }}>
-              <div style={{ fontSize:48, marginBottom:12 }}>🏆</div>
-              <div style={{ fontWeight:700 }}>No loyalty members yet</div>
-              <div style={{ fontSize:13, marginTop:4 }}>Members are auto-created from confirmed bookings</div>
-            </div>
+            <EmptyState icon="🏆" title={search ? "No matching members" : "No loyalty members yet"}
+              description={search ? "Try a different search term" : "Members are created automatically from confirmed bookings"} />
           ) : (
             <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", minWidth:700 }}>
                 <thead>
                   <tr style={{ background:"#F5F3FF" }}>
                     {["Client","Tier","Points","Earned","Redeemed","Actions"].map(h => (
-                      <th key={h} style={{ fontSize:10, fontWeight:900, color:"#9A94A8", textAlign:"left", padding:"11px 16px", letterSpacing:"0.8px", textTransform:"uppercase", borderBottom:"1px solid #ECE9F1" }}>{h}</th>
+                      <th key={h} style={{ fontSize:10, fontWeight:900, color:"#6B6577", textAlign:"left", padding:"11px 16px", letterSpacing:"0.8px", textTransform:"uppercase", borderBottom:"1px solid #ECE9F1" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -227,7 +282,7 @@ function LoyaltyContent() {
                             </div>
                             <div>
                               <div style={{ fontSize:13.5, fontWeight:800, color:"#12101A" }}>{c.client_name}</div>
-                              <div style={{ fontSize:11.5, color:"#9A94A8" }}>{c.client_email}</div>
+                              <div style={{ fontSize:11.5, color:"#6B6577" }}>{c.client_email}</div>
                             </div>
                           </div>
                         </td>
@@ -238,12 +293,12 @@ function LoyaltyContent() {
                               <div style={{ height:4, background:"#ECE9F1", borderRadius:99, width:80 }}>
                                 <div style={{ height:"100%", borderRadius:99, background:tier.color, width:`${progress}%` }} />
                               </div>
-                              <div style={{ fontSize:9.5, color:"#9A94A8", marginTop:2 }}>{next.min - c.points} pts to {next.name}</div>
+                              <div style={{ fontSize:9.5, color:"#6B6577", marginTop:2 }}>{next.min - c.points} pts to {next.name}</div>
                             </div>
                           )}
                         </td>
                         <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:18, fontWeight:900, color:tier.color }}>{c.points.toLocaleString()}</td>
-                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color:"#10B981", fontWeight:700 }}>+{c.total_earned}</td>
+                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color: "#047857", fontWeight:700 }}>+{c.total_earned}</td>
                         <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color:"#EF4444", fontWeight:700 }}>-{c.total_redeemed}</td>
                         <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1" }}>
                           <button onClick={() => { setSelectedClient(c); setShowModal(true); }} style={{ padding:"6px 14px", background:"linear-gradient(135deg,#7C3AED,#6D28D9)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer" }}>Adjust</button>
@@ -263,32 +318,32 @@ function LoyaltyContent() {
         <div onClick={() => setShowModal(false)} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(4px)" }}>
           <div onClick={e => e.stopPropagation()} style={{ background:"#FFFFFF", borderRadius:20, padding:28, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize:18, fontWeight:900, color:"#12101A", marginBottom:4 }}>Adjust Points</div>
-            <div style={{ fontSize:13, color:"#6B6577", marginBottom:20 }}>{selectedClient.client_name} · <strong style={{ color:getTier(selectedClient.points, tiers).color }}>{selectedClient.points} pts</strong></div>
+            <div style={{ fontSize:13, color:"#524D60", marginBottom:20 }}>{selectedClient.client_name} · <strong style={{ color:getTier(selectedClient.points, tiers).color }}>{selectedClient.points} pts</strong></div>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Type</label>
+                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Type</label>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
                   {(["earn","redeem","bonus"] as const).map(t => (
                     <button key={t} onClick={() => setAdjForm({...adjForm, type:t})}
-                      style={{ padding:"8px 4px", borderRadius:10, border:`1.5px solid ${adjForm.type===t ? "#7C3AED" : "#ECE9F1"}`, background: adjForm.type===t ? "rgba(124,58,237,0.10)" : "#FFFFFF", color: adjForm.type===t ? "#7C3AED" : "#6B6577", fontSize:12.5, fontWeight:700, cursor:"pointer", textTransform:"capitalize", transition:"all 0.12s" }}>
+                      style={{ padding:"8px 4px", borderRadius:10, border:`1.5px solid ${adjForm.type===t ? "#7C3AED" : "#ECE9F1"}`, background: adjForm.type===t ? "rgba(124,58,237,0.10)" : "#FFFFFF", color: adjForm.type===t ? "#7C3AED" : "#524D60", fontSize:12.5, fontWeight:700, cursor:"pointer", textTransform:"capitalize", transition:"all 0.12s" }}>
                       {t === "earn" ? "💰" : t === "redeem" ? "🎁" : "⭐"} {t}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Points *</label>
+                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Points *</label>
                 <input type="number" value={adjForm.points} onChange={e => setAdjForm({...adjForm, points:e.target.value})} placeholder="e.g. 50"
                   style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Note (optional)</label>
+                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Note (optional)</label>
                 <input value={adjForm.note} onChange={e => setAdjForm({...adjForm, note:e.target.value})} placeholder="e.g. Birthday bonus"
                   style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
               </div>
             </div>
             <div style={{ display:"flex", gap:10, marginTop:20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex:1, padding:12, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#6B6577", cursor:"pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ flex:1, padding:12, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#524D60", cursor:"pointer" }}>Cancel</button>
               <button onClick={handleAdjust} disabled={saving || !adjForm.points} style={{ flex:2, padding:12, background:"linear-gradient(135deg,#7C3AED,#6D28D9)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer", opacity:!adjForm.points?0.5:1 }}>
                 {saving ? "Saving…" : "Save Changes"}
               </button>
@@ -303,21 +358,21 @@ function LoyaltyContent() {
           <div onClick={e => e.stopPropagation()} style={{ background:"#FFFFFF", borderRadius:20, padding:28, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize:18, fontWeight:900, color:"#12101A", marginBottom:20 }}>Loyalty Settings</div>
             <div>
-              <label style={{ fontSize:12, fontWeight:700, color:"#6B6577", display:"block", marginBottom:6 }}>Points per £1 spent</label>
+              <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Points per £1 spent</label>
               <input type="number" value={pointsPerPound} onChange={e => setPointsPerPound(parseInt(e.target.value))}
                 style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
-              <div style={{ fontSize:12, color:"#9A94A8", marginTop:6 }}>e.g. £50 service = {50*pointsPerPound} points</div>
+              <div style={{ fontSize:12, color:"#6B6577", marginTop:6 }}>e.g. £50 service = {50*pointsPerPound} points</div>
             </div>
             <div style={{ marginTop:16, padding:"14px 16px", background:"rgba(124,58,237,0.10)", borderRadius:12 }}>
               <div style={{ fontSize:12.5, fontWeight:700, color:"#7C3AED", marginBottom:8 }}>Tier Breakdown</div>
               {tiers.map((t: Tier) => (
-                <div key={t.name} style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:"#6B6577", marginBottom:4 }}>
+                <div key={t.name} style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:"#524D60", marginBottom:4 }}>
                   <span>{t.icon} {t.name}</span>
                   <span>{t.min}{t.max===Infinity?"+":` – ${t.max}`} pts = £{Math.floor(t.min/pointsPerPound)} spent</span>
                 </div>
               ))}
             </div>
-            <button onClick={() => { toast.success("Settings saved!"); setShowSetup(false); }} style={{ marginTop:20, width:"100%", padding:12, background:"linear-gradient(135deg,#7C3AED,#6D28D9)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer" }}>Save Settings</button>
+            <button onClick={() => setShowSetup(false)} style={{ marginTop:20, width:"100%", padding:12, background:"linear-gradient(135deg,#7C3AED,#6D28D9)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer" }}>Save Settings</button>
           </div>
         </div>
       )}

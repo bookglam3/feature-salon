@@ -1,6 +1,21 @@
 ﻿"use client";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  House,
+  ListPlus,
+  Mail,
+  MessageCircle,
+  Plus,
+  Phone,
+  UsersRound,
+} from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import FeatureGate from "../components/FeatureGate";
@@ -62,6 +77,195 @@ function sameDay(a: Date, b: Date) {
 
 type ViewMode = "week" | "month" | "day";
 
+const CALENDAR_STYLES = `
+  .cal-topbar {
+    min-height: 64px;
+    padding: 0 24px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #ECE9F1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+  .cal-topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .cal-topbar-title { font-size: 14px; font-weight: 700; color: #12101A; letter-spacing: -0.2px; }
+  .cal-topbar-create {
+    min-height: 40px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #FFFFFF;
+    background: linear-gradient(145deg,#8B3FF1 0%,#7135E8 100%);
+    border-radius: 11px;
+    box-shadow: 0 8px 22px rgba(124,58,237,0.25);
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .cal-topbar-create:hover { transform: translateY(-1px); box-shadow: 0 11px 26px rgba(124,58,237,0.32); }
+  .cal-page { padding: 26px 24px 40px; max-width: 1360px; margin: 0 auto; }
+  .cal-heading { margin-bottom: 20px; }
+  .cal-eyebrow { font-size: 10.5px; font-weight: 600; color: #6B6577; letter-spacing: 0.2px; }
+  .cal-title { margin: 6px 0 0; color: #12101A; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+  .cal-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .cal-toolbar-main { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cal-nav-buttons { display: flex; gap: 6px; }
+  .cal-nav-button {
+    height: 34px;
+    min-width: 34px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    color: #524D60;
+    border: 1px solid #ECE9F1;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+  }
+  .cal-nav-button:hover { color: #7C3AED; border-color: #CFC4EB; box-shadow: 0 4px 14px rgba(31,24,51,0.06); }
+  .cal-nav-today { padding: 0 14px; }
+  .cal-range { color: #12101A; font-size: 14px; font-weight: 700; letter-spacing: -0.2px; }
+  .cal-view-toggle { display: flex; padding: 3px; gap: 2px; background: #F5F3FF; border: 1px solid #ECE9F1; border-radius: 10px; }
+  .cal-view-button { padding: 5px 13px; color: #524D60; background: transparent; border: 0; border-radius: 8px; font-size: 11.5px; font-weight: 500; text-transform: capitalize; cursor: pointer; transition: all 0.14s ease; }
+  .cal-view-button.active { color: #6D28D9; background: #EDE9FF; font-weight: 700; }
+  .cal-status-counts { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+  .cal-status-count { display: flex; align-items: center; gap: 7px; }
+  .cal-status-count > i { width: 7px; height: 7px; border-radius: 50%; }
+  .cal-status-value { color: #12101A; font-size: 12px; font-weight: 700; }
+  .cal-status-label { color: #524D60; font-size: 12px; }
+  .cal-desktop { display: block; }
+  .cal-mobile { display: none; }
+  .cal-reference-nav { display: none; }
+
+  .cal-agenda-row {
+    min-height: 76px;
+    padding: 12px 0;
+    display: grid;
+    grid-template-columns: 52px 3px minmax(0,1fr) auto;
+    align-items: center;
+    column-gap: 13px;
+    cursor: pointer;
+    transition: background 0.14s ease;
+  }
+  .cal-agenda-row + .cal-agenda-row { border-top: 1px solid #ECE9F1; }
+  .cal-agenda-row:hover { background: #FAF9FC; }
+  .cal-agenda-time { color: #24212D; font-size: 12.5px; font-weight: 700; letter-spacing: -0.15px; }
+  .cal-agenda-accent { width: 3px; min-height: 38px; border-radius: 999px; }
+  .cal-agenda-copy { min-width: 0; }
+  .cal-agenda-name { color: #24212D; font-size: 13.5px; font-weight: 700; letter-spacing: -0.16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-agenda-service { margin-top: 4px; color: #6B6577; font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-agenda-price { padding-left: 5px; color: #24212D; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+
+  .cal-drawer-client { display: flex; align-items: center; gap: 14px; padding: 8px 0 22px; border-bottom: 1px solid #eeecf2; }
+  .cal-drawer-client-copy { min-width: 0; }
+  .cal-drawer-client-name { color: #12101A; font-family: var(--font-playfair,Georgia,serif); font-size: 21px; font-weight: 600; line-height: 1.2; letter-spacing: -0.45px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-drawer-client-sub { margin-top: 6px; color: #524D60; font-size: 11.5px; text-transform: capitalize; }
+  .cal-drawer-status { width: fit-content; margin-top: 7px; padding: 3px 9px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid; border-radius: 999px; font-size: 10.5px; font-weight: 700; text-transform: capitalize; }
+  .cal-drawer-status > span { width: 5px; height: 5px; border-radius: 50%; }
+  .cal-drawer-summary { margin: 20px 0 26px; padding: 18px; display: flex; align-items: flex-start; gap: 13px; background: #F5F3FF; border: 1px solid #ECE9F1; border-radius: 14px; }
+  .cal-drawer-summary-icon { width: 36px; height: 36px; flex: 0 0 36px; display: flex; align-items: center; justify-content: center; color: #7C3AED; background: #EDE7FF; border-radius: 10px; }
+  .cal-drawer-summary-copy { min-width: 0; }
+  .cal-drawer-summary-title { color: #12101A; font-size: 13.5px; font-weight: 700; }
+  .cal-drawer-summary-date { margin-top: 4px; color: #524D60; font-size: 11.5px; line-height: 1.45; }
+  .cal-drawer-service { margin-top: 10px; color: #12101A; font-size: 12.5px; font-weight: 700; }
+  .cal-drawer-meta { margin-top: 3px; color: #524D60; font-size: 11.5px; }
+  .cal-drawer-section-label { margin-bottom: 10px; color: #6B6577; font-size: 10px; font-weight: 800; letter-spacing: 0.9px; text-transform: uppercase; }
+  .cal-drawer-details-label { margin-top: 26px; margin-bottom: 4px; }
+  .cal-drawer-phone { margin: -2px 0 11px; color: #12101A; font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .cal-drawer-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-bottom: 4px; }
+  .cal-drawer-action { min-width: 0; min-height: 46px; padding: 12px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #6D28D9; background: #F5F3FF; border: 1px solid #ECE9F1; border-radius: 12px; text-decoration: none; font-size: 12.5px; font-weight: 700; transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease; }
+  .cal-drawer-action:hover { transform: translateY(-1px); border-color: #CFC0EF; box-shadow: 0 7px 18px rgba(76,45,121,0.08); }
+  .cal-drawer-action > span { min-width: 0; }
+  .cal-drawer-action-whatsapp { color: #047857; background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.22); }
+  .cal-drawer-action-email { grid-column: 1 / -1; justify-content: flex-start; color: #524D60; background: #FFFFFF; border-color: #ECE9F1; font-weight: 600; font-size: 12px; }
+  .cal-drawer-action-email > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cal-drawer-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid #eeecf2; }
+  .cal-drawer-row-label { color: #524D60; font-size: 12px; }
+  .cal-drawer-row-value { color: #12101A; font-size: 13px; font-weight: 700; text-align: right; }
+  .cal-drawer-total { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0 4px; }
+  .cal-drawer-total-label { color: #12101A; font-size: 13px; font-weight: 700; }
+  .cal-drawer-total-value { color: #12101A; font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
+  .cal-drawer-footer { display: flex; gap: 8px; padding-top: 16px; }
+  .cal-drawer-close, .cal-drawer-primary { min-height: 44px; flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 11px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .cal-drawer-close { color: #524D60; background: #FFFFFF; border: 1px solid #E5E1EB; }
+  .cal-drawer-primary { color: #FFFFFF; background: linear-gradient(145deg,#8B3FF1,#7135E8); border: 0; box-shadow: 0 7px 18px rgba(124,58,237,0.22); }
+  .modal-inner:has(.cal-drawer-client) { box-shadow: -18px 0 60px rgba(46,32,67,0.14) !important; }
+  .modal-inner:has(.cal-drawer-client) h2 { font-family: var(--font-playfair,Georgia,serif); font-size: 21px !important; font-weight: 600 !important; letter-spacing: -0.45px !important; }
+
+  @media (max-width: 767px) {
+    .cal-topbar { min-height: 64px; padding: 0 18px; background: #FBFAFE; }
+    .cal-topbar-left { gap: 0; }
+    .cal-topbar-title { display: none; }
+    .cal-topbar-left .hbtn { width: 28px !important; height: 32px !important; padding: 6px 2px !important; gap: 4px !important; background: transparent !important; border: 0 !important; border-radius: 0 !important; }
+    .cal-topbar-left .hbtn span { height: 1.5px !important; background: #5C5766 !important; }
+    .cal-topbar-left .hbtn span:nth-child(1), .cal-topbar-left .hbtn span:nth-child(3) { width: 21px !important; }
+    .cal-topbar-left .hbtn span:nth-child(2) { width: 15px !important; align-self: flex-start; }
+    .cal-topbar-create { width: 42px; height: 42px; min-height: 42px; padding: 0; border-radius: 11px; }
+    .cal-topbar-create-label { display: none; }
+    .cal-page { min-height: calc(100vh - 64px); padding: 28px 18px 48px; }
+    .cal-heading { margin-bottom: 28px; }
+    .cal-eyebrow { font-size: 11.5px; font-weight: 500; letter-spacing: 0; }
+    .cal-title { margin-top: 8px; font-family: var(--font-playfair,Georgia,serif); font-size: 28px; font-weight: 400; letter-spacing: -0.75px; }
+    .cal-toolbar { display: block; margin-bottom: 22px; }
+    .cal-toolbar-main { display: block; }
+    .cal-nav-buttons { gap: 7px; }
+    .cal-nav-button { width: 38px; height: 38px; min-width: 38px; padding: 0; border-radius: 9px; box-shadow: 0 2px 8px rgba(33,24,51,0.025); }
+    .cal-nav-today { width: auto; padding: 0 15px; }
+    .cal-range { margin-top: 19px; font-size: 16px; font-weight: 750; letter-spacing: -0.35px; }
+    .cal-status-counts { display: none; }
+    /* View toggle now shows on mobile too, so Week/Month are reachable. */
+    .cal-view-toggle { margin-top: 16px; width: 100%; justify-content: stretch; }
+    .cal-view-button { flex: 1; min-height: 36px; font-size: 12px; }
+    /* The existing Week/Month grids, made usable on a phone. Week keeps its
+       own horizontal scroll (minWidth 720); Month gets compact cells. */
+    .cal-mobile-grid { margin-top: 14px; }
+    .cal-mobile-grid > div { padding: 0 !important; }
+    .cal-mobile-grid [style*="min-height: 90px"], .cal-mobile-grid [style*="minHeight: 90"] { min-height: 62px !important; }
+    .cal-desktop { display: none; }
+    .cal-mobile { display: block; }
+    .cal-week-card { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); padding: 8px; background: #FFFFFF; border: 1px solid #E8E4ED; border-radius: 15px; box-shadow: 0 7px 20px rgba(37,25,57,0.035); }
+    .cal-day-button { min-width: 0; height: 56px; padding: 7px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6B6577; background: transparent; border: 0; border-radius: 11px; cursor: pointer; transition: color 0.14s ease, background 0.14s ease, transform 0.14s ease; }
+    .cal-day-button:hover { color: #6D28D9; background: #F8F5FF; }
+    .cal-day-button.active { color: #FFFFFF; background: linear-gradient(145deg,#8C39F2,#7532EB); box-shadow: 0 7px 16px rgba(124,58,237,0.24); }
+    .cal-day-name { font-size: 9px; font-weight: 600; line-height: 1; text-transform: uppercase; opacity: 0.8; }
+    .cal-day-number { margin-top: 7px; font-size: 15px; font-weight: 750; line-height: 1; letter-spacing: -0.25px; }
+    .cal-agenda-card { margin-top: 14px; padding: 8px 16px 17px; background: #FFFFFF; border: 1px solid #E8E4ED; border-radius: 16px; box-shadow: 0 8px 22px rgba(37,25,57,0.035); }
+    .cal-agenda-list { margin-top: 0; }
+    .cal-agenda-empty { padding: 36px 12px 31px; text-align: center; }
+    .cal-agenda-empty-title { color: #24212D; font-size: 13px; font-weight: 700; }
+    .cal-agenda-empty-copy { margin-top: 4px; color: #6B6577; font-size: 11.5px; }
+    .cal-add-booking { width: 100%; min-height: 48px; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #7C3AED; background: #FBF8FF; border: 1.5px dashed #D9C2FA; border-radius: 11px; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: background 0.14s ease, border-color 0.14s ease; }
+    .cal-add-booking:hover { background: #F5EEFF; border-color: #BDA0ED; }
+    .mobile-nav-bar { display: none !important; }
+    .cal-reference-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; min-height: 72px; padding: 6px 8px env(safe-area-inset-bottom,0px); display: flex; align-items: stretch; background: #FFFFFF; border-top: 1px solid #ECE9F1; box-shadow: 0 -2px 12px rgba(18,16,26,0.04); }
+    .cal-reference-nav-item { flex: 1; min-width: 0; padding: 7px 2px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #9D97A5; text-decoration: none; font-size: 9.5px; font-weight: 500; }
+    .cal-reference-nav-item.active { color: #8B45F5; }
+    .cal-reference-nav-item svg { width: 21px; height: 21px; }
+    .modal-inner:has(.cal-drawer-client) h2 { font-size: 20px !important; }
+    .cal-drawer-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  }
+
+  @media (max-width: 390px) {
+    .cal-page { padding-left: 14px; padding-right: 14px; }
+    .cal-week-card { padding: 6px; }
+    .cal-day-button { height: 53px; }
+    .cal-agenda-card { padding-left: 13px; padding-right: 13px; }
+    .cal-agenda-row { grid-template-columns: 46px 3px minmax(0,1fr) auto; column-gap: 10px; }
+    .cal-agenda-service { max-width: 135px; }
+  }
+`;
+
 /* ─── Initials avatar (no photo field exists on an appointment) ── */
 const AVATAR_COLORS = ["#7C3AED", "#6D28D9", "#8B5CF6", "#A78BFA", "#EC4899"];
 function Avatar({ name, size = 44 }: { name: string; size?: number }) {
@@ -106,7 +310,7 @@ function MonthView({ currentDate, monthDays, getApptsByDay, today, setSelectedAp
       <div style={{ textAlign: "center", fontSize: 20, fontWeight: 900, color: "#12101A", marginBottom: 20, letterSpacing: "-0.5px" }}>{monthName}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 2 }}>
         {DAYS.map(d => (
-          <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 800, color: "#6B6577", padding: "8px 0", letterSpacing: "0.5px", textTransform: "uppercase" }}>{d}</div>
+          <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 800, color: "#524D60", padding: "8px 0", letterSpacing: "0.5px", textTransform: "uppercase" }}>{d}</div>
         ))}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
@@ -134,7 +338,7 @@ function MonthView({ currentDate, monthDays, getApptsByDay, today, setSelectedAp
                     </div>
                   );
                 })}
-                {dayAppts.length > 3 && <div style={{ fontSize: 9.5, color: "#6B6577", fontWeight: 600, paddingLeft: 4 }}>+{dayAppts.length - 3} more</div>}
+                {dayAppts.length > 3 && <div style={{ fontSize: 9.5, color: "#524D60", fontWeight: 600, paddingLeft: 4 }}>+{dayAppts.length - 3} more</div>}
               </div>
             </div>
           );
@@ -172,14 +376,14 @@ function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewPr
           const isToday = sameDay(day, today);
           return (
             <div key={day.toISOString()} style={{ textAlign: "center", padding: "11px 4px", borderRight: di < 6 ? "1px solid #ECE9F1" : "none", borderBottom: "1px solid #ECE9F1", background: isToday ? "#F5F3FF" : "#FBFAFD" }}>
-              <div style={{ fontSize: 9.5, fontWeight: 700, color: "#9A94A8", textTransform: "uppercase", letterSpacing: "0.7px" }}>{DAYS[di]}</div>
+              <div style={{ fontSize: 9.5, fontWeight: 700, color: "#6B6577", textTransform: "uppercase", letterSpacing: "0.7px" }}>{DAYS[di]}</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: isToday ? "#7C3AED" : "#12101A", marginTop: 3, letterSpacing: "-0.3px" }}>{day.getDate()}</div>
             </div>
           );
         })}
         {hours.map(hour => (
           <React.Fragment key={hour}>
-            <div style={{ padding: "6px 8px", fontSize: 10, color: "#9A94A8", fontWeight: 600, borderRight: "1px solid #ECE9F1", borderBottom: "1px solid #ECE9F1", textAlign: "right", background: "#FBFAFD" }}>
+            <div style={{ padding: "6px 8px", fontSize: 10, color: "#6B6577", fontWeight: 600, borderRight: "1px solid #ECE9F1", borderBottom: "1px solid #ECE9F1", textAlign: "right", background: "#FBFAFD" }}>
               {String(hour).padStart(2, "0")}:00
             </div>
             {weekDays.map((day, di) => {
@@ -242,7 +446,7 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
         const hourAppts = dayAppts.filter(a => new Date(a.date_time).getHours() === hour);
         return (
           <div key={hour} style={{ display: "flex", gap: 14, marginBottom: 4, alignItems: "flex-start" }}>
-            <div style={{ width: 50, fontSize: 11.5, color: "#6B6577", fontWeight: 700, textAlign: "right", paddingTop: 10, flexShrink: 0 }}>{hour}:00</div>
+            <div style={{ width: 50, fontSize: 11.5, color: "#524D60", fontWeight: 700, textAlign: "right", paddingTop: 10, flexShrink: 0 }}>{hour}:00</div>
             <div style={{ flex: 1, minHeight: 48, borderTop: "1px solid #ECE9F1", display: "flex", flexDirection: "column", gap: 4, paddingTop: 4 }}>
               {hourAppts.map(a => {
                 const sc = STATUS_COLORS[a.status] || STATUS_COLORS.pending;
@@ -255,11 +459,11 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: sc.text }}>{a.client_name}</div>
-                        <div style={{ fontSize: 12, color: "#6B6577", marginTop: 2 }}>{a.serviceName || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
+                        <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>{a.serviceName || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        {!!a.combinedPrice && <div style={{ fontSize: 14, fontWeight: 800, color: "#10B981" }}>{a.anyPriceIsFrom ? "from " : ""}£{a.combinedPrice}</div>}
-                        <div style={{ fontSize: 11, color: "#6B6577", textTransform: "capitalize" }}>{a.status}</div>
+                        {!!a.combinedPrice && <div style={{ fontSize: 14, fontWeight: 800, color: "#047857" }}>{a.anyPriceIsFrom ? "from " : ""}£{a.combinedPrice}</div>}
+                        <div style={{ fontSize: 11, color: "#524D60", textTransform: "capitalize" }}>{a.status}</div>
                       </div>
                     </div>
                   </div>
@@ -270,7 +474,7 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
         );
       })}
       {dayAppts.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6577", fontSize: 15 }}>
+        <div style={{ textAlign: "center", padding: "60px 0", color: "#524D60", fontSize: 15 }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
           <div style={{ fontWeight: 700 }}>No appointments on this day</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Use the dashboard to add a new booking</div>
@@ -284,9 +488,9 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
 /* Detail row — module scope so it isn't re-created on every render. */
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "11px 0", borderBottom: "1px solid #ECE9F1" }}>
-      <span style={{ fontSize: 12, color: "#6B6577" }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#12101A", textAlign: "right" }}>{value}</span>
+    <div className="cal-drawer-row">
+      <span className="cal-drawer-row-label">{label}</span>
+      <span className="cal-drawer-row-value">{value}</span>
     </div>
   );
 }
@@ -296,21 +500,19 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 function AgendaRow({ a, onClick }: { a: Appointment; onClick: () => void }) {
   const sc = STATUS_COLORS[a.status] || STATUS_COLORS.pending;
   return (
-    <div onClick={onClick} className="cal-agenda-row"
-      style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 4px", borderTop: "1px solid #ECE9F1", cursor: "pointer" }}>
-      <div style={{ width: 46, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>
+    <div onClick={onClick} className="cal-agenda-row">
+      <div className="cal-agenda-time">
         {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
       </div>
-      <div style={{ width: 3, alignSelf: "stretch", minHeight: 34, borderRadius: 99, background: sc.dot, flexShrink: 0 }} />
-      <Avatar name={a.client_name} size={34} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.client_name}</div>
-        <div style={{ fontSize: 11, color: "#6B6577", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      <div className="cal-agenda-accent" style={{ background: sc.border }} />
+      <div className="cal-agenda-copy">
+        <div className="cal-agenda-name">{a.client_name}</div>
+        <div className="cal-agenda-service">
           {a.serviceName || "No service"}{a.staff?.name ? ` \u00b7 ${a.staff.name}` : ""}
         </div>
       </div>
       {typeof a.combinedPrice === "number" && a.combinedPrice > 0 && (
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#12101A", flexShrink: 0 }}>£{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}</div>
+        <div className="cal-agenda-price">£{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}</div>
       )}
     </div>
   );
@@ -351,62 +553,67 @@ function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName }: App
       side="right"
       maxWidth={420}
       footer={
-        <div style={{ display: "flex", gap: 8, paddingTop: 16 }}>
-          <button onClick={() => setSelectedAppt(null)} style={{ flex: 1, padding: "11px", background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#6B6577", cursor: "pointer" }}>Close</button>
-          <button onClick={onViewAll} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>View all →</button>
+        <div className="cal-drawer-footer">
+          <button className="cal-drawer-close" onClick={() => setSelectedAppt(null)}>Close</button>
+          <button className="cal-drawer-primary" onClick={onViewAll}>View all <ArrowRight size={15} strokeWidth={2} /></button>
         </div>
       }
     >
       {/* Header — initials avatar, real name, real status */}
-      <div style={{ display: "flex", alignItems: "center", gap: 13, paddingBottom: 18, borderBottom: "1px solid #ECE9F1" }}>
-        <Avatar name={a.client_name} />
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.client_name}</div>
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 3, textTransform: "capitalize" }}>
-            {a.status} · Calendar {vc.bookingSingular.toLowerCase()}
-          </div>
+      <div className="cal-drawer-client">
+        <Avatar name={a.client_name} size={48} />
+        <div className="cal-drawer-client-copy">
+          <div className="cal-drawer-client-name">{a.client_name}</div>
+          <div className="cal-drawer-client-sub">{a.status} · Calendar {vc.bookingSingular.toLowerCase()}</div>
         </div>
       </div>
 
       {/* When / what */}
-      <div style={{ background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 12, padding: "14px 16px", margin: "18px 0" }}>
-        <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A" }}>
-          {vc.bookingSingular} at {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-        </div>
-        <div style={{ fontSize: 12, color: "#6B6577", marginTop: 4 }}>
-          {new Date(a.date_time).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-        </div>
-        {a.serviceName && <div style={{ fontSize: 12.5, color: "#12101A", marginTop: 8, fontWeight: 600 }}>{a.serviceName}</div>}
-        {(mins || a.staff?.name) && (
-          <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 3 }}>
-            {mins ? `${mins} min` : ""}{mins && a.staff?.name ? " with " : ""}{!mins && a.staff?.name ? "with " : ""}{a.staff?.name || ""}
+      <div className="cal-drawer-summary">
+        <div className="cal-drawer-summary-icon"><CalendarDays size={18} strokeWidth={1.8} /></div>
+        <div className="cal-drawer-summary-copy">
+          <div className="cal-drawer-summary-title">
+            {vc.bookingSingular} at {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
           </div>
-        )}
+          <div className="cal-drawer-summary-date">
+            {new Date(a.date_time).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </div>
+          {a.serviceName && <div className="cal-drawer-service">{a.serviceName}</div>}
+          {(mins || a.staff?.name) && (
+            <div className="cal-drawer-meta">
+              {mins ? `${mins} min` : ""}{mins && a.staff?.name ? " with " : ""}{!mins && a.staff?.name ? "with " : ""}{a.staff?.name || ""}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Contact — each action only when its field exists */}
       {(a.client_phone || a.client_email) && (
         <>
-          <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", letterSpacing: "0.9px", textTransform: "uppercase", marginBottom: 10 }}>
+          <div className="cal-drawer-section-label">
             {vc.clientSingular} contact
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+          {a.client_phone && <div className="cal-drawer-phone">{a.client_phone}</div>}
+          <div className="cal-drawer-actions">
             {a.client_phone && (
               <a href={`tel:${a.client_phone}`}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(124,58,237,0.10)", color: "#7C3AED", border: "1px solid rgba(124,58,237,0.25)", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                Call {vc.clientSingular.toLowerCase()} · {a.client_phone}
+                className="cal-drawer-action cal-drawer-action-call">
+                <Phone size={16} strokeWidth={1.9} />
+                <span>Call client</span>
               </a>
             )}
             {a.client_phone && (
               <a href={`https://wa.me/${whatsAppNumber(a.client_phone)}?text=${waText}`} target="_blank" rel="noopener"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(16,185,129,0.10)", color: "#047857", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                Message on WhatsApp
+                className="cal-drawer-action cal-drawer-action-whatsapp">
+                <MessageCircle size={16} strokeWidth={1.9} />
+                <span>WhatsApp</span>
               </a>
             )}
             {a.client_email && (
               <a href={`mailto:${a.client_email}`}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, textDecoration: "none", wordBreak: "break-all" }}>
-                {a.client_email}
+                className="cal-drawer-action cal-drawer-action-email">
+                <Mail size={15} strokeWidth={1.9} />
+                <span>{a.client_email}</span>
               </a>
             )}
           </div>
@@ -414,23 +621,21 @@ function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName }: App
       )}
 
       {/* Details */}
-      <div style={{ fontSize: 10.5, fontWeight: 800, color: "#9A94A8", letterSpacing: "0.9px", textTransform: "uppercase", marginBottom: 4 }}>
+      <div className="cal-drawer-section-label cal-drawer-details-label">
         {vc.bookingSingular} details
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "11px 0", borderBottom: "1px solid #ECE9F1" }}>
-        <span style={{ fontSize: 12, color: "#6B6577" }}>Status</span>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, textTransform: "capitalize" }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: sc.dot }} />{a.status}
+      <div className="cal-drawer-row">
+        <span className="cal-drawer-row-label">Status</span>
+        <span className="cal-drawer-status" style={{ marginTop: 0, background: sc.bg, color: sc.text, borderColor: sc.border }}>
+          <span style={{ background: sc.dot }} />{a.status}
         </span>
       </div>
       {a.staff?.name && <DetailRow label={vc.staffSingular} value={a.staff.name} />}
       {mins !== null && <DetailRow label="Duration" value={`${mins} min`} />}
       {typeof a.combinedPrice === "number" && a.combinedPrice > 0 && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "13px 0" }}>
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: "#12101A" }}>Total</span>
-          <span style={{ fontSize: 17, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px" }}>
-            £{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}
-          </span>
+        <div className="cal-drawer-total">
+          <span className="cal-drawer-total-label">Total</span>
+          <span className="cal-drawer-total-value">£{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}</span>
         </div>
       )}
     </Modal>
@@ -502,21 +707,24 @@ function CalendarContent() {
   const today = new Date();
 
   const Topbar = (
-    <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 24px", minHeight: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, gap: 12, flexWrap: "wrap" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <HamburgerBtn onClick={() => {}} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>Calendar</div>
-      </div>
-      <a href="/dashboard/bookings"
-        style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 15px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", borderRadius: 10, fontSize: 12.5, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
-        + New {vc.bookingSingular.toLowerCase()}
-      </a>
-    </header>
+    <>
+      <style>{CALENDAR_STYLES}</style>
+      <header className="cal-topbar">
+        <div className="cal-topbar-left">
+          <HamburgerBtn />
+          <div className="cal-topbar-title">Calendar</div>
+        </div>
+        <a href="/dashboard/bookings" className="cal-topbar-create" aria-label={`New ${vc.bookingSingular.toLowerCase()}`} title={`New ${vc.bookingSingular.toLowerCase()}`}>
+          <Plus size={20} strokeWidth={2} />
+          <span className="cal-topbar-create-label">New {vc.bookingSingular.toLowerCase()}</span>
+        </a>
+      </header>
+    </>
   );
 
   if (loading) return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
-      <div style={{ padding: 40, textAlign: "center", color: "#6B6577" }}>Loading calendar…</div>
+      <div style={{ padding: 40, textAlign: "center", color: "#524D60" }}>Loading calendar…</div>
     </DashboardShell>
   );
 
@@ -527,45 +735,34 @@ function CalendarContent() {
 
   return (
     <DashboardShell salonName={salonName} topbar={Topbar}>
-      <style>{`
-        .cal-agenda-row:hover { background: #FAF9FC; }
-        .cal-desktop { display: block; }
-        .cal-mobile  { display: none; }
-        @media (max-width: 900px) {
-          .cal-desktop { display: none; }
-          .cal-mobile  { display: block; }
-        }
-        .cal-daypills::-webkit-scrollbar { display: none; }
-      `}</style>
-
-      <div style={{ padding: "26px 24px 40px", maxWidth: 1360, margin: "0 auto" }}>
+      <div className="cal-page cal-reference-page">
 
         {/* ── Header ── */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 10.5, fontWeight: 600, color: "#9A94A8", letterSpacing: "0.2px" }}>
+        <div className="cal-heading">
+          <div className="cal-eyebrow">
             {weekAppts.length} {weekAppts.length === 1 ? vc.bookingSingular.toLowerCase() : vc.bookingPlural.toLowerCase()} this week
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: "#12101A", letterSpacing: "-0.5px", margin: "6px 0 0", lineHeight: 1.2 }}>Calendar</h1>
+          <h1 className="cal-title">Calendar</h1>
         </div>
 
         {/* ── Toolbar ── */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", gap: 6 }}>
-              {([["\u2039", -1], ["Today", 0], ["\u203a", 1]] as const).map(([lbl, dir]) => (
-                <button key={lbl} onClick={() => dir === 0 ? setCurrentDate(new Date()) : nav(dir)}
-                  style={{ minWidth: lbl === "Today" ? undefined : 34, padding: lbl === "Today" ? "7px 14px" : "7px 0", background: "#FFFFFF", color: "#6B6577", border: "1px solid #ECE9F1", borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.14s" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.color = "#7C3AED"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#ECE9F1"; e.currentTarget.style.color = "#6B6577"; }}
-                >{lbl}</button>
-              ))}
+        <div className="cal-toolbar">
+          <div className="cal-toolbar-main">
+            <div className="cal-nav-buttons">
+              <button className="cal-nav-button" onClick={() => nav(-1)} aria-label="Previous period" title="Previous period">
+                <ChevronLeft size={17} strokeWidth={2} />
+              </button>
+              <button className="cal-nav-button cal-nav-today" onClick={() => setCurrentDate(new Date())}>Today</button>
+              <button className="cal-nav-button" onClick={() => nav(1)} aria-label="Next period" title="Next period">
+                <ChevronRight size={17} strokeWidth={2} />
+              </button>
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>{rangeLabel}</div>
+            <div className="cal-range">{rangeLabel}</div>
           </div>
-          <div style={{ display: "flex", background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 10, padding: 3, gap: 2 }}>
+          <div className="cal-view-toggle">
             {(["day","week","month"] as ViewMode[]).map(v => (
               <button key={v} onClick={() => setView(v)}
-                style={{ fontSize: 11.5, padding: "5px 13px", borderRadius: 8, border: "none", background: view === v ? "#EDE9FF" : "transparent", color: view === v ? "#6D28D9" : "#6B6577", cursor: "pointer", fontWeight: view === v ? 700 : 500, transition: "all 0.14s", textTransform: "capitalize" }}>
+                className={`cal-view-button${view === v ? " active" : ""}`}>
                 {v}
               </button>
             ))}
@@ -573,16 +770,16 @@ function CalendarContent() {
         </div>
 
         {/* ── Status counts (real) ── */}
-        <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap", marginBottom: 18 }}>
+        <div className="cal-status-counts">
           {[
-            { label: "Confirmed", value: appointments.filter(a => a.status === "confirmed").length, color: "#10B981" },
+            { label: "Confirmed", value: appointments.filter(a => a.status === "confirmed").length, color: "#047857" },
             { label: "Pending", value: appointments.filter(a => a.status === "pending").length, color: "#F59E0B" },
             { label: "Cancelled", value: appointments.filter(a => a.status === "cancelled").length, color: "#EF4444" },
           ].map(st => (
-            <div key={st.label} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.color }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#12101A" }}>{st.value}</span>
-              <span style={{ fontSize: 12, color: "#6B6577" }}>{st.label}</span>
+            <div key={st.label} className="cal-status-count">
+              <i style={{ background: st.color }} />
+              <span className="cal-status-value">{st.value}</span>
+              <span className="cal-status-label">{st.label}</span>
             </div>
           ))}
         </div>
@@ -594,54 +791,68 @@ function CalendarContent() {
           {view === "day"   && <DayView currentDate={currentDate} getApptsByDay={getApptsByDay} setSelectedAppt={setSelectedAppt} />}
         </div>
 
-        {/* ── Mobile: day pills + agenda (not hour-bound, so nothing hides) ── */}
+        {/* ── Mobile ──────────────────────────────────────────────
+            Day = the agenda (not hour-bound, so nothing hides);
+            Week/Month reuse the very same grid components desktop
+            renders. No new state and no new view components — this is
+            the existing `view` value driving which one shows. */}
         <div className="cal-mobile">
-          <div className="cal-daypills" style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 4, marginBottom: 14, scrollbarWidth: "none" }}>
+          {view === "week" && (
+            <div className="cal-mobile-grid">
+              <WeekView weekDays={weekDays} appointments={appointments} today={today} setSelectedAppt={setSelectedAppt} />
+            </div>
+          )}
+          {view === "month" && (
+            <div className="cal-mobile-grid">
+              <MonthView currentDate={currentDate} monthDays={monthDays} getApptsByDay={getApptsByDay} today={today} setSelectedAppt={setSelectedAppt} />
+            </div>
+          )}
+          {view === "day" && (
+          <>
+          <div className="cal-week-card">
             {weekDays.map((day, di) => {
               const active = sameDay(day, currentDate);
               return (
                 <button key={day.toISOString()} onClick={() => setCurrentDate(day)}
-                  style={{ flex: "1 0 auto", minWidth: 46, padding: "9px 6px", borderRadius: 11, cursor: "pointer",
-                    background: active ? "#7C3AED" : "#FFFFFF", color: active ? "#fff" : "#6B6577",
-                    border: `1px solid ${active ? "#7C3AED" : "#ECE9F1"}`, transition: "all 0.14s" }}>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.4px", opacity: active ? 0.85 : 1 }}>{DAYS[di][0]}</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginTop: 2, letterSpacing: "-0.2px" }}>{day.getDate()}</div>
+                  className={`cal-day-button${active ? " active" : ""}`}
+                  aria-label={day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
+                  aria-pressed={active}>
+                  <span className="cal-day-name">{DAYS[di][0]}</span>
+                  <span className="cal-day-number">{day.getDate()}</span>
                 </button>
               );
             })}
           </div>
 
-          <div style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 14, padding: "4px 16px 16px", boxShadow: "0 1px 2px rgba(18,16,26,0.03)" }}>
-            <div style={{ padding: "14px 4px 4px" }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>
-                {currentDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
-              </div>
-              <div style={{ fontSize: 10.5, color: "#9A94A8", marginTop: 3 }}>
-                {dayAppts.length} {dayAppts.length === 1 ? vc.bookingSingular.toLowerCase() : vc.bookingPlural.toLowerCase()}
-              </div>
-            </div>
-
+          <div className="cal-agenda-card">
             {dayAppts.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "34px 12px", borderTop: "1px solid #ECE9F1", marginTop: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A" }}>Nothing booked</div>
-                <div style={{ fontSize: 11.5, color: "#6B6577", marginTop: 4 }}>This day is completely free.</div>
+              <div className="cal-agenda-empty">
+                <div className="cal-agenda-empty-title">Nothing booked</div>
+                <div className="cal-agenda-empty-copy">This day is completely free.</div>
               </div>
             ) : (
-              <div style={{ marginTop: 6 }}>
+              <div className="cal-agenda-list">
                 {dayAppts.map(a => <AgendaRow key={a.id} a={a} onClick={() => setSelectedAppt(a)} />)}
               </div>
             )}
 
-            <button onClick={() => router.push("/dashboard/bookings")}
-              style={{ width: "100%", marginTop: 14, padding: "12px", background: "transparent", border: "1.5px dashed #D6D1DE", borderRadius: 11, color: "#6B6577", fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.14s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.color = "#7C3AED"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#D6D1DE"; e.currentTarget.style.color = "#6B6577"; }}
-            >
-              + Add {vc.bookingSingular.toLowerCase()}{freeTime ? ` at ${freeTime}` : ""}
+            <button className="cal-add-booking" onClick={() => router.push("/dashboard/bookings")}>
+              <Plus size={16} strokeWidth={1.9} />
+              Add {vc.bookingSingular.toLowerCase()}{freeTime ? ` at ${freeTime}` : ""}
             </button>
           </div>
+          </>
+          )}
         </div>
       </div>
+
+      <nav className="cal-reference-nav" aria-label="Calendar navigation">
+        <Link href="/dashboard" className="cal-reference-nav-item"><House strokeWidth={1.7} /><span>Overview</span></Link>
+        <Link href="/dashboard/calendar" className="cal-reference-nav-item active" aria-current="page"><CalendarDays strokeWidth={1.9} /><span>Calendar</span></Link>
+        <Link href="/dashboard/bookings" className="cal-reference-nav-item"><Clock3 strokeWidth={1.7} /><span>{vc.bookingPlural}</span></Link>
+        <Link href="/dashboard/waitlist" className="cal-reference-nav-item"><ListPlus strokeWidth={1.7} /><span>Waitlist</span></Link>
+        <Link href="/dashboard/clients" className="cal-reference-nav-item"><UsersRound strokeWidth={1.7} /><span>{vc.clientPlural}</span></Link>
+      </nav>
 
       <ApptDrawer selectedAppt={selectedAppt} setSelectedAppt={setSelectedAppt} salonName={salonName} onViewAll={() => { router.push("/dashboard/bookings"); setSelectedAppt(null); }} />
     </DashboardShell>

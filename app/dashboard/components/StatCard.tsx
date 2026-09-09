@@ -29,7 +29,7 @@ const colorMap = {
     glow: "rgba(245,158,11,0.18)", bar: "#FCD34D",
   },
   red: {
-    accent: "#EF4444", light: "rgba(239,68,68,0.10)", text: "#DC2626",
+    accent: "#EF4444", light: "rgba(239,68,68,0.10)", text: "#B91C1C",
     grad: "linear-gradient(135deg,#EF4444,#F87171)",
     glow: "rgba(239,68,68,0.18)", bar: "#F87171",
   },
@@ -149,7 +149,7 @@ export default function StatCard({ label, value, icon, color, badge, sub, trend,
             display: "inline-flex", alignItems: "center", gap: 3,
             fontSize: 11, fontWeight: 800, padding: "3px 8px", borderRadius: 99,
             background: trendUp ? "rgba(16,185,129,0.10)" : "rgba(239,68,68,0.10)",
-            color: trendUp ? "#10B981" : "#DC2626",
+            color: trendUp ? "#047857" : "#B91C1C",
             flexShrink: 0,
           }}>
             <span>{trendUp ? "↑" : "↓"}</span>

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useCallback } from "react";
 import { supabase as sb } from "../lib/supabase";
-const IND = "#C9A24B";
+const IND = "#7C3AED";
 
 const CFG = {
   GB: {
@@ -97,7 +97,7 @@ function PhotoUpload({label,hint,icon,value,onChange}:{label:string;hint:string;
           <input ref={ref} type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files?.[0];if(f)upload(f);}}/>
         </div>
       </F>
-      {err&&<p style={{fontSize:12,color:"#DC2626",marginTop:-10,marginBottom:8}}>{err}</p>}
+      {err&&<p style={{fontSize:12,color: "#B91C1C",marginTop:-10,marginBottom:8}}>{err}</p>}
     </div>
   );
 }
@@ -153,7 +153,7 @@ export default function PartnerPage() {
       <style>{`*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif}select option{font-size:14px}`}</style>
 
       {/* Hero */}
-      <div style={{background:"linear-gradient(135deg,#1E3A8A,#C9A24B)",padding:"36px 24px 52px",textAlign:"center"}}>
+      <div style={{background:"linear-gradient(135deg,#5B21B6,#7C3AED)",padding:"36px 24px 52px",textAlign:"center"}}>
         <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.15)",borderRadius:99,padding:"5px 16px",marginBottom:16}}>
           <span style={{fontSize:14}}>🤝</span><span style={{fontSize:11.5,fontWeight:700,color:"#fff",letterSpacing:"0.5px",textTransform:"uppercase"}}>Partner Application</span>
         </div>
@@ -315,7 +315,7 @@ export default function PartnerPage() {
             {step>0&&<button onClick={()=>{setErr("");setStep(s=>s-1);}} style={{flex:1,padding:"13px",background:"#fff",border:"1.5px solid #E5E7EB",borderRadius:12,fontSize:14,fontWeight:600,cursor:"pointer",color:"#374151"}}>← Back</button>}
             {step<3
               ?<button onClick={next} style={{flex:2,padding:"13px",background:`linear-gradient(135deg,${IND},#3B55E0)`,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 8px 24px rgba(79,110,247,0.28)"}}>Continue →</button>
-              :<button onClick={submit} disabled={saving} style={{flex:2,padding:"13px",background:saving?"#aab1c4":`linear-gradient(135deg,${IND},#3B55E0)`,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",boxShadow:saving?"none":"0 8px 24px rgba(79,110,247,0.28)"}}>{saving?"Submitting…":"Submit Application ✓"}</button>
+              :<button onClick={submit} disabled={saving} style={{flex:2,padding:"13px",background:saving?"#D6D1DE":`linear-gradient(135deg,${IND},#3B55E0)`,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",boxShadow:saving?"none":"0 8px 24px rgba(79,110,247,0.28)"}}>{saving?"Submitting…":"Submit Application ✓"}</button>
             }
           </div>
           <p style={{textAlign:"center",fontSize:11.5,color:"#6B7280",marginTop:12}}>🔒 Your data is encrypted and protected under {form.country==="GB"?"UK GDPR":form.country==="AE"?"UAE Data Protection Law":form.country==="SA"?"Saudi PDPL":"Pakistan Data Protection"} regulations.</p>

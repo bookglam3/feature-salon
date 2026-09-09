@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Fails if a retired theme colour reappears. See scripts/check-theme.mjs
+      # for the value list and the `theme-allow` escape hatch.
+      - name: Theme regression guard
+        run: npm run check:theme
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # Non-blocking for now: the repo carries 29 pre-existing eslint errors
+      # (react-hooks/setState-in-effect, no-explicit-any, prefer-const) that
+      # are unrelated to the theme work. Flip to a hard gate once they are
+      # cleared, otherwise CI is red on day one and stops meaning anything.
+      - name: Lint (report only)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Slot logic tests
+        run: npm test

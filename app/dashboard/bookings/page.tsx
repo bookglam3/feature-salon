@@ -430,7 +430,7 @@ export default function BookingsPage() {
                             {a.status !== "no_show" && a.status !== "cancelled" && a.status !== "completed" && (
                               <button onClick={async () => { await supabase.from("appointments").update({ status: "no_show" }).eq("id", a.id); await reloadAppts(); toast.success("No-show marked"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#B45309", borderColor: "rgba(245,158,11,0.2)" }}>No-show</button>
                             )}
-                            <button onClick={() => handleDelete(a.id)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#DC2626", borderColor: "rgba(239,68,68,0.2)" }}>Delete</button>
+                            <button onClick={() => handleDelete(a.id)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#B91C1C", borderColor: "rgba(239,68,68,0.2)" }}>Delete</button>
                           </div>
                         </td>
                       </tr>
@@ -807,7 +807,7 @@ export default function BookingsPage() {
               </div>
               <FormGroup label="Status"><Select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">✓ Completed</option><option value="no_show">💤 No-show</option><option value="cancelled">Cancelled</option></Select></FormGroup>
               {formData.client_email && (
-                <p style={{ fontSize: 12, color: "#10B981", margin: "0 0 12px", fontWeight: 500 }}>✉️ Confirmation email will be sent to {formData.client_email}</p>
+                <p style={{ fontSize: 12, color: "#047857", margin: "0 0 12px", fontWeight: 500 }}>✉️ Confirmation email will be sent to {formData.client_email}</p>
               )}
             </div>
           )}

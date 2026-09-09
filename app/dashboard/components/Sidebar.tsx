@@ -443,7 +443,7 @@ export default function Sidebar({ salonName, onClose, onLogout }: SidebarProps) 
                 letterSpacing: "-0.2px",
               }}>{salonName || `Your ${vc.productName.replace(" OS","")}`}</div>
               <div style={{
-                fontSize: 10, color: "#10B981", fontWeight: 600,
+                fontSize: 10, color: "#047857", fontWeight: 600,
                 display: "flex", alignItems: "center", gap: 4, marginTop: 1,
               }}>
                 <span style={{

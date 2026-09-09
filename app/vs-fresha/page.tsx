@@ -46,7 +46,7 @@ const C = {
   gold: "#7C3AED",
   dim: "#524D60",
   green: "#047857",
-  red: "#DC2626",
+  red: "#B91C1C",
 };
 
 interface TableRow {

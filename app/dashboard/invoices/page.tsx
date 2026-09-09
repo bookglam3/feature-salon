@@ -26,7 +26,7 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; label: string }> = {
     draft: { bg: "#ECE9F1", color: "#524D60", label: "Draft" },
     sent:  { bg: "rgba(124,58,237,0.10)", color: "#7C3AED", label: "Sent" },
-    paid:  { bg: "rgba(16,185,129,0.10)", color: "#10B981", label: "✓ Paid" },
+    paid:  { bg: "rgba(16,185,129,0.10)", color: "#047857", label: "✓ Paid" },
   };
   const s = map[status] || map.draft;
   return <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: s.bg, color: s.color }}>{s.label}</span>;
@@ -212,9 +212,9 @@ export default function InvoicesPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
           {[
             { label: "Total Invoices", value: invoices.length, color: "#7C3AED" },
-            { label: "Paid", value: invoices.filter(i => i.status === "paid").length, color: "#10B981" },
+            { label: "Paid", value: invoices.filter(i => i.status === "paid").length, color: "#047857" },
             { label: "Pending", value: invoices.filter(i => i.status === "sent").length, color: "#F59E0B" },
-            { label: "Revenue Collected", value: `£${totalRevenue.toFixed(2)}`, color: "#10B981" },
+            { label: "Revenue Collected", value: `£${totalRevenue.toFixed(2)}`, color: "#047857" },
           ].map(s => (
             <div key={s.label} style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color }} />
@@ -253,7 +253,7 @@ export default function InvoicesPage() {
                         <div style={{ fontSize: 11.5, color: "#524D60" }}>{inv.client_email}</div>
                       </td>
                       <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{inv.items.length} item{inv.items.length !== 1 ? "s" : ""}</td>
-                      <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 900, color: "#10B981" }}>£{inv.total.toFixed(2)}</td>
+                      <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 14, fontWeight: 900, color: "#047857" }}>£{inv.total.toFixed(2)}</td>
                       <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }}><StatusBadge status={inv.status} /></td>
                       <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1", fontSize: 12.5, color: "#524D60" }}>{inv.due_date ? new Date(inv.due_date + "T00:00:00").toLocaleDateString("en-GB") : "—"}</td>
                       <td style={{ padding: "12px 16px", borderBottom: "1px solid #ECE9F1" }} onClick={e => e.stopPropagation()}>
@@ -264,7 +264,7 @@ export default function InvoicesPage() {
                             disabled={!inv.client_email || sendingEmail === inv.id}
                             style={{ padding: "5px 10px", background: inv.client_email ? "rgba(124,58,237,0.10)" : "#F5F3FF", border: `1.5px solid ${inv.client_email ? "rgba(124,58,237,0.25)" : "#ECE9F1"}`, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: inv.client_email ? "pointer" : "not-allowed", color: inv.client_email ? "#7C3AED" : "#524D60", opacity: sendingEmail === inv.id ? 0.6 : 1 }}
                           >{sendingEmail === inv.id ? "Sending…" : "Email"}</button>
-                          {inv.status !== "paid" && <button onClick={() => updateStatus(inv.id, inv.status === "draft" ? "sent" : "paid")} style={{ padding: "5px 10px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#10B981" }}>{inv.status === "draft" ? "Sent" : "Mark Paid"}</button>}
+                          {inv.status !== "paid" && <button onClick={() => updateStatus(inv.id, inv.status === "draft" ? "sent" : "paid")} style={{ padding: "5px 10px", background: "rgba(16,185,129,0.10)", border: "1.5px solid rgba(16,185,129,0.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#047857" }}>{inv.status === "draft" ? "Sent" : "Mark Paid"}</button>}
                         </div>
                       </td>
                     </tr>
@@ -310,7 +310,7 @@ export default function InvoicesPage() {
             <div style={{ textAlign: "right", marginBottom: 20 }}>
               <div style={{ fontSize: 13, color: "#524D60" }}>Subtotal: £{selected.subtotal.toFixed(2)}</div>
               <div style={{ fontSize: 13, color: "#524D60" }}>VAT ({selected.tax_rate}%): £{selected.tax_amount.toFixed(2)}</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#10B981", marginTop: 4 }}>Total: £{selected.total.toFixed(2)}</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#047857", marginTop: 4 }}>Total: £{selected.total.toFixed(2)}</div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button onClick={() => printInvoice(selected)} style={{ flex: 1, minWidth: 120, padding: 12, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#524D60", cursor: "pointer" }}>Print / PDF</button>
@@ -366,7 +366,7 @@ export default function InvoicesPage() {
               <div style={{ padding: "14px 16px", background: "#F5F3FF", borderRadius: 12, textAlign: "right" }}>
                 <div style={{ fontSize: 12.5, color: "#524D60" }}>Subtotal: £{subtotal.toFixed(2)}</div>
                 <div style={{ fontSize: 12.5, color: "#524D60" }}>VAT ({form.tax_rate}%): £{taxAmount.toFixed(2)}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981", marginTop: 4 }}>Total: £{total.toFixed(2)}</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "#047857", marginTop: 4 }}>Total: £{total.toFixed(2)}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
@@ -421,7 +421,7 @@ export default function InvoicesPage() {
               <div style={{ padding: "14px 16px", background: "#F5F3FF", borderRadius: 12, textAlign: "right" }}>
                 <div style={{ fontSize: 12.5, color: "#524D60" }}>Subtotal: £{subtotal.toFixed(2)}</div>
                 <div style={{ fontSize: 12.5, color: "#524D60" }}>VAT ({form.tax_rate}%): £{taxAmount.toFixed(2)}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981", marginTop: 4 }}>Total: £{total.toFixed(2)}</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "#047857", marginTop: 4 }}>Total: £{total.toFixed(2)}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>

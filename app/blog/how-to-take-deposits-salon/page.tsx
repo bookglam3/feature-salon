@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const bg      = "#141A2E";
-const surface = "#1C2438";
-const border  = "#2a3350";
-const gold    = "#C9A24B";
-const text    = "#F7F5EF";
-const text2   = "#CBD5E1";
-const muted   = "#aab1c4";
+const bg      = "#FFFFFF";
+const surface = "#F5F3FF";
+const border  = "#ECE9F1";
+const gold    = "#7C3AED";
+const text    = "#12101A";
+const text2   = "#524D60";
+const muted   = "#6B6577";
 
 export const metadata: Metadata = {
   title: "How to Take Deposits in Your Salon (and Why You Should) — 2026 Guide | Feature",
@@ -54,14 +54,14 @@ export default function SalonDepositsPage() {
       <main style={{ background: bg, minHeight: "100vh", color: text, fontFamily: "system-ui, sans-serif" }}>
 
         {/* Nav */}
-        <nav style={{ background: "#0E1320", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+        <nav style={{ background: "#FFFFFF", borderBottom: `1px solid ${border}`, padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 20, color: gold, textDecoration: "none", letterSpacing: "-0.5px" }}>feature</Link>
           <div style={{ display: "flex", gap: 24, alignItems: "center", fontSize: 14 }}>
             <Link href="/#features" style={{ color: muted, textDecoration: "none" }}>Features</Link>
             <Link href="/pricing" style={{ color: muted, textDecoration: "none" }}>Pricing</Link>
             <Link href="/blog" style={{ color: muted, textDecoration: "none" }}>Blog</Link>
             <Link href="/login" style={{ color: muted, textDecoration: "none" }}>Login</Link>
-            <Link href="/signup" style={{ background: gold, color: "#0E1320", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
+            <Link href="/signup" style={{ background: gold, color: "#FFFFFF", fontWeight: 700, fontSize: 13, padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}>Start free trial</Link>
           </div>
         </nav>
 
@@ -76,7 +76,7 @@ export default function SalonDepositsPage() {
 
         {/* Article header */}
         <header style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 32px" }}>
-          <div style={{ display: "inline-block", background: "rgba(201,162,75,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
+          <div style={{ display: "inline-block", background: "rgba(124,58,237,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
             SALON DEPOSITS
           </div>
           <h1 style={{ fontSize: "clamp(26px,4.5vw,40px)", fontWeight: 800, color: text, margin: "0 0 20px", lineHeight: 1.2, letterSpacing: "-0.5px" }}>
@@ -131,7 +131,7 @@ export default function SalonDepositsPage() {
             </h2>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>1</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>1</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Start small</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>You don&rsquo;t need the full price up front. A deposit of around 10&ndash;20% of the service is usually enough to create commitment without feeling like a barrier.</div>
@@ -139,7 +139,7 @@ export default function SalonDepositsPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>2</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>2</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Apply them where they matter most</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Many owners use deposits only for longer or higher-value treatments (colour, extensions, multi-hour services), for new clients, or for clients with a history of missing appointments &mdash; while keeping quick, low-value bookings deposit-free.</div>
@@ -147,7 +147,7 @@ export default function SalonDepositsPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>3</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>3</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Make the policy clear before booking</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>State it on your booking page and in confirmations: for example, &ldquo;A 20% deposit secures your appointment, refundable with 24 hours&rsquo; notice.&rdquo; No surprises means no resentment.</div>
@@ -155,7 +155,7 @@ export default function SalonDepositsPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>4</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>4</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Set a fair cancellation window</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Refund or transfer the deposit if the client gives reasonable notice (commonly 24&ndash;48 hours). This keeps it fair while still protecting your time.</div>
@@ -163,7 +163,7 @@ export default function SalonDepositsPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 0 }}>
-              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(201,162,75,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>5</div>
+              <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>5</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Make paying effortless</div>
                 <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>The deposit should be taken at the moment of booking, through a smooth card payment. If paying is awkward, you&rsquo;ll lose bookings &mdash; so use proper, mainstream processing (e.g. Stripe).</div>
@@ -205,7 +205,7 @@ export default function SalonDepositsPage() {
           </section>
 
           {/* CTA box */}
-          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #1e2a4a 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
+          <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #F5F3FF 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: text, margin: "0 0 10px" }}>
               Protect your diary with deposits
             </h3>
@@ -214,7 +214,7 @@ export default function SalonDepositsPage() {
             </p>
             <Link
               href="/signup"
-              style={{ display: "inline-block", background: gold, color: "#0E1320", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
+              style={{ display: "inline-block", background: gold, color: "#FFFFFF", fontWeight: 800, fontSize: 16, padding: "14px 36px", borderRadius: 10, textDecoration: "none", letterSpacing: "-0.2px" }}
             >
               Start free trial
             </Link>
@@ -242,7 +242,7 @@ export default function SalonDepositsPage() {
         </article>
 
         {/* Footer */}
-        <footer style={{ background: "#0E1320", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
+        <footer style={{ background: "#FFFFFF", borderTop: `1px solid ${border}`, padding: "40px 24px", textAlign: "center" }}>
           <Link href="/" style={{ fontWeight: 800, fontSize: 22, color: gold, textDecoration: "none", display: "block", marginBottom: 12 }}>feature</Link>
           <p style={{ fontSize: 13, color: muted, marginBottom: 16 }}>
             UK-built booking software for salons, clinics, gyms &amp; studios.
