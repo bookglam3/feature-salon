@@ -1,10 +1,6 @@
 /* Playfair Display is loaded via next/font in layout.tsx — zero render-blocking */
 /* Other fonts are loaded via next/font/google in layout.tsx — no extra @import needed */
 
-@theme inline {
-  --font-sans: var(--font-manrope);
-}
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -76,61 +72,12 @@
   --gradient-brand: linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#4338CA 100%);
   --gradient-surface: linear-gradient(135deg,#F8FAFF 0%,#F0F4FF 100%);
 
-  /* ══ DARK DASHBOARD THEME — Midnight & Gold ═══════════════════ */
-  --dk-bg:        #141A2E;
-  --dk-surface:   #1C2438;
-  --dk-surface-2: #1C2438;
-  --dk-surface-3: #1C2438;
-  --dk-border:    rgba(255,255,255,0.07);
-  --dk-border-2:  rgba(255,255,255,0.12);
-  --dk-text-1:    #F7F5EF;
-  --dk-text-2:    #aab1c4;
-  --dk-text-3:    #8B99B5;
-  --dk-purple:    #C9A24B;
-  --dk-purple-mid: #E7C878;
-  --dk-purple-light: rgba(201,162,75,0.12);
-  --dk-purple-glow: rgba(201,162,75,0.28);
-  --dk-green:     #10B981;
-  --dk-green-dim: rgba(16,185,129,0.15);
-  --dk-amber:     #F59E0B;
-  --dk-amber-dim: rgba(245,158,11,0.15);
-  --dk-red:       #EF4444;
-  --dk-red-dim:   rgba(239,68,68,0.15);
-  --dk-shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
-  --dk-shadow-purple: 0 8px 32px rgba(201,162,75,0.18);
   /* ── Landing preview (new design) — purple brand tokens ── */
   --lp-purple: #7C3AED;
   --lp-purple-dark: #6D28D9;
   --lp-purple-deep: #5B21B6;
   --lp-purple-light: #EDE9FF;
   --lp-purple-pale: #F5F3FF;
-}
-
-/* ── Dashboard: Midnight & Gold — scoped override ── */
-.ds-layout {
-  --dk-bg:            #141A2E;
-  --dk-surface:       #1C2438;
-  --dk-purple:        #C9A24B;
-  --dk-purple-mid:    #E7C878;
-  --dk-purple-light:  rgba(201,162,75,0.10);
-  --dk-purple-glow:   rgba(201,162,75,0.28);
-  --dk-shadow-purple: 0 8px 32px rgba(201,162,75,0.18);
-  --gradient-brand:   linear-gradient(135deg,#141A2E 0%,#1C2438 50%,#0E1320 100%);
-
-  /* Override light-theme tokens so any var(--text-*)/var(--border) inside the
-     dashboard shell automatically resolves to dark-theme values */
-  --text-1:    #F7F5EF;
-  --text-2:    #aab1c4;
-  --text-3:    #aab1c4;
-  --border:    #2a3350;
-  --border-2:  #3a4a60;
-  --slate-50:  #141A2E;
-  --slate-100: #1C2438;
-  --slate-200: #2a3350;
-  --slate-300: #3a4a60;
-  --indigo:         #C9A24B;
-  --indigo-light:   rgba(201,162,75,0.10);
-  --indigo-text:    #C9A24B;
 }
 
 html { scroll-behavior: smooth; }
@@ -708,29 +655,6 @@ details[open] .faq-question::after { transform: rotate(45deg); }
 
 /* Dashboard main wrap */
 @media (max-width: 767px) {
-  /* Welcome banner */
-  .dash-banner {
-    padding: 22px 20px !important;
-    border-radius: 18px !important;
-    margin-bottom: 16px !important;
-  }
-  .dash-banner h1 {
-    font-size: 20px !important;
-    letter-spacing: -0.5px !important;
-    line-height: 1.2 !important;
-  }
-  .dash-banner-meta { font-size: 12px !important; }
-  .dash-banner-btns {
-    gap: 8px !important;
-    margin-top: 14px !important;
-  }
-  .dash-banner-btns button,
-  .dash-banner-btns a {
-    padding: 8px 13px !important;
-    font-size: 12px !important;
-    border-radius: 10px !important;
-  }
-
   /* Stat cards — 2 col grid */
   .dash-stats {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -767,28 +691,6 @@ details[open] .faq-question::after { transform: rotate(45deg); }
   /* Status-tab horizontal scroll — same treatment as dash-quick-scroll
      above, no min-width override since these are short text pills that
      already size to their own content correctly. */
-  .dash-tab-scroll {
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .dash-tab-scroll::-webkit-scrollbar { display: none; }
-
-  /* Appointment table → cards on mobile */
-  .dash-appt-row { display: none !important; }
-  .dash-appt-card { display: flex !important; }
-  .dash-table-head { display: none !important; }
-  .dash-table-footer { display: none !important; }
-
-  /* Two-col layout stacks on mobile */
-  .dash-cols {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* Desktop: restore two-col layout */
-@media (min-width: 768px) {
-  .dash-appt-card { display: none !important; }
-  .dash-cols { grid-template-columns: 3fr 2fr !important; }
 }
 
 /* ─────────────── EXTRA MOBILE POLISH ─────────────── */
@@ -1041,295 +943,9 @@ html.gpu-capable .ds-topbar {
   background-size: 800px 100% !important;
 }
 
-/* Dark premium card */
-.dk-card {
-  background: var(--dk-surface);
-  border: 1px solid var(--dk-border);
-  border-radius: 18px;
-  box-shadow: var(--dk-shadow-card);
-  transition: all 0.2s ease;
-}
-.dk-card:hover {
-  border-color: rgba(201,162,75,0.18);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,162,75,0.12);
-  transform: translateY(-2px);
-}
-
 /* Dark overlay */
 .ds-overlay {
   background: rgba(0,0,0,0.7) !important;
-}
-
-/* Focus ring in dark */
-.ds-content :focus-visible {
-  outline-color: var(--dk-purple-mid) !important;
-}
-
-/* Dark subscription warning bars */
-.dk-sub-warn {
-  background: rgba(239,68,68,0.12);
-  border-bottom: 1px solid rgba(239,68,68,0.2);
-  color: #FCA5A5;
-}
-.dk-sub-pastdue {
-  background: rgba(245,158,11,0.12);
-  border-bottom: 1px solid rgba(245,158,11,0.2);
-  color: #FCD34D;
-}
-
-/* ── Glow pulse animation for active sidebar items ── */
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(201,162,75,0.25); }
-  50%       { box-shadow: 0 0 16px rgba(201,162,75,0.35); }
-}
-.glow-active { animation: glowPulse 2.5s ease-in-out infinite; }
-
-/* ── Dark mode table ── */
-.dk-table-head tr { background: rgba(255,255,255,0.03) !important; }
-.dk-table-head th {
-  color: var(--dk-text-3) !important;
-  border-bottom: 1px solid var(--dk-border) !important;
-}
-.dk-table-row:hover { background: rgba(255,255,255,0.03) !important; }
-.dk-table-row td   { border-bottom: 1px solid var(--dk-border) !important; }
-
-/* ── Purple glow button ── */
-.btn-purple-glow {
-  background: linear-gradient(135deg,#1C2438,#0E1320) !important;
-  box-shadow: 0 4px 18px rgba(201,162,75,0.30) !important;
-  transition: all 0.18s ease !important;
-}
-.btn-purple-glow:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 8px 28px rgba(201,162,75,0.35) !important;
-}
-
-/* ── Mobile bottom nav ── */
-.mobile-nav-bar {
-  background: #FFFFFF !important;
-  border-top: 1px solid #ECE9F1 !important;
-  box-shadow: 0 -2px 12px rgba(18,16,26,0.06) !important;
-}
-.mnav-item.active .mnav-icon-wrap {
-  background: linear-gradient(135deg,#7C3AED,#6D28D9) !important;
-}
-.mnav-item.active .mnav-label { color: #7C3AED !important; }
-.mnav-active-dot { background: #7B5EA7 !important; }
-
-/* ═══════════════════════════════════════════════════════════════
-   ELITE 2026 PREMIUM DESIGN SYSTEM
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── Layered mesh background for dark layouts ── */
-.elite-bg {
-  background:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(201,162,75,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(37,99,235,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(16,185,129,0.03) 0%, transparent 70%),
-    #09090F;
-}
-
-/* ── Premium animations ── */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes glowOrb {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%       { opacity: 0.8; transform: scale(1.15); }
-}
-@keyframes borderGlow {
-  0%, 100% { border-color: rgba(201,162,75,0.12); }
-  50%       { border-color: rgba(201,162,75,0.28); }
-}
-.fade-in-up { animation: fadeInUp 0.32s cubic-bezier(0.4,0,0.2,1) both; }
-.slide-in-right { animation: slideInRight 0.28s cubic-bezier(0.4,0,0.2,1) both; }
-
-/* ── Elite glass card ── */
-.elite-card {
-  background: linear-gradient(145deg, rgba(20,18,40,0.95), rgba(16,14,32,0.98));
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-.elite-card:hover {
-  border-color: rgba(201,162,75,0.18);
-  box-shadow: 0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,162,75,0.08), 0 1px 0 rgba(255,255,255,0.04) inset;
-  transform: translateY(-3px);
-}
-
-/* ── Elite topbar ── */
-/* Wave 1 perf pass — was blur(28px) saturate(180%) unconditionally, the
-   largest blur radius in the codebase, on a sticky element. Same gated
-   pattern as .ds-topbar: base ships with no backdrop-filter (background
-   bumped 0.97->0.98), html.gpu-capable restores a trimmed blur. */
-.elite-topbar {
-  background: rgba(9,9,20,0.98);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 1px 0 rgba(201,162,75,0.06), 0 4px 24px rgba(0,0,0,0.3);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  gap: 12px;
-}
-html.gpu-capable .elite-topbar {
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-/* Responsive audit fix — had zero mobile handling (confirmed: no @media
-   block anywhere in this file touches .elite-*). Used by bookings/page.tsx
-   (left: hamburger+title, right: view-toggle tabs + "+ New Appointment",
-   measured ~410-500px combined, unwrappable) and settings/page.tsx (left
-   group only, unaffected by this either way). Same 767px breakpoint as
-   every other dashboard responsive rule. height:60px -> auto/min-height so
-   a wrapped second line isn't clipped by the fixed height. */
-@media (max-width: 767px) {
-  .elite-topbar {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 60px;
-    padding: 10px 16px;
-    row-gap: 8px;
-  }
-}
-
-/* ── Elite table ── */
-.elite-table-wrap {
-  background: linear-gradient(145deg,rgba(16,15,28,0.98),rgba(13,12,25,0.99));
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.45);
-}
-.elite-table { width: 100%; border-collapse: collapse; }
-.elite-table thead tr {
-  background: rgba(255,255,255,0.025);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.elite-table th {
-  text-align: left;
-  padding: 11px 18px;
-  font-size: 10.5px; font-weight: 800;
-  color: rgba(255,255,255,0.3);
-  letter-spacing: 0.9px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.elite-table td {
-  padding: 13px 18px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.75);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  vertical-align: middle;
-}
-.elite-table tr:last-child td { border-bottom: none; }
-.elite-table tbody tr {
-  transition: background 0.15s ease;
-  cursor: default;
-}
-.elite-table tbody tr:hover {
-  background: rgba(201,162,75,0.04);
-}
-
-/* ── Elite search input ── */
-.elite-input {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 11px;
-  padding: 9px 13px;
-  font-size: 13px;
-  color: #F1F5F9;
-  font-family: var(--font);
-  outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
-  width: 100%;
-}
-.elite-input::placeholder { color: rgba(255,255,255,0.22); }
-.elite-input:focus {
-  border-color: rgba(201,162,75,0.35);
-  background: rgba(201,162,75,0.04);
-  box-shadow: 0 0 0 3px rgba(201,162,75,0.08);
-}
-
-/* ── Elite buttons ── */
-.elite-btn-primary {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: linear-gradient(135deg,#1C2438,#0E1320);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 11px;
-  padding: 9px 20px;
-  font-size: 13px; font-weight: 700;
-  cursor: pointer; white-space: nowrap;
-  box-shadow: 0 4px 18px rgba(201,162,75,0.30);
-  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
-  letter-spacing: -0.1px;
-  font-family: var(--font);
-}
-.elite-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(201,162,75,0.40);
-}
-/* Same values already proven on .dash-topbar-newbtn at this breakpoint —
-   reusing, not inventing a new compact size. */
-@media (max-width: 767px) {
-  .elite-btn-primary { padding: 9px 14px; font-size: 12.5px; }
-}
-.elite-btn-ghost {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.55);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 7px 14px;
-  font-size: 12.5px; font-weight: 600;
-  cursor: pointer; white-space: nowrap;
-  transition: all 0.15s ease;
-  font-family: var(--font);
-}
-.elite-btn-ghost:hover {
-  background: rgba(255,255,255,0.08);
-  color: #F1F5F9;
-  border-color: rgba(255,255,255,0.14);
-}
-
-/* ── Dark pill tab switcher ── */
-.elite-tabs {
-  display: flex;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 1px;
-}
-.elite-tab {
-  padding: 5px 13px;
-  border-radius: 8px;
-  border: none;
-  font-size: 12px; font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  background: transparent;
-  color: rgba(255,255,255,0.35);
-  font-family: var(--font);
-}
-.elite-tab.active {
-  background: linear-gradient(135deg,rgba(201,162,75,0.20),rgba(14,19,32,0.5));
-  color: #C9A24B;
-  border: 1px solid rgba(201,162,75,0.20);
-  box-shadow: 0 2px 8px rgba(201,162,75,0.18);
 }
 
 /* ── Dark badge variants ── */
@@ -1370,8 +986,8 @@ html.gpu-capable .elite-topbar {
 .delay-4 { animation-delay: 0.20s; }
 
 /* ── Landing preview (new design) — scoped base classes ── */
-.lp-root { font-family: var(--font-manrope); color: var(--text-1); background: #ffffff; -webkit-font-smoothing: antialiased; }
+.lp-root { font-family: var(--font); color: var(--text-1); background: #ffffff; -webkit-font-smoothing: antialiased; }
 .lp-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
 /* ── Signup (purple rebrand) — scoped font, keeps rest of app on --font ── */
-.signup-page { font-family: var(--font-manrope); -webkit-font-smoothing: antialiased; }
+.signup-page { font-family: var(--font); -webkit-font-smoothing: antialiased; }
