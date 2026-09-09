@@ -9,26 +9,26 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#1C2438", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "Inter, system-ui, sans-serif" }}>
 
       {/* Header */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #2a3350", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ fontSize: 18, fontWeight: 800, color: "#F7F5EF", textDecoration: "none", letterSpacing: "-0.5px" }}>
+      <header style={{ background: "#fff", borderBottom: "1px solid #ECE9F1", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/" style={{ fontSize: 18, fontWeight: 800, color: "#12101A", textDecoration: "none", letterSpacing: "-0.5px" }}>
           feature
         </Link>
-        <Link href="/signup" style={{ background: "linear-gradient(135deg,#C9A24B,#4F46E5)", color: "#fff", padding: "9px 20px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>
+        <Link href="/signup" style={{ background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", padding: "9px 20px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>
           Start Free Trial
         </Link>
       </header>
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#EEF2FF 0%,#F5F3FF 100%)", borderBottom: "1px solid #2a3350", padding: "52px 24px 44px", textAlign: "center" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#C9A24B", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Legal</div>
-        <h1 style={{ fontSize: 38, fontWeight: 900, color: "#F7F5EF", letterSpacing: "-1px", margin: "0 0 14px" }}>Terms of Service</h1>
-        <p style={{ fontSize: 15, color: "#aab1c4", maxWidth: 520, margin: "0 auto 16px" }}>
+      <div style={{ background: "linear-gradient(135deg,#EEF2FF 0%,#F5F3FF 100%)", borderBottom: "1px solid #ECE9F1", padding: "52px 24px 44px", textAlign: "center" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Legal</div>
+        <h1 style={{ fontSize: 38, fontWeight: 900, color: "#12101A", letterSpacing: "-1px", margin: "0 0 14px" }}>Terms of Service</h1>
+        <p style={{ fontSize: 15, color: "#6B6577", maxWidth: 520, margin: "0 auto 16px" }}>
           Please read these terms carefully before using Feature. By creating an account, you agree to be bound by them.
         </p>
-        <p style={{ fontSize: 13, color: "#aab1c4" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
+        <p style={{ fontSize: 13, color: "#6B6577" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
       </div>
 
       {/* Content */}
@@ -60,7 +60,7 @@ export default function TermsOfServicePage() {
         <Section title="3. Your Account">
           <ul>
             <li>You are responsible for maintaining the security of your account credentials.</li>
-            <li>Notify us immediately at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a> if you suspect unauthorised access.</li>
+            <li>Notify us immediately at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a> if you suspect unauthorised access.</li>
             <li>You are responsible for all activity that occurs under your account.</li>
             <li>You may not share login credentials with third parties or create accounts on behalf of others without their consent.</li>
           </ul>
@@ -90,8 +90,8 @@ export default function TermsOfServicePage() {
         </Section>
 
         <Section title="5. Cancellation">
-          <p>You may cancel your subscription at any time by emailing <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a>. Cancellation takes effect at the end of your current billing period, and you will not be charged again after that date.</p>
-          <p>Following cancellation, your data will be retained for up to 90 days, during which you may contact us to request a copy. After that period, your account data will be deleted. See our <Link href="/privacy" style={{ color: "#C9A24B" }}>Privacy Policy</Link> for details.</p>
+          <p>You may cancel your subscription at any time by emailing <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a>. Cancellation takes effect at the end of your current billing period, and you will not be charged again after that date.</p>
+          <p>Following cancellation, your data will be retained for up to 90 days, during which you may contact us to request a copy. After that period, your account data will be deleted. See our <Link href="/privacy" style={{ color: "#7C3AED" }}>Privacy Policy</Link> for details.</p>
         </Section>
 
         <Section title="6. Acceptable Use">
@@ -121,7 +121,7 @@ export default function TermsOfServicePage() {
 
         <Section title="8. Your Data">
           <p>You retain ownership of all data you upload to Feature — your business information, client records, service details, and so on. By using Feature, you grant us a limited licence to store and process that data solely to provide the service to you.</p>
-          <p>You are responsible for ensuring that any client or patient data you upload to Feature has been collected lawfully, and that your clients are informed of how their data is used (for example, via your own privacy notice). See our <Link href="/privacy" style={{ color: "#C9A24B" }}>Privacy Policy</Link> for how we handle this data as your data processor.</p>
+          <p>You are responsible for ensuring that any client or patient data you upload to Feature has been collected lawfully, and that your clients are informed of how their data is used (for example, via your own privacy notice). See our <Link href="/privacy" style={{ color: "#7C3AED" }}>Privacy Policy</Link> for how we handle this data as your data processor.</p>
         </Section>
 
         <Section title="9. Intellectual Property">
@@ -149,7 +149,7 @@ export default function TermsOfServicePage() {
           <SubHeading>13.2 By us</SubHeading>
           <p>We may suspend or terminate your access immediately if you breach these Terms, fail to pay subscription fees, or if we are required to do so by law. We will notify you by email where reasonably possible.</p>
           <SubHeading>13.3 Effect of termination</SubHeading>
-          <p>On termination, your access to the platform will cease. Your data will be retained for up to 90 days, after which it will be deleted in accordance with our <Link href="/privacy" style={{ color: "#C9A24B" }}>Privacy Policy</Link>.</p>
+          <p>On termination, your access to the platform will cease. Your data will be retained for up to 90 days, after which it will be deleted in accordance with our <Link href="/privacy" style={{ color: "#7C3AED" }}>Privacy Policy</Link>.</p>
         </Section>
 
         <Section title="14. Changes to These Terms">
@@ -158,22 +158,22 @@ export default function TermsOfServicePage() {
 
         <Section title="15. Governing Law and Disputes">
           <p>These Terms are governed by the law of <strong>England and Wales</strong>. Any dispute arising from or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
-          <p>We encourage you to contact us first at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a> — most issues can be resolved without legal proceedings.</p>
+          <p>We encourage you to contact us first at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a> — most issues can be resolved without legal proceedings.</p>
         </Section>
 
         <Section title="16. Contact">
           <p>For questions about these Terms:</p>
           <ul>
-            <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a></li>
-            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#C9A24B" }}>featuresalon.co.uk</a></li>
+            <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a></li>
+            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
           </ul>
         </Section>
 
         {/* Footer nav */}
-        <div style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid #2a3350", display: "flex", gap: 24, flexWrap: "wrap" }}>
-          <Link href="/privacy" style={{ color: "#C9A24B", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Privacy Policy →</Link>
-          <Link href="/" style={{ color: "#aab1c4", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
-          <Link href="/signup" style={{ color: "#aab1c4", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
+        <div style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid #ECE9F1", display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <Link href="/privacy" style={{ color: "#7C3AED", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Privacy Policy →</Link>
+          <Link href="/" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
+          <Link href="/signup" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
         </div>
       </div>
     </div>
@@ -183,10 +183,10 @@ export default function TermsOfServicePage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section style={{ marginBottom: 40 }}>
-      <h2 style={{ fontSize: 19, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px", marginBottom: 14, paddingBottom: 10, borderBottom: "2px solid #EEF2FF" }}>
+      <h2 style={{ fontSize: 19, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", marginBottom: 14, paddingBottom: 10, borderBottom: "2px solid #EEF2FF" }}>
         {title}
       </h2>
-      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#aab1c4" }}>
+      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#6B6577" }}>
         {children}
       </div>
     </section>
@@ -195,7 +195,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function SubHeading({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontWeight: 700, color: "#F7F5EF", marginTop: 18, marginBottom: 6, fontSize: 14 }}>
+    <p style={{ fontWeight: 700, color: "#12101A", marginTop: 18, marginBottom: 6, fontSize: 14 }}>
       {children}
     </p>
   );

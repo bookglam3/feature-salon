@@ -9,26 +9,26 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#1C2438", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "Inter, system-ui, sans-serif" }}>
 
       {/* Header */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #2a3350", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ fontSize: 18, fontWeight: 800, color: "#F7F5EF", textDecoration: "none", letterSpacing: "-0.5px" }}>
+      <header style={{ background: "#fff", borderBottom: "1px solid #ECE9F1", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/" style={{ fontSize: 18, fontWeight: 800, color: "#12101A", textDecoration: "none", letterSpacing: "-0.5px" }}>
           feature
         </Link>
-        <Link href="/signup" style={{ background: "linear-gradient(135deg,#C9A24B,#4F46E5)", color: "#fff", padding: "9px 20px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>
+        <Link href="/signup" style={{ background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", padding: "9px 20px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>
           Start Free Trial
         </Link>
       </header>
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#EEF2FF 0%,#F5F3FF 100%)", borderBottom: "1px solid #2a3350", padding: "52px 24px 44px", textAlign: "center" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#C9A24B", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Legal</div>
-        <h1 style={{ fontSize: 38, fontWeight: 900, color: "#F7F5EF", letterSpacing: "-1px", margin: "0 0 14px" }}>Privacy Policy</h1>
-        <p style={{ fontSize: 15, color: "#aab1c4", maxWidth: 520, margin: "0 auto 16px" }}>
+      <div style={{ background: "linear-gradient(135deg,#EEF2FF 0%,#F5F3FF 100%)", borderBottom: "1px solid #ECE9F1", padding: "52px 24px 44px", textAlign: "center" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Legal</div>
+        <h1 style={{ fontSize: 38, fontWeight: 900, color: "#12101A", letterSpacing: "-1px", margin: "0 0 14px" }}>Privacy Policy</h1>
+        <p style={{ fontSize: 15, color: "#6B6577", maxWidth: 520, margin: "0 auto 16px" }}>
           We take your privacy seriously. This policy explains what data we collect, how we use it, and your rights under UK GDPR and the Data Protection Act 2018.
         </p>
-        <p style={{ fontSize: 13, color: "#aab1c4" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
+        <p style={{ fontSize: 13, color: "#6B6577" }}>Last updated: 27 May 2026 · Effective: 27 May 2026</p>
       </div>
 
       {/* Content */}
@@ -44,7 +44,7 @@ export default function PrivacyPolicyPage() {
 
         <Section title="1. Who We Are">
           <p>Feature is a booking and business management platform available at <strong>featuresalon.co.uk</strong>, operated by <strong>Adil Albert, trading as Feature</strong>.</p>
-          <p>For questions about this policy, contact us at: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a></p>
+          <p>For questions about this policy, contact us at: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a></p>
           <SubHeading>Our role under UK GDPR</SubHeading>
           <p>Feature acts as <strong>data controller</strong> for the personal data of our business subscribers (salon owners, clinic operators, gym managers, and similar). Where subscribers use Feature to manage their own clients&apos; or patients&apos; data, <strong>the subscriber is the data controller</strong> for those end-client records, and Feature acts only as a <strong>data processor</strong> — processing that data solely on the subscriber&apos;s instruction. This distinction matters for your rights: if you are the client of a business that uses Feature, you should direct data subject requests to that business.</p>
         </Section>
@@ -145,7 +145,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Withdraw consent</strong> — where processing is based on consent, withdraw it at any time without affecting prior processing</li>
           </ul>
           <p><strong>Note on data portability:</strong> Feature does not currently provide a self-service data export tool. To request a copy of your data, please contact us by email and we will fulfil the request within 30 days.</p>
-          <p>To exercise any of these rights, email <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with the <strong>Information Commissioner&apos;s Office (ICO)</strong> at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" style={{ color: "#C9A24B" }}>ico.org.uk</a>.</p>
+          <p>To exercise any of these rights, email <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with the <strong>Information Commissioner&apos;s Office (ICO)</strong> at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" style={{ color: "#7C3AED" }}>ico.org.uk</a>.</p>
           <p><strong>If you are a client of a business that uses Feature</strong> (not a Feature subscriber yourself), please direct your data subject rights request to that business — they are the data controller for your records.</p>
         </Section>
 
@@ -178,7 +178,7 @@ export default function PrivacyPolicyPage() {
         </Section>
 
         <Section title="11. Children">
-          <p>Feature is intended for use by businesses and is not directed at individuals under the age of 18. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, please contact us at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a> and we will delete it promptly.</p>
+          <p>Feature is intended for use by businesses and is not directed at individuals under the age of 18. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, please contact us at <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a> and we will delete it promptly.</p>
         </Section>
 
         <Section title="12. Changes to This Policy">
@@ -188,16 +188,16 @@ export default function PrivacyPolicyPage() {
         <Section title="13. Contact">
           <p>For any privacy-related questions or requests:</p>
           <ul>
-            <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#C9A24B" }}>adilgill2008@gmail.com</a></li>
-            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#C9A24B" }}>featuresalon.co.uk</a></li>
+            <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a></li>
+            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
           </ul>
         </Section>
 
         {/* Footer nav */}
-        <div style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid #2a3350", display: "flex", gap: 24, flexWrap: "wrap" }}>
-          <Link href="/terms" style={{ color: "#C9A24B", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Terms of Service →</Link>
-          <Link href="/" style={{ color: "#aab1c4", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
-          <Link href="/signup" style={{ color: "#aab1c4", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
+        <div style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid #ECE9F1", display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <Link href="/terms" style={{ color: "#7C3AED", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Terms of Service →</Link>
+          <Link href="/" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Back to Home</Link>
+          <Link href="/signup" style={{ color: "#6B6577", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Start Free Trial</Link>
         </div>
       </div>
     </div>
@@ -207,10 +207,10 @@ export default function PrivacyPolicyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section style={{ marginBottom: 40 }}>
-      <h2 style={{ fontSize: 19, fontWeight: 800, color: "#F7F5EF", letterSpacing: "-0.4px", marginBottom: 14, paddingBottom: 10, borderBottom: "2px solid #EEF2FF" }}>
+      <h2 style={{ fontSize: 19, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", marginBottom: 14, paddingBottom: 10, borderBottom: "2px solid #EEF2FF" }}>
         {title}
       </h2>
-      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#aab1c4" }}>
+      <div style={{ fontSize: 15, lineHeight: 1.75, color: "#6B6577" }}>
         {children}
       </div>
     </section>
@@ -219,7 +219,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function SubHeading({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontWeight: 700, color: "#F7F5EF", marginTop: 18, marginBottom: 6, fontSize: 14 }}>
+    <p style={{ fontWeight: 700, color: "#12101A", marginTop: 18, marginBottom: 6, fontSize: 14 }}>
       {children}
     </p>
   );
