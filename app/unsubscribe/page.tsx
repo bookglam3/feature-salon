@@ -30,40 +30,40 @@ function UnsubscribeInner() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#141A2E", display: "flex",
+      minHeight: "100vh", background: "#F5F3FF", display: "flex",
       alignItems: "center", justifyContent: "center", padding: 20,
       fontFamily: "'Inter','Plus Jakarta Sans',system-ui,sans-serif",
     }}>
       <div style={{
-        width: "100%", maxWidth: 420, background: "#1C2438",
-        border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20,
+        width: "100%", maxWidth: 420, background: "#FFFFFF",
+        border: "1px solid #ECE9F1", borderRadius: 20,
         padding: "36px 32px", textAlign: "center",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        boxShadow: "0 8px 32px rgba(91,33,182,0.12)",
       }}>
         <div style={{ fontSize: 34, marginBottom: 14 }}>✉️</div>
 
         {missing ? (
           <>
-            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#F7F5EF", margin: "0 0 8px" }}>Invalid unsubscribe link</h1>
-            <p style={{ fontSize: 13.5, color: "#aab1c4", lineHeight: 1.6, margin: 0 }}>
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#12101A", margin: "0 0 8px" }}>Invalid unsubscribe link</h1>
+            <p style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.6, margin: 0 }}>
               This link is missing information. Please use the unsubscribe link from the email you received.
             </p>
           </>
         ) : state === "done" ? (
           <>
-            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#F7F5EF", margin: "0 0 8px" }}>You&apos;re unsubscribed</h1>
-            <p style={{ fontSize: 13.5, color: "#aab1c4", lineHeight: 1.6, margin: 0 }}>
-              <strong style={{ color: "#F7F5EF" }}>{email}</strong> will no longer receive marketing emails from this salon. You may still receive essential booking confirmations.
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#12101A", margin: "0 0 8px" }}>You&apos;re unsubscribed</h1>
+            <p style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.6, margin: 0 }}>
+              <strong style={{ color: "#12101A" }}>{email}</strong> will no longer receive marketing emails from this salon. You may still receive essential booking confirmations.
             </p>
           </>
         ) : (
           <>
-            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#F7F5EF", margin: "0 0 8px" }}>Unsubscribe from marketing emails?</h1>
-            <p style={{ fontSize: 13.5, color: "#aab1c4", lineHeight: 1.6, margin: "0 0 24px" }}>
-              <strong style={{ color: "#F7F5EF" }}>{email}</strong> will stop receiving win-back and promotional emails from this salon.
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: "#12101A", margin: "0 0 8px" }}>Unsubscribe from marketing emails?</h1>
+            <p style={{ fontSize: 13.5, color: "#524D60", lineHeight: 1.6, margin: "0 0 24px" }}>
+              <strong style={{ color: "#12101A" }}>{email}</strong> will stop receiving win-back and promotional emails from this salon.
             </p>
             {state === "error" && (
-              <div style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#FCA5A5", marginBottom: 16 }}>
+              <div style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#B91C1C", marginBottom: 16 }}>
                 ⚠️ {errorMsg}
               </div>
             )}
@@ -72,7 +72,7 @@ function UnsubscribeInner() {
               disabled={state === "loading"}
               style={{
                 width: "100%", padding: "12px 20px",
-                background: "linear-gradient(135deg,#C9A24B,#0E1320)",
+                background: "linear-gradient(135deg,#7C3AED,#6D28D9)",
                 color: "#fff", border: "none", borderRadius: 10,
                 fontSize: 14, fontWeight: 700, cursor: state === "loading" ? "default" : "pointer",
                 opacity: state === "loading" ? 0.6 : 1,

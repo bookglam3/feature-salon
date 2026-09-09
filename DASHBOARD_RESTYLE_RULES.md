@@ -135,3 +135,45 @@ The grey ramp below is the **only** approved set of text greys. `#9A94A8` (2.93:
 
 Verify with `npx lighthouse@12 <url> --only-categories=accessibility` against `npm run dev`.
 Dashboard routes sit behind auth and cannot be reached by Lighthouse — audit those statically.
+
+---
+
+## Icons: inline SVG, not emoji
+
+Decorative emoji on public pages are being replaced by `app/components/icons/Icon.tsx`.
+
+```tsx
+import { Icon } from "@/app/components/icons/Icon";
+<Icon name="map-pin" size={14} />
+```
+
+- **Geometry is lucide-react's** (ISC, already a dependency) so marketing icons match
+  the dashboard, but they are emitted as **plain inline SVG**. Do *not* import
+  `lucide-react` into a server component: its `Icon` module carries `"use client"`,
+  which drags a client bundle into statically rendered SEO pages.
+- Every icon is `aria-hidden="true"` + `focusable="false"`. They are decorative; the
+  adjacent text always carries the meaning. If an icon is ever the *only* content of a
+  control, give that control an `aria-label` instead of un-hiding the icon.
+- Size with the `size` prop; where a breakpoint needs a different size, target
+  `.your-class svg { width/height }` — CSS beats the SVG's width/height attributes.
+  `font-size` no longer sizes anything, so remove it when converting a slot.
+
+**Keep as text, do not convert:** country flags and other genuine *data*, medal ranks
+(🥇🥈🥉), and status indicators — these carry meaning rather than decoration.
+
+Converted so far: `salons/[city]` (17 icons) plus the three static
+`salons/{london,manchester,birmingham}` pages that shadow it. **504** decorative emoji
+remain across 67 files, heaviest in `book/[slug]` (43) and `admin/broadcast` (35).
+
+> **Routing note found during this pass:** `app/salons/london|manchester|birmingham/page.tsx`
+> are older ~102-line static pages that *shadow* the richer ~400-line `[city]` route, so
+> those three cities never render the dynamic template. Worth reconciling separately.
+
+## Dead CSS
+
+`app/globals.css` went 993 -> 662 lines by removing 100 unused classes. Before deleting
+a class, check three things a plain grep misses: dynamically built names
+(`` `bk-tab${active ? " active" : ""}` ``), `[class*="..."]` attribute selectors, and
+the standalone `public/brand/brand-preview.html`, which defines its own styles inline
+and does not depend on this file. A class used only inside `app/page-old-backup.tsx` or
+`app/preview/` still counts as live while those backups are kept.

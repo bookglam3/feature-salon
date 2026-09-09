@@ -3,15 +3,15 @@ import { useState } from "react";
 import Link from "next/link";
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
-  dim: "#94A3B8",
-  green: "#10B981",
+  bg: "#FFFFFF",
+  surface: "#FFFFFF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
+  dim: "#6B6577",
+  green: "#065F46",
 };
 
 function calcFresha(newClients: number, avgPrice: number, teamMembers: number) {
@@ -62,7 +62,7 @@ function SliderRow({ label, hint, value, min, max, step, prefix, suffix, onChang
             style={{
               width: 60,
               padding: "5px 8px",
-              background: "#0E1320",
+              background: "#F5F3FF",
               border: `1.5px solid ${C.border}`,
               borderRadius: 8,
               color: C.gold,
@@ -121,7 +121,7 @@ export default function Calculator() {
           width: 100%;
           height: 5px;
           border-radius: 99px;
-          background: linear-gradient(to right, #C9A24B var(--pct, 15%), #2a3350 var(--pct, 15%));
+          background: linear-gradient(to right, #7C3AED var(--pct, 15%), #ECE9F1 var(--pct, 15%));
           outline: none;
           cursor: pointer;
           margin: 4px 0;
@@ -132,22 +132,22 @@ export default function Calculator() {
           width: 22px;
           height: 22px;
           border-radius: 50%;
-          background: #C9A24B;
+          background: #7C3AED;
           cursor: pointer;
-          box-shadow: 0 0 0 3px #141A2E, 0 2px 8px rgba(201,162,75,0.5);
+          box-shadow: 0 0 0 3px #FFFFFF, 0 2px 8px rgba(124,58,237,0.5);
           border: none;
         }
         .calc-slider::-moz-range-thumb {
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          background: #C9A24B;
+          background: #7C3AED;
           cursor: pointer;
-          border: 3px solid #141A2E;
-          box-shadow: 0 2px 8px rgba(201,162,75,0.4);
+          border: 3px solid #FFFFFF;
+          box-shadow: 0 2px 8px rgba(124,58,237,0.4);
         }
         .calc-slider:focus::-webkit-slider-thumb {
-          box-shadow: 0 0 0 3px #141A2E, 0 0 0 5px rgba(201,162,75,0.4);
+          box-shadow: 0 0 0 3px #FFFFFF, 0 0 0 5px rgba(124,58,237,0.4);
         }
         @media (max-width: 640px) {
           .result-grid { grid-template-columns: 1fr !important; }
@@ -207,7 +207,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#F87171", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
+              <span style={{ color: "#DC2626", fontWeight: 700 }}>~£{freshaCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               20% on {newClients} new clients (min £6 each)
@@ -229,7 +229,7 @@ export default function Calculator() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: C.muted }}>Commission</span>
-              <span style={{ color: "#F87171", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
+              <span style={{ color: "#DC2626", fontWeight: 700 }}>~£{booksyCommission}/mo</span>
             </div>
             <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.5, marginTop: 4 }}>
               30% on {newClients} new clients via Boost (min £5 each)
@@ -238,8 +238,8 @@ export default function Calculator() {
         </div>
 
         {/* Feature */}
-        <div style={{ background: "rgba(201,162,75,0.07)", border: `2px solid rgba(201,162,75,0.4)`, borderRadius: 16, padding: "22px 20px", position: "relative" }}>
-          <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", background: C.gold, color: "#0E1320", fontSize: 10, fontWeight: 900, padding: "3px 14px", borderRadius: 99, whiteSpace: "nowrap", letterSpacing: "1px" }}>
+        <div style={{ background: "rgba(124,58,237,0.07)", border: `2px solid rgba(124,58,237,0.4)`, borderRadius: 16, padding: "22px 20px", position: "relative" }}>
+          <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", background: C.gold, color: "#FFFFFF", fontSize: 10, fontWeight: 900, padding: "3px 14px", borderRadius: 99, whiteSpace: "nowrap", letterSpacing: "1px" }}>
             FLAT RATE
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, marginBottom: 10, textTransform: "uppercase", letterSpacing: "1px" }}>Feature</div>
@@ -247,7 +247,7 @@ export default function Calculator() {
             £{featureTotal}
           </div>
           <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>always, no commission</div>
-          <div style={{ borderTop: `1px solid rgba(201,162,75,0.2)`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ borderTop: `1px solid rgba(124,58,237,0.2)`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
             {savingVsFresha > 0 && (
               <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(16,185,129,0.12)", borderRadius: 8, padding: "8px 12px" }}>
                 <span style={{ color: C.green, fontSize: 16, fontWeight: 900, lineHeight: 1 }}>↓</span>

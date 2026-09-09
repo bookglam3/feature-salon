@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { Icon, type IconName } from "@/app/components/icons/Icon";
 import { notFound } from "next/navigation";
 
 // ─────────────────────────────────────────────────────────────────
@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 const CITY_DATA: Record<string, {
   name: string;
   region: string;
-  emoji: string;
+  icon: IconName;
   tagline: string;
   desc: string;
   neighborhoods: string[];
@@ -18,7 +18,7 @@ const CITY_DATA: Record<string, {
   london: {
     name: "London",
     region: "Greater London",
-    emoji: "🏙️",
+    icon: "building-2",
     tagline: "Built for the pace of London",
     desc: "London hair salons, beauty salons, and barbershops can use Feature to manage bookings, staff, and payments — without Fresha's hidden commission fees.",
     neighborhoods: ["Shoreditch", "Brixton", "Canary Wharf", "Chelsea", "Notting Hill"],
@@ -27,7 +27,7 @@ const CITY_DATA: Record<string, {
   manchester: {
     name: "Manchester",
     region: "Greater Manchester",
-    emoji: "🌆",
+    icon: "sunset",
     tagline: "Built for Manchester salons",
     desc: "Manchester hair salons, beauty studios, and barbers can use Feature to automate bookings, reminders, and payments — all from one dashboard.",
     neighborhoods: ["Northern Quarter", "Didsbury", "Deansgate", "Chorlton", "Salford"],
@@ -36,7 +36,7 @@ const CITY_DATA: Record<string, {
   birmingham: {
     name: "Birmingham",
     region: "West Midlands",
-    emoji: "🏘️",
+    icon: "house",
     tagline: "Built for Birmingham hair & beauty salons",
     desc: "Birmingham salons can use Feature instead of Treatwell and Fresha — keeping 100% of their revenue with zero marketplace commission.",
     neighborhoods: ["Jewellery Quarter", "Moseley", "Edgbaston", "Digbeth", "Harborne"],
@@ -45,7 +45,7 @@ const CITY_DATA: Record<string, {
   leeds: {
     name: "Leeds",
     region: "West Yorkshire",
-    emoji: "🏛️",
+    icon: "landmark",
     tagline: "Salon software for Leeds salons",
     desc: "Leeds salons can choose Feature for its flat-rate pricing, zero commission, and powerful automated reminders that keep clients coming back.",
     neighborhoods: ["Chapel Allerton", "Headingley", "Roundhay", "Leeds City Centre", "Horsforth"],
@@ -54,7 +54,7 @@ const CITY_DATA: Record<string, {
   edinburgh: {
     name: "Edinburgh",
     region: "Scotland",
-    emoji: "🏰",
+    icon: "castle",
     tagline: "Salon software for Edinburgh salons",
     desc: "Edinburgh salons can use Feature to manage bookings year-round — from festival season spikes to quiet January weeks — with smart scheduling and automated reminders.",
     neighborhoods: ["New Town", "Old Town", "Leith", "Morningside", "Stockbridge"],
@@ -63,7 +63,7 @@ const CITY_DATA: Record<string, {
   glasgow: {
     name: "Glasgow",
     region: "Scotland",
-    emoji: "🌉",
+    icon: "waves",
     tagline: "Salon software for Glasgow salons",
     desc: "Glasgow's salon scene can use Feature to automate bookings, reduce no-shows with WhatsApp reminders, and take Stripe payments — all with no marketplace fees.",
     neighborhoods: ["West End", "Merchant City", "Southside", "Finnieston", "Shawlands"],
@@ -72,7 +72,7 @@ const CITY_DATA: Record<string, {
   bristol: {
     name: "Bristol",
     region: "South West England",
-    emoji: "🌉",
+    icon: "waves",
     tagline: "Salon software for Bristol salons",
     desc: "Bristol salons, beauty studios, and barbershops can use Feature to book clients online, send automatic reminders, and grow revenue — without Fresha's fees.",
     neighborhoods: ["Clifton", "Stokes Croft", "Bedminster", "Bishopston", "Redland"],
@@ -81,7 +81,7 @@ const CITY_DATA: Record<string, {
   sheffield: {
     name: "Sheffield",
     region: "South Yorkshire",
-    emoji: "⚙️",
+    icon: "cog",
     tagline: "Salon software for Sheffield salons",
     desc: "Sheffield salons can use Feature to replace their paper diary, automate reminders, and take online payments — at a fraction of the cost of Fresha or Treatwell.",
     neighborhoods: ["Ecclesall Road", "Broomhill", "Kelham Island", "Hillsborough", "Abbeydale"],
@@ -90,7 +90,7 @@ const CITY_DATA: Record<string, {
   liverpool: {
     name: "Liverpool",
     region: "Merseyside",
-    emoji: "🎵",
+    icon: "music",
     tagline: "Salon software built for Liverpool",
     desc: "Liverpool salons can use Feature for online booking, automated WhatsApp reminders, and Stripe payments — with no commissions and no hidden fees.",
     neighborhoods: ["Bold Street", "Allerton", "Woolton", "Aigburth", "Crosby"],
@@ -99,7 +99,7 @@ const CITY_DATA: Record<string, {
   nottingham: {
     name: "Nottingham",
     region: "East Midlands",
-    emoji: "🏹",
+    icon: "target",
     tagline: "Salon software for Nottingham salons",
     desc: "Nottingham salons and beauty studios can use Feature to manage bookings online, send automated reminders, and grow their client base — all for a flat monthly fee.",
     neighborhoods: ["Hockley", "West Bridgford", "Beeston", "Arnold", "Mapperley"],
@@ -254,7 +254,10 @@ export default async function CityPage({
       <section className="hero hero-v2">
         <div className="hero-inner">
           <div className="hero-content">
-            <div className="hero-badge">{data.emoji} {data.name.toUpperCase()} SALONS</div>
+            <div className="hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <Icon name={data.icon} size={14} />
+              {data.name.toUpperCase()} SALONS
+            </div>
             <h1 className="hero-title">Salon Software for {data.name} Salons</h1>
             <p className="hero-sub">{data.desc}</p>
             <div className="hero-btns">
@@ -293,15 +296,15 @@ export default async function CityPage({
 
         <div className="features-grid features-grid-v2">
           {[
-            { icon: "📲", title: "Online Booking 24/7", desc: `${data.name} clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page.` },
-            { icon: "💬", title: "WhatsApp & SMS Reminders", desc: `Reduce no-shows with automated reminders via WhatsApp, SMS, and email — personalised for every ${data.name} salon.` },
-            { icon: "💷", title: "No Commission Fees", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups — ever." },
-            { icon: "👥", title: "Multi-Staff Scheduling", desc: `Manage your entire ${data.name} salon team's calendars, breaks, and holidays from one clean dashboard.` },
-            { icon: "💳", title: "Stripe Online Payments", desc: "Take deposits or full payments online via Stripe. Reduce no-shows and get paid before clients arrive." },
-            { icon: "📊", title: "Revenue Analytics", desc: `Track your busiest days, top services, and best staff members — specific to your ${data.name} salon.` },
+            { icon: "smartphone" as IconName, title: "Online Booking 24/7", desc: `${data.name} clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page.` },
+            { icon: "message-circle" as IconName, title: "WhatsApp & SMS Reminders", desc: `Reduce no-shows with automated reminders via WhatsApp, SMS, and email — personalised for every ${data.name} salon.` },
+            { icon: "pound-sterling" as IconName, title: "No Commission Fees", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups — ever." },
+            { icon: "users" as IconName, title: "Multi-Staff Scheduling", desc: `Manage your entire ${data.name} salon team's calendars, breaks, and holidays from one clean dashboard.` },
+            { icon: "credit-card" as IconName, title: "Stripe Online Payments", desc: "Take deposits or full payments online via Stripe. Reduce no-shows and get paid before clients arrive." },
+            { icon: "chart-column" as IconName, title: "Revenue Analytics", desc: `Track your busiest days, top services, and best staff members — specific to your ${data.name} salon.` },
           ].map((f) => (
             <div key={f.title} className="feature-card feature-card-v2">
-              <div className="feature-icon-v2">{f.icon}</div>
+              <div className="feature-icon-v2" style={{ color: "#7C3AED" }}><Icon name={f.icon} size={28} /></div>
               <h3>{f.title}</h3>
               <p>{f.desc}</p>
             </div>
@@ -321,8 +324,10 @@ export default async function CityPage({
             <span key={n} style={{
               padding: "10px 20px", background: "#EEF2FF", color: "#4338CA",
               borderRadius: 999, fontSize: 14, fontWeight: 600,
+              display: "inline-flex", alignItems: "center", gap: 6,
             }}>
-              📍 {n}
+              <Icon name="map-pin" size={14} />
+              {n}
             </span>
           ))}
         </div>
@@ -361,9 +366,12 @@ export default async function CityPage({
                 minWidth: 160, textAlign: "center",
               }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#4F46E5", marginBottom: 8, textTransform: "uppercase" }}>{p.plan}</div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: "#0F172A", marginBottom: 12 }}>{p.price}<span style={{ fontSize: 13, fontWeight: 400, color: "#64748B" }}>/mo</span></div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "#0F172A", marginBottom: 12 }}>{p.price}<span style={{ fontSize: 13, fontWeight: 400, color: "#475569" }}>/mo</span></div>
                 {p.features.map((f) => (
-                  <div key={f} style={{ fontSize: 13, color: "#475569", marginBottom: 4 }}>✓ {f}</div>
+                  <div key={f} style={{ fontSize: 13, color: "#475569", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                    <Icon name="check" size={14} style={{ color: "#047857", flexShrink: 0 }} />
+                    {f}
+                  </div>
                 ))}
               </div>
             ))}
@@ -397,8 +405,10 @@ export default async function CityPage({
               padding: "10px 20px", background: "#F1F5F9", color: "#475569",
               borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 600,
               border: "1.5px solid #E2E8F0", transition: "all 0.15s",
+              display: "inline-flex", alignItems: "center", gap: 6,
             }}>
-              {CITY_DATA[c].emoji} {CITY_DATA[c].name}
+              <Icon name={CITY_DATA[c].icon} size={14} />
+              {CITY_DATA[c].name}
             </Link>
           ))}
         </div>

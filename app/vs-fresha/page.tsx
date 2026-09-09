@@ -37,16 +37,16 @@ const jsonLd = JSON.stringify({
 });
 
 const C = {
-  bg: "#141A2E",
-  surface: "#1C2438",
-  border: "#2a3350",
-  text: "#F7F5EF",
-  text2: "#CBD5E1",
-  muted: "#aab1c4",
-  gold: "#C9A24B",
+  bg: "#FFFFFF",
+  surface: "#FFFFFF",
+  border: "#ECE9F1",
+  text: "#12101A",
+  text2: "#524D60",
+  muted: "#6B6577",
+  gold: "#7C3AED",
   dim: "#524D60",
-  green: "#10B981",
-  red: "#F87171",
+  green: "#047857",
+  red: "#DC2626",
 };
 
 interface TableRow {
@@ -138,9 +138,9 @@ export default function VsFresha() {
       </nav>
 
       {/* Hero */}
-      <section style={{ background: "#0E1320", borderBottom: `1px solid ${C.border}`, padding: "64px 24px 56px", textAlign: "center" }}>
+      <section style={{ background: "#F5F3FF", borderBottom: `1px solid ${C.border}`, padding: "64px 24px 56px", textAlign: "center" }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,162,75,0.12)", border: "1px solid rgba(201,162,75,0.25)", color: C.gold, fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 99, marginBottom: 24, letterSpacing: "0.5px", textTransform: "uppercase" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", color: "#6D28D9", fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 99, marginBottom: 24, letterSpacing: "0.5px", textTransform: "uppercase" }}>
             Honest comparison · 2026 pricing
           </div>
           <h1 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 900, color: C.text, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.5px" }}>
@@ -150,7 +150,7 @@ export default function VsFresha() {
             See what a marketplace commission could cost you — and compare it to one flat monthly price.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="#calculator" style={{ background: C.gold, color: "#12101A", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 10, textDecoration: "none", display: "inline-block" }}>
+            <a href="#calculator" style={{ background: C.gold, color: "#fff", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 10, textDecoration: "none", display: "inline-block" }}>
               Try the calculator ↓
             </a>
             <Link href="/signup" style={{ background: C.surface, color: C.text2, fontSize: 14, fontWeight: 600, padding: "12px 24px", borderRadius: 10, textDecoration: "none", border: `1px solid ${C.border}`, display: "inline-block" }}>
@@ -173,14 +173,14 @@ export default function VsFresha() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
             <thead>
               <tr>
-                <th style={{ padding: "12px 18px", textAlign: "left", background: "#0E1320", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", width: "28%" }}></th>
-                <th style={{ padding: "14px 18px", textAlign: "center", background: "rgba(201,162,75,0.12)", color: "#6B4F17", fontWeight: 900, border: "1px solid rgba(201,162,75,0.35)", fontSize: 15 }}>
+                <th style={{ padding: "12px 18px", textAlign: "left", background: "#F5F3FF", color: C.muted, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", width: "28%" }}></th>
+                <th style={{ padding: "14px 18px", textAlign: "center", background: "rgba(124,58,237,0.12)", color: "#6D28D9", fontWeight: 900, border: "1px solid rgba(124,58,237,0.35)", fontSize: 15 }}>
                   Feature
                 </th>
-                <th style={{ padding: "14px 18px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>
+                <th style={{ padding: "14px 18px", textAlign: "center", background: "#F5F3FF", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>
                   Fresha
                 </th>
-                <th style={{ padding: "14px 18px", textAlign: "center", background: "#0E1320", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>
+                <th style={{ padding: "14px 18px", textAlign: "center", background: "#F5F3FF", color: C.text, fontWeight: 700, border: `1px solid ${C.border}`, fontSize: 14 }}>
                   Booksy
                 </th>
               </tr>
@@ -191,7 +191,7 @@ export default function VsFresha() {
                   <td style={{ padding: "13px 18px", color: C.text, fontWeight: 600, border: `1px solid ${C.border}`, fontSize: 13.5 }}>
                     {row.label}
                   </td>
-                  <td style={{ padding: "13px 18px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(201,162,75,0.2)", background: i % 2 === 0 ? "rgba(201,162,75,0.07)" : "rgba(201,162,75,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13.5 }}>
+                  <td style={{ padding: "13px 18px", textAlign: "center", color: row.featColor ?? C.text2, border: "1px solid rgba(124,58,237,0.2)", background: i % 2 === 0 ? "rgba(124,58,237,0.07)" : "rgba(124,58,237,0.04)", fontWeight: row.featColor ? 700 : 400, fontSize: 13.5 }}>
                     {row.feat}
                   </td>
                   <td style={{ padding: "13px 18px", textAlign: "center", color: row.freshaColor ?? C.text2, border: `1px solid ${C.border}`, fontWeight: row.freshaColor ? 700 : 400, fontSize: 13 }}>
@@ -220,7 +220,7 @@ export default function VsFresha() {
       </section>
 
       {/* Calculator section */}
-      <section id="calculator" style={{ background: "#0E1320", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: "56px 24px 64px" }}>
+      <section id="calculator" style={{ background: "#F5F3FF", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: "56px 24px 64px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, letterSpacing: "2px", textTransform: "uppercase", marginBottom: 12 }}>Interactive</div>

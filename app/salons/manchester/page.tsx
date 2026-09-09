@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { Icon } from "@/app/components/icons/Icon";
 
 export const metadata: Metadata = {
   title: "Salon Management Software for Manchester Salons | Feature Salon",
@@ -30,7 +30,10 @@ export default function ManchesterPage() {
       </nav>
 
       <section className="hero">
-        <div className="hero-badge">🌆 MANCHESTER SALONS</div>
+        <div className="hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <Icon name="sunset" size={14} />
+          MANCHESTER SALONS
+        </div>
         <h1 className="hero-title">Salon Management Software for Manchester Salons</h1>
         <p className="hero-sub">
           Manchester&apos;s fastest-growing salons trust Feature to handle bookings, staff, automated reminders,
