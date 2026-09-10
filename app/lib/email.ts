@@ -158,7 +158,7 @@ export async function sendBookingEmails({
   clientEmail, clientName, clientPhone, serviceName,
   dateTime, staffName, salonName, salonOwnerEmail, price,
   salonAddress, cancelLink, dashboardUrl, paymentStatus, depositOnly, businessType,
-  salonId, appointmentId, priceIsFrom,
+  salonId, appointmentId, priceIsFrom, loyalty,
 }: {
   clientEmail: string; clientName: string; clientPhone: string;
   serviceName: string; dateTime: string; staffName?: string;
@@ -168,6 +168,11 @@ export async function sendBookingEmails({
   // Only used for the error log below if salonOwnerEmail can't be resolved.
   salonId?: string; appointmentId?: string;
   priceIsFrom?: boolean;
+  // Optional stamp-card progress. Omitted (or null) whenever the programme
+  // is off, unconfigured, or the lookup failed — in which case no loyalty
+  // block is rendered at all. Never a predicted visit number: this is a
+  // booking confirmation, and the visit it confirms has not happened yet.
+  loyalty?: { visits: number; required: number; remaining: number; rewardReady: boolean; rewardText: string } | null;
 }) {
   const { formattedDate, formattedTime } = formatDate(dateTime);
   const terms = getEmailTerms(businessType);
@@ -230,6 +235,21 @@ export async function sendBookingEmails({
             <div style="font-size:14px;color:#334155;font-weight:500;line-height:1.5;">${salonAddress}</div>
             <a href="https://maps.google.com/?q=${encodeURIComponent(salonAddress)}" style="font-size:12px;color:#4F6EF7;font-weight:600;text-decoration:none;margin-top:6px;display:inline-block;">Open in Google Maps →</a>
           </div>
+        </div>` : ""}
+
+        ${loyalty ? `
+        <!-- Loyalty stamp progress — factual, counted from completed visits only -->
+        <div style="background:#F5F3FF;border:1px solid #ECE9F1;border-radius:12px;padding:16px 20px;margin-bottom:22px;">
+          <div style="font-size:11px;font-weight:700;color:#6D28D9;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Loyalty</div>
+          ${loyalty.rewardReady
+            ? `<div style="font-size:14px;color:#12101A;line-height:1.6;">
+                 <strong>Your reward is ready.</strong><br/>
+                 You've completed ${loyalty.visits} of ${loyalty.required} visits — ask us about ${loyalty.rewardText} on your next visit.
+               </div>`
+            : `<div style="font-size:14px;color:#12101A;line-height:1.6;">
+                 You're at <strong>${loyalty.visits} of ${loyalty.required} visits</strong> —
+                 ${loyalty.remaining} more for ${loyalty.rewardText}.
+               </div>`}
         </div>` : ""}
 
         <!-- Need to change? -->
@@ -425,11 +445,29 @@ export async function sendWinbackEmail({
 // 5. THANK YOU — 1 Hour After Appointment
 // ═══════════════════════════════════════════════
 export async function sendThankyouEmail({
-  to, clientName, salonName, serviceName, reviewLink,
+  to, clientName, salonName, serviceName, reviewLink, loyalty,
 }: {
   to: string; clientName: string; salonName: string;
   serviceName?: string; reviewLink?: string;
+  // Optional stamp-card progress. This email fires only for appointments
+  // marked completed, so the visit it describes has definitely happened —
+  // unlike the booking confirmation, it can safely say "that was visit N".
+  loyalty?: { visits: number; required: number; remaining: number; rewardReady: boolean; rewardText: string } | null;
 }) {
+  const loyaltyBlock = loyalty ? `
+    <div style="background:#F5F3FF;border:1px solid #ECE9F1;border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#6D28D9;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Loyalty</div>
+      ${loyalty.rewardReady
+        ? `<div style="font-size:14px;color:#12101A;line-height:1.6;">
+             That was visit ${loyalty.visits} of ${loyalty.required} — <strong>your reward is ready.</strong><br/>
+             Ask us about ${loyalty.rewardText} next time you're in.
+           </div>`
+        : `<div style="font-size:14px;color:#12101A;line-height:1.6;">
+             That was <strong>visit ${loyalty.visits} of ${loyalty.required}</strong> —
+             ${loyalty.remaining} more for ${loyalty.rewardText}.
+           </div>`}
+    </div>` : "";
+
   await sendEmailSafe({
     from: FROM, to,
     subject: `Thank you for visiting ${salonName} today! 💕`,
@@ -437,13 +475,19 @@ export async function sendThankyouEmail({
       title: "Thank You for Your Visit! 🌟", clientName,
       message: `It was wonderful to have you with us today${serviceName ? ` for your <strong>${serviceName}</strong>` : ""}. We hope you love the results!`,
       salonName, color: "#C2185B",
-      extra: reviewLink ? `
+      // The review block is still gated on reviewLink, but the loyalty block
+      // must render with or without one — so `extra` is present whenever
+      // either half has something to show.
+      extra: (reviewLink || loyaltyBlock) ? `
+        ${loyaltyBlock}
+        ${reviewLink ? `
         <div style="background:linear-gradient(135deg,#FDE8F0,#F3E8FD);border:1.5px solid #C2185B;border-radius:12px;padding:22px;margin-bottom:20px;text-align:center;">
           <p style="font-size:15px;font-weight:600;color:#1a1a1a;margin:0 0 8px;">Share Your Experience</p>
           <p style="font-size:13px;color:#555;margin:0 0 18px;">Your feedback means the world to us and helps other clients find us.</p>
           <a href="${reviewLink}" style="display:inline-block;background:#C2185B;color:#fff;padding:13px 30px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Leave a Review ⭐</a>
         </div>
         <p style="font-size:12px;color:#bbb;text-align:center;margin:0;">Takes less than 60 seconds — and it makes a huge difference. Thank you! 🙏</p>
+        ` : ""}
       ` : undefined,
     }),
   });

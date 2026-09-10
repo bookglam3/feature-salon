@@ -22,6 +22,9 @@ export interface Appointment {
   date_time: string;
   status: 'confirmed' | 'pending' | 'cancelled' | 'completed' | 'no_show';
   created_at: string;
+  /** Set when status becomes 'completed', cleared when it moves away.
+   *  Loyalty stamps are counted from this, not from date_time. */
+  completed_at?: string | null;
   services?: { name: string; price: number; price_is_from?: boolean } | null;
   staff?: { name: string } | null;
   notes?: string | null;

@@ -1,38 +1,62 @@
-﻿"use client";
-import React, { useEffect, useState, useMemo } from "react";
+"use client";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
+import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
 import { useToast } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 import StatCard from "../components/StatCard";
 import EmptyState from "../components/EmptyState";
+import { describeReward, normaliseEmail, type RewardType } from "@/app/lib/loyalty";
 
-interface LoyaltyClient {
-  id: string;
+/* ────────────────────────────────────────────────────────────────
+   Visit-based loyalty (stamp card).
+
+   Visits are COUNTED, never stored — they come from the
+   loyalty_progress view, which counts completed appointments since
+   the client's last redemption. Nothing on this page writes a visit
+   count, so the numbers cannot drift from the bookings they derive
+   from. The only writes here are the settings row and a redemption.
+
+   The previous points system (loyalty_points / loyalty_transactions)
+   is no longer read or written by this page. Those tables are
+   deliberately left in place and untouched.
+   ──────────────────────────────────────────────────────────────── */
+
+interface Settings {
+  salon_id: string;
+  enabled: boolean;
+  visits_required: number;
+  reward_type: RewardType;
+  reward_service_id: string | null;
+  reward_value: number | null;
+  reward_description: string | null;
+}
+
+interface ProgressRow {
+  salon_id: string;
   client_email: string;
-  client_name: string;
-  points: number;
-  total_earned: number;
-  total_redeemed: number;
+  client_name: string | null;
+  visits: number;
+  lifetime_visits: number;
+  last_visit_at: string | null;
+  rewards_redeemed: number;
+  last_redeemed_at: string | null;
 }
 
-function getTiers(bt?: string | null) {
-  const freeWord = ["gym","yoga","pt"].includes(bt ?? "") ? "session"
-    : ["dental","physio"].includes(bt ?? "") ? "consultation"
-    : "visit";
-  return [
-    { name:"Bronze",  min:0,    max:199,  color:"#CD7F32", icon:"🥉", perks:"5% discount on next visit" },
-    { name:"Silver",  min:200,  max:499,  color:"#6B6577", icon:"🥈", perks:"10% discount + priority booking" },
-    { name:"Gold",    min:500,  max:999,  color:"#F59E0B", icon:"🥇", perks:`15% discount + free ${freeWord}` },
-    { name:"Platinum",min:1000, max:Infinity, color:"#7C3AED", icon:"💎", perks:"20% off + VIP access" },
-  ];
-}
+interface ServiceLite { id: string; name: string }
 
-type Tier = { name:string; min:number; max:number; color:string; icon:string; perks:string };
+const DEFAULT_SETTINGS: Omit<Settings, "salon_id"> = {
+  enabled: false,
+  visits_required: 5,
+  reward_type: "custom",
+  reward_service_id: null,
+  reward_value: null,
+  reward_description: "",
+};
 
-/* Initials avatar — loyalty_points carries no photo field. */
 const AVATAR_COLORS = ["#7C3AED", "#6D28D9", "#8B5CF6", "#A78BFA", "#EC4899"];
 function Avatar({ name, size = 38 }: { name: string; size?: number }) {
   const bg = AVATAR_COLORS[(name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
@@ -44,16 +68,27 @@ function Avatar({ name, size = 38 }: { name: string; size?: number }) {
   );
 }
 
-function getTier(points: number, tiers: Tier[]) {
-  return tiers.find(t => points >= t.min && points <= t.max) || tiers[0];
-}
-
-function TierBadge({ points, tiers }: { points: number; tiers: Tier[] }) {
-  const tier = getTier(points, tiers);
+/* Stamp dots up to 10 required; beyond that a bar stays readable. */
+function StampProgress({ visits, required }: { visits: number; required: number }) {
+  const done = Math.min(visits, required);
+  if (required <= 10) {
+    return (
+      <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+        {Array.from({ length: required }).map((_, i) => (
+          <span key={i} style={{
+            width:11, height:11, borderRadius:"50%", flexShrink:0,
+            background: i < done ? "#7C3AED" : "transparent",
+            border: i < done ? "1px solid #7C3AED" : "1px solid #ECE9F1",
+          }} />
+        ))}
+      </div>
+    );
+  }
+  const pct = required > 0 ? (done / required) * 100 : 0;
   return (
-    <span style={{ fontSize:10.5, fontWeight:800, padding:"3px 9px", borderRadius:99, background:`${tier.color}18`, color:tier.color, border:`1px solid ${tier.color}40` }}>
-      {tier.icon} {tier.name}
-    </span>
+    <div style={{ width:110, height:6, background:"#ECE9F1", borderRadius:99, overflow:"hidden" }}>
+      <div style={{ width:`${pct}%`, height:"100%", background:"#7C3AED", borderRadius:99 }} />
+    </div>
   );
 }
 
@@ -62,132 +97,168 @@ function LoyaltyContent() {
   const toast = useToast();
   const [salonId, setSalonId] = useState<string|null>(null);
   const [salonName, setSalonName] = useState("");
-  const [businessType, setBusinessType] = useState<string|null>(null);
-  const [clients, setClients] = useState<LoyaltyClient[]>([]);
+  const [settings, setSettings] = useState<Settings|null>(null);
+  const [services, setServices] = useState<ServiceLite[]>([]);
+  const [rows, setRows] = useState<ProgressRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<LoyaltyClient|null>(null);
-  const [adjForm, setAdjForm] = useState({ type:"earn", points:"", note:"" });
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [form, setForm] = useState<Omit<Settings, "salon_id">>(DEFAULT_SETTINGS);
   const [saving, setSaving] = useState(false);
-  const [showSetup, setShowSetup] = useState(false);
-  const [pointsPerPound, setPointsPerPound] = useState(10);
-  /* Real repeat-visit figures, from confirmed appointments (see load()). */
-  const [repeatStats, setRepeatStats] = useState<{ repeat: number; total: number } | null>(null);
-  const tiers = getTiers(businessType);
+
+  const [redeemTarget, setRedeemTarget] = useState<ProgressRow|null>(null);
+  const [redeeming, setRedeeming] = useState(false);
+
+  const load = useCallback(async (sid: string) => {
+    const [{ data: s }, { data: svcs }, { data: progress }] = await Promise.all([
+      supabase.from("loyalty_settings").select("*").eq("salon_id", sid).maybeSingle(),
+      supabase.from("services").select("id, name").eq("salon_id", sid).order("name"),
+      supabase.from("loyalty_progress").select("*").eq("salon_id", sid).order("visits", { ascending: false }),
+    ]);
+    setSettings(s ?? null);
+    setForm(s ? {
+      enabled: s.enabled,
+      visits_required: s.visits_required,
+      reward_type: s.reward_type,
+      reward_service_id: s.reward_service_id,
+      reward_value: s.reward_value,
+      reward_description: s.reward_description ?? "",
+    } : DEFAULT_SETTINGS);
+    setServices(svcs ?? []);
+    setRows(progress ?? []);
+  }, []);
 
   useEffect(() => {
-    const load = async () => {
+    const init = async () => {
       const profile = await getCurrentUserProfile();
       if (!profile?.salon) { router.push("/login"); return; }
       setSalonId(profile.salon.id);
       setSalonName(profile.salon.name);
-      setBusinessType(profile.salon.business_type ?? null);
-
-      // Load loyalty — if no records, auto-create from appointments
-      const { data: existing } = await supabase.from("loyalty_points").select("*").eq("salon_id", profile.salon.id).order("points", { ascending:false });
-      if (existing && existing.length > 0) {
-        setClients(existing);
-      } else {
-        // Seed from appointments
-        const { data: appts } = await supabase.from("appointments").select("client_name, client_email, status, services(price)").eq("salon_id", profile.salon.id).eq("status","confirmed");
-        const map: Record<string, { name:string; pts:number }> = {};
-        (appts||[]).forEach((a: { client_email: string; client_name: string; services?: { price?: number }[] | null }) => {
-          const key = a.client_email || a.client_name;
-          if (!map[key]) map[key] = { name: a.client_name, pts: 0 };
-          map[key].pts += Math.floor(((a.services?.[0]?.price) || 0) * 10);
-        });
-        const inserts = Object.entries(map).map(([email, v]) => ({
-          salon_id: profile.salon.id, client_email: email, client_name: v.name,
-          points: v.pts, total_earned: v.pts, total_redeemed: 0
-        }));
-        if (inserts.length) {
-          const { data: seeded } = await supabase.from("loyalty_points").insert(inserts).select();
-          setClients(seeded || []);
-        }
-      }
-      /* Repeat-visit rate — additive read, no writes. A client counts as
-         "repeat" when they have 2+ confirmed bookings. Distinct clients are
-         keyed the same way the seeding above keys them (email, else name). */
-      const { data: allAppts } = await supabase
-        .from("appointments")
-        .select("client_name, client_email")
-        .eq("salon_id", profile.salon.id)
-        .eq("status", "confirmed");
-      const visitCounts = new Map<string, number>();
-      (allAppts || []).forEach((a: { client_name: string | null; client_email: string | null }) => {
-        const key = a.client_email || a.client_name;
-        if (!key) return;
-        visitCounts.set(key, (visitCounts.get(key) || 0) + 1);
-      });
-      const total = visitCounts.size;
-      const repeat = Array.from(visitCounts.values()).filter(n => n >= 2).length;
-      setRepeatStats({ repeat, total });
-
+      await load(profile.salon.id);
       setLoading(false);
     };
-    load();
-  }, [router]);
+    init();
+  }, [router, load]);
 
-  const filtered = useMemo(() =>
-    clients.filter(c => c.client_name?.toLowerCase().includes(search.toLowerCase()) || c.client_email?.toLowerCase().includes(search.toLowerCase())),
-    [clients, search]
-  );
+  const required = settings?.visits_required ?? 0;
+  const enabled  = !!settings?.enabled;
 
-  const handleAdjust = async () => {
-    if (!selectedClient || !adjForm.points) return;
-    setSaving(true);
-    const pts = parseInt(adjForm.points);
-    const newPoints = adjForm.type === "earn" || adjForm.type === "bonus"
-      ? selectedClient.points + pts
-      : Math.max(0, selectedClient.points - pts);
+  const rewardText = useMemo(() => {
+    if (!settings) return "";
+    const svc = services.find(s => s.id === settings.reward_service_id);
+    return describeReward(settings, svc?.name ?? null);
+  }, [settings, services]);
 
-    const { error } = await supabase.from("loyalty_points").update({
-      points: newPoints,
-      total_earned: adjForm.type === "earn" || adjForm.type === "bonus" ? selectedClient.total_earned + pts : selectedClient.total_earned,
-      total_redeemed: adjForm.type === "redeem" ? selectedClient.total_redeemed + pts : selectedClient.total_redeemed,
-      updated_at: new Date().toISOString(),
-    }).eq("id", selectedClient.id).eq("salon_id", salonId!);
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(r =>
+      (r.client_name ?? "").toLowerCase().includes(q) ||
+      r.client_email.toLowerCase().includes(q));
+  }, [rows, search]);
 
-    if (!error) {
-      await supabase.from("loyalty_transactions").insert({
-        salon_id: salonId, client_email: selectedClient.client_email,
-        points: pts, type: adjForm.type, note: adjForm.note
-      });
-      setClients(p => p.map(c => c.id === selectedClient.id ? { ...c, points: newPoints,
-        total_earned: adjForm.type !== "redeem" ? c.total_earned + pts : c.total_earned,
-        total_redeemed: adjForm.type === "redeem" ? c.total_redeemed + pts : c.total_redeemed,
-      } : c).sort((a,b) => b.points - a.points));
-      toast.success("Points updated!");
+  /* Every figure below is derived from real rows — no placeholders. */
+  const withProgress  = rows.filter(r => r.visits > 0).length;
+  const rewardsReady  = required > 0 ? rows.filter(r => r.visits >= required).length : 0;
+  const totalRedeemed = rows.reduce((s, r) => s + (r.rewards_redeemed || 0), 0);
+
+  const handleSaveSettings = async () => {
+    if (!salonId) return;
+    // Mirror the DB CHECK constraint so the owner gets a clear message
+    // instead of a Postgres error.
+    if (form.reward_type === "free_service" && !form.reward_service_id) {
+      toast.error("Pick which service is free"); return;
     }
+    if ((form.reward_type === "amount_off" || form.reward_type === "percent_off") &&
+        (form.reward_value === null || Number.isNaN(form.reward_value))) {
+      toast.error("Enter the reward amount"); return;
+    }
+    if (form.reward_type === "percent_off" && (form.reward_value ?? 0) > 100) {
+      toast.error("A percentage can't be over 100"); return;
+    }
+    if (form.reward_type === "custom" && !form.reward_description?.trim()) {
+      toast.error("Describe the reward"); return;
+    }
+    setSaving(true);
+    const payload = {
+      salon_id: salonId,
+      enabled: form.enabled,
+      visits_required: form.visits_required,
+      reward_type: form.reward_type,
+      // Only the field this reward_type uses is persisted; the others are
+      // nulled so a stale value from a previous type can never be shown.
+      reward_service_id: form.reward_type === "free_service" ? form.reward_service_id : null,
+      reward_value: (form.reward_type === "amount_off" || form.reward_type === "percent_off") ? form.reward_value : null,
+      reward_description: form.reward_type === "custom" ? form.reward_description?.trim() ?? "" : null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await supabase.from("loyalty_settings").upsert(payload, { onConflict: "salon_id" });
     setSaving(false);
-    setShowModal(false);
-    setAdjForm({ type:"earn", points:"", note:"" });
+    if (error) { toast.error("Couldn't save settings"); return; }
+    await load(salonId);
+    setShowSettings(false);
+    toast.success("Loyalty settings saved");
   };
 
-  const totalPoints = clients.reduce((s,c) => s + c.points, 0);
-  /* Real, and previously never surfaced: total points clients have redeemed. */
-  const totalRedeemed = clients.reduce((s,c) => s + (c.total_redeemed || 0), 0);
-  /* null until the query resolves, and null when there are no clients at all —
-     so we render "—" rather than a misleading 0%. */
-  const repeatRate = repeatStats && repeatStats.total > 0
-    ? Math.round((repeatStats.repeat / repeatStats.total) * 100)
-    : null;
-  const topClients = useMemo(() => [...clients].sort((a,b) => b.points - a.points).slice(0, 8), [clients]);
+  const handleRedeem = async () => {
+    if (!salonId || !redeemTarget || required <= 0) return;
+    setRedeeming(true);
+    const email = normaliseEmail(redeemTarget.client_email);
+    const now = new Date().toISOString();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // The card row carries the watermark. Upsert because a client who has
+    // never redeemed has no card row yet — their progress came straight
+    // from completed appointments.
+    const { error: cardErr } = await supabase.from("loyalty_cards").upsert({
+      salon_id: salonId,
+      client_email: email,
+      client_name: redeemTarget.client_name,
+      last_redeemed_at: now,
+      rewards_redeemed: (redeemTarget.rewards_redeemed || 0) + 1,
+      updated_at: now,
+    }, { onConflict: "salon_id,client_email" });
+
+    if (cardErr) { setRedeeming(false); toast.error("Couldn't record the redemption"); return; }
+
+    // Audit row. reward_snapshot freezes what the reward was at this moment,
+    // so later settings changes can't rewrite history.
+    await supabase.from("loyalty_redemptions").insert({
+      salon_id: salonId,
+      client_email: email,
+      client_name: redeemTarget.client_name,
+      redeemed_at: now,
+      redeemed_by: user?.id ?? null,
+      visits_at_redemption: redeemTarget.visits,
+      reward_snapshot: settings ? {
+        reward_type: settings.reward_type,
+        reward_value: settings.reward_value,
+        reward_description: settings.reward_description,
+        reward_service_id: settings.reward_service_id,
+        reward_text: rewardText,
+        visits_required: settings.visits_required,
+      } : null,
+    });
+
+    await load(salonId);
+    setRedeeming(false);
+    setRedeemTarget(null);
+    toast.success("Reward redeemed — counter reset");
+  };
 
   const Topbar = (
-    <header style={{ background:"#FFFFFF", borderBottom:"1px solid #ECE9F1", padding:"0 24px", height:66, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:30, boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}>
+    <header style={{ background:"#FFFFFF", borderBottom:"1px solid #ECE9F1", padding:"0 24px", height:66, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:30, boxShadow:"0 1px 3px rgba(18,16,26,0.04)" }}>
       <div style={{ display:"flex", alignItems:"center", gap:14 }}>
         <HamburgerBtn onClick={() => {}} />
         <div>
-          <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>Loyalty Points</div>
-          <div style={{ fontSize:11.5, color:"#6B6577", marginTop:1 }}>Reward your loyal clients</div>
+          <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>Loyalty</div>
+          <div style={{ fontSize:11.5, color:"#6B6577", marginTop:1 }}>Stamp card — one stamp per completed visit</div>
         </div>
       </div>
       <div style={{ display:"flex", gap:8 }}>
-        <button onClick={() => setShowSetup(true)} style={{ padding:"9px 14px", background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13, fontWeight:700, color:"#524D60", cursor:"pointer" }}>⚙️ Settings</button>
+        <button onClick={() => setShowSettings(true)} style={{ padding:"9px 14px", background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13, fontWeight:700, color:"#524D60", cursor:"pointer" }}>Settings</button>
         <div style={{ display:"flex", alignItems:"center", gap:8, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:10, padding:"7px 14px" }}>
-          <span style={{ fontSize:14, color:"#6B6577" }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ background:"none", border:"none", outline:"none", fontSize:13, color:"#12101A", fontFamily:"inherit", width:160 }} />
         </div>
       </div>
@@ -201,107 +272,99 @@ function LoyaltyContent() {
       <style>{`.loy-row:hover { background:#FAF9FC; }`}</style>
       <div style={{ padding:"28px 24px", maxWidth:1360, margin:"0 auto" }}>
 
-        {/* ── 1. Stat cards — every figure from real loyalty data ── */}
+        {/* ── Stat cards — all four from real rows ── */}
         <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:13, marginBottom:22 }}>
-          <StatCard label="Loyalty members" value={clients.length} icon="👥" color="indigo"
-            sub={clients.length === 1 ? "enrolled client" : "enrolled clients"} />
-          <StatCard label="Points outstanding" value={totalPoints.toLocaleString()} icon="💎" color="amber"
-            sub="unredeemed balance" />
-          <StatCard label="Rewards redeemed" value={totalRedeemed.toLocaleString()} icon="🎁" color="green"
-            sub={totalRedeemed === 0 ? "no redemptions yet" : "points redeemed"} />
-          <StatCard label="Repeat visit rate" value={repeatRate === null ? "—" : `${repeatRate}%`} icon="🔁" color="indigo"
-            sub={repeatStats && repeatStats.total > 0
-              ? `${repeatStats.repeat} of ${repeatStats.total} clients rebooked`
-              : "no confirmed bookings yet"} />
+          <StatCard label="Programme" value={enabled ? "On" : "Off"} icon="🎟️" color={enabled ? "green" : "slate"}
+            sub={enabled ? `${required} visits → ${rewardText}` : "not running"} />
+          <StatCard label="Clients with progress" value={withProgress} icon="👥" color="indigo"
+            sub={withProgress === 1 ? "has a stamp" : "have at least one stamp"} />
+          <StatCard label="Rewards ready" value={rewardsReady} icon="🎁" color={rewardsReady > 0 ? "amber" : "slate"}
+            sub={enabled ? (rewardsReady === 0 ? "none at the threshold" : "waiting to be redeemed") : "programme off"} />
+          <StatCard label="Rewards redeemed" value={totalRedeemed} icon="✅" color="green"
+            sub={totalRedeemed === 0 ? "no redemptions yet" : "all time"} />
         </div>
 
-        {/* ── 2. Top loyal clients — real rows, points DESC ── */}
-        <div style={{ background:"#FFFFFF", border:"1px solid #ECE9F1", borderRadius:14, overflow:"hidden", marginBottom:22, boxShadow:"0 1px 2px rgba(18,16,26,0.03)" }}>
-          <div style={{ padding:"16px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
-            <div>
-              <div style={{ fontSize:14, fontWeight:700, color:"#12101A", letterSpacing:"-0.2px" }}>Top loyal clients</div>
-              <div style={{ fontSize:10, color:"#6B6577", marginTop:3 }}>Ranked by points balance</div>
+        {/* Programme-off notice — honest, not a fake preview. */}
+        {!enabled && (
+          <div style={{ background:"#F5F3FF", border:"1px solid #ECE9F1", borderRadius:14, padding:"16px 20px", marginBottom:22 }}>
+            <div style={{ fontSize:13.5, fontWeight:700, color:"#12101A", marginBottom:4 }}>The stamp card is switched off</div>
+            <div style={{ fontSize:12.5, color:"#524D60", lineHeight:1.6 }}>
+              Visits below are still counted from completed appointments, so nothing is lost while it&apos;s off.
+              Clients see no loyalty message in their emails until you turn it on.
             </div>
           </div>
-          {topClients.length === 0 ? (
-            <EmptyState icon="🏆" title="No loyalty members yet"
-              description="Members are created automatically from confirmed bookings" />
-          ) : (
-            topClients.map((c, i) => {
-              const tier = getTier(c.points, tiers);
-              return (
-                <div key={c.id} className="loy-row" onClick={() => { setSelectedClient(c); setShowModal(true); }}
-                  style={{ display:"flex", alignItems:"center", gap:13, padding:"12px 20px", borderTop:"1px solid #eeecf2", cursor:"pointer", transition:"background 0.14s" }}>
-                  <span style={{ width:18, fontSize:11.5, fontWeight:700, color:"#6B6577", flexShrink:0 }}>{i + 1}</span>
-                  <Avatar name={c.client_name} />
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:13.5, fontWeight:700, color:"#12101A", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{c.client_name || "Unnamed client"}</div>
-                    <div style={{ fontSize:11.5, color:"#524D60", marginTop:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{c.client_email}</div>
-                  </div>
-                  <TierBadge points={c.points} tiers={tiers} />
-                  <div style={{ fontSize:14, fontWeight:700, color:tier.color, letterSpacing:"-0.2px", flexShrink:0, minWidth:54, textAlign:"right" }}>
-                    {c.points.toLocaleString()}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+        )}
 
-        {/* Client table */}
-        <div style={{ background:"#FFFFFF", border:"1.5px solid #ECE9F1", borderRadius:20, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.03)" }}>
+        {/* ── Client progress ── */}
+        <div style={{ background:"#FFFFFF", border:"1px solid #ECE9F1", borderRadius:20, overflow:"hidden", boxShadow:"0 1px 2px rgba(18,16,26,0.03)" }}>
           <div style={{ padding:"16px 22px", borderBottom:"1px solid #ECE9F1" }}>
-            <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>All Members <span style={{ fontSize:12, color:"#6B6577", fontWeight:600 }}>({filtered.length})</span></div>
+            <div style={{ fontSize:15, fontWeight:800, color:"#12101A" }}>
+              Client progress <span style={{ fontSize:12, color:"#6B6577", fontWeight:600 }}>({filtered.length})</span>
+            </div>
+            <div style={{ fontSize:11, color:"#6B6577", marginTop:3 }}>
+              Counted from completed appointments since each client&apos;s last reward
+            </div>
           </div>
+
           {filtered.length === 0 ? (
-            <EmptyState icon="🏆" title={search ? "No matching members" : "No loyalty members yet"}
-              description={search ? "Try a different search term" : "Members are created automatically from confirmed bookings"} />
+            <EmptyState icon="🎟️"
+              title={search ? "No matching clients" : "No completed visits yet"}
+              description={search
+                ? "Try a different search term"
+                : "A client appears here once one of their appointments is marked completed in Bookings."} />
           ) : (
             <div style={{ overflowX:"auto" }}>
-              <table style={{ width:"100%", borderCollapse:"collapse", minWidth:700 }}>
+              <table style={{ width:"100%", borderCollapse:"collapse", minWidth:680 }}>
                 <thead>
                   <tr style={{ background:"#F5F3FF" }}>
-                    {["Client","Tier","Points","Earned","Redeemed","Actions"].map(h => (
+                    {["Client","Progress","Visits","Redeemed","Last visit",""].map(h => (
                       <th key={h} style={{ fontSize:10, fontWeight:900, color:"#6B6577", textAlign:"left", padding:"11px 16px", letterSpacing:"0.8px", textTransform:"uppercase", borderBottom:"1px solid #ECE9F1" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(c => {
-                    const tier = getTier(c.points, tiers);
-                    const next = tiers[tiers.indexOf(tier)+1];
-                    const progress = next ? ((c.points - tier.min) / (tier.max - tier.min)) * 100 : 100;
+                  {filtered.map(r => {
+                    const ready = enabled && required > 0 && r.visits >= required;
                     return (
-                      <tr key={c.id} style={{ transition:"background 0.1s" }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = "#F5F3FF"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
+                      <tr key={`${r.salon_id}:${r.client_email}`} className="loy-row" style={{ transition:"background 0.1s" }}>
                         <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                            <div style={{ width:36, height:36, borderRadius:11, background:`hsl(${c.client_name.charCodeAt(0)*37%360},55%,55%)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, color:"#fff", flexShrink:0 }}>
-                              {c.client_name.slice(0,2).toUpperCase()}
-                            </div>
-                            <div>
-                              <div style={{ fontSize:13.5, fontWeight:800, color:"#12101A" }}>{c.client_name}</div>
-                              <div style={{ fontSize:11.5, color:"#6B6577" }}>{c.client_email}</div>
+                            <Avatar name={r.client_name || r.client_email} size={36} />
+                            <div style={{ minWidth:0 }}>
+                              <div style={{ fontSize:13.5, fontWeight:800, color:"#12101A" }}>{r.client_name || "Unnamed client"}</div>
+                              <div style={{ fontSize:11.5, color:"#6B6577" }}>{r.client_email}</div>
                             </div>
                           </div>
                         </td>
                         <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1" }}>
-                          <TierBadge points={c.points} tiers={tiers} />
-                          {next && (
-                            <div style={{ marginTop:6 }}>
-                              <div style={{ height:4, background:"#ECE9F1", borderRadius:99, width:80 }}>
-                                <div style={{ height:"100%", borderRadius:99, background:tier.color, width:`${progress}%` }} />
-                              </div>
-                              <div style={{ fontSize:9.5, color:"#6B6577", marginTop:2 }}>{next.min - c.points} pts to {next.name}</div>
-                            </div>
+                          {required > 0
+                            ? <StampProgress visits={r.visits} required={required} />
+                            : <span style={{ fontSize:12, color:"#6B6577" }}>—</span>}
+                        </td>
+                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:14, fontWeight:800, color:"#12101A", whiteSpace:"nowrap" }}>
+                          {required > 0 ? `${r.visits} / ${required}` : r.visits}
+                          {ready && (
+                            <span style={{ marginLeft:8, fontSize:10, fontWeight:800, padding:"3px 8px", borderRadius:99, background:"rgba(245,158,11,0.12)", color:"#92400E", border:"1px solid rgba(245,158,11,0.25)" }}>READY</span>
                           )}
                         </td>
-                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:18, fontWeight:900, color:tier.color }}>{c.points.toLocaleString()}</td>
-                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color: "#047857", fontWeight:700 }}>+{c.total_earned}</td>
-                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color:"#EF4444", fontWeight:700 }}>-{c.total_redeemed}</td>
-                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1" }}>
-                          <button onClick={() => { setSelectedClient(c); setShowModal(true); }} style={{ padding:"6px 14px", background:"linear-gradient(135deg,#7C3AED,#6D28D9)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer" }}>Adjust</button>
+                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:13, color:"#524D60", fontWeight:700 }}>{r.rewards_redeemed || 0}</td>
+                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", fontSize:12.5, color:"#524D60", whiteSpace:"nowrap" }}>
+                          {r.last_visit_at ? new Date(r.last_visit_at).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" }) : "—"}
+                        </td>
+                        <td style={{ padding:"12px 16px", borderBottom:"1px solid #ECE9F1", textAlign:"right" }}>
+                          <button
+                            onClick={() => setRedeemTarget(r)}
+                            disabled={!ready}
+                            title={!enabled ? "Turn the programme on first" : !ready ? `Needs ${required - r.visits} more visit${required - r.visits === 1 ? "" : "s"}` : undefined}
+                            style={{
+                              padding:"6px 14px", borderRadius:8, fontSize:12, fontWeight:700,
+                              border:"none", whiteSpace:"nowrap",
+                              background: ready ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "#F5F3FF",
+                              color: ready ? "#fff" : "#6B6577",
+                              cursor: ready ? "pointer" : "not-allowed",
+                            }}>
+                            Redeem
+                          </button>
                         </td>
                       </tr>
                     );
@@ -313,69 +376,97 @@ function LoyaltyContent() {
         </div>
       </div>
 
-      {/* Adjust Modal */}
-      {showModal && selectedClient && (
-        <div onClick={() => setShowModal(false)} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#FFFFFF", borderRadius:20, padding:28, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize:18, fontWeight:900, color:"#12101A", marginBottom:4 }}>Adjust Points</div>
-            <div style={{ fontSize:13, color:"#524D60", marginBottom:20 }}>{selectedClient.client_name} · <strong style={{ color:getTier(selectedClient.points, tiers).color }}>{selectedClient.points} pts</strong></div>
-            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Type</label>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
-                  {(["earn","redeem","bonus"] as const).map(t => (
-                    <button key={t} onClick={() => setAdjForm({...adjForm, type:t})}
-                      style={{ padding:"8px 4px", borderRadius:10, border:`1.5px solid ${adjForm.type===t ? "#7C3AED" : "#ECE9F1"}`, background: adjForm.type===t ? "rgba(124,58,237,0.10)" : "#FFFFFF", color: adjForm.type===t ? "#7C3AED" : "#524D60", fontSize:12.5, fontWeight:700, cursor:"pointer", textTransform:"capitalize", transition:"all 0.12s" }}>
-                      {t === "earn" ? "💰" : t === "redeem" ? "🎁" : "⭐"} {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Points *</label>
-                <input type="number" value={adjForm.points} onChange={e => setAdjForm({...adjForm, points:e.target.value})} placeholder="e.g. 50"
-                  style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
-              </div>
-              <div>
-                <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Note (optional)</label>
-                <input value={adjForm.note} onChange={e => setAdjForm({...adjForm, note:e.target.value})} placeholder="e.g. Birthday bonus"
-                  style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
-              </div>
-            </div>
-            <div style={{ display:"flex", gap:10, marginTop:20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex:1, padding:12, background:"#F5F3FF", border:"1.5px solid #ECE9F1", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#524D60", cursor:"pointer" }}>Cancel</button>
-              <button onClick={handleAdjust} disabled={saving || !adjForm.points} style={{ flex:2, padding:12, background:"linear-gradient(135deg,#7C3AED,#6D28D9)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer", opacity:!adjForm.points?0.5:1 }}>
-                {saving ? "Saving…" : "Save Changes"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Settings ──
+          Inside <Modal> the CSS custom properties resolve against :root,
+          not .ds-layout (the portal token trap in DASHBOARD_RESTYLE_RULES),
+          so every colour in here is a literal. */}
+      <Modal open={showSettings} onClose={() => setShowSettings(false)} title="Loyalty settings" maxWidth={460}
+        footer={
+          <ModalActions>
+            <BtnSecondary onClick={() => setShowSettings(false)}>Cancel</BtnSecondary>
+            <BtnPrimary onClick={handleSaveSettings} disabled={saving}>{saving ? "Saving…" : "Save settings"}</BtnPrimary>
+          </ModalActions>
+        }>
+        <label style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", borderRadius:12, border:"1.5px solid #ECE9F1", background:"#F5F3FF", cursor:"pointer", marginBottom:16 }}>
+          <input type="checkbox" checked={form.enabled} onChange={e => setForm({ ...form, enabled: e.target.checked })} style={{ width:16, height:16, accentColor:"#7C3AED" }} />
+          <span style={{ fontSize:13.5, fontWeight:700, color:"#12101A" }}>Run the stamp card</span>
+        </label>
 
-      {/* Settings Modal */}
-      {showSetup && (
-        <div onClick={() => setShowSetup(false)} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#FFFFFF", borderRadius:20, padding:28, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize:18, fontWeight:900, color:"#12101A", marginBottom:20 }}>Loyalty Settings</div>
-            <div>
-              <label style={{ fontSize:12, fontWeight:700, color:"#524D60", display:"block", marginBottom:6 }}>Points per £1 spent</label>
-              <input type="number" value={pointsPerPound} onChange={e => setPointsPerPound(parseInt(e.target.value))}
-                style={{ width:"100%", padding:"10px 13px", border:"1.5px solid #ECE9F1", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }} />
-              <div style={{ fontSize:12, color:"#6B6577", marginTop:6 }}>e.g. £50 service = {50*pointsPerPound} points</div>
-            </div>
-            <div style={{ marginTop:16, padding:"14px 16px", background:"rgba(124,58,237,0.10)", borderRadius:12 }}>
-              <div style={{ fontSize:12.5, fontWeight:700, color:"#7C3AED", marginBottom:8 }}>Tier Breakdown</div>
-              {tiers.map((t: Tier) => (
-                <div key={t.name} style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:"#524D60", marginBottom:4 }}>
-                  <span>{t.icon} {t.name}</span>
-                  <span>{t.min}{t.max===Infinity?"+":` – ${t.max}`} pts = £{Math.floor(t.min/pointsPerPound)} spent</span>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setShowSetup(false)} style={{ marginTop:20, width:"100%", padding:12, background:"linear-gradient(135deg,#7C3AED,#6D28D9)", border:"none", borderRadius:12, fontSize:13.5, fontWeight:700, color:"#fff", cursor:"pointer" }}>Save Settings</button>
+        <FormGroup label="Visits needed for a reward" hint="Counted from completed appointments only — no-shows and cancellations don't earn a stamp.">
+          <Input type="number" min={2} max={100} value={form.visits_required}
+            onChange={e => setForm({ ...form, visits_required: parseInt(e.target.value) || 0 })} />
+        </FormGroup>
+
+        <FormGroup label="Reward">
+          <Select value={form.reward_type}
+            onChange={e => setForm({ ...form, reward_type: e.target.value as RewardType })}>
+            <option value="free_service">Free service</option>
+            <option value="amount_off">£ off</option>
+            <option value="percent_off">% off</option>
+            <option value="custom">Something else</option>
+          </Select>
+        </FormGroup>
+
+        {form.reward_type === "free_service" && (
+          <FormGroup label="Which service is free?"
+            hint={services.length === 0 ? "You have no services yet — add one in Services first." : undefined}>
+            <Select value={form.reward_service_id ?? ""}
+              onChange={e => setForm({ ...form, reward_service_id: e.target.value || null })}>
+              <option value="">Choose a service…</option>
+              {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </Select>
+          </FormGroup>
+        )}
+
+        {(form.reward_type === "amount_off" || form.reward_type === "percent_off") && (
+          <FormGroup label={form.reward_type === "amount_off" ? "Amount off (£)" : "Percentage off (%)"}>
+            <Input type="number" min={0} max={form.reward_type === "percent_off" ? 100 : undefined}
+              value={form.reward_value ?? ""}
+              onChange={e => setForm({ ...form, reward_value: e.target.value === "" ? null : parseFloat(e.target.value) })} />
+          </FormGroup>
+        )}
+
+        {form.reward_type === "custom" && (
+          <FormGroup label="Describe the reward" hint="Clients see this wording in their emails.">
+            <Input value={form.reward_description ?? ""} placeholder="e.g. a free treatment upgrade"
+              onChange={e => setForm({ ...form, reward_description: e.target.value })} />
+          </FormGroup>
+        )}
+
+        <div style={{ marginTop:8, padding:"12px 14px", borderRadius:12, background:"#F5F3FF", border:"1px solid #ECE9F1" }}>
+          <div style={{ fontSize:11, fontWeight:800, color:"#6D28D9", letterSpacing:"1px", textTransform:"uppercase", marginBottom:5 }}>Clients will read</div>
+          <div style={{ fontSize:12.5, color:"#12101A", lineHeight:1.6 }}>
+            {form.enabled
+              ? `You're at 2 of ${form.visits_required || "…"} visits — ${Math.max(0, (form.visits_required || 0) - 2)} more for ${describeReward(form, services.find(s => s.id === form.reward_service_id)?.name ?? null)}.`
+              : "Nothing — the programme is off, so no loyalty message is added to their emails."}
           </div>
         </div>
-      )}
+      </Modal>
+
+      {/* ── Redeem confirmation ── */}
+      <Modal open={!!redeemTarget} onClose={() => setRedeemTarget(null)} title="Redeem reward" maxWidth={420}
+        footer={
+          <ModalActions>
+            <BtnSecondary onClick={() => setRedeemTarget(null)}>Cancel</BtnSecondary>
+            <BtnPrimary onClick={handleRedeem} disabled={redeeming}>{redeeming ? "Redeeming…" : "Confirm redemption"}</BtnPrimary>
+          </ModalActions>
+        }>
+        {redeemTarget && (
+          <div style={{ fontSize:13.5, color:"#12101A", lineHeight:1.7 }}>
+            <div style={{ marginBottom:12 }}>
+              <strong>{redeemTarget.client_name || redeemTarget.client_email}</strong> has
+              {" "}{redeemTarget.visits} of {required} visits.
+            </div>
+            <div style={{ padding:"12px 14px", borderRadius:12, background:"#F5F3FF", border:"1px solid #ECE9F1", marginBottom:12 }}>
+              Reward: <strong>{rewardText}</strong>
+            </div>
+            <div style={{ fontSize:12.5, color:"#524D60" }}>
+              Their counter resets to zero — the next completed visit becomes visit 1.
+              Visits already completed before now stop counting towards a future reward.
+            </div>
+          </div>
+        )}
+      </Modal>
     </DashboardShell>
   );
 }

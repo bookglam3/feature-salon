@@ -4,6 +4,7 @@ import { sendBookingEmails } from "@/app/lib/email";
 import { sendWhatsAppConfirmation } from "@/app/lib/whatsapp";
 import { sendSMS, formatUKDate, formatUKTime } from "@/app/lib/sms";
 import { sendPushToSalon } from "@/app/lib/push";
+import { getLoyaltySnapshot } from "@/app/lib/loyalty";
 
 export const dynamic = "force-dynamic";
 
@@ -127,6 +128,18 @@ export async function POST(req: NextRequest) {
       ? lineItems!.some(li => li.price_is_from === true)
       : !!appt.services?.price_is_from;
 
+    // Stamp-card progress for the client's email. getLoyaltySnapshot never
+    // throws — it returns null for "programme off", "not configured", or any
+    // failure — but it is wrapped anyway so that no future change to it can
+    // ever cost someone their booking confirmation. null simply means the
+    // email renders without a loyalty block.
+    let loyalty = null;
+    try {
+      loyalty = await getLoyaltySnapshot(supabase, salon?.id, clientEmail);
+    } catch (loyaltyErr) {
+      console.error("[send-confirmation] Loyalty lookup failed (non-fatal):", loyaltyErr);
+    }
+
     console.log(`[send-confirmation] Sending to client=${clientEmail}, owner=${ownerEmail || "NONE"}`);
 
     await sendBookingEmails({
@@ -148,6 +161,7 @@ export async function POST(req: NextRequest) {
       salonId:         salon?.id,
       appointmentId,
       priceIsFrom:     anyPriceIsFrom,
+      loyalty,
     });
 
     // ── WhatsApp Confirmation ────────────────────────────────

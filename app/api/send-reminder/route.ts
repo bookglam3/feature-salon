@@ -7,6 +7,7 @@ import {
   sendWinbackEmail,
   sendNoShowAlertEmail,
 } from "@/app/lib/email";
+import { getLoyaltySnapshot } from "@/app/lib/loyalty";
 import {
   send24hWhatsApp,
   send2hWhatsApp,
@@ -400,12 +401,23 @@ export async function GET(req: Request) {
     // Email
     if (a.client_email) {
       try {
+        // This email only fires for appointments already marked completed, so
+        // the stamp for this visit is already counted — "that was visit N" is
+        // a fact here, not a prediction. null = programme off or lookup failed,
+        // in which case no loyalty block renders.
+        let loyalty = null;
+        try {
+          loyalty = await getLoyaltySnapshot(supabase, a.salon_id, a.client_email);
+        } catch (loyaltyErr) {
+          console.error(`[Reminder] Loyalty lookup failed for ${a.id} (non-fatal):`, loyaltyErr);
+        }
         await sendThankyouEmail({
           to: a.client_email,
           clientName: a.client_name,
           salonName: a.salons?.name || "Your Salon",
           serviceName: a.services?.name,
           reviewLink,
+          loyalty,
         });
       } catch (e) { errors.push(`thankyou email ${a.id}: ${e}`); }
     }

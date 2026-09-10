@@ -186,7 +186,18 @@ export default function BookingsPage() {
       ? new Date(new Date(startIso).getTime() + durationMin * 60_000).toISOString()
       : null;
     if (editingId) {
-      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue }).eq("id", editingId);
+      // Loyalty stamps are counted from completed_at, so it has to track the
+      // status both ways: stamped on the way in, cleared on the way out. If a
+      // status is corrected away from "completed" the visit must stop counting,
+      // otherwise the client keeps a stamp for a visit that didn't happen.
+      // Only stamp a fresh timestamp when it wasn't already completed, so
+      // re-saving an unrelated field doesn't move an existing completion.
+      const wasCompleted = appointments.find(x => x.id === editingId)?.status === "completed";
+      const isCompleted  = formData.status === "completed";
+      const completedAt  = isCompleted
+        ? (wasCompleted ? undefined : new Date().toISOString())
+        : null;
+      const { error } = await supabase.from("appointments").update({ client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue, ...(completedAt === undefined ? {} : { completed_at: completedAt }) }).eq("id", editingId);
       if (error) { toast.error("Failed to update booking"); return; }
       toast.success("Booking updated!");
     } else {
@@ -239,7 +250,7 @@ export default function BookingsPage() {
       submittingRef.current = false;
       setIsSubmitting(false);
     }
-  }, [salon, editingId, formData, vc, toast, reloadAppts, serializeNotes]);
+  }, [salon, editingId, appointments, formData, vc, toast, reloadAppts, serializeNotes]);
 
   const handleEdit = useCallback((a: Appointment) => {
     setEditingId(a.id);
@@ -425,7 +436,7 @@ export default function BookingsPage() {
                           <div style={{ display: "flex", gap: 4 }}>
                             <button onClick={() => handleEdit(a)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5 }}>Edit</button>
                             {a.status !== "completed" && a.status !== "cancelled" && (
-                              <button onClick={async () => { await supabase.from("appointments").update({ status: "completed" }).eq("id", a.id); await reloadAppts(); toast.success("Marked complete ✓"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#059669", borderColor: "rgba(16,185,129,0.2)" }}>Done</button>
+                              <button onClick={async () => { await supabase.from("appointments").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", a.id); await reloadAppts(); toast.success("Marked complete ✓"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#059669", borderColor: "rgba(16,185,129,0.2)" }}>Done</button>
                             )}
                             {a.status !== "no_show" && a.status !== "cancelled" && a.status !== "completed" && (
                               <button onClick={async () => { await supabase.from("appointments").update({ status: "no_show" }).eq("id", a.id); await reloadAppts(); toast.success("No-show marked"); }} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5, color: "#B45309", borderColor: "rgba(245,158,11,0.2)" }}>No-show</button>
