@@ -36,6 +36,8 @@ const ALLOW_MARKER = "theme-allow";
 const RETIRED = {
   "#0E1320": "legacy navy page ground",
   "#141A2E": "legacy navy page ground",
+  "#100F1C": "legacy navy skeleton ground",
+  "#130F2A": "legacy navy skeleton ground",
   "#1C2438": "legacy navy card surface",
   "#2A3350": "legacy navy border",
   "#1E2A4A": "legacy navy section",
@@ -63,8 +65,24 @@ const RETIRED_PATTERNS = [
 const hexAlternation = Object.keys(RETIRED)
   .map((h) => h.slice(1))
   .join("|");
+
+/* The same retired colours written as rgb()/rgba() slipped through a
+   hex-only scan entirely — the dark loading skeletons used
+   rgba(16,15,28,0.98) and rgba(13,12,25,0.99), which are #100F1C and
+   #0D0C19 in another notation. Derive the decimal triples from the hex
+   list so the two can never drift apart. */
+const rgbTriples = Object.keys(RETIRED).map((hex) => {
+  const n = hex.slice(1);
+  const rgb = [0, 2, 4].map((i) => parseInt(n.slice(i, i + 2), 16));
+  return { hex, rgb, pattern: `rgba?\\(\\s*${rgb[0]}\\s*,\\s*${rgb[1]}\\s*,\\s*${rgb[2]}\\s*[,)]` };
+});
+
 const RETIRED_RE = new RegExp(
-  `#(?:${hexAlternation})\\b|${RETIRED_PATTERNS.map(([p]) => p).join("|")}`,
+  [
+    `#(?:${hexAlternation})\\b`,
+    ...RETIRED_PATTERNS.map(([p]) => p),
+    ...rgbTriples.map((t) => t.pattern),
+  ].join("|"),
   "gi"
 );
 
@@ -93,6 +111,13 @@ function walk(dir, out = []) {
 function describe(match) {
   const upper = match.toUpperCase();
   if (RETIRED[upper]) return RETIRED[upper];
+  // rgb()/rgba() form of a retired hex — name the hex so the message is
+  // actionable rather than just "retired value".
+  for (const t of rgbTriples) {
+    if (new RegExp(t.pattern, "i").test(match)) {
+      return `${RETIRED[t.hex]} — ${t.hex} in rgb()/rgba() form`;
+    }
+  }
   for (const [pattern, why] of RETIRED_PATTERNS) {
     if (new RegExp(pattern, "i").test(match)) return why;
   }
