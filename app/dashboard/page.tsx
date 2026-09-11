@@ -379,7 +379,12 @@ export default function DashboardPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
         <HamburgerBtn />
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{greeting}, {salon?.name?.split(" ")[0]}</div>
+          {/* Salon name, matching what every other dashboard route puts in
+              this slot (a page title — "Payments", "Loyalty"). The greeting
+              lives in the body hero below; having it here too rendered it
+              twice on screen at once. The overflow guards matter more now,
+              not less: this is the full salon name, not a first name. */}
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#12101A", letterSpacing: "-0.4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{salon?.name || "Dashboard"}</div>
           <div className="dash-greeting-date" style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
         </div>
       </div>
