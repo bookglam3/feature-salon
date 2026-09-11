@@ -136,7 +136,7 @@ export default function AutomationsPage() {
       <div style={{ padding: "28px 24px", maxWidth: 1000, margin: "0 auto" }}>
 
         {/* Info banner */}
-        <div style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.10),rgba(14,19,32,0.95))", border: "1px solid #ECE9F1", borderRadius: 16, padding: "16px 20px", marginBottom: 24, display: "flex", gap: 14, alignItems: "center" }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.10),rgba(124,58,237,0.04))", border: "1px solid #ECE9F1", borderRadius: 16, padding: "16px 20px", marginBottom: 24, display: "flex", gap: 14, alignItems: "center" }}>
           <span style={{ fontSize: 28 }}>🤖</span>
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, color: "#12101A" }}>Automated Messages</div>
