@@ -452,19 +452,26 @@ export function HamburgerBtn({ onClick }: { onClick?: () => void }) {
     <button
       className="hbtn"
       onClick={handleClick}
+      aria-label="Open menu"
       style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.07)",
+        // Resting state only — the light-theme equivalents of the original
+        // light-on-dark values. The bars were rgba(255,255,255,0.55) on the
+        // #FFFFFF topbar, i.e. 1.00:1 and literally invisible. #12101A is
+        // 18.84:1. Hover was already converted and is left untouched.
+        background: "#F5F3FF",
+        border: "1px solid #ECE9F1",
         cursor: "pointer", padding: "7px 8px", borderRadius: 9,
         display: "flex", flexDirection: "column", gap: 4,
         transition: "all 0.18s", alignItems: "center",
       }}
       onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.10)"; e.currentTarget.style.borderColor = "rgba(124,58,237,0.25)"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+      // Restores the resting state, so these must track the values above —
+      // otherwise hovering once would repaint it invisible again.
+      onMouseLeave={e => { e.currentTarget.style.background = "#F5F3FF"; e.currentTarget.style.borderColor = "#ECE9F1"; }}
     >
-      <span style={{ display: "block", width: 16, height: 1.5, background: "rgba(255,255,255,0.55)", borderRadius: 2 }} />
-      <span style={{ display: "block", width: 11, height: 1.5, background: "rgba(255,255,255,0.55)", borderRadius: 2 }} />
-      <span style={{ display: "block", width: 16, height: 1.5, background: "rgba(255,255,255,0.55)", borderRadius: 2 }} />
+      <span style={{ display: "block", width: 16, height: 1.5, background: "#12101A", borderRadius: 2 }} />
+      <span style={{ display: "block", width: 11, height: 1.5, background: "#12101A", borderRadius: 2 }} />
+      <span style={{ display: "block", width: 16, height: 1.5, background: "#12101A", borderRadius: 2 }} />
     </button>
   );
 }
