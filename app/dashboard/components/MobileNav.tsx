@@ -10,7 +10,7 @@ import {
   Leaf,
   Dumbbell,
   Stethoscope,
-  Settings2,
+  Menu,
 } from "lucide-react";
 
 type LucideIcon = React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
@@ -25,13 +25,25 @@ const STAFF_ICON_MAP: Record<string, LucideIcon> = {
 };
 import { useSalon } from "../context/SalonContext";
 
-const NAV_BASE = [
+/* The bar exposes four routes plus "More", which opens the sidebar sheet.
+   Settings moved into the sheet: the bar has five slots, and the ~19
+   routes that aren't on it had no mobile entry point at all once the
+   menu button was inert. path: null marks the action item — it renders
+   as a <button>, not a <Link>. */
+const NAV_BASE: {
+  key: string; path: string | null; Icon: LucideIcon;
+  activeColor: string; activeGlow: string; activeBg: string;
+}[] = [
   { key: "home",     path: "/dashboard",          Icon: LayoutDashboard, activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
   { key: "bookings", path: "/dashboard/bookings", Icon: BookOpenCheck,   activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
   { key: "clients",  path: "/dashboard/clients",  Icon: Users,           activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
   { key: "staff",    path: "/dashboard/staff",    Icon: Scissors,        activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
-  { key: "settings", path: "/dashboard/settings", Icon: Settings2,       activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
+  { key: "more",     path: null,                  Icon: Menu,            activeColor: "#7C3AED", activeGlow: "rgba(124,58,237,0.4)", activeBg: "linear-gradient(135deg,#7C3AED,#6D28D9)" },
 ];
+
+/* The four routes the bar links to directly. Anything else means the user
+   got there through the sheet, so "More" shows as the active section. */
+const BAR_PATHS = ["/dashboard", "/dashboard/bookings", "/dashboard/clients", "/dashboard/staff"];
 
 export default function MobileNav() {
   const pathname = usePathname();
@@ -42,10 +54,18 @@ export default function MobileNav() {
     if (key === "bookings") return vc.bookingPlural;
     if (key === "clients")  return vc.clientPlural;
     if (key === "staff")    return vc.staffPlural;
-    return "Settings";
+    return "More";
   };
   const isActive = (path: string) =>
     path === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(path);
+
+  // On a route the bar doesn't link to, "More" is the active section —
+  // otherwise nothing in the bar is highlighted and the user has no
+  // indication of where they are.
+  const onBarRoute = BAR_PATHS.some(isActive);
+
+  // Same event the topbar menu button dispatches; DashboardShell listens.
+  const openSidebar = () => document.dispatchEvent(new CustomEvent("open-sidebar"));
 
   return (
     <>
@@ -126,16 +146,15 @@ export default function MobileNav() {
         }}
       >
         {NAV_BASE.map(item => {
-          const active = isActive(item.path);
+          const active = item.path ? isActive(item.path) : !onBarRoute;
           const { activeColor, activeGlow, activeBg } = item;
           const Icon = item.key === "staff" ? (STAFF_ICON_MAP[vc.staffIcon] ?? Scissors) : item.Icon;
-          return (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={`mnav-item${active ? " active" : ""}`}
-              style={{ color: active ? activeColor : "#6B6577" }}
-            >
+
+          /* Identical markup for the link and the action item, so "More"
+             matches the other four exactly — same accent bar, icon pill,
+             label and active treatment. */
+          const inner = (
+            <>
               {/* Accent bar at top */}
               <div
                 className="mnav-accent-bar"
@@ -162,7 +181,29 @@ export default function MobileNav() {
               <span className="mnav-label" style={{ color: active ? activeColor : "#6B6577" }}>
                 {labelFor(item.key)}
               </span>
+            </>
+          );
+
+          const className = `mnav-item${active ? " active" : ""}`;
+          const style = { color: active ? activeColor : "#6B6577" };
+
+          // .mnav-item already resets background/border and sets
+          // cursor:pointer, so the button needs no extra styling.
+          return item.path ? (
+            <Link key={item.key} href={item.path} className={className} style={style}>
+              {inner}
             </Link>
+          ) : (
+            <button
+              key={item.key}
+              type="button"
+              onClick={openSidebar}
+              aria-label="Open menu"
+              className={className}
+              style={style}
+            >
+              {inner}
+            </button>
           );
         })}
       </nav>
