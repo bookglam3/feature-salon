@@ -194,7 +194,7 @@ export default function ServicesPage() {
   const Topbar = (
     <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <HamburgerBtn onClick={() => {}} />
+        <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#12101A", letterSpacing: "-0.3px" }}>Services</div>
           <div style={{ fontSize: 11.5, color: "#6B6577" }}>{services.length} service{services.length !== 1 ? "s" : ""}</div>

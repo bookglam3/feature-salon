@@ -153,7 +153,7 @@ export default function GalleryPage() {
   const Topbar = (
     <header style={{ background: "#FFFFFF", borderBottom: "1px solid #ECE9F1", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 30, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <HamburgerBtn onClick={() => {}} />
+        <HamburgerBtn />
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#12101A" }}>Gallery</div>
           <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 1 }}>Showcase your salon work</div>
