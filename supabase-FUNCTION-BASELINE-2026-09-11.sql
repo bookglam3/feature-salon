@@ -1,0 +1,18 @@
+-- Live DB function baseline, captured 2026-09-11 from Supabase.
+-- Source of truth for create_booking_with_services, check_slot_available
+-- and the admin functions — none of which exist in any other tracked file.
+-- This is the ROLLBACK REFERENCE. Do not run as a migration.
+
+-- ═══════════════════════════════════════════════════════════════════
+-- PASTE THE pg_get_functiondef OUTPUT BELOW THIS LINE, THEN SAVE.
+-- Delete this marker block once the content is in.
+--
+--   SELECT pg_get_functiondef(p.oid)
+--     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+--    WHERE n.nspname = 'public'
+--      AND p.proname IN ('create_booking_with_services',
+--                        'check_slot_available');
+--
+-- Until this file contains the real definitions it is a placeholder and
+-- provides NO rollback cover.
+-- ═══════════════════════════════════════════════════════════════════
