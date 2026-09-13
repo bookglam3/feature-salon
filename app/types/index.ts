@@ -4,7 +4,10 @@ export interface Salon {
   slug: string;
   owner_email: string;
   owner_id: string;
+  /** Legacy column. Display/analytics only — nothing gates on it. */
   plan: string;
+  /** The billing column. FeatureGate and hasFeatureAccess read THIS. */
+  subscription_plan?: string | null;
   created_at: string;
   business_type?: string | null;
   timezone?: string | null;

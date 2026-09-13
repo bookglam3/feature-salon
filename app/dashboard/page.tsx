@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
+import { PLAN_LABELS, type Plan } from "@/app/lib/featureAccess";
 import { fromZonedTime } from "date-fns-tz";
 import { COUNTRY_TIMEZONES } from "@/app/lib/slot-availability";
 import DashboardShell, { HamburgerBtn } from "./components/DashboardShell";
@@ -28,12 +29,6 @@ type StaffItem = { id: string; name: string };
 
 const TIME_SLOTS = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"];
 
-const PLAN_FEATURES: Record<string, { color: string; bg: string; border: string; badge: string; features: string[]; limit: string }> = {
-  Starter: { color: "#6B6577", bg: "#F5F3FF", border: "#ECE9F1", badge: "STARTER", features: ["Up to 50 bookings/mo", "1 staff member", "Basic analytics", "Email notifications", "Public booking page"], limit: "50 bookings/month" },
-  Professional: { color: "#6D28D9", bg: "rgba(124,58,237,0.10)", border: "rgba(124,58,237,0.25)", badge: "PROFESSIONAL", features: ["Unlimited bookings", "Up to 5 staff", "Advanced analytics", "SMS + Email", "Custom offers", "Priority support"], limit: "Unlimited bookings" },
-  Growth: { color: "#047857", bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.25)", badge: "GROWTH", features: ["Unlimited bookings", "Up to 15 staff", "Revenue reports", "SMS + Email + WhatsApp", "Staff performance", "API access"], limit: "Unlimited bookings" },
-  Enterprise: { color: "#B45309", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)", badge: "ENTERPRISE", features: ["Unlimited everything", "Unlimited staff", "White-label option", "Dedicated support", "Custom integrations", "SLA 99.9%"], limit: "Unlimited everything" },
-};
 
 
 /* ─── STATUS PILL ─────────────────────────────────────────────── */
@@ -354,8 +349,14 @@ export default function DashboardPage() {
   }, [appointments, serviceDisplay]);
 
   const greeting = useMemo(() => { const h = new Date().getHours(); return h < 12 ? "Good morning ☀️" : h < 17 ? "Good afternoon 👋" : "Good evening 🌙"; }, []);
-  const plan = salon?.plan || "Starter";
-  const planInfo = PLAN_FEATURES[plan] || PLAN_FEATURES.Starter;
+  // Reads subscription_plan — the same column FeatureGate gates on — via the
+  // same PLAN_LABELS map and the same normalisation, so the badge cannot
+  // contradict what is actually enforced. It previously read the legacy
+  // `plan` column against a different taxonomy (Starter/Professional/
+  // Growth/Enterprise), which is how an account could display PRO while the
+  // calendar was locked.
+  const planKey = (salon?.subscription_plan || "starter").toLowerCase() as Plan;
+  const planInfo = PLAN_LABELS[planKey] || PLAN_LABELS.starter;
 
 
 
@@ -391,7 +392,7 @@ export default function DashboardPage() {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         {/* Plan badge */}
-        <div className="dash-topbar-badge" style={{ padding: "5px 14px", borderRadius: 99, background: "#EDE9FF", border: "1px solid rgba(124,58,237,0.20)", fontSize: 10.5, fontWeight: 900, color: "#6D28D9", letterSpacing: "1px" }}>{planInfo.badge}</div>
+        <div className="dash-topbar-badge" style={{ padding: "5px 14px", borderRadius: 99, background: "#EDE9FF", border: "1px solid rgba(124,58,237,0.20)", fontSize: 10.5, fontWeight: 900, color: "#6D28D9", letterSpacing: "1px" }}>{planInfo.name.toUpperCase()}</div>
         {/* Export */}
         <button onClick={handleExportCSV} title="Export CSV" className="dash-topbar-export"
           style={{ width: 38, height: 38, borderRadius: 10, background: "#F5F3FF", border: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#524D60", transition: "all 0.18s" }}
