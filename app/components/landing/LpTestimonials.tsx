@@ -9,14 +9,6 @@ const testimonials = [
   },
 ];
 
-function StarIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
-
 export default function LpTestimonials() {
   return (
     <section className="lp-section">
@@ -26,9 +18,6 @@ export default function LpTestimonials() {
         <div className="lp-tst-grid" style={{ marginTop: 48 }}>
           {testimonials.map(t => (
             <div key={t.name} className="lp-tst">
-              <div className="lp-tst-stars">
-                {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} />)}
-              </div>
               <p className="lp-tst-quote">&quot;{t.quote}&quot;</p>
               <div className="lp-tst-person">
                 <div className="lp-tst-av">{t.initial}</div>
