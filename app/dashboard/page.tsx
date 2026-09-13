@@ -22,6 +22,7 @@ import OnboardingChecklist from "./components/OnboardingChecklist";
 import { useSalon } from "./context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "@/app/lib/appointmentServices";
 import PushNotificationButton from "@/app/components/PushNotificationButton";
+import { formatTimeDisplay } from "@/app/lib/formatTime";
 
 type StaffItem = { id: string; name: string };
 
@@ -149,7 +150,7 @@ function ApptRow({ appt, serviceName, price, onClick }: { appt: Appointment; ser
       {/* Time (real, from date_time) */}
       <div style={{ width: 46, flexShrink: 0 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#12101A", letterSpacing: "-0.2px" }}>
-          {new Date(appt.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+          {formatTimeDisplay(appt.date_time)}
         </div>
       </div>
 

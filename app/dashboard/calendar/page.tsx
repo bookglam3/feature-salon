@@ -23,6 +23,7 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal from "../components/Modal";
 import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices } from "@/app/lib/appointmentServices";
+import { formatTimeDisplay } from "@/app/lib/formatTime";
 
 interface Appointment {
   id: string;
@@ -334,7 +335,7 @@ function MonthView({ currentDate, monthDays, getApptsByDay, today, setSelectedAp
                       onMouseEnter={e => { e.currentTarget.style.opacity = "0.8"; }}
                       onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
                     >
-                      {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} {a.client_name}
+                      {formatTimeDisplay(a.date_time)} {a.client_name}
                     </div>
                   );
                 })}
@@ -404,7 +405,7 @@ function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewPr
                     const topPct = (d.getMinutes() / 60) * 100;
                     const n = cellAppts.length;
                     return (
-                      <div key={a.id} onClick={() => setSelectedAppt(a)} title={`${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · ${a.client_name}`}
+                      <div key={a.id} onClick={() => setSelectedAppt(a)} title={`${formatTimeDisplay(d)} · ${a.client_name}`}
                         style={{ position: "absolute", top: `${topPct}%`, left: `calc(${(idx / n) * 100}% + 3px)`, width: `calc(${100 / n}% - 6px)`,
                           background: sc.bg, border: `1px solid ${sc.border}`, borderLeft: `3px solid ${sc.dot}`, borderRadius: 7,
                           padding: "3px 6px", cursor: "pointer", overflow: "hidden", transition: "box-shadow 0.12s, transform 0.12s" }}
@@ -412,7 +413,7 @@ function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewPr
                         onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}
                       >
                         <div style={{ fontSize: 9.5, fontWeight: 700, color: sc.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} {a.client_name}
+                          {formatTimeDisplay(d)} {a.client_name}
                         </div>
                         {a.serviceName && n === 1 && (
                           <div style={{ fontSize: 9, color: sc.text, opacity: 0.75, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.serviceName}</div>
@@ -502,7 +503,7 @@ function AgendaRow({ a, onClick }: { a: Appointment; onClick: () => void }) {
   return (
     <div onClick={onClick} className="cal-agenda-row">
       <div className="cal-agenda-time">
-        {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+        {formatTimeDisplay(a.date_time)}
       </div>
       <div className="cal-agenda-accent" style={{ background: sc.border }} />
       <div className="cal-agenda-copy">
@@ -573,7 +574,7 @@ function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName }: App
         <div className="cal-drawer-summary-icon"><CalendarDays size={18} strokeWidth={1.8} /></div>
         <div className="cal-drawer-summary-copy">
           <div className="cal-drawer-summary-title">
-            {vc.bookingSingular} at {new Date(a.date_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+            {vc.bookingSingular} at {formatTimeDisplay(a.date_time)}
           </div>
           <div className="cal-drawer-summary-date">
             {new Date(a.date_time).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}

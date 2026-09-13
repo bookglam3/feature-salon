@@ -13,6 +13,7 @@ import {
   DAY_KEYS, COUNTRY_TIMEZONES, type BookedInterval,
   addMinutesToSlot, intervalsOverlap, utcToSalonTime, isStaffAvailableForWindow, computeBlocked,
 } from "@/app/lib/slot-availability";
+import { formatWallClock } from "@/app/lib/formatTime";
 
 interface SalonData {
   id: string; name: string; slug: string; description?: string;
@@ -859,7 +860,7 @@ export default function BookingPage() {
                                 onClick={()=>!disabled&&setSelTime(t)}
                                 title={isBlocked ? (isEligible ? "Fully booked" : "Outside working hours") : ""}
                                 style={isBlocked ? { textDecoration:"line-through",opacity:0.45,cursor:"not-allowed",fontSize:12 } : {}}>
-                                {t}{isBlocked ? <span style={{display:"block",fontSize:9,color:"#EF4444",fontWeight:700}}>Taken</span> : null}
+                                {formatWallClock(t)}{isBlocked ? <span style={{display:"block",fontSize:9,color:"#EF4444",fontWeight:700}}>Taken</span> : null}
                               </button>
                             );
                           })}
@@ -982,7 +983,7 @@ export default function BookingPage() {
                   )}
                   <div className="summary-row"><span className="summary-label">{bookingVc.staffSingular}</span><span className="summary-value">{selectedStaff?.name||"Any available"}</span></div>
                   <div className="summary-row"><span className="summary-label">Date</span><span className="summary-value">{selDate?.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</span></div>
-                  <div className="summary-row"><span className="summary-label">Time</span><span className="summary-value">{selTime}</span></div>
+                  <div className="summary-row"><span className="summary-label">Time</span><span className="summary-value">{formatWallClock(selTime)}</span></div>
                   <div className="summary-row"><span className="summary-label">{isPayAtSalon ? "Due Now" : selectedOption?.pct === 100 ? "Total" : "Deposit Due"}</span><span className="summary-value summary-total">£{chargeAmount.toFixed(2)}{isPayAtSalon ? " (pay at salon)" : ""}</span></div>
                 </div>
 

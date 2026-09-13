@@ -7,6 +7,7 @@ import { SkeletonDashboard } from "../components/SkeletonLoader";
 import Modal, { FormGroup, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
 import { useToast } from "../components/Toast";
 import { ToastProvider } from "../components/Toast";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 // ─── Types ─────────────────────────────────────────────────────
 interface LoginLog {
@@ -707,7 +708,7 @@ function PartnersPageInner() {
                           <span style={{ fontSize: 11.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99, background: isMobile ? "rgba(236,72,153,0.12)" : "rgba(124,58,237,0.12)", color: isMobile ? "#F472B6" : "#7C3AED", border: `1px solid ${isMobile ? "rgba(236,72,153,0.25)" : "rgba(124,58,237,0.25)"}` }}>{log.device || "Unknown"}</span>
                         </td>
                         <td style={{ padding: "11px 16px", borderBottom: "1px solid #F5F3FF", fontSize: 11.5, color: "#6B6577", whiteSpace: "nowrap" }}>
-                          {new Date(log.logged_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          {withMeridiem(new Date(log.logged_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true}))}
                         </td>
                       </tr>
                     );

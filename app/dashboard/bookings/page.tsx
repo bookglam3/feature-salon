@@ -13,6 +13,7 @@ import { useToast } from "../components/Toast";
 import type { Appointment, Service } from "../../types";
 import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
+import { formatTimeDisplay, formatWallClock, withMeridiem } from "@/app/lib/formatTime";
 
 type StaffItem = { id: string; name: string };
 
@@ -430,7 +431,7 @@ export default function BookingsPage() {
                         <td style={{ fontWeight: 700, color: "#12101A" }}>{a.client_name}</td>
                         <td style={{ color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ color: "#524D60" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
-                        <td style={{ color: "#524D60", whiteSpace: "nowrap" }}>{new Date(a.date_time).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</td>
+                        <td style={{ color: "#524D60", whiteSpace: "nowrap" }}>{withMeridiem(new Date(a.date_time).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour: "numeric",minute:"2-digit", hour12: true}))}</td>
                         <td style={{ fontWeight: 700, color: "#059669" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 4 }}>
@@ -490,7 +491,7 @@ export default function BookingsPage() {
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.22)"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.12)"; }}
                       >
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED" }}>{new Date(a.date_time).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED" }}>{formatTimeDisplay(a.date_time)}</div>
                         <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600 }}>{a.client_name}</div>
                         <div style={{ fontSize: 10, color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
                       </div>
@@ -691,7 +692,7 @@ export default function BookingsPage() {
                         background: wizardTimePart === t ? "rgba(124,58,237,0.15)" : "#F5F3FF",
                         color: wizardTimePart === t ? "#7C3AED" : "#12101A",
                       }}
-                    >{t}</button>
+                    >{formatWallClock(t)}</button>
                   ))}
                 </div>
               </FormGroup>
@@ -807,7 +808,7 @@ export default function BookingsPage() {
                 {[
                   { label: "Service", value: formData.service_id ? (services.find(s => s.id === formData.service_id)?.name || "—") : "No service selected" },
                   { label: vc.staffSingular, value: formData.staff_id ? (staff.find(s => s.id === formData.staff_id)?.name || "—") : `Any Available ${vc.staffSingular}` },
-                  { label: "Date & Time", value: wizardDatePart && wizardTimePart ? `${new Date(`${wizardDatePart}T${wizardTimePart}`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · ${wizardTimePart}` : "—" },
+                  { label: "Date & Time", value: wizardDatePart && wizardTimePart ? `${new Date(`${wizardDatePart}T${wizardTimePart}`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · ${formatWallClock(wizardTimePart)}` : "—" },
                   { label: vc.clientSingular, value: formData.client_name || "—" },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #ECE9F1" }}>

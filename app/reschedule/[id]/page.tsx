@@ -8,6 +8,7 @@ import {
   DAY_KEYS, COUNTRY_TIMEZONES, type BookedInterval,
   addMinutesToSlot, utcToSalonTime, isStaffAvailableForWindow, computeBlocked,
 } from "@/app/lib/slot-availability";
+import { formatTimeDisplay } from "@/app/lib/formatTime";
 
 interface Appointment {
   id: string;
@@ -233,7 +234,7 @@ function RescheduleContent({ params }: { params: Promise<{ id: string }> }) {
                   : (appt.services?.name || "—"),
               },
               { label: "Date",    value: apptDate.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" }) },
-              { label: "Time",    value: apptDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) },
+              { label: "Time",    value: formatTimeDisplay(apptDate) },
             ].map(({ label, value }) => (
               <div key={label} style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 13.5, color: "#64748B" }}>{label}</span>

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 // ── Types ─────────────────────────────────────────────────────
 interface LogEntry {
@@ -52,7 +53,7 @@ function fmtTime(iso: string) {
   const d = new Date(iso);
   return {
     rel:  relativeTime(d),
-    abs:  d.toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+    abs:  withMeridiem(d.toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true})),
   };
 }
 function relativeTime(d: Date) {

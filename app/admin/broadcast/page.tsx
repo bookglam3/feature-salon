@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 const ADMIN_EMAIL = "adilgill2008@gmail.com";
 const TEMPLATE_STORE_KEY = "fs_broadcast_templates_v1";
@@ -667,7 +668,7 @@ export default function BroadcastPage() {
                         return (
                           <tr key={log.id} className="row-hover">
                             <Td style={{ color: T.text2, fontSize: 12.5, whiteSpace: "nowrap" }}>
-                              {new Date(log.sent_at).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                              {withMeridiem(new Date(log.sent_at).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true}))}
                             </Td>
                             <Td>
                               <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{log.subject}</div>
