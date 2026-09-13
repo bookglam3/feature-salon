@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { formatTimeDisplay } from "./formatTime";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -80,10 +81,7 @@ function formatDate(dateTime: string) {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
       timeZone: "Europe/London",
     }),
-    formattedTime: date.toLocaleTimeString("en-GB", {
-      hour: "2-digit", minute: "2-digit", hour12: false,
-      timeZone: "Europe/London",
-    }),
+    formattedTime: formatTimeDisplay(date, { timeZone: "Europe/London" }),
   };
 }
 

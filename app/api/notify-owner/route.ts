@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 export const dynamic = "force-dynamic";
 
@@ -47,10 +48,10 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
     const isCancel = action === "cancelled";
 
-    const fmt = (dt: string) => new Date(dt).toLocaleString("en-GB", {
+    const fmt = (dt: string) => withMeridiem(new Date(dt).toLocaleString("en-GB", {
       weekday: "short", day: "numeric", month: "long",
-      hour: "2-digit", minute: "2-digit", timeZone: "Europe/London",
-    });
+      hour: "numeric", minute: "2-digit", timeZone: "Europe/London", hour12: true,
+    }));
 
     const oldFmt = oldDateTime ? fmt(oldDateTime) : "—";
     const newFmt = newDateTime ? fmt(newDateTime) : null;

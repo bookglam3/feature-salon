@@ -5,6 +5,7 @@ import { randomBytes } from "crypto";
 import { verifyAdminRequest } from "@/app/lib/adminAuth";
 import { ROLE_LABELS, ROLE_COLORS } from "@/app/types/admin";
 import type { AdminRole } from "@/app/types/admin";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -111,10 +112,10 @@ export async function POST(req: NextRequest) {
   const inviteUrl  = `${APP_URL}/admin/invite/${token}`;
   const roleLabel  = ROLE_LABELS[role as AdminRole];
   const roleColor  = ROLE_COLORS[role as AdminRole];
-  const expiryDate = new Date(invite.expires_at).toLocaleString("en-GB", {
+  const expiryDate = withMeridiem(new Date(invite.expires_at).toLocaleString("en-GB", {
     weekday: "long", day: "numeric", month: "long",
-    hour: "2-digit", minute: "2-digit", timeZone: "Europe/London",
-  });
+    hour: "numeric", minute: "2-digit", timeZone: "Europe/London", hour12: true,
+  }));
 
   const html = buildInviteEmail({
     email: emailLower, roleLabel, roleColor, inviteUrl, expiryDate, note,

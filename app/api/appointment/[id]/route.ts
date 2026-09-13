@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { timingSafeEqual } from "crypto";
 import { Resend } from "resend";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 // Service-role client to bypass RLS (public reschedule page)
 const supabaseAdmin = createClient(
@@ -197,10 +198,10 @@ export async function PATCH(
 
     if (getSalon()?.owner_email) {
       const salon = getSalon()!;
-      const fmt = (dt: string) => new Date(dt).toLocaleString("en-GB", {
+      const fmt = (dt: string) => withMeridiem(new Date(dt).toLocaleString("en-GB", {
         weekday: "short", day: "numeric", month: "long",
-        hour: "2-digit", minute: "2-digit", timeZone: "Europe/London",
-      });
+        hour: "numeric", minute: "2-digit", timeZone: "Europe/London", hour12: true,
+      }));
       const serviceName = getService()?.name || "";
       try {
         await resend.emails.send({
@@ -243,10 +244,10 @@ export async function PATCH(
 
     if (getSalon()?.owner_email) {
       const salon = getSalon()!;
-      const fmt = (dt: string) => new Date(dt).toLocaleString("en-GB", {
+      const fmt = (dt: string) => withMeridiem(new Date(dt).toLocaleString("en-GB", {
         weekday: "short", day: "numeric", month: "long",
-        hour: "2-digit", minute: "2-digit", timeZone: "Europe/London",
-      });
+        hour: "numeric", minute: "2-digit", timeZone: "Europe/London", hour12: true,
+      }));
       const serviceName = getService()?.name || "";
       try {
         await resend.emails.send({

@@ -1,4 +1,5 @@
 import twilio from "twilio";
+import { formatTimeDisplay } from "./formatTime";
 
 // ─────────────────────────────────────────────────────────
 // Twilio client — reuses same SID/token as SMS
@@ -67,12 +68,7 @@ export function normalisePhone(raw: string): string | null {
 // UK time formatter (Europe/London — handles GMT/BST auto)
 // ─────────────────────────────────────────────────────────
 export function formatWATime(dateTime: string): string {
-  return new Date(dateTime).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Europe/London",
-  });
+  return formatTimeDisplay(dateTime, { timeZone: "Europe/London" });
 }
 
 export function formatWADate(dateTime: string): string {

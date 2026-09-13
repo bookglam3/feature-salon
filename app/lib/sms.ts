@@ -1,4 +1,5 @@
 import twilio from "twilio";
+import { formatTimeDisplay } from "./formatTime";
 
 // ─────────────────────────────────────────────────────────
 // Feature flag — set to true to re-enable plain SMS sending
@@ -58,12 +59,7 @@ export const normaliseUKPhone = normalisePhone;
 // UK time formatter (Europe/London — handles GMT/BST auto)
 // ─────────────────────────────────────────────────────────
 export function formatUKTime(dateTime: string): string {
-  return new Date(dateTime).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Europe/London",
-  });
+  return formatTimeDisplay(dateTime, { timeZone: "Europe/London" });
 }
 
 export function formatUKDate(dateTime: string): string {

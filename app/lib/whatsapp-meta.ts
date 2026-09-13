@@ -12,6 +12,8 @@
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+import { formatTimeDisplay } from "./formatTime";
+
 /** A single parameter inside a template component */
 export type TemplateParameter =
   | { type: "text"; text: string }
@@ -235,10 +237,5 @@ export function formatWADate(dateTime: string, timezone = "Europe/London"): stri
 }
 
 export function formatWATime(dateTime: string, timezone = "Europe/London"): string {
-  return new Date(dateTime).toLocaleTimeString("en-GB", {
-    hour:     "2-digit",
-    minute:   "2-digit",
-    hour12:   false,
-    timeZone: timezone,
-  });
+  return formatTimeDisplay(dateTime, { timeZone: timezone });
 }

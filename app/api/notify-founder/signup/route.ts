@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { withMeridiem } from "@/app/lib/formatTime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,11 +42,11 @@ export async function POST(req: NextRequest) {
 
     const typeLabel = BUSINESS_TYPE_LABELS[businessType] || businessType;
 
-    const signupDate = new Date(signedUpAt).toLocaleString("en-GB", {
+    const signupDate = withMeridiem(new Date(signedUpAt).toLocaleString("en-GB", {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
-      timeZone: "Europe/London",
-    });
+      hour: "numeric", minute: "2-digit",
+      timeZone: "Europe/London", hour12: true,
+    }));
 
     const html = `<!DOCTYPE html>
 <html lang="en-GB">
