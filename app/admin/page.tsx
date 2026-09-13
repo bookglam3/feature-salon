@@ -2,9 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import { PLAN_LABELS } from "../lib/featureAccess";
 
 const ADMIN_EMAIL = "adilgill2008@gmail.com";
-const PLAN_OPTIONS = ["starter", "pro", "premium"];
+// Derived from the single source of truth in featureAccess.ts, not a
+// fourth hand-written copy. The previous list was ["starter","pro",
+// "premium"] — "premium" is not a real tier and matches no entry in
+// PLAN_FEATURE_ACCESS, so selecting it now that this dropdown writes
+// subscription_plan would fail every gate and lock the salon out of
+// everything. The real tiers are starter / pro / business / enterprise.
+const PLAN_OPTIONS = Object.keys(PLAN_LABELS);
 
 type Tab = "overview" | "salons" | "revenue" | "users" | "announcements" | "flags" | "settings" | "applications" | "verifications";
 const PLAN_PRICE: Record<string, number> = { starter: 29, pro: 59, premium: 99 };
@@ -311,10 +318,21 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  // Writes BOTH plan columns. subscription_plan is the one that matters:
+  // FeatureGate and hasFeatureAccess read it exclusively, so a write to
+  // `plan` alone changed nothing a customer could see or use — the salon
+  // stayed gated on its old tier while this dropdown and the dashboard
+  // badge both showed the new one. `plan` is the legacy column, still read
+  // by this admin table and its analytics, so it is kept in step rather
+  // than abandoned. The Stripe webhook remains the authority for
+  // subscription_plan on real billing events; this is the manual override.
   const updateSalonPlan = async (salonId: string, plan: string) => {
-    const { error: e } = await supabase.from("salons").update({ plan }).eq("id", salonId);
+    const { error: e } = await supabase
+      .from("salons")
+      .update({ plan, subscription_plan: plan })
+      .eq("id", salonId);
     if (e) { setError(e.message); return; }
-    setSalons(p => p.map(s => s.id === salonId ? { ...s, plan } : s));
+    setSalons(p => p.map(s => s.id === salonId ? { ...s, plan, subscription_plan: plan } : s));
   };
 
   const updateSalonStatus = async (salonId: string, status: string) => {
