@@ -33,6 +33,10 @@ interface Settings {
   reward_service_id: string | null;
   reward_value: number | null;
   reward_description: string | null;
+  /** Set once, when the programme is first switched on, and never moved
+   *  after — so toggling off and on again does not wipe accrued progress.
+   *  NULL means the programme has never run: the view counts nothing. */
+  loyalty_start_at: string | null;
 }
 
 interface ProgressRow {
@@ -48,7 +52,9 @@ interface ProgressRow {
 
 interface ServiceLite { id: string; name: string }
 
-const DEFAULT_SETTINGS: Omit<Settings, "salon_id"> = {
+// loyalty_start_at is excluded: it is not a form field. It is written
+// once by handleSaveSettings and otherwise never touched by the UI.
+const DEFAULT_SETTINGS: Omit<Settings, "salon_id" | "loyalty_start_at"> = {
   enabled: false,
   visits_required: 5,
   reward_type: "custom",
@@ -104,7 +110,7 @@ function LoyaltyContent() {
   const [search, setSearch] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
-  const [form, setForm] = useState<Omit<Settings, "salon_id">>(DEFAULT_SETTINGS);
+  const [form, setForm] = useState<Omit<Settings, "salon_id" | "loyalty_start_at">>(DEFAULT_SETTINGS);
   const [saving, setSaving] = useState(false);
 
   const [redeemTarget, setRedeemTarget] = useState<ProgressRow|null>(null);
@@ -181,6 +187,13 @@ function LoyaltyContent() {
       toast.error("Describe the reward"); return;
     }
     setSaving(true);
+    // Start the clock the first time the programme is switched on, and never
+    // again. Not on row creation: an owner can configure the programme weeks
+    // before enabling it, and that gap must not become earned stamps. Not on
+    // re-enable either: once set it stays, so toggling off and back on
+    // preserves what clients have accrued. On every other save the key is
+    // simply absent, and a PostgREST upsert only writes the columns it is given.
+    const startingNow = form.enabled && !settings?.loyalty_start_at;
     const payload = {
       salon_id: salonId,
       enabled: form.enabled,
@@ -191,6 +204,7 @@ function LoyaltyContent() {
       reward_service_id: form.reward_type === "free_service" ? form.reward_service_id : null,
       reward_value: (form.reward_type === "amount_off" || form.reward_type === "percent_off") ? form.reward_value : null,
       reward_description: form.reward_type === "custom" ? form.reward_description?.trim() ?? "" : null,
+      ...(startingNow ? { loyalty_start_at: new Date().toISOString() } : {}),
       updated_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("loyalty_settings").upsert(payload, { onConflict: "salon_id" });
@@ -289,7 +303,7 @@ function LoyaltyContent() {
           <div style={{ background:"#F5F3FF", border:"1px solid #ECE9F1", borderRadius:14, padding:"16px 20px", marginBottom:22 }}>
             <div style={{ fontSize:13.5, fontWeight:700, color:"#12101A", marginBottom:4 }}>The stamp card is switched off</div>
             <div style={{ fontSize:12.5, color:"#524D60", lineHeight:1.6 }}>
-              Visits below are still counted from completed appointments, so nothing is lost while it&apos;s off.
+              Counting starts when you switch the programme on. Completed visits before that point don&apos;t earn stamps, so no one is owed a reward the moment you enable it.
               Clients see no loyalty message in their emails until you turn it on.
             </div>
           </div>
