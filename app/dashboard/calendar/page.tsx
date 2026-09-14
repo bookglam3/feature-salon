@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
+import { describeReward } from "@/app/lib/loyalty";
 import FeatureGate from "../components/FeatureGate";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal from "../components/Modal";
@@ -350,14 +351,37 @@ function MonthView({ currentDate, monthDays, getApptsByDay, today, setSelectedAp
 }
 
 /* ─── WEEK VIEW ─────────────────────────────────── */
+/* ── Loyalty "reward ready" signal ──────────────────────────────────
+   The owner works from the calendar, not the loyalty page, so a client
+   arriving to claim a reward previously showed nothing here.
+
+   `null` means: programme off, unconfigured, or the lookup failed. In every
+   one of those cases nothing renders at all, so salons not running the
+   scheme see no change. Keyed on lower(btrim(email)) to match the
+   loyalty_progress view's own key; entries with no email (walk-ins) simply
+   never match rather than throwing. */
+export interface LoyaltyReady {
+  /** normalised client_email -> visits, for clients at or over the threshold */
+  ready: Map<string, number>;
+  required: number;
+  rewardText: string;
+}
+
+function isRewardReady(a: Appointment, loyalty: LoyaltyReady | null): boolean {
+  if (!loyalty) return false;
+  const key = (a.client_email ?? "").trim().toLowerCase();
+  return !!key && loyalty.ready.has(key);
+}
+
 interface WeekViewProps {
   weekDays: Date[];
   appointments: Appointment[];
   today: Date;
   setSelectedAppt: (a: Appointment) => void;
+  loyalty: LoyaltyReady | null;
 }
 const CELL_H = 60;
-function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewProps) {
+function WeekView({ weekDays, appointments, today, setSelectedAppt, loyalty }: WeekViewProps) {
   /* Visible hour range. HOURS (7–19) stays the baseline, but it is widened
      to cover any booking that actually falls outside it — previously an
      08:00-or-21:00 appointment simply never rendered. Display range only;
@@ -405,13 +429,23 @@ function WeekView({ weekDays, appointments, today, setSelectedAppt }: WeekViewPr
                     const topPct = (d.getMinutes() / 60) * 100;
                     const n = cellAppts.length;
                     return (
-                      <div key={a.id} onClick={() => setSelectedAppt(a)} title={`${formatTimeDisplay(d)} · ${a.client_name}`}
+                      <div key={a.id} onClick={() => setSelectedAppt(a)} title={`${formatTimeDisplay(d)} · ${a.client_name}${isRewardReady(a, loyalty) ? " · Reward ready" : ""}`}
                         style={{ position: "absolute", top: `${topPct}%`, left: `calc(${(idx / n) * 100}% + 3px)`, width: `calc(${100 / n}% - 6px)`,
                           background: sc.bg, border: `1px solid ${sc.border}`, borderLeft: `3px solid ${sc.dot}`, borderRadius: 7,
                           padding: "3px 6px", cursor: "pointer", overflow: "hidden", transition: "box-shadow 0.12s, transform 0.12s" }}
                         onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(18,16,26,0.14)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                         onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}
                       >
+                        {isRewardReady(a, loyalty) && (
+                          /* 6px dot only — the chip text is 9.5px and already truncates, so a
+                             word will not fit. Meaning comes from tapping through to the drawer,
+                             which works on mobile where hover does not. */
+                          <span aria-label="Reward ready" style={{
+                            position: "absolute", top: 3, right: 3,
+                            width: 6, height: 6, borderRadius: "50%",
+                            background: "#7C3AED", flexShrink: 0,
+                          }} />
+                        )}
                         <div style={{ fontSize: 9.5, fontWeight: 700, color: sc.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {formatTimeDisplay(d)} {a.client_name}
                         </div>
@@ -436,8 +470,9 @@ interface DayViewProps {
   currentDate: Date;
   getApptsByDay: (day: Date) => Appointment[];
   setSelectedAppt: (a: Appointment) => void;
+  loyalty: LoyaltyReady | null;
 }
-function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) {
+function DayView({ currentDate, getApptsByDay, setSelectedAppt, loyalty }: DayViewProps) {
   const dayAppts = getApptsByDay(currentDate);
   const label = currentDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   return (
@@ -459,7 +494,19 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt }: DayViewProps) 
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: sc.text }}>{a.client_name}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: sc.text }}>{a.client_name}</div>
+                          {isRewardReady(a, loyalty) && (
+                            /* Same treatment as the READY pill on /dashboard/loyalty, so the
+                               two screens read as one system. */
+                            <span style={{
+                              fontSize: 9.5, fontWeight: 800, letterSpacing: "0.4px",
+                              padding: "2px 7px", borderRadius: 99, whiteSpace: "nowrap",
+                              background: "rgba(124,58,237,0.10)", color: "#6D28D9",
+                              border: "1px solid rgba(124,58,237,0.25)",
+                            }}>REWARD READY</span>
+                          )}
+                        </div>
                         <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>{a.serviceName || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
@@ -498,7 +545,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 /* ─── AGENDA ROW (mobile day list) ─────────────────────────────
    Time · status accent · name · service/staff · price — all real. */
-function AgendaRow({ a, onClick }: { a: Appointment; onClick: () => void }) {
+function AgendaRow({ a, onClick, loyalty }: { a: Appointment; onClick: () => void; loyalty: LoyaltyReady | null }) {
   const sc = STATUS_COLORS[a.status] || STATUS_COLORS.pending;
   return (
     <div onClick={onClick} className="cal-agenda-row">
@@ -507,7 +554,20 @@ function AgendaRow({ a, onClick }: { a: Appointment; onClick: () => void }) {
       </div>
       <div className="cal-agenda-accent" style={{ background: sc.border }} />
       <div className="cal-agenda-copy">
-        <div className="cal-agenda-name">{a.client_name}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+          {/* The name keeps its own nowrap/ellipsis; the pill is a sibling with
+             flexShrink:0 so truncation can never eat it. This is the mobile DAY
+             view — it renders AgendaRow, NOT DayView, so it needs its own badge. */}
+          <div className="cal-agenda-name">{a.client_name}</div>
+          {isRewardReady(a, loyalty) && (
+            <span style={{
+              fontSize: 9, fontWeight: 800, letterSpacing: "0.3px",
+              padding: "2px 6px", borderRadius: 99, whiteSpace: "nowrap", flexShrink: 0,
+              background: "rgba(124,58,237,0.10)", color: "#6D28D9",
+              border: "1px solid rgba(124,58,237,0.25)",
+            }}>READY</span>
+          )}
+        </div>
         <div className="cal-agenda-service">
           {a.serviceName || "No service"}{a.staff?.name ? ` \u00b7 ${a.staff.name}` : ""}
         </div>
@@ -533,11 +593,12 @@ interface ApptDrawerProps {
   setSelectedAppt: (a: Appointment | null) => void;
   onViewAll: () => void;
   salonName: string;
+  loyalty: LoyaltyReady | null;
 }
 /* ─── APPOINTMENT DETAIL DRAWER ──────────────────────────────────
    Every value comes off selectedAppt. Contact actions render only when
    the underlying field actually has a value — no dead buttons. */
-function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName }: ApptDrawerProps) {
+function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName, loyalty }: ApptDrawerProps) {
   const { vc } = useSalon();
   if (!selectedAppt) return null;
   const a = selectedAppt;
@@ -565,6 +626,19 @@ function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName }: App
         <Avatar name={a.client_name} size={48} />
         <div className="cal-drawer-client-copy">
           <div className="cal-drawer-client-name">{a.client_name}</div>
+          {isRewardReady(a, loyalty) && loyalty && (
+            /* The one surface with room for the full statement. Uses the same
+               describeReward() wording the client's email used, so the owner
+               reads back exactly what the client was promised. */
+            <div style={{
+              marginTop: 8, padding: "10px 12px", borderRadius: 10,
+              background: "#F5F3FF", border: "1px solid #ECE9F1",
+              fontSize: 12.5, color: "#12101A", lineHeight: 1.5,
+            }}>
+              <strong>Reward ready</strong> — {loyalty.ready.get((a.client_email ?? "").trim().toLowerCase())} of {loyalty.required} visits.
+              <br />Ask about {loyalty.rewardText}.
+            </div>
+          )}
           <div className="cal-drawer-client-sub">{a.status} · Calendar {vc.bookingSingular.toLowerCase()}</div>
         </div>
       </div>
@@ -648,6 +722,7 @@ function CalendarContent() {
   const router = useRouter();
   const { vc } = useSalon();
   const [salonName, setSalonName]   = useState("");
+  const [loyalty, setLoyalty] = useState<LoyaltyReady | null>(null);
   const [appointments, setAppts]    = useState<Appointment[]>([]);
   const [loading, setLoading]       = useState(true);
   const [view, setView]             = useState<ViewMode>("week");
@@ -670,6 +745,33 @@ function CalendarContent() {
         return { ...a, serviceName: r?.serviceName, combinedPrice: r?.combinedPrice, anyPriceIsFrom: r?.anyPriceIsFrom };
       });
       setAppts(enriched);
+
+      /* Loyalty "reward ready" lookup — additive and non-fatal. Wrapped so a
+         failure here can never stop the calendar rendering. Stays null when the
+         programme is off or unconfigured, in which case nothing renders. */
+      try {
+        const { data: ls } = await supabase
+          .from("loyalty_settings")
+          .select("enabled, visits_required, reward_type, reward_service_id, reward_value, reward_description")
+          .eq("salon_id", profile.salon.id)
+          .maybeSingle();
+        if (ls?.enabled && ls.visits_required > 0) {
+          const [{ data: prog }, { data: svc }] = await Promise.all([
+            supabase.from("loyalty_progress")
+              .select("client_email, visits")
+              .eq("salon_id", profile.salon.id)
+              .gte("visits", ls.visits_required),
+            ls.reward_type === "free_service" && ls.reward_service_id
+              ? supabase.from("services").select("name").eq("id", ls.reward_service_id).maybeSingle()
+              : Promise.resolve({ data: null }),
+          ]);
+          const ready = new Map<string, number>();
+          (prog ?? []).forEach((r: { client_email: string; visits: number }) => ready.set(r.client_email, r.visits));
+          setLoyalty({ ready, required: ls.visits_required, rewardText: describeReward(ls, svc?.name ?? null) });
+        }
+      } catch (e) {
+        console.error("[calendar] loyalty lookup failed (non-fatal):", e);
+      }
       setLoading(false);
     };
     load();
@@ -788,8 +890,8 @@ function CalendarContent() {
         {/* ── Desktop: the grid views ── */}
         <div className="cal-desktop">
           {view === "month" && <MonthView currentDate={currentDate} monthDays={monthDays} getApptsByDay={getApptsByDay} today={today} setSelectedAppt={setSelectedAppt} />}
-          {view === "week"  && <WeekView weekDays={weekDays} appointments={appointments} today={today} setSelectedAppt={setSelectedAppt} />}
-          {view === "day"   && <DayView currentDate={currentDate} getApptsByDay={getApptsByDay} setSelectedAppt={setSelectedAppt} />}
+          {view === "week"  && <WeekView weekDays={weekDays} appointments={appointments} today={today} setSelectedAppt={setSelectedAppt} loyalty={loyalty} />}
+          {view === "day"   && <DayView currentDate={currentDate} getApptsByDay={getApptsByDay} setSelectedAppt={setSelectedAppt} loyalty={loyalty} />}
         </div>
 
         {/* ── Mobile ──────────────────────────────────────────────
@@ -800,7 +902,7 @@ function CalendarContent() {
         <div className="cal-mobile">
           {view === "week" && (
             <div className="cal-mobile-grid">
-              <WeekView weekDays={weekDays} appointments={appointments} today={today} setSelectedAppt={setSelectedAppt} />
+              <WeekView weekDays={weekDays} appointments={appointments} today={today} setSelectedAppt={setSelectedAppt} loyalty={loyalty} />
             </div>
           )}
           {view === "month" && (
@@ -833,7 +935,7 @@ function CalendarContent() {
               </div>
             ) : (
               <div className="cal-agenda-list">
-                {dayAppts.map(a => <AgendaRow key={a.id} a={a} onClick={() => setSelectedAppt(a)} />)}
+                {dayAppts.map(a => <AgendaRow key={a.id} a={a} onClick={() => setSelectedAppt(a)} loyalty={loyalty} />)}
               </div>
             )}
 
@@ -855,7 +957,7 @@ function CalendarContent() {
         <Link href="/dashboard/clients" className="cal-reference-nav-item"><UsersRound strokeWidth={1.7} /><span>{vc.clientPlural}</span></Link>
       </nav>
 
-      <ApptDrawer selectedAppt={selectedAppt} setSelectedAppt={setSelectedAppt} salonName={salonName} onViewAll={() => { router.push("/dashboard/bookings"); setSelectedAppt(null); }} />
+      <ApptDrawer selectedAppt={selectedAppt} setSelectedAppt={setSelectedAppt} salonName={salonName} loyalty={loyalty} onViewAll={() => { router.push("/dashboard/bookings"); setSelectedAppt(null); }} />
     </DashboardShell>
   );
 }
