@@ -235,17 +235,21 @@ export async function sendBookingEmails({
           </div>
         </div>` : ""}
 
-        ${loyalty ? `
-        <!-- Loyalty stamp progress — factual, counted from completed visits only -->
+        ${loyalty && loyalty.visits > 0 ? `
+        <!-- Loyalty stamp progress — factual, counted from completed visits only.
+             Suppressed at zero: a first-time client's very first contact should
+             not be a scoreboard reading 0. The first mention lands on their
+             second booking as "1 of 5", which reads as progress. The thank-you
+             email is deliberately NOT gated this way — see sendThankyouEmail. -->
         <div style="background:#F5F3FF;border:1px solid #ECE9F1;border-radius:12px;padding:16px 20px;margin-bottom:22px;">
           <div style="font-size:11px;font-weight:700;color:#6D28D9;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Loyalty</div>
           ${loyalty.rewardReady
             ? `<div style="font-size:14px;color:#12101A;line-height:1.6;">
                  <strong>Your reward is ready.</strong><br/>
-                 You've completed ${loyalty.visits} of ${loyalty.required} visits — ask us about ${loyalty.rewardText} on your next visit.
+                 You've completed ${Math.min(loyalty.visits, loyalty.required)} of ${loyalty.required} visits — ask us about ${loyalty.rewardText} on your next visit.
                </div>`
             : `<div style="font-size:14px;color:#12101A;line-height:1.6;">
-                 You're at <strong>${loyalty.visits} of ${loyalty.required} visits</strong> —
+                 You're at <strong>${Math.min(loyalty.visits, loyalty.required)} of ${loyalty.required} visits</strong> —
                  ${loyalty.remaining} more for ${loyalty.rewardText}.
                </div>`}
         </div>` : ""}
@@ -457,11 +461,11 @@ export async function sendThankyouEmail({
       <div style="font-size:11px;font-weight:700;color:#6D28D9;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Loyalty</div>
       ${loyalty.rewardReady
         ? `<div style="font-size:14px;color:#12101A;line-height:1.6;">
-             That was visit ${loyalty.visits} of ${loyalty.required} — <strong>your reward is ready.</strong><br/>
+             That was visit ${Math.min(loyalty.visits, loyalty.required)} of ${loyalty.required} — <strong>your reward is ready.</strong><br/>
              Ask us about ${loyalty.rewardText} next time you're in.
            </div>`
         : `<div style="font-size:14px;color:#12101A;line-height:1.6;">
-             That was <strong>visit ${loyalty.visits} of ${loyalty.required}</strong> —
+             That was <strong>visit ${Math.min(loyalty.visits, loyalty.required)} of ${loyalty.required}</strong> —
              ${loyalty.remaining} more for ${loyalty.rewardText}.
            </div>`}
     </div>` : "";
