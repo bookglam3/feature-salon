@@ -389,12 +389,29 @@ export default function ClientsPage() {
                     📞 Call
                   </a>
                 )}
-                {salon?.slug && (
-                  <a href={`/book/${salon.slug}`} target="_blank" rel="noopener"
-                    style={{ flex: 1, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>
-                    📅 Book Again
-                  </a>
-                )}
+                {/* Book Again. Two deliberate choices here:
+                    1. It stays INSIDE the dashboard. It used to open the
+                       public /book/<slug> page in a new tab, which is a
+                       dead end in the installed PWA — there is no tab bar
+                       and no way back.
+                    2. It carries the client's identity as params so the
+                       wizard prefills from the STORED record. Retyping the
+                       email is the real bug: loyalty_progress groups on
+                       lower(btrim(client_email)), so one typo silently
+                       starts a second, empty stamp card for the same
+                       person. The receiving page strips the params
+                       immediately (see app/dashboard/bookings/page.tsx). */}
+                <button
+                  onClick={() => {
+                    const q = new URLSearchParams({ new: "1" });
+                    if (selected.name)  q.set("name",  selected.name.slice(0, 100));
+                    if (selected.email) q.set("email", selected.email.slice(0, 200));
+                    if (selected.phone) q.set("phone", selected.phone.slice(0, 40));
+                    router.push(`/dashboard/bookings?${q.toString()}`);
+                  }}
+                  style={{ flex: 1, background: "#F5F3FF", color: "#524D60", border: "1px solid #ECE9F1", borderRadius: 10, padding: "9px", fontSize: 12.5, fontWeight: 700, textAlign: "center", fontFamily: "inherit", cursor: "pointer", display: "block" }}>
+                  📅 Book Again
+                </button>
               </div>
 
               {/* Stats bar */}

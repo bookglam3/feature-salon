@@ -115,6 +115,15 @@ export default function BookingsPage() {
   // optional treatment-notes/consultation fields on the Details step.
   const [step, setStep] = useState(0);
   const [showExtra, setShowExtra] = useState(false);
+  // The email this wizard was PREFILLED with, from a client record (the
+  // "Book Again" button on /dashboard/clients). Null for a booking typed
+  // from scratch. It exists only to label the email field, so the owner
+  // can see at a glance that the address came from the record and can see
+  // when they have changed it — changing it starts a second loyalty stamp
+  // card, because loyalty_progress groups on lower(btrim(client_email)).
+  // Stored lowercased/trimmed so the comparison matches how the view
+  // groups, not how it was typed.
+  const [prefillEmail, setPrefillEmail] = useState<string | null>(null);
   // Multi-service aware (3C-2b-display): combined service name/price per
   // appointment, resolved from appointment_services line items where they
   // exist, falling back to the single primary services(...) join for
@@ -123,6 +132,38 @@ export default function BookingsPage() {
   const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
 
   useEffect(() => {
+    // "Book Again" hand-off from /dashboard/clients: that page routes here
+    // with the client's stored details as params, and this opens the wizard
+    // prefilled with them. Read from window.location rather than
+    // useSearchParams — it is a one-shot seed with nothing to stay
+    // subscribed to, and useSearchParams would pull a Suspense boundary
+    // onto the page for no benefit.
+    //
+    // The params are stripped immediately, before any await. Left in place
+    // they would re-open the wizard on every refresh, over whatever the
+    // owner was doing, and leave the client's email sitting in the address
+    // bar. replaceState (not pushState) overwrites the entry the push from
+    // the clients page just made, so the email-bearing URL is not left in
+    // the history stack to navigate back to. Next.js supports the native
+    // History API and keeps its own router in sync with it.
+    //
+    // Values are capped because they are URL-controlled and end up in an
+    // insert. The seeding itself happens after the load below: the page
+    // renders a skeleton until loading is false, so the modal could not
+    // appear any earlier regardless.
+    let handoff: { name: string; email: string; phone: string } | null = null;
+    if (typeof window !== "undefined") {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get("new") === "1") {
+        handoff = {
+          name:  (q.get("name")  || "").slice(0, 100),
+          email: (q.get("email") || "").slice(0, 200),
+          phone: (q.get("phone") || "").slice(0, 40),
+        };
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    }
+
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
@@ -140,9 +181,40 @@ export default function BookingsPage() {
         setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
       }
       setLoading(false);
+
+      if (handoff) {
+        setEditingId(null);
+        setShowExtra(false);
+        setStep(0);
+        setPrefillEmail(handoff.email ? handoff.email.trim().toLowerCase() : null);
+        setFormData({
+          ...EMPTY_FORM,
+          client_name:  handoff.name,
+          client_email: handoff.email,
+          client_phone: handoff.phone,
+          // Same as the "+ New Booking" button: seed the date half of the
+          // datetime-local value so the date/time step starts on today.
+          date_time: `${todayLocalDateStr()}T`,
+        });
+        setShowForm(true);
+      }
     };
     load();
   }, [router]);
+
+  // Opening a FRESH wizard. Previously this exact body was inlined,
+  // identically, on both the header button and the empty-state action;
+  // it is shared now so the two cannot drift. It also clears prefillEmail,
+  // which is what stops a cancelled "Book Again" from leaving a stale
+  // "changed from their record" label on the next, unrelated booking.
+  const openNewBooking = useCallback(() => {
+    setEditingId(null);
+    setPrefillEmail(null);
+    setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` });
+    setStep(0);
+    setShowExtra(false);
+    setShowForm(true);
+  }, []);
 
   const reloadAppts = useCallback(async () => {
     if (!salon) return;
@@ -255,6 +327,7 @@ export default function BookingsPage() {
 
   const handleEdit = useCallback((a: Appointment) => {
     setEditingId(a.id);
+    setPrefillEmail(null);
     let parsed = { notes: a.notes || "", skin_type: "", allergies: "no", allergy_details: "", previous_treatments: "", medical_conditions: "", patch_test: false };
     if (vc.consultationForm && a.notes) {
       try {
@@ -349,7 +422,7 @@ export default function BookingsPage() {
           ))}
         </div>
         <button
-          onClick={() => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); }}
+          onClick={openNewBooking}
           className="bk-btn-primary"
         >+ New {vc.bookingSingular}</button>
       </div>
@@ -413,7 +486,7 @@ export default function BookingsPage() {
         {view === "table" ? (
           <div className="fade-in-up" style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 3px rgba(18,16,26,0.04), 0 8px 24px -12px rgba(18,16,26,0.08)" }}>
             {filtered.length === 0 ? (
-              <EmptyState title="No bookings found" description={search ? "Try a different search term" : "Create your first booking to get started"} action={{ label: "+ New Booking", onClick: () => { setShowForm(true); setEditingId(null); setFormData({ ...EMPTY_FORM, date_time: `${todayLocalDateStr()}T` }); setStep(0); setShowExtra(false); } }} />
+              <EmptyState title="No bookings found" description={search ? "Try a different search term" : "Create your first booking to get started"} action={{ label: "+ New Booking", onClick: openNewBooking }} />
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table className="bk-table" style={{ minWidth: 640 }}>
@@ -721,7 +794,26 @@ export default function BookingsPage() {
           {step === 3 && (
             <div>
               <FormGroup label="Client Name *"><Input placeholder="Sarah Johnson" value={formData.client_name} onChange={e => setFormData({ ...formData, client_name: e.target.value })} required /></FormGroup>
-              <FormGroup label="Email"><Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} /></FormGroup>
+              <FormGroup label="Email">
+                <Input type="email" placeholder="sarah@email.com" value={formData.client_email} onChange={e => setFormData({ ...formData, client_email: e.target.value })} />
+                {/* Left EDITABLE on purpose — clients do genuinely change
+                    address, and a read-only field would force the owner out
+                    to the client record to fix it. But an accidental edit is
+                    silent and expensive, so it is labelled: both the clients
+                    list and loyalty_progress group on the email, so a changed
+                    one splits this person into two records. */}
+                {prefillEmail && (
+                  formData.client_email.trim().toLowerCase() === prefillEmail ? (
+                    <p style={{ fontSize: 11.5, color: "#6B6577", marginTop: 4 }}>
+                      From this client&apos;s record.
+                    </p>
+                  ) : (
+                    <p style={{ fontSize: 11.5, color: "#92400E", fontWeight: 600, marginTop: 4 }}>
+                      Changed from their record. This address will be filed as a separate client.
+                    </p>
+                  )
+                )}
+              </FormGroup>
               <FormGroup label="Phone"><Input placeholder="+44 7700 900000" value={formData.client_phone} onChange={e => setFormData({ ...formData, client_phone: e.target.value })} /></FormGroup>
               {(vc.treatmentNotes || vc.consultationForm) && (
                 <>
