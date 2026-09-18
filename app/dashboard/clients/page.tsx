@@ -13,7 +13,8 @@ type SortKey = "name" | "bookings" | "spent" | "lastVisit";
 
 interface ClientRecord {
   name: string; email: string; phone: string;
-  lastVisit: Date; bookings: number; spent: number;
+  /** Last COMPLETED visit, or null if they have never been seen. */
+  lastVisit: Date | null; bookings: number; spent: number;
   note?: string; services: Record<string, number>;
   imported?: boolean;
 }
@@ -62,7 +63,7 @@ export default function ClientsPage() {
       setSalon(profile.salon);
       const { data: appts } = await supabase
         .from("appointments")
-        .select("client_name,client_email,client_phone,id,date_time,status,services(name,price)")
+        .select("client_name,client_email,client_phone,id,date_time,completed_at,status,services(name,price)")
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: false });
 
@@ -71,20 +72,29 @@ export default function ClientsPage() {
       const map = new Map<string, ClientRecord>();
       (appts || []).forEach((a: {
         client_name: string; client_email: string; client_phone: string;
-        id: string; date_time: string; status: string;
+        id: string; date_time: string; completed_at: string | null; status: string;
         services?: { name?: string; price?: number }[] | { name?: string; price?: number } | null;
       }) => {
         const key = a.client_email || a.client_name;
         const r = resolved.get(a.id);
         const price = r?.combinedPrice ?? 0;
         const lines = r?.lines ?? [];
+        /* A visit is a COMPLETED appointment, dated by completed_at — the same
+           field loyalty counts stamps from. Previously lastVisit was the first
+           row of a date_time-DESC query with no status or date filter, i.e. the
+           client's furthest-FUTURE booking, which is why upcoming appointments
+           showed as "last visit" and the relative label went negative. */
+        const visitAt = a.status === "completed" && a.completed_at ? new Date(a.completed_at) : null;
         if (!map.has(key)) {
           const services: Record<string, number> = {};
           lines.forEach(l => { services[l.name] = (services[l.name] || 0) + 1; });
-          map.set(key, { name: a.client_name, email: a.client_email, phone: a.client_phone, lastVisit: new Date(a.date_time), bookings: 1, spent: price, services });
+          map.set(key, { name: a.client_name, email: a.client_email, phone: a.client_phone, lastVisit: visitAt, bookings: 1, spent: price, services });
         } else {
           const c = map.get(key)!;
           c.bookings += 1; c.spent += price;
+          // keep the LATEST completed visit; the query is ordered by date_time,
+          // which is not the same ordering as completed_at
+          if (visitAt && (!c.lastVisit || visitAt > c.lastVisit)) c.lastVisit = visitAt;
           lines.forEach(l => { c.services[l.name] = (c.services[l.name] || 0) + 1; });
         }
       });
@@ -106,7 +116,8 @@ export default function ClientsPage() {
         } else {
           map.set(key, {
             name: c.name, email: c.email || "", phone: c.phone || "",
-            lastVisit: new Date(c.last_visit_at || c.created_at),
+            // created_at is when they were imported, not when they visited
+            lastVisit: c.last_visit_at ? new Date(c.last_visit_at) : null,
             bookings: 0, spent: 0, services: {}, note: c.notes || undefined, imported: true,
           });
         }
@@ -148,25 +159,46 @@ export default function ClientsPage() {
         if (sortKey === "name") return (a.name || "").localeCompare(b.name || "");
         if (sortKey === "bookings") return b.bookings - a.bookings;
         if (sortKey === "spent") return b.spent - a.spent;
-        return new Date(b.lastVisit).getTime() - new Date(a.lastVisit).getTime();
+        // never-visited sorts last rather than as epoch 0
+        const bt = b.lastVisit ? b.lastVisit.getTime() : -Infinity;
+        const at = a.lastVisit ? a.lastVisit.getTime() : -Infinity;
+        return bt - at;
       });
   }, [clients, search, sortKey]);
 
   const topSpender = clients.reduce<ClientRecord | null>((max, c) => c.spent > (max?.spent || 0) ? c : max, null);
-  const newThisMonth = clients.filter(c => {
-    const d = new Date(c.lastVisit); const now = new Date();
+  /* Renamed from "new this month": this counts clients whose LAST COMPLETED
+     visit falls in the current month, which is activity, not acquisition. It
+     was never a count of new clients — and it previously keyed off a lastVisit
+     that could be a future booking, so an upcoming appointment made a
+     long-standing client look new. */
+  const seenThisMonth = clients.filter(c => {
+    if (!c.lastVisit) return false;
+    const d = c.lastVisit; const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
-  const avgSpend = clients.length ? Math.round(clients.reduce((s, c) => s + c.spent, 0) / clients.length) : 0;
+  /* Divided by clients who have actually spent, not by every row. The list
+     merges CSV-imported clients with spent:0, so dividing by clients.length
+     averaged real spend across hundreds who have never booked — 839 clients
+     and a handful of real spenders produced "£1 per client". */
+  const payingClients = clients.filter(c => c.spent > 0);
+  const avgSpend = payingClients.length
+    ? Math.round(payingClients.reduce((s, c) => s + c.spent, 0) / payingClients.length)
+    : 0;
   const favService = (c: ClientRecord) => {
     if (!c.services || Object.keys(c.services).length === 0) return null;
     return Object.entries(c.services).sort((a, b) => (b[1] as number) - (a[1] as number))[0][0];
   };
-  const daysSince = (d: Date) => Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
+  /* Null = never seen. Negative should now be unreachable (lastVisit is a past
+     completed_at), but it is guarded so a future date can never render
+     "-90d ago" again. Still browser-local and still 24h blocks rather than
+     calendar days — deliberately left for the timezone batch. */
+  const daysSince = (d: Date | null) =>
+    d === null ? null : Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
   const statusColor = (s: string) =>
     s === "confirmed" ? { bg: "rgba(16,185,129,0.10)", color: "#047857", border: "rgba(16,185,129,0.25)" }
     : s === "cancelled" ? { bg: "rgba(239,68,68,0.10)", color: "#B91C1C", border: "rgba(239,68,68,0.25)" }
-    : { bg: "rgba(245,158,11,0.10)", color: "#F59E0B", border: "rgba(245,158,11,0.25)" };
+    : { bg: "rgba(245,158,11,0.10)", color: "#92400E", border: "rgba(245,158,11,0.25)" };  // #F59E0B was 1.99:1 on this tint
 
   if (loading) return <DashboardShell salonName=""><SkeletonDashboard /></DashboardShell>;
 
@@ -226,8 +258,8 @@ export default function ClientsPage() {
         {/* Stats */}
         <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
           <StatCard label={`Total ${vc.clientPlural}`} value={clients.length} icon="👤" color="indigo" sub="all time" />
-          <StatCard label="New This Month" value={newThisMonth} icon="✨" color="green" sub="vs last month" />
-          <StatCard label="Avg Spend" value={avgSpend} icon="💷" color="amber" prefix="£" sub={`per ${vc.clientSingular.toLowerCase()}`} />
+          <StatCard label="Seen This Month" value={seenThisMonth} icon="✨" color="green" sub="had a completed visit" />
+          <StatCard label="Avg Spend" value={avgSpend} icon="💷" color="amber" prefix="£" sub={`per paying ${vc.clientSingular.toLowerCase()} (${payingClients.length})`} />
           <StatCard label="Top Spender" value={topSpender ? topSpender.spent : 0} icon="🏆" color="red" prefix="£" sub={topSpender?.name || "—"} />
         </div>
 
@@ -298,10 +330,16 @@ export default function ClientsPage() {
                           </td>
                           <td style={{ padding: "13px 16px", fontSize: 13.5, fontWeight: 800, color: "#12101A", borderBottom: "1px solid #ECE9F1" }}>£{c.spent.toFixed(0)}</td>
                           <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
-                            <div style={{ fontSize: 12.5, color: "#524D60" }}>{new Date(c.lastVisit).toLocaleDateString("en-GB")}</div>
-                            <div style={{ fontSize: 10.5, color: ds > 60 ? "var(--red)" : ds > 30 ? "var(--amber)" : "var(--green)", marginTop: 1, fontWeight: 700 }}>
-                              {ds === 0 ? "Today" : `${ds}d ago`}
-                            </div>
+                          {c.lastVisit === null || ds === null ? (
+                            <div style={{ fontSize: 12.5, color: "#6B6577" }}>No visits yet</div>
+                          ) : (
+                            <>
+                              <div style={{ fontSize: 12.5, color: "#524D60" }}>{c.lastVisit.toLocaleDateString("en-GB")}</div>
+                              <div style={{ fontSize: 10.5, color: ds > 60 ? "var(--red)" : ds > 30 ? "var(--amber)" : "var(--green)", marginTop: 1, fontWeight: 700 }}>
+                                {ds === 0 ? "Today" : `${ds}d ago`}
+                              </div>
+                            </>
+                          )}
                           </td>
                           <td style={{ padding: "13px 16px", borderBottom: "1px solid #ECE9F1" }}>
                             <span style={{ fontSize: 11.5, color: "#7C3AED", fontWeight: 700, background: "rgba(124,58,237,0.10)", padding: "3px 10px", borderRadius: 8, border: "1px solid rgba(124,58,237,0.25)" }}>View →</span>
