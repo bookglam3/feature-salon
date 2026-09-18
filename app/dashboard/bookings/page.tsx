@@ -465,40 +465,59 @@ export default function BookingsPage() {
                 <button onClick={() => setWeekOffset(w => w + 1)} className="bk-btn-ghost" style={{ padding: "5px 12px" }}>→</button>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderBottom: "1px solid #ECE9F1", overflowX: "auto" }}>
-              {weekDays.map((day, i) => {
-                const isToday = day.toDateString() === new Date().toDateString();
-                return (
-                  <div key={i} style={{ padding: "10px 8px", textAlign: "center", borderRight: i < 6 ? "1px solid #F5F3FF" : "none" }}>
-                    <div style={{ fontSize: 10, color: "#6B6577", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                      {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][day.getDay()]}
-                    </div>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: isToday ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "transparent", color: isToday ? "#fff" : "#ECE9F1", fontSize: 13, fontWeight: isToday ? 800 : 500, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: isToday ? "0 4px 12px rgba(124,58,237,0.45)" : "none" }}>
-                      {day.getDate()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", minHeight: 280, overflowX: "auto" }}>
-              {weekDays.map((day, i) => {
-                const dayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === day.toDateString());
-                return (
-                  <div key={i} style={{ padding: 6, borderRight: i < 6 ? "1px solid #F5F3FF" : "none", minHeight: 200 }}>
-                    {dayAppts.map(a => (
-                      <div key={a.id} onClick={() => handleEdit(a)}
-                        style={{ background: "rgba(124,58,237,0.12)", borderRadius: 7, padding: "5px 8px", marginBottom: 4, cursor: "pointer", borderLeft: "3px solid #7C3AED", transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.22)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.12)"; }}
-                      >
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED" }}>{formatTimeDisplay(a.date_time)}</div>
-                        <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600 }}>{a.client_name}</div>
-                        <div style={{ fontSize: 10, color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
+            {/* One grid, one scroll container.
+
+                The header row and the body row used to be two sibling grids,
+                each with its own overflowX:auto and its own repeat(7,1fr). `1fr`
+                is minmax(auto,1fr), so the auto floor let a long client name in
+                the body widen a column the header knew nothing about — the two
+                resolved independently and a booking appeared under the wrong
+                date. They also scrolled separately. Both rows are now children
+                of the SAME grid, so column i is column i by construction.
+
+                minmax(96px,1fr) + minWidth matches /dashboard/calendar's
+                WeekView: keep columns readable and scroll horizontally, rather
+                than squeezing seven columns onto a phone. Two week grids
+                behaving differently is its own bug. 672 = 7 x 96 (WeekView's
+                720 includes its 58px time gutter, which this grid has not). */}
+            <div style={{ overflowX: "auto" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7,minmax(96px,1fr))", minWidth: 672 }}>
+                {weekDays.map((day, i) => {
+                  const isToday = day.toDateString() === new Date().toDateString();
+                  return (
+                    <div key={`hd-${i}`} style={{ padding: "10px 8px", textAlign: "center", minWidth: 0, borderBottom: "1px solid #ECE9F1", borderRight: i < 6 ? "1px solid #F5F3FF" : "none" }}>
+                      <div style={{ fontSize: 10, color: "#6B6577", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][day.getDay()]}
                       </div>
-                    ))}
-                  </div>
-                );
-              })}
+                      {/* Non-today was #ECE9F1 — a border token used as text, 1.20:1
+                          on white, so every date but today was near-invisible. */}
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: isToday ? "linear-gradient(135deg,#7C3AED,#6D28D9)" : "transparent", color: isToday ? "#fff" : "#12101A", fontSize: 13, fontWeight: isToday ? 800 : 500, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: isToday ? "0 4px 12px rgba(124,58,237,0.45)" : "none" }}>
+                        {day.getDate()}
+                      </div>
+                    </div>
+                  );
+                })}
+                {weekDays.map((day, i) => {
+                  const dayAppts = appointments.filter(a => new Date(a.date_time).toDateString() === day.toDateString());
+                  return (
+                    <div key={`bd-${i}`} style={{ padding: 6, minWidth: 0, borderRight: i < 6 ? "1px solid #F5F3FF" : "none", minHeight: 200 }}>
+                      {dayAppts.map(a => (
+                        <div key={a.id} onClick={() => handleEdit(a)}
+                          style={{ background: "rgba(124,58,237,0.12)", borderRadius: 7, padding: "5px 8px", marginBottom: 4, cursor: "pointer", borderLeft: "3px solid #7C3AED", transition: "all 0.15s", minWidth: 0, overflow: "hidden" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.22)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.12)"; }}
+                        >
+                          {/* nowrap + ellipsis so a long name truncates inside its
+                              column instead of forcing the column wider. */}
+                          <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{formatTimeDisplay(a.date_time)}</div>
+                          <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.client_name}</div>
+                          <div style={{ fontSize: 10, color: "#524D60", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
