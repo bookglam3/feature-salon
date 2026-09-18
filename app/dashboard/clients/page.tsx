@@ -190,6 +190,39 @@ export default function ClientsPage() {
     <DashboardShell salonName={salon ? undefined : ""} topbar={Topbar}>
       <div style={{ padding: "20px 20px 32px" }}>
 
+        {/* Client detail panel.
+
+            Desktop: a column beside the list. Mobile: a full-screen drawer,
+            matching the calendar's appointment drawer so the two detail views
+            behave the same way.
+
+            Previously the list was forced to flex:"0 0 100%" whenever a client
+            was selected, which wrapped the panel BELOW all 839 rows — with no
+            pagination, no maxHeight and no scrollIntoView, so the tap worked
+            and the panel simply rendered off-screen. That affected desktop
+            too, not just mobile.
+
+            900px rather than the shell's 768: a 380px panel beside the list
+            stops being usable well before the sidebar breakpoint. */}
+        <style>{`
+          .cl-panel { flex: 0 0 380px; align-self: flex-start; }
+          .cl-scrim { display: none; }
+          @media (max-width: 900px) {
+            .cl-panel {
+              position: fixed; inset: 0; z-index: 210;
+              flex: none; border: 0; border-radius: 0;
+              /* overrides the inline maxHeight:82vh, which fights inset:0.
+                 The panel is a flex column whose body already scrolls
+                 internally, so the drawer itself must not scroll. */
+              max-height: none;
+            }
+            .cl-scrim {
+              display: block; position: fixed; inset: 0;
+              z-index: 200; background: rgba(18,16,26,0.5);
+            }
+          }
+        `}</style>
+
         {/* Stats */}
         <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
           <StatCard label={`Total ${vc.clientPlural}`} value={clients.length} icon="👤" color="indigo" sub="all time" />
@@ -200,7 +233,7 @@ export default function ClientsPage() {
 
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Client list */}
-          <div style={{ flex: selected ? "0 0 100%" : "1", minWidth: 0, background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
+          <div style={{ flex: 1, minWidth: 0, background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 8px rgba(15,23,42,0.05)" }}>
             {/* Toolbar */}
             <div style={{ padding: "14px 18px", borderBottom: "1px solid #ECE9F1", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", background: "#F5F3FF" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 160, background: "#F5F3FF", border: "1.5px solid #ECE9F1", borderRadius: 10, padding: "8px 12px" }}
@@ -284,7 +317,10 @@ export default function ClientsPage() {
 
           {/* Detail panel */}
           {selected && (
-            <div style={{ width: "100%", background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 8px 32px rgba(124,58,237,0.12)", display: "flex", flexDirection: "column", maxHeight: "82vh" }}>
+            <div className="cl-scrim" onClick={() => setSelected(null)} aria-hidden="true" />
+          )}
+          {selected && (
+            <div className="cl-panel" style={{ background: "#FFFFFF", border: "1.5px solid #ECE9F1", borderRadius: 20, overflow: "hidden", boxShadow: "0 8px 32px rgba(124,58,237,0.12)", display: "flex", flexDirection: "column", maxHeight: "82vh" }}>
               {/* Header */}
               <div style={{ padding: "18px 20px", borderBottom: "1px solid #ECE9F1", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg,rgba(124,58,237,0.10),rgba(245,243,255,0.95))", flexShrink: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
