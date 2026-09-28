@@ -3,7 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
-import { POPULAR_COUNTRIES, ALL_COUNTRIES, type Country } from "../lib/countries";
+import type { BusinessField } from "../lib/business-location";
+
+type FieldErrors = Partial<Record<BusinessField, string>>;
+const POSTCODE_UNAVAILABLE = "We couldn't check your postcode right now. Please try again in a minute.";
 
 const C = { indigo:"#7C3AED", indigoDark:"#6D28D9", indigoSoft:"rgba(124,58,237,0.10)", green:"#047857", red:"#EF4444", text:"#12101A", text2:"#524D60", text3:"#6B6577", border:"#E6E2EF", bg:"#FFFFFF", formText:"#12101A", formText2:"#524D60" };
 const STEPS = ["Account", "Your Business", "Verify Email", "Done!"];
@@ -35,74 +38,45 @@ function maskEmail(email: string): string {
   return `${local[0]}${"*".repeat(Math.min(local.length - 1, 4))}@${domain}`;
 }
 
-function Inp({ label, type="text", value, onChange, placeholder, required, hint, right }:
-  { label:string; type?:string; value:string; onChange:(v:string)=>void; placeholder?:string; required?:boolean; hint?:string; right?: React.ReactNode }) {
+function Inp({ label, type="text", value, onChange, placeholder, required, hint, right, error, note, onBlur, maxLength, autoComplete }:
+  { label:string; type?:string; value:string; onChange:(v:string)=>void; placeholder?:string; required?:boolean; hint?:string; right?: React.ReactNode;
+    error?:string; note?:React.ReactNode; onBlur?:()=>void; maxLength?:number; autoComplete?:string }) {
   const [f, setF] = useState(false);
+  const ring = error ? "0 0 0 3px rgba(239,68,68,0.12)" : "0 0 0 3px rgba(124,58,237,0.12)";
   return (
     <div style={{ marginBottom:16 }}>
       <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:7 }}>{label}{required && <span style={{color:C.indigo}}> *</span>}</label>
       <div style={{ position:"relative" }}>
         <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required}
-          onFocus={()=>setF(true)} onBlur={()=>setF(false)} className="signup-input"
-          style={{ width:"100%", padding:"13px 15px", paddingRight: right?"44px":"15px", fontSize:14, color:C.formText, border:`1px solid ${f?C.indigo:C.border}`, borderRadius:11, outline:"none", boxSizing:"border-box", background:C.bg, transition:"border-color .15s, box-shadow .15s", boxShadow:f?"0 0 0 3px rgba(124,58,237,0.12)":"none" }} />
+          maxLength={maxLength} autoComplete={autoComplete} aria-invalid={error ? true : undefined}
+          onFocus={()=>setF(true)} onBlur={()=>{ setF(false); onBlur?.(); }} className="signup-input"
+          style={{ width:"100%", padding:"13px 15px", paddingRight: right?"44px":"15px", fontSize:14, color:C.formText, border:`1px solid ${error?C.red:f?C.indigo:C.border}`, borderRadius:11, outline:"none", boxSizing:"border-box", background:C.bg, transition:"border-color .15s, box-shadow .15s", boxShadow:f?ring:"none" }} />
         {right && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}>{right}</div>}
       </div>
-      {hint && <div style={{ fontSize:11, color:C.text3, marginTop:4 }}>{hint}</div>}
+      {error
+        ? <div role="alert" style={{ fontSize:12, color:"#B91C1C", marginTop:5, lineHeight:1.5 }}>{error}</div>
+        : note
+          ? <div style={{ fontSize:12, marginTop:5, fontWeight:600 }}>{note}</div>
+          : hint && <div style={{ fontSize:11, color:C.text3, marginTop:4 }}>{hint}</div>}
     </div>
   );
 }
 
-function CountryDropdown({ value, onChange }: { value: Country|null; onChange:(c:Country)=>void }) {
-  const [open, setOpen] = useState(false);
-  const [q, setQ] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const h = (e:MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) { setOpen(false); setQ(""); } };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-  const filtered = q ? ALL_COUNTRIES.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.dial.includes(q)) : null;
-  const Item = ({ c }: { c: Country }) => (
-    <button type="button" onClick={() => { onChange(c); setOpen(false); setQ(""); }}
-      style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"9px 14px", border:"none", cursor:"pointer", background: value?.code===c.code?"rgba(124,58,237,0.10)":"transparent", color:C.formText, fontSize:13, textAlign:"left", transition:"background .1s" }}
-      onMouseEnter={e=>{ if(value?.code!==c.code)(e.currentTarget as HTMLElement).style.background="#F5F3FF"; }}
-      onMouseLeave={e=>{ if(value?.code!==c.code)(e.currentTarget as HTMLElement).style.background="transparent"; }}>
-      <span style={{fontSize:18}}>{c.flag}</span>
-      <span style={{flex:1}}>{c.name}</span>
-      <span style={{fontSize:11.5, color:C.text3, fontWeight:600}}>{c.dial}</span>
-    </button>
-  );
+function EyeBtn({ show, toggle }: { show:boolean; toggle:()=>void }) {
   return (
-    <div style={{ marginBottom:16 }}>
-      <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:7 }}>Country <span style={{color:C.indigo}}>*</span></label>
-      <div ref={ref} style={{ position:"relative" }}>
-        <button type="button" onClick={()=>setOpen(o=>!o)}
-          style={{ width:"100%", padding:"13px 15px", border:`1px solid ${open?C.indigo:C.border}`, borderRadius:11, background:C.bg, display:"flex", alignItems:"center", gap:10, cursor:"pointer", fontSize:14, color: value?C.formText:C.text3, boxShadow:open?"0 0 0 3px rgba(124,58,237,0.12)":"none", transition:"border-color .15s, box-shadow .15s" }}>
-          {value ? <><span style={{fontSize:18}}>{value.flag}</span><span style={{flex:1, textAlign:"left"}}>{value.name}</span><span style={{fontSize:12,color:C.text3}}>{value.dial}</span></> : <span>Select country…</span>}
-          <span style={{fontSize:10, color:C.text3}}>{open?"▲":"▼"}</span>
-        </button>
-        {open && (
-          <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, right:0, zIndex:500, background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, boxShadow:"0 16px 48px rgba(17,10,40,0.14)", overflow:"hidden" }}>
-            <div style={{ padding:"10px 12px", borderBottom:`1px solid ${C.border}` }}>
-              <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search country or dial code…" className="signup-input"
-                style={{ width:"100%", padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, outline:"none", fontFamily:"inherit", background:C.bg, color:C.formText }} />
-            </div>
-            <div style={{ maxHeight:260, overflowY:"auto" }}>
-              {filtered ? (
-                filtered.length===0 ? <div style={{padding:"20px",textAlign:"center",color:C.text3,fontSize:13}}>No results</div>
-                : filtered.map(c=><Item key={c.code} c={c}/>)
-              ) : <>
-                <div style={{ padding:"7px 14px 3px", fontSize:10, fontWeight:800, color:C.text3, letterSpacing:"1px", textTransform:"uppercase" }}>⭐ Popular</div>
-                {POPULAR_COUNTRIES.map(c=><Item key={"p-"+c.code} c={c}/>)}
-                <div style={{ height:1, background:C.border, margin:"4px 0" }}/>
-                <div style={{ padding:"7px 14px 3px", fontSize:10, fontWeight:800, color:C.text3, letterSpacing:"1px", textTransform:"uppercase" }}>🌍 All Countries</div>
-                {ALL_COUNTRIES.map(c=><Item key={c.code} c={c}/>)}
-              </>}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:"#6B6577", padding:0, lineHeight:1, display:"flex" }}>
+      {show ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.87 20.87 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.87 20.87 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      )}
+    </button>
   );
 }
 
@@ -120,11 +94,21 @@ export default function SignupPage() {
   const [confirmPw, setConfirmPw] = useState("");
   // Step 1 — business info
   const [salonName, setSalonName] = useState("");
-  const [country, setCountry] = useState<Country|null>(null);
+  const [address, setAddress] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [postcodeCheck, setPostcodeCheck] = useState<{ state:"idle"|"checking"|"ok"; town?:string }>({ state:"idle" });
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [terms, setTerms] = useState(false);
   const [category, setCategory] = useState("hair");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [loadingText, setLoadingText] = useState("");
+  const postcodeReq = useRef(0);
+  // Finish mode: a signed-in, email-verified user with no salon yet (sent here
+  // by the dashboard, or after /api/signup/complete failed post-verification).
+  // Step 1 then also collects name + password and completes with their session.
+  const [finishMode, setFinishMode] = useState(false);
+  const [resuming, setResuming] = useState(false);
   // Step 2 — email OTP
   const [otp, setOtp] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
@@ -133,15 +117,27 @@ export default function SignupPage() {
   const [isResending, setIsResending] = useState(false);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Auto-detect country on mount
+  // /signup?finish=1 — resume for a signed-in user who has no salon yet
   useEffect(() => {
-    fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) })
-      .then(r=>r.json()).then(d => {
-        const cc = d.country_code;
-        const found = [...POPULAR_COUNTRIES, ...ALL_COUNTRIES].find(c=>c.code===cc);
-        if (found) { setCountry(found); setPhone(found.dial+" "); }
-      }).catch(()=>{});
-  }, []);
+    if (new URLSearchParams(window.location.search).get("finish") !== "1") return;
+    const resume = async () => {
+      setResuming(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setResuming(false); return; } // not signed in — normal signup
+      const { data: owned, error: ownedErr } = await supabase
+        .from("salons").select("id").eq("owner_id", session.user.id).limit(1);
+      if (!ownedErr && owned?.length) { router.replace("/dashboard"); return; }
+      const meta = session.user.user_metadata ?? {};
+      setEmail(session.user.email ?? "");
+      if (typeof meta.full_name === "string") setFullName(meta.full_name);
+      if (typeof meta.salon_name === "string") setSalonName(meta.salon_name);
+      if (BUSINESS_TYPES.some(b => b.key === meta.business_type)) setCategory(meta.business_type);
+      setFinishMode(true);
+      setStep(1);
+      setResuming(false);
+    };
+    resume();
+  }, [router]);
 
   // Auto-redirect to dashboard after success screen
   useEffect(() => {
@@ -176,18 +172,145 @@ export default function SignupPage() {
     e.preventDefault();
     if (!fullName.trim()) { setError("Full name is required."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+    if (password.length > 72) { setError("Password must be 72 characters or fewer."); return; }
     if (password !== confirmPw) { setError("Passwords do not match."); return; }
     setError(""); setStep(1);
   };
 
-  // ── Step 1: send email OTP (no account created yet) ─────────────
+  const clearFieldError = (field: BusinessField) =>
+    setFieldErrors(errs => (errs[field] ? { ...errs, [field]: undefined } : errs));
+
+  // ── Postcode: check on blur, show "✓ {town}" or the error ───────
+  const checkPostcode = async () => {
+    const value = postcode.trim();
+    if (!value || postcodeCheck.state === "ok") return;
+    const req = ++postcodeReq.current;
+    setPostcodeCheck({ state:"checking" });
+    let message = POSTCODE_UNAVAILABLE;
+    try {
+      const res = await fetch("/api/signup/validate-business", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postcodeOnly: true, postcode: value }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (req !== postcodeReq.current) return; // postcode was edited since — stale result
+      if (res.ok) {
+        setPostcode(json.postcode);
+        setPostcodeCheck({ state:"ok", town: json.town });
+        clearFieldError("postcode");
+        return;
+      }
+      message = json.errors?.postcode || json.error || message;
+    } catch {
+      if (req !== postcodeReq.current) return;
+    }
+    setPostcodeCheck({ state:"idle" });
+    setFieldErrors(errs => ({ ...errs, postcode: message }));
+  };
+
+  // ── Business details: instant empty-field check, then server validation ──
+  const checkRequiredBusiness = (): boolean => {
+    const missing: FieldErrors = {};
+    if (!salonName.trim()) missing.businessName = "Business name is required.";
+    if (!address.trim())   missing.addressLine1 = "Business address is required.";
+    if (!postcode.trim())  missing.postcode = "Postcode is required.";
+    if (!phone.trim())     missing.phone = "Business phone is required.";
+    setFieldErrors(missing);
+    return Object.keys(missing).length === 0;
+  };
+
+  const validateBusiness = async (): Promise<boolean> => {
+    setLoadingText("Checking details…");
+    try {
+      const res = await fetch("/api/signup/validate-business", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessName: salonName, addressLine1: address, postcode, phone, company }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (json.errors && Object.keys(json.errors).length) {
+          setFieldErrors(json.errors);
+          if (json.errors.postcode) setPostcodeCheck({ state:"idle" });
+        } else {
+          setError(json.error || "We couldn't check your details. Please try again.");
+        }
+        return false;
+      }
+      setFieldErrors({});
+      setPostcode(json.values.postcode);
+      setPostcodeCheck({ state:"ok", town: json.values.town });
+      return true;
+    } catch {
+      setError("We couldn't check your details. Please check your connection and try again.");
+      return false;
+    }
+  };
+
+  // ── Create the account + salon server-side (re-validates everything) ──
+  const completeSignup = async (accessToken: string): Promise<{ ok: true } | { ok: false; error: string; errors?: FieldErrors }> => {
+    try {
+      const res = await fetch("/api/signup/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken,
+          fullName, password, salonName, addressLine1: address, postcode, phone, company, category,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) return { ok: false, error: json.error || "Failed to complete signup. Please try again.", errors: json.errors };
+    } catch {
+      return { ok: false, error: "Network error. Please check your connection and try again." };
+    }
+
+    // Notify founder — fire-and-forget, never blocks signup
+    fetch("/api/notify-founder/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ salonName, email, businessType: category, signedUpAt: new Date().toISOString() }),
+    }).catch(() => {});
+    return { ok: true };
+  };
+
+  // ── Step 1: validate business, then send email OTP (no account created yet).
+  //    In finish mode there is already a verified session, so complete directly.
   const step1 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!salonName.trim()) { setError("Business name is required."); return; }
-    if (!country) { setError("Please select your country."); return; }
+    if (loading) return;
+    setError("");
+    if (finishMode) {
+      if (!fullName.trim()) { setError("Full name is required."); return; }
+      if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+      if (password.length > 72) { setError("Password must be 72 characters or fewer."); return; }
+      if (password !== confirmPw) { setError("Passwords do not match."); return; }
+    }
+    if (!checkRequiredBusiness()) return;
     if (!terms) { setError("Please accept the Terms & Conditions."); return; }
-    setLoading(true); setError("");
+    setLoading(true);
 
+    if (!(await validateBusiness())) { setLoading(false); return; }
+
+    if (finishMode) {
+      setLoadingText("Creating your account…");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError("Your session has expired. Please sign in again.");
+        setLoading(false); return;
+      }
+      const result = await completeSignup(session.access_token);
+      setLoading(false);
+      if (!result.ok) {
+        if (result.errors && Object.keys(result.errors).length) setFieldErrors(result.errors);
+        else setError(result.error);
+        return;
+      }
+      setStep(3);
+      return;
+    }
+
+    setLoadingText("Sending code…");
     const { error: otpErr } = await supabase.auth.signInWithOtp({
       email,
       options: { shouldCreateUser: true },
@@ -235,29 +358,25 @@ export default function SignupPage() {
     }
 
     // Complete account + salon creation server-side
-    const res = await fetch("/api/signup/complete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        accessToken: data.session.access_token,
-        fullName, password, salonName, phone, company, category,
-      }),
-    });
-    const json = await res.json();
+    const result = await completeSignup(data.session.access_token);
+    setOtpLoading(false);
 
-    if (!res.ok) {
-      setOtpError(json.error || "Failed to complete signup. Please try again.");
-      setOtpLoading(false); return;
+    if (!result.ok) {
+      // The email is verified and the session is live — the code can't be
+      // reused, so don't loop back through it. Fix details on the finish screen.
+      if (cooldownRef.current) { clearInterval(cooldownRef.current); cooldownRef.current = null; }
+      setCooldown(0); setOtp("");
+      setFinishMode(true);
+      setStep(1);
+      if (result.errors && Object.keys(result.errors).length) {
+        setFieldErrors(result.errors);
+        setError("Your email is verified. Please fix the details below to finish.");
+      } else {
+        setError(result.error);
+      }
+      return;
     }
 
-    // Notify founder — fire-and-forget, never blocks signup
-    fetch("/api/notify-founder/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ salonName, email, businessType: category, signedUpAt: new Date().toISOString() }),
-    }).catch(() => {});
-
-    setOtpLoading(false);
     setStep(3);
   };
 
@@ -277,22 +396,6 @@ export default function SignupPage() {
     }
     setIsResending(false);
   };
-
-  const EyeBtn = ({ show, toggle }: { show:boolean; toggle:()=>void }) => (
-    <button type="button" onClick={toggle} style={{ background:"none", border:"none", cursor:"pointer", color:"#6B6577", padding:0, lineHeight:1, display:"flex" }}>
-      {show ? (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.87 20.87 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.87 20.87 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>
-      ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-      )}
-    </button>
-  );
 
   // ── Step 3: Success / redirect ───────────────────────────────────
   if (step === 3) return (
@@ -348,7 +451,8 @@ export default function SignupPage() {
       <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"32px 24px" }}>
         <div style={{ width:"100%", maxWidth:520 }}>
 
-          {/* Progress */}
+          {/* Progress — hidden in finish mode, where there's no verify step */}
+          {!finishMode && (
           <div style={{ marginBottom:20 }}>
             <div style={{ display:"flex", alignItems:"center", marginBottom:6 }}>
               {STEPS.map((s,i)=>(
@@ -364,6 +468,7 @@ export default function SignupPage() {
               ))}
             </div>
           </div>
+          )}
 
           {/* Card */}
           <div style={{ background:"#FFFFFF", borderRadius:20, padding:"44px 44px", border:"1px solid #F0EDF5", boxShadow:"0 1px 2px rgba(18,16,26,0.04), 0 12px 32px -8px rgba(91,33,182,0.12), 0 30px 60px -30px rgba(18,16,26,0.12)", maxWidth:520, width:"100%", boxSizing:"border-box" }}>
@@ -376,14 +481,21 @@ export default function SignupPage() {
             </div>
           )}
 
+          {resuming ? (
+            <div style={{ display:"flex", justifyContent:"center", padding:"40px 0" }}>
+              <div style={{ width:28, height:28, borderRadius:"50%", border:"3px solid rgba(124,58,237,0.2)", borderTopColor:C.indigo, animation:"spin 0.7s linear infinite" }} />
+            </div>
+          ) : <>
           <h1 style={{ fontSize:26, fontWeight:900, color:C.formText, letterSpacing:"-0.8px", marginBottom:4, lineHeight:1.2 }}>
-            {step===0 ? "Create your account" : step===1 ? "Tell us about your business" : "Check your inbox"}
+            {step===0 ? "Create your account" : step===1 ? (finishMode ? "Finish setting up your business" : "Tell us about your business") : "Check your inbox"}
           </h1>
           <p style={{ fontSize:13.5, color:C.formText2, marginBottom:20 }}>
             {step===0
               ? "Start your free trial in under 60 seconds."
               : step===1
-                ? "Help us personalise your experience."
+                ? (finishMode
+                    ? <>Signed in as <strong style={{color:C.formText}}>{email}</strong>. Add your business details to open your dashboard.</>
+                    : "Help us personalise your experience.")
                 : <>We sent a 6-digit code to <strong style={{color:C.formText}}>{maskEmail(email)}</strong>. Enter it below to verify your email.</>
             }
           </p>
@@ -433,11 +545,27 @@ export default function SignupPage() {
 
           {/* ── Step 1: Business info ──────────────────────────────── */}
           {step===1 && (
-            <form onSubmit={step1}>
-              <Inp label="Business Name" value={salonName} onChange={setSalonName} placeholder="e.g. The Cut Studio, Serenity Physio…" required hint="Appears on your public booking page." />
-              <CountryDropdown value={country} onChange={c=>{ setCountry(c); if(!phone || phone.startsWith("+")) setPhone(c.dial+" "); }} />
-              <Inp label="Phone Number (optional)" type="tel" value={phone} onChange={setPhone} placeholder={country ? country.dial+" 000 000 0000" : "+44 000 000 0000"} />
-              <Inp label="Company Name (optional)" value={company} onChange={setCompany} placeholder="Your registered company name" />
+            <form onSubmit={step1} noValidate>
+              {finishMode && <>
+                <Inp label="Full Name" value={fullName} onChange={setFullName} placeholder="Sarah Johnson" required maxLength={100} autoComplete="name" />
+                <Inp label="Set a password" type={showPw?"text":"password"} value={password} onChange={setPassword} placeholder="Min. 8 characters" required
+                  maxLength={72} autoComplete="new-password" hint="You'll use this to sign in." right={<EyeBtn show={showPw} toggle={()=>setShowPw(p=>!p)} />} />
+                <Inp label="Confirm Password" type={showCpw?"text":"password"} value={confirmPw} onChange={setConfirmPw} placeholder="Repeat password" required
+                  maxLength={72} autoComplete="new-password" right={<EyeBtn show={showCpw} toggle={()=>setShowCpw(p=>!p)} />} />
+              </>}
+              <Inp label="Business Name" value={salonName} onChange={v=>{ setSalonName(v); clearFieldError("businessName"); }} placeholder="e.g. The Cut Studio, Serenity Physio…" required
+                maxLength={100} autoComplete="organization" error={fieldErrors.businessName} hint="Appears on your public booking page." />
+              <Inp label="Business address (street and number)" value={address} onChange={v=>{ setAddress(v); clearFieldError("addressLine1"); }} placeholder="e.g. 12 High Street" required
+                maxLength={150} autoComplete="address-line1" error={fieldErrors.addressLine1} />
+              <Inp label="Postcode" value={postcode} placeholder="e.g. SW1A 1AA" required maxLength={10} autoComplete="postal-code"
+                onChange={v=>{ setPostcode(v); postcodeReq.current++; setPostcodeCheck({ state:"idle" }); clearFieldError("postcode"); }}
+                onBlur={checkPostcode} error={fieldErrors.postcode}
+                note={postcodeCheck.state==="checking" ? <span style={{ color:C.text3, fontWeight:500 }}>Checking postcode…</span>
+                  : postcodeCheck.state==="ok" ? <span style={{ color:C.green }}>✓ {postcodeCheck.town}</span> : undefined} />
+              <Inp label="Business phone" type="tel" value={phone} onChange={v=>{ setPhone(v); clearFieldError("phone"); }} placeholder="07… or 020…" required
+                maxLength={20} autoComplete="tel" error={fieldErrors.phone} hint="UK mobile, landline or 03 number." />
+              <Inp label="Company Name (optional)" value={company} onChange={v=>{ setCompany(v); clearFieldError("company"); }} placeholder="Your registered company name"
+                maxLength={100} error={fieldErrors.company} />
               <div style={{ marginBottom:16 }}>
                 <label style={{ fontSize:13.5, fontWeight:600, color:"#2A2536", display:"block", marginBottom:8 }}>Business Type</label>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }} className="salon-grid">
@@ -456,9 +584,13 @@ export default function SignupPage() {
                 </span>
               </label>
               <div style={{ display:"flex", gap:10 }}>
-                <button type="button" onClick={()=>{ setStep(0); setError(""); }} style={{ padding:"13px 20px", borderRadius:12, border:`1px solid ${C.border}`, background:C.bg, color:C.formText2, fontSize:14, fontWeight:700, cursor:"pointer" }}>← Back</button>
+                {finishMode
+                  ? <button type="button" onClick={async()=>{ await supabase.auth.signOut(); router.replace("/login"); }} style={{ padding:"13px 20px", borderRadius:12, border:`1px solid ${C.border}`, background:C.bg, color:C.formText2, fontSize:14, fontWeight:700, cursor:"pointer" }}>Sign out</button>
+                  : <button type="button" onClick={()=>{ setStep(0); setError(""); }} style={{ padding:"13px 20px", borderRadius:12, border:`1px solid ${C.border}`, background:C.bg, color:C.formText2, fontSize:14, fontWeight:700, cursor:"pointer" }}>← Back</button>}
                 <button type="submit" disabled={loading} className={loading ? undefined : "btn-primary"} style={{ flex:1, padding:"14px", background: loading?C.text3:"linear-gradient(180deg, #7C3AED, #6D28D9)", color:"#fff", border:"none", borderRadius:12, fontSize:15, fontWeight:700, cursor: loading?"not-allowed":"pointer", boxShadow: loading?"none":"0 8px 20px -6px rgba(124,58,237,0.45)", transition:"all .15s" }}>
-                  {loading ? <span>Sending code… <span style={{ display:"inline-block", animation:"spin 1s linear infinite" }}>⟳</span></span> : "Send Verification Code →"}
+                  {loading
+                    ? <span>{loadingText} <span style={{ display:"inline-block", animation:"spin 1s linear infinite" }}>⟳</span></span>
+                    : finishMode ? "Create My Business →" : "Send Verification Code →"}
                 </button>
               </div>
             </form>
@@ -559,6 +691,7 @@ export default function SignupPage() {
               </div>
             </div>
           )}
+          </>}
 
           </div>
           {/* Trust badges */}

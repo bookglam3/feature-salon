@@ -1,0 +1,28 @@
+-- 2026-09-28 — Drop the "Users can insert own salon" RLS policy on public.salons
+--
+-- WHY
+--   This policy (INSERT, with check auth.uid() = owner_id) lets any signed-in
+--   user create a salon row directly from the browser with the anon key,
+--   skipping /api/signup/complete — and with it the server-side business
+--   checks added on branch feature/signup-location (UK postcode lookup via
+--   postcodes.io, UK phone validation, input length limits).
+--
+-- SAFE TO DROP BECAUSE
+--   A search of the codebase (2026-09-28) found no browser/client-side insert
+--   into "salons". Every insert uses the service-role key, which bypasses RLS:
+--     - app/api/signup/complete/route.ts   (self-serve signup)
+--     - app/api/admin/salons/route.ts      (admin-created salons)
+--     - scripts/test-default-services.mjs  (local test script)
+--   SELECT / UPDATE policies are untouched.
+--
+-- HOW TO RUN
+--   Manually, in the Supabase SQL editor, after the branch is deployed.
+--   Not run automatically. Idempotent ("if exists").
+--
+-- ROLLBACK
+--   create policy "Users can insert own salon" on public.salons
+--     for insert with check (auth.uid() = owner_id);
+--   (Check the original definition in Supabase first — e.g. its role target —
+--   and match it exactly.)
+
+drop policy if exists "Users can insert own salon" on public.salons;

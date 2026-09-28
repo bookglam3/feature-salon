@@ -164,6 +164,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     const fetchSalon = async (userId: string) => {
+      // No salon row (e.g. verified their email but never finished signup):
+      // send them to finish their business details instead of rendering an
+      // empty dashboard. Uses its own limit(1) query — the .single() below also
+      // returns null for owners with 2+ salons, so it can't tell "none" apart.
+      // Only redirects on a successful empty result, never on a query error.
+      const { data: owned, error: ownedErr } = await supabase
+        .from("salons")
+        .select("id")
+        .eq("owner_id", userId)
+        .limit(1);
+      if (!ownedErr && owned?.length === 0) {
+        router.replace("/signup?finish=1");
+        return;
+      }
+
       const { data } = await supabase
         .from("salons")
         .select("id,subscription_status,subscription_plan,plan,trial_ends_at,current_period_end,stripe_customer_id")

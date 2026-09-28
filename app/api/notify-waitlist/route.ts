@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendWhatsApp } from "@/app/lib/whatsapp";
 import { Resend } from "resend";
+import { escapeHtml } from "@/app/lib/escapeHtml";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
           ? new Date(entry.preferred_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
           : null;
 
+        const safeSalonName = escapeHtml(salon.name); // owner-provided
         const html = `
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -94,14 +96,14 @@ export async function POST(req: NextRequest) {
 
     <div style="background:linear-gradient(135deg,#7C3AED 0%,#C2185B 100%);padding:36px 28px;text-align:center;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:14px;">🎉</div>
-      <p style="color:rgba(255,255,255,0.8);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salon.name}</p>
+      <p style="color:rgba(255,255,255,0.8);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${safeSalonName}</p>
       <h1 style="color:#fff;margin:0;font-size:24px;font-weight:700;">A Slot Just Opened Up!</h1>
     </div>
 
     <div style="background:#fff;padding:28px;">
       <p style="font-size:16px;margin:0 0 8px;">Hi <strong>${entry.client_name}</strong> 👋</p>
       <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">
-        Great news! A booking slot has just become available at <strong>${salon.name}</strong>.
+        Great news! A booking slot has just become available at <strong>${safeSalonName}</strong>.
         You're on our waitlist, so we're letting you know first!
       </p>
 
@@ -123,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:16px 28px;text-align:center;">
       <p style="font-size:12px;color:#bbb;margin:0;line-height:1.8;">
-        ${salon.name} • Powered by feature • United Kingdom<br/>
+        ${safeSalonName} • Powered by feature • United Kingdom<br/>
         <a href="${APP_URL}/unsubscribe" style="color:#bbb;text-decoration:underline;font-size:11px;">Unsubscribe from notifications</a>
       </p>
     </div>

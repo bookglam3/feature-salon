@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { withMeridiem } from "@/app/lib/formatTime";
+import { escapeHtml } from "@/app/lib/escapeHtml";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,6 +43,11 @@ export async function POST(req: NextRequest) {
 
     const typeLabel = BUSINESS_TYPE_LABELS[businessType] || businessType;
 
+    // All of these come straight from the browser — escape before they go into HTML.
+    const safeSalonName = escapeHtml(salonName);
+    const safeEmail     = escapeHtml(email);
+    const safeTypeLabel = escapeHtml(typeLabel);
+
     const signupDate = withMeridiem(new Date(signedUpAt).toLocaleString("en-GB", {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
       hour: "numeric", minute: "2-digit",
@@ -57,22 +63,22 @@ export async function POST(req: NextRequest) {
     <div style="background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 100%);padding:32px 28px;text-align:center;border-bottom:3px solid #4C1D95;">
       <p style="color:#EDE9FE;margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Feature</p>
       <h1 style="color:#FFFFFF;margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px;">🎉 New signup!</h1>
-      <p style="color:#F5F3FF;margin:8px 0 0;font-size:14px;">${salonName} just joined Feature</p>
+      <p style="color:#F5F3FF;margin:8px 0 0;font-size:14px;">${safeSalonName} just joined Feature</p>
     </div>
 
     <div style="padding:28px 28px 8px;">
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;width:38%;">Business name</td>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:700;color:#0F172A;">${salonName}</td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:700;color:#0F172A;">${safeSalonName}</td>
         </tr>
         <tr>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Type</td>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;">${typeLabel}</td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;">${safeTypeLabel}</td>
         </tr>
         <tr>
           <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Email</td>
-          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;"><a href="mailto:${email}" style="color:#6366F1;text-decoration:none;">${email}</a></td>
+          <td style="padding:11px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#0F172A;"><a href="mailto:${safeEmail}" style="color:#6366F1;text-decoration:none;">${safeEmail}</a></td>
         </tr>
         <tr>
           <td style="padding:11px 0;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;">Signed up</td>

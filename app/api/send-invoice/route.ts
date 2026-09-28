@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import { escapeHtml } from "@/app/lib/escapeHtml";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -44,6 +45,7 @@ function buildInvoiceEmail({
   notes?: string;
   status: string;
 }) {
+  const safeSalonName = escapeHtml(salonName); // owner-provided
   const dueDateFormatted = dueDate
     ? new Date(dueDate + "T00:00:00").toLocaleDateString("en-GB", {
         day: "numeric", month: "long", year: "numeric",
@@ -70,7 +72,7 @@ function buildInvoiceEmail({
 
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 100%);padding:36px 32px;text-align:center;">
-      <p style="color:rgba(255,255,255,0.7);margin:0 0 4px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;">${salonName}</p>
+      <p style="color:rgba(255,255,255,0.7);margin:0 0 4px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;">${safeSalonName}</p>
       <h1 style="color:#fff;margin:8px 0 4px;font-size:26px;font-weight:700;letter-spacing:-0.5px;">Invoice</h1>
       <p style="color:rgba(255,255,255,0.85);margin:0;font-size:16px;font-weight:600;letter-spacing:1px;">${invoiceNumber}</p>
     </div>
@@ -80,7 +82,7 @@ function buildInvoiceEmail({
 
       <p style="font-size:15px;margin:0 0 6px;color:#111;">Hi <strong>${clientName}</strong>,</p>
       <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 28px;">
-        Please find your invoice from <strong>${salonName}</strong> below. 
+        Please find your invoice from <strong>${safeSalonName}</strong> below. 
         ${dueDateFormatted ? `Payment is due by <strong>${dueDateFormatted}</strong>.` : ""}
       </p>
 
@@ -136,7 +138,7 @@ function buildInvoiceEmail({
     <!-- Footer -->
     <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:18px 32px;text-align:center;">
       <p style="font-size:12px;color:#bbb;margin:0;line-height:1.8;">
-        ${salonName} &bull; Powered by Feature &bull; United Kingdom<br/>
+        ${safeSalonName} &bull; Powered by Feature &bull; United Kingdom<br/>
         This is an automated invoice — please do not reply directly to this email.
       </p>
     </div>
