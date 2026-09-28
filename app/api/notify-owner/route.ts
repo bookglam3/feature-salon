@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
 <div style="max-width:500px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
   <div style="background:${isCancel ? "linear-gradient(135deg,#DC2626,#B91C1C)" : "linear-gradient(135deg,#4F46E5,#6366F1)"};padding:32px 28px;text-align:center;">
     <div style="font-size:40px;margin-bottom:8px;">${isCancel ? "❌" : "🔄"}</div>
-    <p style="color:rgba(255,255,255,0.7);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salonName}</p>
+    <p style="color:rgba(255,255,255,0.7);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(String(salonName ?? ""))}</p>
     <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">${isCancel ? "Appointment Cancelled" : "Appointment Rescheduled"}</h1>
   </div>
   <div style="padding:28px;">
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     </div>
   </div>
   <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:14px 28px;text-align:center;">
-    <p style="font-size:11px;color:#64748B;margin:0;">${salonName} · Powered by Feature Salon</p>
+    <p style="font-size:11px;color:#64748B;margin:0;">${escapeHtml(String(salonName ?? ""))} · Powered by Feature Salon</p>
   </div>
 </div>
 </body></html>`;

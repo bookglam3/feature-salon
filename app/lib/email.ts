@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { formatTimeDisplay } from "./formatTime";
+import { escapeHtml } from "./escapeHtml";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -99,6 +100,7 @@ function emailTemplate({
   price?: number; extra?: string; unsubLink?: string; terms?: EmailTerms;
 }) {
   unsubLink = unsubLink ?? `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe`;
+  const safeSalonName = escapeHtml(salonName); // owner-provided
   return `
   <!DOCTYPE html>
   <html lang="en-GB">
@@ -108,7 +110,7 @@ function emailTemplate({
 
       <!-- Header -->
       <div style="background:linear-gradient(135deg,${color} 0%,#7B2D52 100%);padding:32px 28px;text-align:center;">
-        <p style="color:rgba(255,255,255,0.7);margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salonName}</p>
+        <p style="color:rgba(255,255,255,0.7);margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${safeSalonName}</p>
         <h1 style="color:#fff;margin:0;font-size:22px;font-weight:600;">${title}</h1>
       </div>
 
@@ -138,7 +140,7 @@ function emailTemplate({
       <!-- Footer -->
       <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:16px 28px;text-align:center;">
         <p style="font-size:12px;color:#ccc;margin:0;line-height:1.7;">
-          ${salonName} &bull; United Kingdom<br/>
+          ${safeSalonName} &bull; United Kingdom<br/>
           This is an automated message — please do not reply directly to this email.<br/>
           <a href="${unsubLink}" style="color:#bbb;text-decoration:underline;font-size:11px;">Unsubscribe from reminders</a>
         </p>
@@ -174,7 +176,11 @@ export async function sendBookingEmails({
 }) {
   const { formattedDate, formattedTime } = formatDate(dateTime);
   const terms = getEmailTerms(businessType);
-  const detailsLabel = terms.bookingWord.charAt(0).toUpperCase() + terms.bookingWord.slice(1) + " Details";
+  // Owner-provided — escape for the HTML bodies. Subjects and the Maps link
+  // (encodeURIComponent) use the raw values.
+  const safeSalonName = escapeHtml(salonName);
+  const safeSalonAddress = escapeHtml(salonAddress);
+  const detailsLabel =terms.bookingWord.charAt(0).toUpperCase() + terms.bookingWord.slice(1) + " Details";
 
   // ── Payment status badge for owner email ──
   const paymentBadge = (() => {
@@ -203,14 +209,14 @@ export async function sendBookingEmails({
       <!-- Header -->
       <div style="background:linear-gradient(135deg,#C2185B 0%,#7B2D52 100%);padding:36px 28px;text-align:center;">
         <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;">✅</div>
-        <p style="color:rgba(255,255,255,0.75);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salonName}</p>
+        <p style="color:rgba(255,255,255,0.75);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${safeSalonName}</p>
         <h1 style="color:#fff;margin:0;font-size:24px;font-weight:700;">Booking Confirmed! ${terms.headerIcon}</h1>
       </div>
 
       <!-- Greeting -->
       <div style="background:#fff;padding:28px 28px 0;">
         <p style="font-size:16px;margin:0 0 6px;color:#111;">Hi <strong>${clientName}</strong> 👋</p>
-        <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">Your ${terms.bookingWord} at <strong>${salonName}</strong> is confirmed. ${terms.greetingLine}</p>
+        <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">Your ${terms.bookingWord} at <strong>${safeSalonName}</strong> is confirmed. ${terms.greetingLine}</p>
 
         <!-- Booking Card -->
         <div style="background:#FDF5F8;border:1.5px solid #F0C4D4;border-radius:12px;padding:20px 22px;margin-bottom:22px;">
@@ -230,7 +236,7 @@ export async function sendBookingEmails({
           <span style="font-size:20px;">📍</span>
           <div>
             <div style="font-size:12px;font-weight:700;color:#4F6EF7;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Location</div>
-            <div style="font-size:14px;color:#334155;font-weight:500;line-height:1.5;">${salonAddress}</div>
+            <div style="font-size:14px;color:#334155;font-weight:500;line-height:1.5;">${safeSalonAddress}</div>
             <a href="https://maps.google.com/?q=${encodeURIComponent(salonAddress)}" style="font-size:12px;color:#4F6EF7;font-weight:600;text-decoration:none;margin-top:6px;display:inline-block;">Open in Google Maps →</a>
           </div>
         </div>` : ""}
@@ -264,13 +270,13 @@ export async function sendBookingEmails({
         </div>
 
         <p style="font-size:13px;color:#64748B;margin:0 0 4px;line-height:1.6;">We look forward to welcoming you.</p>
-        <p style="font-size:13px;color:#64748B;margin:0;line-height:1.6;">— The ${salonName} Team</p>
+        <p style="font-size:13px;color:#64748B;margin:0;line-height:1.6;">— The ${safeSalonName} Team</p>
       </div>
 
       <!-- Footer -->
       <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:18px 28px;text-align:center;margin-top:28px;">
         <p style="font-size:12px;color:#bbb;margin:0;line-height:1.8;">
-          ${salonName} &bull; United Kingdom<br/>
+          ${safeSalonName} &bull; United Kingdom<br/>
           This is an automated confirmation — please do not reply to this email.<br/>
           <a href="${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe" style="color:#bbb;text-decoration:underline;font-size:11px;">Unsubscribe from reminders</a>
         </p>
@@ -290,7 +296,7 @@ export async function sendBookingEmails({
       <!-- Header -->
       <div style="background:linear-gradient(135deg,#1E3A8A 0%,#3730A3 100%);padding:36px 28px;text-align:center;">
         <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;">🎉</div>
-        <p style="color:rgba(255,255,255,0.75);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salonName}</p>
+        <p style="color:rgba(255,255,255,0.75);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${safeSalonName}</p>
         <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">New Booking!</h1>
       </div>
 
@@ -335,7 +341,7 @@ export async function sendBookingEmails({
       <!-- Footer -->
       <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:16px 28px;text-align:center;">
         <p style="font-size:12px;color:#bbb;margin:0;line-height:1.8;">
-          ${salonName} &bull; Powered by feature &bull; United Kingdom<br/>
+          ${safeSalonName} &bull; Powered by feature &bull; United Kingdom<br/>
           This is an automated notification from your booking system.
         </p>
       </div>
@@ -550,6 +556,7 @@ export async function sendNoShowAlertEmail({
   const { formattedDate, formattedTime } = formatDate(dateTime);
   const terms = getEmailTerms(businessType);
   const greeting = ownerName ? ownerName : "there";
+  const safeSalonName = escapeHtml(salonName); // owner-provided
 
   await sendEmailSafe({
     from: FROM,
@@ -565,7 +572,7 @@ export async function sendNoShowAlertEmail({
         <!-- Header -->
         <div style="background:linear-gradient(135deg,#DC2626 0%,#991B1B 100%);padding:32px 28px;text-align:center;">
           <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;">⚠️</div>
-          <p style="color:rgba(255,255,255,0.8);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${salonName}</p>
+          <p style="color:rgba(255,255,255,0.8);margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${safeSalonName}</p>
           <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">Possible No-Show</h1>
         </div>
 
@@ -599,7 +606,7 @@ export async function sendNoShowAlertEmail({
         <!-- Footer -->
         <div style="background:#F9F9F9;border-top:1px solid #EFEFEF;padding:16px 28px;text-align:center;">
           <p style="font-size:12px;color:#bbb;margin:0;line-height:1.8;">
-            ${salonName} • Powered by feature • United Kingdom<br/>
+            ${safeSalonName} • Powered by feature • United Kingdom<br/>
             This is an automated alert from your booking system.
           </p>
         </div>
