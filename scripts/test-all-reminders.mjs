@@ -10,7 +10,7 @@
  * Usage:
  *   node scripts/test-all-reminders.mjs [BASE_URL]
  *   e.g. node scripts/test-all-reminders.mjs http://localhost:3000
- *        node scripts/test-all-reminders.mjs https://www.featuresalon.co.uk
+ *        node scripts/test-all-reminders.mjs https://featuresalon.co.uk
  */
 
 // Load .env.local manually (no dotenv dep needed)
@@ -128,8 +128,8 @@ try {
       salonOwnerEmail: TEST_EMAIL,
       price:           45,
       salonAddress:    "123 Test Street, London, UK",
-      cancelLink:      "https://www.featuresalon.co.uk",
-      dashboardUrl:    "https://www.featuresalon.co.uk/dashboard",
+      cancelLink:      "https://featuresalon.co.uk",
+      dashboardUrl:    "https://featuresalon.co.uk/dashboard",
       paymentStatus:   "paid",
       depositOnly:     false,
     }),

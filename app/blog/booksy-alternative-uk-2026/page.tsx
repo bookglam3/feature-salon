@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "Thinking of leaving Booksy? An honest look at what Booksy costs in 2026 — subscription, per-staff fees and Boost commission — and what to consider if you want something simpler.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/booksy-alternative-uk-2026",
+    canonical: "https://featuresalon.co.uk/blog/booksy-alternative-uk-2026",
   },
   openGraph: {
     title: "The Best Booksy Alternative for UK Salons & Barbers (2026) | Feature",
     description:
       "Thinking of leaving Booksy? An honest look at what Booksy costs in 2026 — subscription, per-staff fees and Boost commission — and what to consider if you want something simpler.",
-    url: "https://www.featuresalon.co.uk/blog/booksy-alternative-uk-2026",
+    url: "https://featuresalon.co.uk/blog/booksy-alternative-uk-2026",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-06-01",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/booksy-alternative-uk-2026`;
 
 const jsonLdArticle = JSON.stringify({

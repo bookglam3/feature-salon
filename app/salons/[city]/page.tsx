@@ -139,12 +139,12 @@ export async function generateMetadata({
       `beauty salon software ${data.name.toLowerCase()}`,
     ],
     alternates: {
-      canonical: `https://www.featuresalon.co.uk/salons/${city}`,
+      canonical: `https://featuresalon.co.uk/salons/${city}`,
     },
     openGraph: {
       title: `Best Salon Software in ${data.name} | Feature Salon`,
       description: `The best salon software for ${data.name} salons. Online bookings, automated reminders, Stripe payments — with zero commission fees.`,
-      url: `https://www.featuresalon.co.uk/salons/${city}`,
+      url: `https://featuresalon.co.uk/salons/${city}`,
       locale: "en_GB",
       type: "website",
     },
@@ -163,7 +163,7 @@ export default async function CityPage({
   const data = CITY_DATA[city];
   if (!data) notFound();
 
-  const BASE = "https://www.featuresalon.co.uk";
+  const BASE = "https://featuresalon.co.uk";
   const pageUrl = `${BASE}/salons/${city}`;
 
   // ── LocalBusiness Schema ────────────────────────────────────

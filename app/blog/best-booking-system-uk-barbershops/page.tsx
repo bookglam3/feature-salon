@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "An honest guide to choosing barbershop booking software in the UK: per-barber calendars, walk-ins, deposits, reminders, and flat vs marketplace pricing.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/best-booking-system-uk-barbershops",
+    canonical: "https://featuresalon.co.uk/blog/best-booking-system-uk-barbershops",
   },
   openGraph: {
     title: "The Best Booking System for UK Barbershops (2026) | Feature",
     description:
       "An honest guide to choosing barbershop booking software in the UK: per-barber calendars, walk-ins, deposits, reminders, and flat vs marketplace pricing.",
-    url: "https://www.featuresalon.co.uk/blog/best-booking-system-uk-barbershops",
+    url: "https://featuresalon.co.uk/blog/best-booking-system-uk-barbershops",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-05-31",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/best-booking-system-uk-barbershops`;
 
 const jsonLdArticle = JSON.stringify({

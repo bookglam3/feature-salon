@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   description:
     "Feature Salon helps Manchester hair salons, beauty salons, and barbershops manage bookings, staff, and payments online. Free 14-day trial. Better than Fresha.",
   keywords: ["salon software manchester", "manchester salon booking system", "fresha alternative manchester"],
-  alternates: { canonical: "https://www.featuresalon.co.uk/salons/manchester" },
+  alternates: { canonical: "https://featuresalon.co.uk/salons/manchester" },
   openGraph: {
     title: "Salon Management Software for Manchester Salons | Feature Salon",
     description: "Feature Salon helps Manchester salons manage bookings, staff, and payments. Free 14-day trial.",
-    url: "https://www.featuresalon.co.uk/salons/manchester",
+    url: "https://featuresalon.co.uk/salons/manchester",
     locale: "en_GB",
   },
 };

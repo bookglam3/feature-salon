@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   description:
     "Feature Salon helps Birmingham hair salons, beauty salons, and barbershops manage bookings, staff, and payments online. Free 14-day trial. Better than Fresha.",
   keywords: ["salon software birmingham", "birmingham salon booking system", "fresha alternative birmingham"],
-  alternates: { canonical: "https://www.featuresalon.co.uk/salons/birmingham" },
+  alternates: { canonical: "https://featuresalon.co.uk/salons/birmingham" },
   openGraph: {
     title: "Salon Management Software for Birmingham Salons | Feature Salon",
     description: "Feature Salon helps Birmingham salons manage bookings, staff, and payments. Free 14-day trial.",
-    url: "https://www.featuresalon.co.uk/salons/birmingham",
+    url: "https://featuresalon.co.uk/salons/birmingham",
     locale: "en_GB",
   },
 };

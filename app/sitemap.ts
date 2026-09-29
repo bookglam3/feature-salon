@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://www.featuresalon.co.uk";
+const BASE_URL = "https://featuresalon.co.uk";
 
 const BLOG_POSTS: { slug: string; date: string; priority: number }[] = [
   { slug: "how-to-reduce-no-shows-salon",           date: "2026-05-01", priority: 0.85 },

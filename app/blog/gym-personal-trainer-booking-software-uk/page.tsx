@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "An honest guide to choosing gym or PT booking software in the UK: what independent trainers, studios and gyms actually need, and how flat pricing compares to commission models in 2026.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/gym-personal-trainer-booking-software-uk",
+    canonical: "https://featuresalon.co.uk/blog/gym-personal-trainer-booking-software-uk",
   },
   openGraph: {
     title: "The Best Gym & Personal Trainer Booking Software in the UK (2026) | Feature",
     description:
       "An honest guide to choosing gym or PT booking software in the UK: what independent trainers, studios and gyms actually need, and how flat pricing compares to commission models in 2026.",
-    url: "https://www.featuresalon.co.uk/blog/gym-personal-trainer-booking-software-uk",
+    url: "https://featuresalon.co.uk/blog/gym-personal-trainer-booking-software-uk",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-06-01",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/gym-personal-trainer-booking-software-uk`;
 
 const jsonLdArticle = JSON.stringify({
