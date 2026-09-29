@@ -23,7 +23,7 @@ const playfair = Playfair_Display({
 });
 
 
-const BASE_URL = "https://www.featuresalon.co.uk";
+const BASE_URL = "https://featuresalon.co.uk";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Our Story | Feature — UK Health & Wellbeing Booking Software",
   description: "Feature started behind the front desk of a family salon. Discover the story behind why we built a booking platform that works for you, not against you.",
-  alternates: { canonical: "https://www.featuresalon.co.uk/about" },
+  alternates: { canonical: "https://featuresalon.co.uk/about" },
 };
 
 const prose: React.CSSProperties = {

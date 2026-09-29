@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "Email reminders are easy to miss. Learn why WhatsApp reminders are quietly becoming the most important feature in salon booking software — and how to use them well.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/salon-software-whatsapp-reminders",
+    canonical: "https://featuresalon.co.uk/blog/salon-software-whatsapp-reminders",
   },
   openGraph: {
     title: "Salon Software with WhatsApp Reminders: Why It Matters (2026) | Feature",
     description:
       "Email reminders are easy to miss. Learn why WhatsApp reminders are quietly becoming the most important feature in salon booking software — and how to use them well.",
-    url: "https://www.featuresalon.co.uk/blog/salon-software-whatsapp-reminders",
+    url: "https://featuresalon.co.uk/blog/salon-software-whatsapp-reminders",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-05-31",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/salon-software-whatsapp-reminders`;
 
 const jsonLdArticle = JSON.stringify({

@@ -20,11 +20,11 @@ export async function generateMetadata({
     description: post.metaDescription,
     keywords: [post.keyword, "salon software uk", "feature salon", "uk salon"],
     authors: [{ name: post.author }],
-    alternates: { canonical: `https://www.featuresalon.co.uk/blog/${slug}` },
+    alternates: { canonical: `https://featuresalon.co.uk/blog/${slug}` },
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,
-      url: `https://www.featuresalon.co.uk/blog/${slug}`,
+      url: `https://featuresalon.co.uk/blog/${slug}`,
       locale: "en_GB",
       type: "article",
       publishedTime: post.publishedDate,
@@ -43,7 +43,7 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const BASE = "https://www.featuresalon.co.uk";
+  const BASE = "https://featuresalon.co.uk";
   const pageUrl = `${BASE}/blog/${slug}`;
 
   // Article Schema

@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     "cheap salon management software uk",
   ],
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/pricing",
+    canonical: "https://featuresalon.co.uk/pricing",
   },
   openGraph: {
     title: "Pricing | Salon Management Software — Feature Salon",
     description:
       "Plans from £29/month. 14-day free trial. No contracts. The affordable Fresha alternative for UK salons.",
-    url: "https://www.featuresalon.co.uk/pricing",
+    url: "https://featuresalon.co.uk/pricing",
     locale: "en_GB",
   },
 };

@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy | Feature",
   description: "How Feature collects, uses, and protects your personal data. UK GDPR and DPA 2018 compliant.",
-  alternates: { canonical: "https://www.featuresalon.co.uk/privacy" },
+  alternates: { canonical: "https://featuresalon.co.uk/privacy" },
 };
 
 export default function PrivacyPolicyPage() {
@@ -189,7 +189,7 @@ export default function PrivacyPolicyPage() {
           <p>For any privacy-related questions or requests:</p>
           <ul>
             <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a></li>
-            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
+            <li>Website: <a href="https://featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
           </ul>
         </Section>
 

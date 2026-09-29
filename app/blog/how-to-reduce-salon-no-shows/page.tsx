@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
+    canonical: "https://featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
   },
   openGraph: {
     title: "How to Reduce No-Shows in Your Salon (2026) | Feature",
     description:
       "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
-    url: "https://www.featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
+    url: "https://featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-05-31",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/how-to-reduce-salon-no-shows`;
 
 const jsonLdArticle = JSON.stringify({

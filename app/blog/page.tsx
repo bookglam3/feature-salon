@@ -5,11 +5,11 @@ import { POSTS } from "./posts";
 export const metadata: Metadata = {
   title: "Salon Software Blog — Tips, Guides & Comparisons | Feature Salon",
   description: "The Feature Salon blog. Expert guides on reducing no-shows, growing salon bookings, and comparing salon software — written for UK salon owners.",
-  alternates: { canonical: "https://www.featuresalon.co.uk/blog" },
+  alternates: { canonical: "https://featuresalon.co.uk/blog" },
   openGraph: {
     title: "Salon Software Blog | Feature Salon",
     description: "Expert guides for UK salon owners — no-shows, online bookings, Fresha alternatives, and more.",
-    url: "https://www.featuresalon.co.uk/blog",
+    url: "https://featuresalon.co.uk/blog",
     locale: "en_GB",
     type: "website",
   },

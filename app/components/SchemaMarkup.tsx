@@ -14,11 +14,11 @@ export default function SchemaMarkup() {
     applicationCategory: "BusinessApplication",
     applicationSubCategory: "Salon Management Software",
     operatingSystem: "Web, iOS, Android",
-    url: "https://www.featuresalon.co.uk",
+    url: "https://featuresalon.co.uk",
     description:
       "Free salon booking software for UK salons. Online bookings, automated WhatsApp & SMS reminders, Stripe payments, staff management, and revenue analytics. Better than Fresha — no commission fees.",
     inLanguage: "en-GB",
-    screenshot: "https://www.featuresalon.co.uk/og-image.png",
+    screenshot: "https://featuresalon.co.uk/og-image.png",
     softwareVersion: "2.0",
     datePublished: "2024-01-01",
     offers: {
@@ -51,7 +51,7 @@ export default function SchemaMarkup() {
     provider: {
       "@type": "Organization",
       name: "Feature Salon",
-      url: "https://www.featuresalon.co.uk",
+      url: "https://featuresalon.co.uk",
     },
   };
 
@@ -59,13 +59,13 @@ export default function SchemaMarkup() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": "https://www.featuresalon.co.uk/#organization",
+    "@id": "https://featuresalon.co.uk/#organization",
     name: "Feature Salon",
     legalName: "Feature Salon Ltd",
-    url: "https://www.featuresalon.co.uk",
+    url: "https://featuresalon.co.uk",
     logo: {
       "@type": "ImageObject",
-      url: "https://www.featuresalon.co.uk/og-image.png",
+      url: "https://featuresalon.co.uk/og-image.png",
       width: 1200,
       height: 630,
     },
@@ -86,7 +86,7 @@ export default function SchemaMarkup() {
         contactType: "customer support",
         areaServed: "GB",
         availableLanguage: "English",
-        url: "https://www.featuresalon.co.uk/signup",
+        url: "https://featuresalon.co.uk/signup",
       },
     ],
     sameAs: [
@@ -99,17 +99,17 @@ export default function SchemaMarkup() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": "https://www.featuresalon.co.uk/#website",
+    "@id": "https://featuresalon.co.uk/#website",
     name: "Feature Salon",
-    url: "https://www.featuresalon.co.uk",
+    url: "https://featuresalon.co.uk",
     description: "Free salon booking software for UK salons — online bookings, payments, and automated reminders",
     inLanguage: "en-GB",
-    publisher: { "@id": "https://www.featuresalon.co.uk/#organization" },
+    publisher: { "@id": "https://featuresalon.co.uk/#organization" },
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: "https://www.featuresalon.co.uk/book/{search_term_string}",
+        urlTemplate: "https://featuresalon.co.uk/book/{search_term_string}",
       },
       "query-input": "required name=search_term_string",
     },

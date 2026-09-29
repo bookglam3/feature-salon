@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://www.featuresalon.co.uk";
+const BASE_URL = "https://featuresalon.co.uk";
 
 const DISALLOW_PATHS = [
   "/dashboard", "/dashboard/", "/admin", "/admin/",

@@ -7,20 +7,20 @@ export const metadata: Metadata = {
   description:
     "Looking for a Fresha alternative with no commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, zero commission.",
   alternates: {
-    canonical: "https://www.featuresalon.co.uk/blog/fresha-alternative-uk-2026",
+    canonical: "https://featuresalon.co.uk/blog/fresha-alternative-uk-2026",
   },
   openGraph: {
     title: "Best Fresha Alternative for UK Salons & Clinics (2026) | Feature",
     description:
       "Looking for a Fresha alternative with no commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, zero commission.",
-    url: "https://www.featuresalon.co.uk/blog/fresha-alternative-uk-2026",
+    url: "https://featuresalon.co.uk/blog/fresha-alternative-uk-2026",
     locale: "en_GB",
     type: "article",
     publishedTime: "2026-05-31",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 const PAGE_URL = `${BASE}/blog/fresha-alternative-uk-2026`;
 
 const jsonLdArticle = JSON.stringify({

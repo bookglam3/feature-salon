@@ -12,7 +12,7 @@ import LpFooter from "./components/landing/LpFooter";
 export const metadata: Metadata = {
   title: "Feature | Health & Wellbeing Booking Software — Free Trial",
   description: "Feature is a booking & management platform for salons, gyms, spas, yoga studios, physiotherapy clinics and more. WhatsApp reminders, Stripe payments, staff scheduling & CRM. 14-day free trial. No commission fees.",
-  alternates: { canonical: "https://www.featuresalon.co.uk" },
+  alternates: { canonical: "https://featuresalon.co.uk" },
 };
 
 const faqItems = [
@@ -32,10 +32,10 @@ const faqItems = [
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  "@id": "https://www.featuresalon.co.uk/#faq",
+  "@id": "https://featuresalon.co.uk/#faq",
   mainEntity: faqItems.map((item, i) => ({
     "@type": "Question",
-    "@id": `https://www.featuresalon.co.uk/#faq-${i + 1}`,
+    "@id": `https://featuresalon.co.uk/#faq-${i + 1}`,
     name: item.question,
     acceptedAnswer: { "@type": "Answer", text: item.answer },
   })),
@@ -45,9 +45,9 @@ const faqSchema = {
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "@id": "https://www.featuresalon.co.uk/#software",
+  "@id": "https://featuresalon.co.uk/#software",
   name: "Feature",
-  url: "https://www.featuresalon.co.uk",
+  url: "https://featuresalon.co.uk",
   applicationCategory: "BusinessApplication",
   applicationSubCategory: "Health & Wellbeing Booking Software",
   operatingSystem: "Web, iOS, Android",
@@ -70,7 +70,7 @@ const softwareSchema = {
     "No booking commission fees",
     "Branded public booking page",
   ],
-  screenshot: "https://www.featuresalon.co.uk/og-image.png",
+  screenshot: "https://featuresalon.co.uk/og-image.png",
   offers: [
     {
       "@type": "Offer",
@@ -79,7 +79,7 @@ const softwareSchema = {
       priceCurrency: "GBP",
       priceSpecification: { "@type": "UnitPriceSpecification", price: "29.00", priceCurrency: "GBP", billingDuration: "P1M" },
       description: "For solo practitioners. Up to 3 staff, online booking, email reminders.",
-      url: "https://www.featuresalon.co.uk/signup",
+      url: "https://featuresalon.co.uk/signup",
     },
     {
       "@type": "Offer",
@@ -88,7 +88,7 @@ const softwareSchema = {
       priceCurrency: "GBP",
       priceSpecification: { "@type": "UnitPriceSpecification", price: "59.00", priceCurrency: "GBP", billingDuration: "P1M" },
       description: "For growing businesses. Up to 10 staff, SMS & WhatsApp reminders, analytics.",
-      url: "https://www.featuresalon.co.uk/signup",
+      url: "https://featuresalon.co.uk/signup",
     },
     {
       "@type": "Offer",
@@ -97,14 +97,14 @@ const softwareSchema = {
       priceCurrency: "GBP",
       priceSpecification: { "@type": "UnitPriceSpecification", price: "99.00", priceCurrency: "GBP", billingDuration: "P1M" },
       description: "For multi-location businesses. Unlimited staff, advanced reports, priority support.",
-      url: "https://www.featuresalon.co.uk/signup",
+      url: "https://featuresalon.co.uk/signup",
     },
   ],
   publisher: {
     "@type": "Organization",
     name: "Feature",
-    url: "https://www.featuresalon.co.uk",
-    logo: { "@type": "ImageObject", url: "https://www.featuresalon.co.uk/brand/logo-light.svg" },
+    url: "https://featuresalon.co.uk",
+    logo: { "@type": "ImageObject", url: "https://featuresalon.co.uk/brand/logo-light.svg" },
   },
 };
 
@@ -112,12 +112,12 @@ const softwareSchema = {
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "https://www.featuresalon.co.uk/#organization",
+  "@id": "https://featuresalon.co.uk/#organization",
   name: "Feature",
-  url: "https://www.featuresalon.co.uk",
+  url: "https://featuresalon.co.uk",
   logo: {
     "@type": "ImageObject",
-    url: "https://www.featuresalon.co.uk/brand/logo-light.svg",
+    url: "https://featuresalon.co.uk/brand/logo-light.svg",
     width: 200,
     height: 60,
   },
@@ -134,13 +134,13 @@ const orgSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": "https://www.featuresalon.co.uk/#website",
-  url: "https://www.featuresalon.co.uk",
+  "@id": "https://featuresalon.co.uk/#website",
+  url: "https://featuresalon.co.uk",
   name: "Feature",
   description: "UK Health & Wellbeing Booking & Management Software",
   potentialAction: {
     "@type": "SearchAction",
-    target: { "@type": "EntryPoint", urlTemplate: "https://www.featuresalon.co.uk/book/{search_term_string}" },
+    target: { "@type": "EntryPoint", urlTemplate: "https://featuresalon.co.uk/book/{search_term_string}" },
     "query-input": "required name=search_term_string",
   },
 };

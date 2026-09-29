@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms of Service | Feature",
   description: "Terms and conditions for using the Feature booking and business management platform.",
-  alternates: { canonical: "https://www.featuresalon.co.uk/terms" },
+  alternates: { canonical: "https://featuresalon.co.uk/terms" },
 };
 
 export default function TermsOfServicePage() {
@@ -165,7 +165,7 @@ export default function TermsOfServicePage() {
           <p>For questions about these Terms:</p>
           <ul>
             <li>Email: <a href="mailto:adilgill2008@gmail.com" style={{ color: "#7C3AED" }}>adilgill2008@gmail.com</a></li>
-            <li>Website: <a href="https://www.featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
+            <li>Website: <a href="https://featuresalon.co.uk" style={{ color: "#7C3AED" }}>featuresalon.co.uk</a></li>
           </ul>
         </Section>
 

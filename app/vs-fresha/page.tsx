@@ -6,18 +6,18 @@ export const metadata: Metadata = {
   title: "Feature vs Fresha — Honest Cost Comparison (2026) | Feature",
   description:
     "Compare Feature, Fresha, and Booksy on real 2026 UK pricing. Use our free calculator to see what marketplace commission could cost your salon or clinic each month.",
-  alternates: { canonical: "https://www.featuresalon.co.uk/vs-fresha" },
+  alternates: { canonical: "https://featuresalon.co.uk/vs-fresha" },
   openGraph: {
     title: "Feature vs Fresha — Honest Cost Comparison (2026) | Feature",
     description:
       "Compare Feature, Fresha, and Booksy on real 2026 UK pricing. Use our free calculator to see what marketplace commission could cost your salon or clinic each month.",
-    url: "https://www.featuresalon.co.uk/vs-fresha",
+    url: "https://featuresalon.co.uk/vs-fresha",
     locale: "en_GB",
     type: "website",
   },
 };
 
-const BASE = "https://www.featuresalon.co.uk";
+const BASE = "https://featuresalon.co.uk";
 
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
