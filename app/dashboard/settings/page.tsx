@@ -241,17 +241,15 @@ export default function SettingsPage() {
     setSaving(true); setSaveError("");
     const finalLogoUrl = (logoUrl && !logoUrl.startsWith("data:")) ? logoUrl
       : (logoUrlInput.trim() || null);
-    const newSlug = salonName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const slugChanged = newSlug !== salon.slug && salonName !== salon.name;
+    // The slug is deliberately not touched: it is the salon's booking link and
+    // is printed on QR codes, so renaming must never change it.
     const { error } = await supabase.from("salons").update({
       name: salonName,
       logo_url: finalLogoUrl,
       description: description || null,
-      ...(slugChanged ? { slug: newSlug } : {}),
     }).eq("id", salon.id);
     if (error) { setSaveError("Failed to save brand settings. Please try again."); setSaving(false); return; }
     if (finalLogoUrl) setLogoUrl(finalLogoUrl);
-    if (slugChanged) setSalon((prev: SalonData | null) => prev ? { ...prev, slug: newSlug } : prev);
     setSaved(true); setSaving(false);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -537,7 +535,8 @@ export default function SettingsPage() {
 
         <div style={{ marginBottom: "14px" }}>
           <label htmlFor="salon-name" style={labelStyle}>{vc.productName.replace(" OS","")} Name</label>
-          <input id="salon-name" value={salonName} onChange={e => setSalonName(e.target.value)} style={inputStyle} {...inputFocus} />
+          <input id="salon-name" value={salonName} onChange={e => setSalonName(e.target.value)} aria-describedby="salon-name-hint" style={inputStyle} {...inputFocus} />
+          <div id="salon-name-hint" style={{ fontSize: 12, color: "#524D60", marginTop: 6 }}>Changing your name doesn&apos;t change your booking link.</div>
         </div>
 
         <div style={{ marginBottom: "16px" }}>
