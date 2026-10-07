@@ -9,6 +9,9 @@ Format: plain text, no images, no buttons. It should read like an email from rea
 - **Emails 1–5 (trial sequence)** follow their send windows below. They are NOT subject to the 7-day cap.
 - **Emails 6–8**: max 1 per owner per 7 days, and never within 7 days of any other lifecycle email.
 - "Paying" = subscription_status 'active' (with or without Stripe, so comped accounts count) or a Stripe subscription that is active/trialing. Paying owners never get emails 2–5.
+- Emails 2–5 only go to owners who never subscribed (no Stripe subscription, status empty or 'trial'). Past-due and cancelled owners get none of them.
+- "Paid since" (emails 6–7) = the Stripe subscription's start date. Comped accounts use their trial end date.
+- "Login" (email 8) = the later of the dashboard login log and the owner's last sign-in.
 
 ### Send windows (day N = whole days since signup)
 | Email | Window | If missed |
@@ -19,23 +22,25 @@ Format: plain text, no images, no buttons. It should read like an email from rea
 | 4 | 3 to 1 days before trial end | Skip for good |
 | 5 | 2 to 7 days after trial end | Skip for good |
 | 6 | Every 30 days for paying owners | Next month |
-| 7 | Once, after 30+ days paid and a booking in the last 30 days | Next eligible day |
+| 7 | Once, between 30 and 60 days of paying, with a booking in the last 30 days | Not sent (older customers are asked by hand) |
 | 8 | 14+ days with no new bookings and no login; max once per 60 days | Next eligible day |
 
 Older accounts outside these windows get nothing on go-live (handled by hand).
 - Skip demo, staging and test salons.
 - Every email ends with the footer below.
-- Never send email 7 (review) to anyone who replied with a complaint in the last 30 days. Handle that by hand.
 - No incentives for reviews (Google forbids it), and ask everyone neutrally (no "only if you're happy").
 
 ### Placeholders
-{first_name} {salon_name} {booking_link} {dashboard_link} {trial_end_date} {subscribe_link} {google_review_link} {unsubscribe_link}
+{first_name} {salon_name} {booking_link} {dashboard_link} {trial_end_date} {subscribe_link} {google_review_link} {unsubscribe_link} {staff_label}
 
-If {first_name} is empty, use "Hi there".
+{staff_label} is the dashboard's name for the staff page for that business type (e.g. Stylists, Barbers, Trainers, Team).
+
+If {first_name} is empty, use "Hi there", and drop ", {first_name}" from the subjects of emails 1, 3 and 7 (e.g. "Welcome to Feature").
 
 ### Footer (all emails)
 —
 Feature · FEATURES TECH LTD · 71-75 Shelton Street, London WC2H 9JQ
+Registered in England and Wales, company no. 17288184
 You're getting this because you have a Feature account. Don't want these emails? Unsubscribe: {unsubscribe_link}
 
 ---
@@ -50,9 +55,11 @@ Thanks for signing up to Feature. We're really glad to have {salon_name} on boar
 
 Three things get you taking bookings:
 
-1. Add your services and prices (Dashboard → Services)
-2. Add your team, even if it's just you (Dashboard → Staff)
+1. Check your services and prices (we've added a few examples to get you started)
+2. Add your team, even if it's just you (Dashboard → {staff_label})
 3. Share your booking link: {booking_link}
+
+(Salons that start with no services — business type "Other", or created by an admin — get this step 1 instead: "Add your services and prices (Dashboard → Services)".)
 
 Most owners are done in about 15 minutes. Put the link in your Instagram bio and you're live.
 
@@ -63,12 +70,14 @@ The Feature Team
 ---
 
 ## 2. Setup help
-When: day 2 after signup. Who: owners who haven't added any services yet.
+When: day 2 after signup. Who: owners with no services, or only the untouched sample services we add at signup (every service still matches a sample's name, price and length).
 Subject: Can we help you set up {salon_name}?
 
 Hi {first_name},
 
-We noticed {salon_name} doesn't have any services on it yet, so your booking page is still empty.
+We noticed {salon_name} is still showing our sample services, so your booking page isn't really yours yet.
+
+(Salons with no services at all get this first line instead: "We noticed {salon_name} doesn't have any services on it yet, so your booking page is still empty.")
 
 No pressure. Setting up a new system is a faff when you're busy with clients all day.
 
@@ -153,7 +162,7 @@ The Feature Team
 ---
 
 ## 7. Google review request
-When: once, after 30 days of active paid use (has bookings in the last 30 days). Who: paying customers, never sent twice.
+When: once, between 30 and 60 days of paying, with a booking in the last 30 days. Who: paying customers, never sent twice.
 Subject: A small favour, {first_name}?
 
 Hi {first_name},
