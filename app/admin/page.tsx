@@ -225,11 +225,18 @@ export default function AdminPage() {
     const loadAdmin = async () => {
       // Auth is handled by JWT middleware — no email check needed here
 
-      const { data: salonData } = await supabase
-        .from("salons")
-        .select("id, name, slug, plan, created_at, owner_id, owner_email, subscription_status, subscription_plan, subscription_id, stripe_customer_id, trial_ends_at, current_period_end, business_type")
-        .eq("is_demo_data", false)
-        .order("created_at", { ascending: false });
+      // Salons come from the admin API (service role, checked against the
+      // admin_token cookie). The browser client can't read owner/billing
+      // columns once the public salons read policies are gone.
+      let salonData: Pick<SalonAdmin, "id" | "name" | "plan" | "created_at" | "owner_id" | "owner_email">[] = [];
+      try {
+        const res = await fetch("/api/admin/salons");
+        const json = await res.json().catch(() => ({}));
+        if (res.ok) salonData = json.salons || [];
+        else setError(json.error || "Failed to load salons.");
+      } catch {
+        setError("Network error — could not load salons.");
+      }
 
       const { data: appointmentData } = await supabase
         .from("appointments")

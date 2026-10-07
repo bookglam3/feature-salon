@@ -10,7 +10,7 @@ export default function BookPage() {
   useEffect(() => {
     const loadSalons = async () => {
       const { data, error } = await supabase
-        .from("salons")
+        .from("public_salons")
         .select("id, name, slug")
         .order("name");
 

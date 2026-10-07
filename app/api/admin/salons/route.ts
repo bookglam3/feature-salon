@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from("salons")
-    .select("id,name,slug,owner_id,owner_email,plan,subscription_status,subscription_plan,trial_ends_at,created_at")
+    .select("id,name,slug,owner_id,owner_email,plan,subscription_status,subscription_plan,subscription_id,stripe_customer_id,trial_ends_at,current_period_end,business_type,created_at")
     .order("created_at", { ascending: false });
 
   if (isGuest) {

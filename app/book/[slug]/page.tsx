@@ -329,7 +329,7 @@ export default function BookingPage() {
   useEffect(() => {
     if (!slug) return;
     (async () => {
-      const { data: s } = await supabase.from("salons").select("id,name,slug,description,logo_url,payment_methods,timezone,country,business_type,phone").eq("slug", slug).single();
+      const { data: s } = await supabase.from("public_salons").select("id,name,slug,description,logo_url,payment_methods,timezone,country,business_type,phone").eq("slug", slug).single();
       if (!s) { setNotFound(true); setLoading(false); return; }
       setSalon(s);
       setBookingVc(getVerticalConfig(s.business_type));
