@@ -80,7 +80,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Does it send WhatsApp reminders?",
-    a: "Yes — automatic WhatsApp and SMS reminders are built in to help reduce no-shows.",
+    a: "Yes — automatic WhatsApp and email reminders are built in to help reduce no-shows.",
   },
   {
     q: "Is it only for hair salons?",
@@ -135,14 +135,6 @@ const TABLE: TableRow[] = [
     featColor: "#047857",
     freshaColor: "#B91C1C",
     booksyColor: "#B91C1C",
-  },
-  {
-    label: "SMS reminders",
-    feat: "Yes",
-    fresha: "Varies",
-    booksy: "Yes",
-    featColor: "#047857",
-    booksyColor: "#047857",
   },
   {
     label: "Consumer marketplace",
@@ -309,7 +301,7 @@ export default function FreshaAlternative2026Page() {
             <div style={{ display: "flex", flexDirection: "column", gap: 18, marginTop: 20 }}>
               {[
                 { title: "Predictable, all-in pricing.", body: "Look past the headline number to the total: subscription + per-staff fees + add-ons + commission. A plan that’s “cheap” at £14.95 can overtake a £29 flat plan once you add team members, reporting, loyalty and a couple of marketplace commissions." },
-                { title: "Reminders clients actually see.", body: "No-shows are pure lost revenue — an empty chair you can’t sell twice. Email reminders are standard, but plenty of clients never open email. Reminders over WhatsApp and SMS get read, and that’s the difference between a confirmed booking and a no-show." },
+                { title: "Reminders clients actually see.", body: "No-shows are pure lost revenue — an empty chair you can’t sell twice. Email reminders are standard, but plenty of clients never open email. Reminders over WhatsApp get read, and that’s the difference between a confirmed booking and a no-show." },
                 { title: "Clear ownership of clients and payments.", body: "Your client list and your takings should obviously be yours, with no cut skimmed off bookings." },
                 { title: "A genuine UK fit.", body: "Pricing in pounds, UK workflows, and support from people who understand how a British salon or clinic actually runs." },
                 { title: "Flexibility across business types.", body: "Whether you run a hair salon, barbershop, nail or beauty studio, spa, gym, yoga studio, or physio clinic, the software should speak your language — clients or patients, stylists or practitioners." },
@@ -332,7 +324,7 @@ export default function FreshaAlternative2026Page() {
             <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {[
                 "One flat price of £29/month for your whole business — no per-staff fees, no paid add-ons for the core tools, and no commission on any booking, ever.",
-                "WhatsApp and SMS reminders built in, to cut the no-shows that quietly cost you the most.",
+                "WhatsApp and email reminders built in, to cut the no-shows that quietly cost you the most.",
                 "Online booking through your own branded page, 24/7, plus card payments via Stripe that land in your account.",
                 "Built for the UK, and flexible enough to run a salon, barber, gym, or clinic in its own words.",
               ].map((item, i) => (
@@ -425,7 +417,7 @@ export default function FreshaAlternative2026Page() {
               </Link>
             </div>
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", margin: 0 }}>
-              Feature is a UK-built booking platform for salons, barbers, gyms, and clinics: online bookings, WhatsApp &amp; SMS reminders, and Stripe payments — one flat price, zero commission.
+              Feature is a UK-built booking platform for salons, barbers, gyms, and clinics: online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat price, zero commission.
             </p>
           </section>
 

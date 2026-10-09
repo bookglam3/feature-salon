@@ -57,7 +57,7 @@ export default function ManchesterPage() {
         <div className="features-grid">
           {[
             { title: "Online booking 24/7", desc: "Your clients can book haircuts, colour treatments, and beauty appointments at any time from any device." },
-            { title: "Automated reminders", desc: "Send WhatsApp, SMS, and email reminders automatically — so clients don't forget their appointment." },
+            { title: "Automated reminders", desc: "Send WhatsApp and email reminders automatically — so clients don't forget their appointment." },
             { title: "No marketplace commission", desc: "Unlike Treatwell, Feature charges a flat monthly fee. Keep 100% of your booking revenue." },
             { title: "Staff scheduling", desc: "Manage rotas, breaks, and shifts for your entire Manchester salon team in one place." },
             { title: "Online deposits & payments", desc: "Collect deposits via Stripe at booking time to protect against last-minute cancellations." },

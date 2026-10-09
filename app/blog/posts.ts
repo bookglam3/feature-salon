@@ -129,13 +129,13 @@ export const POSTS: BlogPost[] = [
     slug: "how-to-reduce-salon-no-shows",
     title: "How to Reduce No-Shows in Your Salon: A UK Owner's Guide (2026)",
     metaTitle: "How to Reduce No-Shows in Your Salon (2026) | Feature",
-    metaDescription: "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
+    metaDescription: "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp reminders, deposits, clear policies and online booking.",
     keyword: "salon no-shows",
     publishedDate: "2026-05-31",
     updatedDate: "2026-05-31",
     readingTime: 5,
     author: "Feature Team",
-    excerpt: "No-shows are one of the quietest, costliest problems in any salon. Here's what actually works to cut them — WhatsApp/SMS reminders, small deposits, clear policies and the right online booking setup.",
+    excerpt: "No-shows are one of the quietest, costliest problems in any salon. Here's what actually works to cut them — WhatsApp reminders, small deposits, clear policies and the right online booking setup.",
     sections: [],
   },
 
@@ -182,11 +182,11 @@ export const POSTS: BlogPost[] = [
         h2: "7 Proven Strategies to Reduce No-Shows",
         body: "Here are the most effective tactics used by high-performing UK salons:",
         h3Items: [
-          { h3: "1. Send Automated Reminders (The Most Effective Fix)", body: "Automated SMS and WhatsApp reminders sent 24 hours and 2 hours before an appointment give clients plenty of notice to cancel or reschedule — rather than just not turning up. Feature Salon sends these automatically for every confirmed booking, with zero effort from you." },
+          { h3: "1. Send Automated Reminders (The Most Effective Fix)", body: "Automated WhatsApp and email reminders sent 24 hours and 2 hours before an appointment give clients plenty of notice to cancel or reschedule — rather than just not turning up. Feature Salon sends these automatically for every confirmed booking, with zero effort from you." },
           { h3: "2. Take a Deposit at Booking", body: "Requiring a 25–50% deposit when clients book online dramatically reduces no-shows. Clients who have money on the line are far more likely to turn up or give proper notice. With Stripe integration, Feature Salon lets you set flexible deposit rules — from 10% to 100% — per service." },
           { h3: "3. Use a Cancellation Policy", body: "A clear, written policy (e.g. '24 hours notice required or deposit is forfeit') sets expectations from day one. Display it on your booking page, in confirmation emails, and at your reception desk. Most clients will respect a fair policy when it's communicated clearly." },
           { h3: "4. Make Rebooking Easy", body: "Include a reschedule link in every confirmation and reminder message. When clients can reschedule in seconds — rather than having to call during opening hours — they're far more likely to rebook than simply not appear." },
-          { h3: "5. Send a WhatsApp Reminder", body: "SMS has an 80% open rate, but WhatsApp messages have over 95%. Sending a friendly WhatsApp reminder the evening before an appointment feels more personal and gets noticed. Feature Salon supports automated WhatsApp reminders via Twilio — enabled with a single toggle in your dashboard." },
+          { h3: "5. Send a WhatsApp Reminder", body: "WhatsApp messages have an open rate of over 95%. Sending a friendly WhatsApp reminder the evening before an appointment feels more personal and gets noticed. Feature Salon supports automated WhatsApp reminders via Twilio — enabled with a single toggle in your dashboard." },
           { h3: "6. Keep a No-Show Record", body: "Track which clients repeatedly miss appointments. After two no-shows, consider requiring a full prepayment before they can book again. Feature Salon's client profiles show visit history, making it easy to spot repeat offenders." },
           { h3: "7. Follow Up After a No-Show", body: "Send a brief, non-confrontational message after a missed appointment: 'We missed you today — would you like to rebook?' Many clients feel guilty and will respond positively. This can recover 15–25% of missed appointments." },
         ],
@@ -234,7 +234,7 @@ export const POSTS: BlogPost[] = [
         h3Items: [
           { h3: "Flat Monthly Fee — No Commission", body: "Feature Salon charges £29–£99/month depending on your plan. That's it. No commission on bookings, no payment processing markup, no per-message fees. Every pound your clients pay goes to you." },
           { h3: "Your Own Branded Booking Page", body: "Just like Fresha, Feature gives you a beautiful public booking page where clients can browse services, select staff, and book online 24/7. Unlike Fresha, it's not listed on a marketplace competing with other salons." },
-          { h3: "Automated WhatsApp, SMS & Email", body: "Feature Salon sends automated reminders via WhatsApp, SMS, and email to help reduce no-shows. Fresha offers reminders too, but they don't include WhatsApp support on standard plans." },
+          { h3: "Automated WhatsApp & Email", body: "Feature Salon sends automated reminders via WhatsApp and email to help reduce no-shows. Fresha offers reminders too, but they don't include WhatsApp support on standard plans." },
           { h3: "Stripe Payments — Your Account", body: "Feature Salon uses Stripe directly — connected to your own account. You see every transaction, every payout, with full transparency. No middleman taking a percentage." },
         ],
       },
@@ -281,14 +281,14 @@ export const POSTS: BlogPost[] = [
         h3Items: [
           { h3: "Pricing model", body: "Some platforms charge a flat monthly fee. Others take a commission on every booking or payment. For busy salons, commission-based pricing can cost far more than a transparent subscription." },
           { h3: "Booking experience", body: "Your booking page is the first impression many clients have of your salon. It should be fast, mobile-friendly, and easy to use — ideally without requiring clients to create an account." },
-          { h3: "Reminders and automation", body: "Automated SMS, WhatsApp, and email reminders are the single most effective way to reduce no-shows. Not all platforms offer all three channels." },
+          { h3: "Reminders and automation", body: "Automated WhatsApp and email reminders are the single most effective way to reduce no-shows. Not all platforms offer all three channels." },
           { h3: "Payment processing", body: "Stripe integration, deposit collection, and refund handling should be seamless and transparent. Avoid platforms that markup your payment processing fees." },
           { h3: "Support quality", body: "When something goes wrong — and it will — you need to reach a real person quickly. UK-based support is a significant advantage." },
         ],
       },
       {
         h2: "Feature Salon — Best Overall for UK Independents",
-        body: "Feature Salon is built specifically for UK independent salons and small chains. It offers a flat monthly subscription starting at £29, with no commission on bookings or payments. Every plan includes a branded booking page, Stripe payments, automated WhatsApp/SMS/email reminders, staff management, and revenue analytics. The Pro plan at £59 covers most growing salons with up to 10 staff members. Feature Salon's UK-based support team responds within the hour during business hours.",
+        body: "Feature Salon is built specifically for UK independent salons and small chains. It offers a flat monthly subscription starting at £29, with no commission on bookings or payments. Every plan includes a branded booking page, Stripe payments, automated WhatsApp and email reminders, staff management, and revenue analytics. The Pro plan at £59 covers most growing salons with up to 5 staff members. Feature Salon's UK-based support team responds within the hour during business hours.",
         h3Items: [
           { h3: "Pros", body: "Zero commission. WhatsApp reminders included. Transparent flat pricing. UK support. 14-day free trial. Clean, modern interface." },
           { h3: "Cons", body: "No marketplace — clients must discover you through your own marketing. Newer platform with a smaller review base than Fresha." },
@@ -356,7 +356,7 @@ export const POSTS: BlogPost[] = [
         h3Items: [
           { h3: "A branded booking page", body: "Your booking page should show your logo, salon name, services with prices and durations, and available staff. It should load in under 2 seconds on mobile." },
           { h3: "Instant confirmation", body: "Clients should receive an instant booking confirmation via email and WhatsApp the moment they book. No waiting, no manual approval required." },
-          { h3: "Automated reminders", body: "SMS and WhatsApp reminders sent 24 hours and 2 hours before each appointment ensure clients actually turn up — converting online bookings into revenue." },
+          { h3: "Automated reminders", body: "WhatsApp and email reminders sent 24 hours and 2 hours before each appointment ensure clients actually turn up — converting online bookings into revenue." },
         ],
       },
       {
@@ -403,8 +403,8 @@ export const POSTS: BlogPost[] = [
         h2: "Automated Reminders",
         body: "Appointment reminders are the most effective tool for reducing no-shows. Here's how the platforms compare:",
         h3Items: [
-          { h3: "Treatwell reminders", body: "Treatwell sends basic booking confirmation emails and appointment reminder emails. There is no WhatsApp reminder functionality. SMS reminders are limited and not customisable." },
-          { h3: "Feature Salon reminders", body: "Feature Salon sends fully automated reminders via Email, SMS, and WhatsApp — at 24 hours and 2 hours before every appointment. Post-visit thank you messages and win-back campaigns are also automated." },
+          { h3: "Treatwell reminders", body: "Treatwell sends basic booking confirmation emails and appointment reminder emails. There is no WhatsApp reminder functionality." },
+          { h3: "Feature Salon reminders", body: "Feature Salon sends fully automated reminders via email and WhatsApp — at 24 hours and 2 hours before every appointment. Post-visit thank you messages and win-back campaigns are also automated." },
         ],
       },
       {

@@ -86,7 +86,7 @@ const sectionStyle: React.CSSProperties = { marginBottom: 44 };
 const FEATURE_POINTS = [
   "One flat £29/month for the whole business — no per-member fees — with no commission on any booking, ever.",
   "Online booking through your own branded page, with per-trainer scheduling so members can pick their trainer.",
-  "WhatsApp & SMS reminders built in to cut no-shows.",
+  "WhatsApp & email reminders built in to cut no-shows.",
   "Payments via Stripe, landing in your account, with the language that fits fitness — members, trainers, sessions and classes rather than salon terms.",
 ];
 
@@ -97,7 +97,7 @@ const WHAT_MATTERS = [
   },
   {
     title: "Reminders that cut no-shows.",
-    body: "No-shows are the quiet tax on every fitness business — an empty slot you can't refill. Automated reminders are the single most effective fix, and reminders over WhatsApp and SMS get read far more reliably than email.",
+    body: "No-shows are the quiet tax on every fitness business — an empty slot you can't refill. Automated reminders are the single most effective fix, and reminders over WhatsApp get read far more reliably than email.",
   },
   {
     title: "Payments and packs up front.",
@@ -277,7 +277,7 @@ export default function GymPTBookingPage() {
               </Link>
             </div>
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", marginTop: 20, marginBottom: 0 }}>
-              Feature: UK-built booking software for gyms, studios, salons and clinics &mdash; online bookings, WhatsApp &amp; SMS reminders, and Stripe payments, one flat price.
+              Feature: UK-built booking software for gyms, studios, salons and clinics &mdash; online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat price.
             </p>
           </section>
 

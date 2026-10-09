@@ -16,7 +16,7 @@ const PLANS = [
     gradient:  "linear-gradient(135deg,#6366F1 0%,#4F46E5 100%)",
     showBadge: false,
     icon:      "✂️",
-    features:  ["Up to 50 bookings/month","1 staff member","Basic analytics","Email notifications","Public booking page","Smart calendar (day, week and month views)","Online payments"],
+    features:  ["Unlimited bookings","1 staff member","Basic analytics","Email notifications","Email + WhatsApp reminders","Public booking page","Smart calendar (day, week and month views)","Online payments"],
   },
   {
     id:        "pro",
@@ -25,7 +25,7 @@ const PLANS = [
     gradient:  "linear-gradient(135deg,#8B5CF6 0%,#7C3AED 100%)",
     showBadge: true,
     icon:      "💎",
-    features:  ["Unlimited bookings","Up to 5 staff members","Smart calendar (day, week and month views)","Advanced analytics","SMS + Email reminders","Custom offers & promotions","Priority support","Stripe online payments"],
+    features:  ["Unlimited bookings","Up to 5 staff members","Smart calendar (day, week and month views)","Advanced analytics","Email + WhatsApp reminders","Custom offers & promotions","Priority support","Stripe online payments"],
   },
   {
     id:        "business",
@@ -34,7 +34,7 @@ const PLANS = [
     gradient:  "linear-gradient(135deg,#EC4899 0%,#BE185D 100%)",
     showBadge: false,
     icon:      "🚀",
-    features:  ["Everything in Pro","Unlimited bookings","Up to 15 staff members","Priority support","Custom branding"],
+    features:  ["Everything in Pro","Unlimited bookings","Up to 15 staff members","Email + WhatsApp reminders","Priority support","Custom branding"],
   },
 ];
 

@@ -170,7 +170,7 @@ export default function NoCommissionPage() {
 
             {[
               { label: "One flat £29/month for the whole business", detail: "No per-staff fees. No commission on any booking, ever." },
-              { label: "WhatsApp & SMS reminders", detail: "Automated reminders built in to cut no-shows, on your own branded booking page." },
+              { label: "WhatsApp & email reminders", detail: "Automated reminders built in to cut no-shows, on your own branded booking page." },
               { label: "Stripe payments that land in your account", detail: "Mainstream payment processing with full transparency — no middleman taking a percentage." },
               { label: "UK-built", detail: "For salons, barbers, gyms and clinics. GBP, GDPR-friendly, UK support." },
             ].map((item, i) => (

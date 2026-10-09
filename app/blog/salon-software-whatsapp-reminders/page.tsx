@@ -159,7 +159,7 @@ export default function WhatsAppRemindersPage() {
               People treat WhatsApp differently from email. Messages get opened within minutes, not days. For most UK clients, it&apos;s where they already talk to friends, family — and increasingly, their salon.
             </p>
             <p>
-              That difference matters. Automated reminders are proven to cut no-shows — online and SMS reminders have been found to reduce missed appointments by around 29% compared to no reminder. The channel amplifies the effect: a reminder a client reads is worth far more than one that sits unopened. WhatsApp (and SMS) land where clients are looking, which is exactly why they outperform email for confirmations and reminders.
+              That difference matters. Automated reminders are proven to cut no-shows — online reminders have been found to reduce missed appointments by around 29% compared to no reminder. The channel amplifies the effect: a reminder a client reads is worth far more than one that sits unopened. WhatsApp messages land where clients are looking, which is exactly why they outperform email for confirmations and reminders.
             </p>
             <p>
               There&apos;s a second benefit that&apos;s easy to miss: WhatsApp feels personal. A friendly, branded message (&ldquo;Hi Sarah, see you tomorrow at 2pm for your cut and colour 💇&rdquo;) feels like your salon, not a faceless system. That tone builds the kind of relationship that keeps clients coming back.
@@ -195,7 +195,7 @@ export default function WhatsAppRemindersPage() {
           <section style={sectionStyle}>
             <h2 style={h2Style}>Why most big platforms don&apos;t offer it</h2>
             <p>
-              Here&apos;s the part that surprises owners: many of the best-known booking platforms still don&apos;t send reminders over WhatsApp. They lean on email and, sometimes, SMS. So if WhatsApp is where your clients actually are, your software may be missing the single most effective place to reach them.
+              Here&apos;s the part that surprises owners: many of the best-known booking platforms still don&apos;t send reminders over WhatsApp. They lean on email. So if WhatsApp is where your clients actually are, your software may be missing the single most effective place to reach them.
             </p>
             <p>
               That gap is exactly why WhatsApp reminders have become a genuine point of difference in salon software — not a nice-to-have, but a feature that directly protects your daily revenue.
@@ -206,7 +206,7 @@ export default function WhatsAppRemindersPage() {
           <section style={sectionStyle}>
             <h2 style={h2Style}>How Feature does it</h2>
             <p>
-              Feature is a UK-built booking platform with <strong style={{ color: C.text }}>WhatsApp and SMS reminders built in from day one</strong> — because reaching clients where they actually read is the whole point. Clients book online, get an instant confirmation, and receive automatic reminders before their appointment, all branded to your salon.
+              Feature is a UK-built booking platform with <strong style={{ color: C.text }}>WhatsApp and email reminders built in from day one</strong> — because reaching clients where they actually read is the whole point. Clients book online, get an instant confirmation, and receive automatic reminders before their appointment, all branded to your salon.
             </p>
             <p>
               And it&apos;s all on one flat price: <strong style={{ color: C.gold }}>£29/month, no commission on your bookings, ever.</strong>
@@ -222,7 +222,7 @@ export default function WhatsAppRemindersPage() {
             </div>
 
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", margin: 0 }}>
-              Feature: UK-built booking software for salons, barbershops, gyms and clinics — online bookings, WhatsApp &amp; SMS reminders, and Stripe payments, one flat price.
+              Feature: UK-built booking software for salons, barbershops, gyms and clinics — online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat price.
             </p>
           </section>
 

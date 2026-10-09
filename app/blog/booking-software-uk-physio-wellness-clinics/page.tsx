@@ -148,7 +148,7 @@ export default function PhysioClinicBookingPage() {
               <div style={{ width: 32, height: 32, minWidth: 32, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: `1.5px solid ${gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: gold, fontWeight: 700, marginTop: 2 }}>2</div>
               <div>
                 <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 5 }}>Reminders that cut no-shows</div>
-                <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Missed appointments are lost revenue and a wasted slot another patient could have used. Automated WhatsApp and SMS reminders are far more effective than email, which patients often miss.</div>
+                <div style={{ fontSize: 14, color: text2, lineHeight: 1.75 }}>Missed appointments are lost revenue and a wasted slot another patient could have used. Automated WhatsApp reminders are far more effective than email, which patients often miss.</div>
               </div>
             </div>
 
@@ -201,7 +201,7 @@ export default function PhysioClinicBookingPage() {
 
               {[
                 "Online booking with per-practitioner scheduling and clinic-appropriate wording (patients, practitioners, appointments)",
-                "WhatsApp & SMS reminders built in to cut no-shows",
+                "WhatsApp & email reminders built in to cut no-shows",
                 "Payments and deposits via Stripe, landing in your account",
                 "One flat £29/month for the whole clinic — not per practitioner — with no commission, ever",
                 "GDPR-friendly UK setup with GBP throughout",
@@ -238,7 +238,7 @@ export default function PhysioClinicBookingPage() {
               Start free trial
             </Link>
             <p style={{ fontSize: 13, color: muted, marginTop: 14, lineHeight: 1.5 }}>
-              UK-built booking software for clinics, salons, gyms &amp; studios &mdash; online bookings, WhatsApp &amp; SMS reminders, and Stripe payments, one flat price.
+              UK-built booking software for clinics, salons, gyms &amp; studios &mdash; online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat price.
             </p>
           </div>
 

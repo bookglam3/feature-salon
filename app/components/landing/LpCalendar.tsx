@@ -7,8 +7,7 @@ const times = ["9 AM", "10 AM", "11 AM", "12 PM"];
 
 const listItems = [
   "View by day, week or month",
-  "Colour-coded by staff or service",
-  "Syncs in real-time",
+  "Colour-coded by booking status",
 ];
 
 type Evt = { who: string; service: string; bg: string; color: string };

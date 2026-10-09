@@ -57,7 +57,7 @@ export default function LondonPage() {
         <div className="features-grid">
           {[
             { title: "Online booking 24/7", desc: "London clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page." },
-            { title: "WhatsApp & SMS reminders", desc: "Reduce no-shows with automated reminders via WhatsApp, SMS, and email — before every appointment." },
+            { title: "WhatsApp & email reminders", desc: "Reduce no-shows with automated reminders via WhatsApp and email — before every appointment." },
             { title: "No Fresha commission", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups." },
             { title: "Multi-staff scheduling", desc: "Manage your entire team's calendars, breaks, and holidays from one clean dashboard." },
             { title: "Stripe online payments", desc: "Take deposits or full payments online via Stripe. Perfect for London salons with high no-show risk." },

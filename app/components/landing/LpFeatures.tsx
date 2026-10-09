@@ -92,7 +92,7 @@ const features = [
   { Icon: CalendarIcon, title: "Online Booking", desc: "Allow your clients to book appointments 24/7 from any device." },
   { Icon: UserIcon, title: "Client Management", desc: "Keep all your client information, history and preferences in one place." },
   { Icon: UsersIcon, title: "Staff Management", desc: "Manage your team, schedules and permissions effortlessly." },
-  { Icon: BellIcon, title: "SMS & Email Reminders", desc: "Reduce no-shows with automated reminders and keep your calendar full." },
+  { Icon: BellIcon, title: "Email & WhatsApp Reminders", desc: "Reduce no-shows with automated reminders and keep your calendar full." },
   { Icon: CreditCardIcon, title: "Payments", desc: "Accept payments online securely with Stripe. Get paid faster." },
   { Icon: BarChartIcon, title: "Reports & Analytics", desc: "Understand your business performance with detailed insights." },
   { Icon: TagIcon, title: "Services & Packages", desc: "Create and manage services, packages and special offers easily." },

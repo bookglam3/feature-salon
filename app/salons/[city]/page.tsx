@@ -172,7 +172,7 @@ export default async function CityPage({
     "@type": "SoftwareApplication",
     "@id": `${pageUrl}#software`,
     name: "Feature Salon",
-    description: `Feature Salon is a UK salon management platform for ${data.name} salons. Online bookings, automated WhatsApp & SMS reminders, Stripe payments — with zero commission fees.`,
+    description: `Feature Salon is a UK salon management platform for ${data.name} salons. Online bookings, automated WhatsApp & email reminders, Stripe payments — with zero commission fees.`,
     url: BASE,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web, iOS, Android",
@@ -297,7 +297,7 @@ export default async function CityPage({
         <div className="features-grid features-grid-v2">
           {[
             { icon: "smartphone" as IconName, title: "Online Booking 24/7", desc: `${data.name} clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page.` },
-            { icon: "message-circle" as IconName, title: "WhatsApp & SMS Reminders", desc: `Reduce no-shows with automated reminders via WhatsApp, SMS, and email — personalised for every ${data.name} salon.` },
+            { icon: "message-circle" as IconName, title: "WhatsApp & Email Reminders", desc: `Reduce no-shows with automated reminders via WhatsApp and email — personalised for every ${data.name} salon.` },
             { icon: "pound-sterling" as IconName, title: "No Commission Fees", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups — ever." },
             { icon: "users" as IconName, title: "Multi-Staff Scheduling", desc: `Manage your entire ${data.name} salon team's calendars, breaks, and holidays from one clean dashboard.` },
             { icon: "credit-card" as IconName, title: "Stripe Online Payments", desc: "Take deposits or full payments online via Stripe. Reduce no-shows and get paid before clients arrive." },
@@ -355,9 +355,9 @@ export default async function CityPage({
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
             {[
-              { plan: "Starter", price: "£29", features: ["3 staff", "Online booking", "Email reminders"] },
-              { plan: "Pro", price: "£59", features: ["10 staff", "SMS + WhatsApp", "Revenue reports"], featured: true },
-              { plan: "Business", price: "£99", features: ["Unlimited staff", "Priority support", "Multi-location"] },
+              { plan: "Starter", price: "£29", features: ["1 staff member", "Online booking", "Email + WhatsApp reminders"] },
+              { plan: "Pro", price: "£59", features: ["Up to 5 staff members", "Email + WhatsApp reminders", "Revenue reports"], featured: true },
+              { plan: "Business", price: "£99", features: ["Up to 15 staff members", "Email + WhatsApp reminders", "Priority support", "Multi-location"] },
             ].map((p) => (
               <div key={p.plan} style={{
                 padding: "24px 20px", borderRadius: 16,
