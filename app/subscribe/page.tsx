@@ -34,7 +34,7 @@ const PLANS = [
     gradient:  "linear-gradient(135deg,#EC4899 0%,#BE185D 100%)",
     showBadge: false,
     icon:      "🚀",
-    features:  ["Unlimited bookings","Up to 15 staff members","Smart calendar (day, week and month views)","Revenue reports & exports","SMS + Email + WhatsApp reminders","Staff performance tracking","API access","Dedicated account manager","SLA 99.9% uptime"],
+    features:  ["Everything in Pro","Unlimited bookings","Up to 15 staff members","Priority support","Custom branding"],
   },
 ];
 
