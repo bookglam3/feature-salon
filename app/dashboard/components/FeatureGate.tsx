@@ -11,6 +11,10 @@ import {
   type Plan,
 } from "../../lib/featureAccess";
 
+// Statuses where the account has a plan but the payment failed: show a
+// "fix your payment" screen instead of an upgrade prompt.
+const PAYMENT_PROBLEM_STATUSES = new Set(["past_due", "unpaid", "incomplete"]);
+
 interface FeatureGateProps {
   feature: Feature;
   children: React.ReactNode;
@@ -22,6 +26,8 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
   const [plan, setPlan] = useState<string | null>(null);
   const [hasCustId, setHasCustId] = useState(false);
   const [salonId, setSalonId] = useState<string | null>(null);
+  const [subStatus, setSubStatus] = useState<string | null>(null);
+  const [portalError, setPortalError] = useState("");
 
   useEffect(() => {
     const check = async () => {
@@ -57,6 +63,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
         setSalonId(salon.id);
         setPlan(salon.subscription_plan);
         setHasCustId(!!salon.stripe_customer_id);
+        setSubStatus(salon.subscription_status);
 
         const allowed = hasFeatureAccess(feature, salon.subscription_plan, salon.subscription_status);
         setStatus(allowed ? "allowed" : "locked");
@@ -117,15 +124,57 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
 
   const openPortal = async () => {
     if (!hasCustId) { router.push("/subscribe"); return; }
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch("/api/subscription/portal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session?.access_token}` },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
+    setPortalError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/subscription/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session?.access_token}` },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) { window.location.href = data.url; return; }
+      setPortalError(data.error || "Couldn't open billing. Please try again or email support@featuresalon.co.uk.");
+    } catch {
+      setPortalError("Network error. Please try again or email support@featuresalon.co.uk.");
+    }
   };
+
+  // ── PAYMENT PROBLEM (past due / unpaid) ────────────────────────
+  if (subStatus && PAYMENT_PROBLEM_STATUSES.has(subStatus.toLowerCase())) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh", padding: "40px 24px" }}>
+        <div style={{ maxWidth: 460, width: "100%", textAlign: "center" }}>
+          <div style={{ width: 72, height: 72, borderRadius: 22, background: "#FFFBEB", border: "1px solid rgba(245,158,11,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 24px" }}>
+            💳
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#12101A", letterSpacing: "-0.6px", margin: "0 0 10px" }}>
+            Your last payment didn&apos;t go through
+          </h1>
+          <p style={{ fontSize: 14.5, color: "#524D60", lineHeight: 1.7, margin: "0 0 24px" }}>
+            Update your payment details to keep using Feature.
+          </p>
+          {portalError && (
+            <div role="alert" style={{ fontSize: 13, color: "#B91C1C", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, textAlign: "left" }}>
+              {portalError}
+            </div>
+          )}
+          <button
+            onClick={openPortal}
+            style={{ width: "100%", padding: "15px", background: "linear-gradient(135deg,#7C3AED,#6D28D9)", color: "#fff", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: "pointer", marginBottom: 14 }}
+          >
+            Update payment details →
+          </button>
+          <button
+            onClick={() => router.push("/dashboard")}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#524D60", fontWeight: 600, padding: 0 }}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Plans in upgrade order above current
   const allPlans: Plan[] = ["pro", "business", "enterprise"];

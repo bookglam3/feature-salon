@@ -94,7 +94,7 @@ const BARBERSHOP_NEEDS = [
   },
   {
     title: "Reminders that cut no-shows.",
-    body: "Automated SMS and WhatsApp reminders are the single most effective way to keep chairs full. (More on no-shows in our separate guide.)",
+    body: "Automated WhatsApp and email reminders are the single most effective way to keep chairs full. (More on no-shows in our separate guide.)",
   },
   {
     title: "Deposits and no-show protection.",
@@ -113,7 +113,7 @@ const BARBERSHOP_NEEDS = [
 const FEATURE_POINTS = [
   "One flat £29/month for the whole shop — not per barber — with no commission on any booking, ever.",
   "Per-barber booking so clients pick their barber, and you see each chair clearly.",
-  "WhatsApp & SMS reminders built in to cut no-shows.",
+  "WhatsApp & email reminders built in to cut no-shows.",
   "Card payments and deposits via Stripe, landing in your account.",
   "UK-built, GDPR-friendly, with your client data always exportable.",
 ];
@@ -215,7 +215,7 @@ export default function BarbershopBookingPage() {
               But many barbershops grow through word of mouth, repeat regulars and their own Instagram — not a marketplace. If that&apos;s you, you may be paying commission for introductions you&apos;d have made anyway. In that case, a <strong style={{ color: C.text }}>flat-rate platform</strong> — one predictable monthly price, no cut of your bookings — usually works out better and far easier to budget.
             </p>
             <p>
-              Per-barber pricing is the other thing to watch. A &ldquo;£27.50 for one barber&rdquo; headline can climb quickly once you add chairs and the add-ons (SMS, loyalty, marketing) that are often sold separately. Always work out the <em>all-in</em> monthly cost for your actual number of barbers before you commit.
+              Per-barber pricing is the other thing to watch. A &ldquo;£27.50 for one barber&rdquo; headline can climb quickly once you add chairs and the add-ons (loyalty, marketing) that are often sold separately. Always work out the <em>all-in</em> monthly cost for your actual number of barbers before you commit.
             </p>
           </section>
 
@@ -257,7 +257,7 @@ export default function BarbershopBookingPage() {
                 Start free →
               </Link>
               <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", marginTop: 20, marginBottom: 0 }}>
-                Feature: UK-built booking software for barbershops, salons, gyms and clinics. Online bookings, WhatsApp &amp; SMS reminders, and Stripe payments — one flat price, zero commission.
+                Feature: UK-built booking software for barbershops, salons, gyms and clinics. Online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat price, zero commission.
               </p>
             </div>
           </section>

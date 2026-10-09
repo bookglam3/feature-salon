@@ -186,7 +186,7 @@ export default function BestSalonBookingSoftwarePage() {
 
             {[
               { heading: "All-in cost, not the headline", body: "Add subscription + per-staff fees + add-ons + likely commission for your real situation. A \"cheap\" tiered plan can overtake a flat plan once you add chairs and features." },
-              { heading: "Reminders that get read", body: "WhatsApp and SMS reminders cut no-shows far more than email alone — and not every big platform offers WhatsApp." },
+              { heading: "Reminders that get read", body: "WhatsApp reminders cut no-shows far more than email alone — and not every big platform offers WhatsApp." },
               { heading: "Deposits and payments", body: "Taking deposits at booking is the strongest no-show defence; look for smooth, mainstream processing (e.g. Stripe)." },
               { heading: "Your data, your clients", body: "Exportable client list, no lock-in, GDPR-friendly, UK pricing and support." },
               { heading: "The right fit for your size", body: "A solo stylist needs something simple; a multi-chair salon needs per-staff calendars; a clinic needs the right terminology. Don't pay for complexity you won't use." },
@@ -239,7 +239,7 @@ export default function BestSalonBookingSoftwarePage() {
               Where Feature fits
             </h2>
             <p style={{ fontSize: 16, color: text2, lineHeight: 1.8, marginBottom: 16 }}>
-              Feature is the flat-rate option: <strong style={{ color: text }}>&pound;29/month for the whole salon, no commission ever, WhatsApp &amp; SMS reminders, online booking, deposits and Stripe payments</strong>, built in the UK for salons, barbers, gyms and clinics.
+              Feature is the flat-rate option: <strong style={{ color: text }}>&pound;29/month for the whole salon, no commission ever, WhatsApp &amp; email reminders, online booking, deposits and Stripe payments</strong>, built in the UK for salons, barbers, gyms and clinics.
             </p>
             <p style={{ fontSize: 15, color: muted, lineHeight: 1.8 }}>
               It&rsquo;s the right choice if you want predictable costs and to keep everything you earn. It&rsquo;s not a consumer marketplace, so if finding brand-new clients through an app is your main growth plan, a marketplace platform may suit you better &mdash; and we&rsquo;d rather tell you that honestly than oversell.

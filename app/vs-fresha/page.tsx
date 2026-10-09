@@ -253,7 +253,7 @@ export default function VsFresha() {
             {
               icon: "💬",
               title: "WhatsApp reminders",
-              body: "Automated WhatsApp and SMS reminders are built in — cutting no-shows without any manual chasing.",
+              body: "Automated WhatsApp and email reminders are built in — cutting no-shows without any manual chasing.",
             },
             {
               icon: "💷",

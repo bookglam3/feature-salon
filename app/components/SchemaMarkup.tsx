@@ -16,7 +16,7 @@ export default function SchemaMarkup() {
     operatingSystem: "Web, iOS, Android",
     url: "https://featuresalon.co.uk",
     description:
-      "Free salon booking software for UK salons. Online bookings, automated WhatsApp & SMS reminders, Stripe payments, staff management, and revenue analytics. Better than Fresha — no commission fees.",
+      "Free salon booking software for UK salons. Online bookings, automated WhatsApp & email reminders, Stripe payments, staff management, and revenue analytics. Better than Fresha — no commission fees.",
     inLanguage: "en-GB",
     screenshot: "https://featuresalon.co.uk/og-image.png",
     softwareVersion: "2.0",
@@ -37,7 +37,7 @@ export default function SchemaMarkup() {
       "24/7 online booking system",
       "Staff management and scheduling",
       "Client CRM and profiles",
-      "Automated SMS appointment reminders",
+      "Automated WhatsApp and email appointment reminders",
       "Automated WhatsApp reminders",
       "Email booking confirmations",
       "Stripe online payments and deposits",

@@ -141,7 +141,7 @@ const TABLE: TableRow[] = [
 
 const FEATURE_POINTS = [
   "One flat £29/month for the whole business — not per staff — with no commission on any booking, ever.",
-  "WhatsApp & SMS reminders built in to cut no-shows.",
+  "WhatsApp & email reminders built in to cut no-shows.",
   "Online booking through your own branded page, plus card payments via Stripe that land in your account.",
   "UK-built, and flexible for salons, barbers, gyms and clinics alike.",
 ];
@@ -236,7 +236,7 @@ export default function BooksyAlternativePage() {
                 },
                 {
                   title: "Reminders that get read.",
-                  body: "WhatsApp and SMS reminders cut no-shows far more effectively than email alone.",
+                  body: "WhatsApp reminders cut no-shows far more effectively than email alone.",
                 },
                 {
                   title: "Your data and payments, clearly yours.",
@@ -324,7 +324,7 @@ export default function BooksyAlternativePage() {
               </Link>
             </div>
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", marginTop: 20, marginBottom: 0 }}>
-              Feature: UK-built booking software for salons, barbershops, gyms and clinics &mdash; online bookings, WhatsApp &amp; SMS reminders, and Stripe payments, one flat price, zero commission.
+              Feature: UK-built booking software for salons, barbershops, gyms and clinics &mdash; online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat price, zero commission.
             </p>
           </section>
 

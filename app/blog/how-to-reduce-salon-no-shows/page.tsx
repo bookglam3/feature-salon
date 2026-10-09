@@ -5,14 +5,14 @@ import { POSTS } from "../posts";
 export const metadata: Metadata = {
   title: "How to Reduce No-Shows in Your Salon (2026) | Feature",
   description:
-    "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
+    "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp reminders, deposits, clear policies and online booking.",
   alternates: {
     canonical: "https://featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
   },
   openGraph: {
     title: "How to Reduce No-Shows in Your Salon (2026) | Feature",
     description:
-      "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
+      "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp reminders, deposits, clear policies and online booking.",
     url: "https://featuresalon.co.uk/blog/how-to-reduce-salon-no-shows",
     locale: "en_GB",
     type: "article",
@@ -29,7 +29,7 @@ const jsonLdArticle = JSON.stringify({
   "@id": `${PAGE_URL}#article`,
   headline: "How to Reduce No-Shows in Your Salon: A UK Owner's Guide (2026)",
   description:
-    "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp/SMS reminders, deposits, clear policies and online booking.",
+    "No-shows cost UK salons over £1bn a year. Learn the proven ways to cut them — WhatsApp reminders, deposits, clear policies and online booking.",
   url: PAGE_URL,
   datePublished: "2026-05-31",
   dateModified: "2026-05-31",
@@ -157,10 +157,10 @@ export default function ReduceNoShowsPage() {
               Most no-shows aren&apos;t clients deciding not to come — they simply forget. A good reminder fixes that.
             </p>
             <p>
-              But the channel matters. Email reminders are standard, yet plenty of clients never open them. Research consistently shows automated reminders cut no-shows meaningfully — online appointment reminders have been found to reduce no-shows by around 29%, and SMS reminders improve attendance significantly compared to no reminder at all.
+              But the channel matters. Email reminders are standard, yet plenty of clients never open them. Research consistently shows automated reminders cut no-shows meaningfully — online appointment reminders have been found to reduce no-shows by around 29%, and reminders improve attendance significantly compared to no reminder at all.
             </p>
             <p>
-              The single biggest upgrade most salons can make is reminding clients somewhere they&apos;ll definitely see it: <strong style={{ color: C.text }}>WhatsApp and SMS.</strong> People read their texts and WhatsApp messages within minutes; emails can sit unopened for days. A reminder 48 hours before (enough time to rebook the slot if they cancel) plus one on the morning of the appointment is a simple, effective rhythm.
+              The single biggest upgrade most salons can make is reminding clients somewhere they&apos;ll definitely see it: <strong style={{ color: C.text }}>WhatsApp.</strong> People read their WhatsApp messages within minutes; emails can sit unopened for days. A reminder 48 hours before (enough time to rebook the slot if they cancel) plus one on the morning of the appointment is a simple, effective rhythm.
             </p>
           </section>
 
@@ -209,7 +209,7 @@ export default function ReduceNoShowsPage() {
           <section style={sectionStyle}>
             <h2 style={h2Style}>Putting it together</h2>
             <p>
-              The salons that beat no-shows rarely do just one thing. The combination that works is consistent: <strong style={{ color: C.text }}>online booking, automatic WhatsApp/SMS reminders, a clear cancellation policy, and deposits on higher-value treatments.</strong> Owners who put all of these in place often see their no-show rate fall by more than half.
+              The salons that beat no-shows rarely do just one thing. The combination that works is consistent: <strong style={{ color: C.text }}>online booking, automatic WhatsApp reminders, a clear cancellation policy, and deposits on higher-value treatments.</strong> Owners who put all of these in place often see their no-show rate fall by more than half.
             </p>
             <p>
               None of it requires a bigger team — just the right system doing the chasing for you.
@@ -223,7 +223,7 @@ export default function ReduceNoShowsPage() {
                 How Feature helps
               </h3>
               <p style={{ margin: "0 0 20px" }}>
-                Feature is a UK-built booking platform designed around exactly this. Clients book online 24/7, get automatic <strong style={{ color: C.text }}>WhatsApp and SMS reminders</strong>, and you can take <strong style={{ color: C.text }}>deposits and payments via Stripe</strong> — all for one flat £29/month, with no commission on your bookings.
+                Feature is a UK-built booking platform designed around exactly this. Clients book online 24/7, get automatic <strong style={{ color: C.text }}>WhatsApp and email reminders</strong>, and you can take <strong style={{ color: C.text }}>deposits and payments via Stripe</strong> — all for one flat £29/month, with no commission on your bookings.
               </p>
               <p style={{ fontSize: 16, color: C.text, fontWeight: 700, marginBottom: 20, margin: "0 0 24px" }}>
                 Start your 14-day free trial — no card, no commission, no catch.

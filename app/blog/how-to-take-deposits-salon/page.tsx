@@ -188,12 +188,12 @@ export default function SalonDepositsPage() {
             </h2>
             <div style={{ background: surface, border: `1.5px solid ${border}`, borderRadius: 12, padding: "24px 28px" }}>
               <p style={{ fontSize: 15, color: text2, lineHeight: 1.8, margin: "0 0 16px" }}>
-                Feature lets you take <strong style={{ color: text }}>deposits and payments via Stripe</strong> right at the point of online booking, alongside <strong style={{ color: text }}>WhatsApp &amp; SMS reminders</strong> &mdash; the two most effective no-show defences working together.
+                Feature lets you take <strong style={{ color: text }}>deposits and payments via Stripe</strong> right at the point of online booking, alongside <strong style={{ color: text }}>WhatsApp &amp; email reminders</strong> &mdash; the two most effective no-show defences working together.
               </p>
               {[
                 "Stripe deposits taken at booking — no chasing payment after the fact",
                 "Set the deposit amount per service or apply it across all bookings",
-                "WhatsApp & SMS reminders automatically sent 24h and 2h before each appointment",
+                "WhatsApp & email reminders automatically sent 24h and 2h before each appointment",
                 "All on one flat £29/month — no commission on any booking",
               ].map((pt, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
