@@ -42,7 +42,7 @@ const faqs = [
   },
   {
     q: "Can I manage multiple staff and services?",
-    a: "You can. Depending on your plan, you get separate calendars for each member of staff, and you can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard.",
+    a: "Yes. Every booking shows which staff member it's with, and you can see your whole team's day in one calendar. You can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard.",
   },
 ];
 

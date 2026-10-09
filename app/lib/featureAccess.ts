@@ -17,7 +17,7 @@ export type Feature =
 
 /** Which plans unlock which features */
 const FEATURE_PLANS: Record<Feature, Plan[]> = {
-  calendar:        ["pro", "business", "enterprise"],
+  calendar:        ["starter", "pro", "business", "enterprise"], // every plan; status rules below still apply
   analytics_basic: ["pro", "business", "enterprise"],
   analytics_full:  ["business", "enterprise"],
   reviews:         ["pro", "business", "enterprise"],
@@ -40,7 +40,7 @@ export const PLAN_LABELS: Record<Plan, { name: string; price: string; color: str
 };
 
 export const FEATURE_META: Record<Feature, { label: string; icon: string; requiredPlan: Plan }> = {
-  calendar:        { label: "Calendar View",    icon: "🗓️", requiredPlan: "pro"      },
+  calendar:        { label: "Calendar View",    icon: "🗓️", requiredPlan: "starter"  },
   analytics_basic: { label: "Analytics",        icon: "📊", requiredPlan: "pro"      },
   analytics_full:  { label: "Full Analytics",   icon: "📊", requiredPlan: "business" },
   reviews:         { label: "Reviews",          icon: "⭐", requiredPlan: "pro"      },
