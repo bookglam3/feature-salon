@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { PLAN_LABELS } from "../lib/featureAccess";
+import LifecycleTab from "./LifecycleTab";
 
 const ADMIN_EMAIL = "adilgill2008@gmail.com";
 // Derived from the single source of truth in featureAccess.ts, not a
@@ -13,7 +14,7 @@ const ADMIN_EMAIL = "adilgill2008@gmail.com";
 // everything. The real tiers are starter / pro / business / enterprise.
 const PLAN_OPTIONS = Object.keys(PLAN_LABELS);
 
-type Tab = "overview" | "salons" | "revenue" | "users" | "announcements" | "flags" | "settings" | "applications" | "verifications";
+type Tab = "overview" | "salons" | "revenue" | "users" | "announcements" | "flags" | "settings" | "applications" | "verifications" | "lifecycle";
 const PLAN_PRICE: Record<string, number> = { starter: 29, pro: 59, premium: 99 };
 const PLAN_COLOR: Record<string, string> = { starter: "#6366F1", pro: "#10B981", premium: "#F59E0B" };
 
@@ -148,6 +149,7 @@ const NAV_ITEMS: { key: Tab; label: string; icon: string }[] = [
   { key: "verifications", label: "Verifications", icon: "🪪" },
   { key: "announcements", label: "Announcements", icon: "◉" },
   { key: "flags", label: "Feature Flags", icon: "⚑" },
+  { key: "lifecycle", label: "Lifecycle Emails", icon: "✉" },
   { key: "settings", label: "Settings", icon: "◎" },
 ];
 
@@ -462,7 +464,7 @@ export default function AdminPage() {
   const TAB_TITLE: Record<Tab, string> = {
     overview: "Platform Overview", salons: "Salons", revenue: "Revenue & Billing",
     users: "Users", applications: "Applications", verifications: "Document Verifications",
-    announcements: "Announcements", flags: "Feature Flags", settings: "Settings",
+    announcements: "Announcements", flags: "Feature Flags", lifecycle: "Lifecycle Emails", settings: "Settings",
   };
 
   // ─── Loading ───────────────────────────────────────────────────────────────
@@ -1686,6 +1688,8 @@ export default function AdminPage() {
             })()}
 
             {/* ── SETTINGS ─────────────────────────────────────────────── */}
+            {activeTab === "lifecycle" && <LifecycleTab />}
+
             {activeTab === "settings" && (
               <div style={{ maxWidth: 560, display: "flex", flexDirection: "column", gap: 14 }}>
                 <Card>
