@@ -16,6 +16,7 @@ const plans: Plan[] = [
     price: "£29",
     features: [
       "Online booking page + QR code",
+      "Smart calendar (day, week and month views)",
       "Unlimited bookings",
       "Client management",
       "Email reminders",
@@ -31,7 +32,6 @@ const plans: Plan[] = [
       "Everything in Starter",
       "WhatsApp + email reminders",
       "Online payments with Stripe",
-      "Multiple staff calendars",
       "Multi-service bookings",
       "Advanced reports",
     ],

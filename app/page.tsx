@@ -36,7 +36,7 @@ const faqItems = [
   { question: "How do payments work?", answer: "Payments run through Stripe, so it's secure and the money lands straight in your own account. You can take deposits or full payment when someone books, and again, we don't take any commission from it." },
   { question: "Can I import my existing clients?", answer: "Yes, you can bring your existing client list over when you sign up, so you're not starting from scratch. Their details and history come with them." },
   { question: "Is there a free trial? Do I need a card to start?", answer: "There's a 14-day free trial and you don't need to put a card in to start it. If it's not for you, you can cancel any time, no hassle." },
-  { question: "Can I manage multiple staff and services?", answer: "You can. Depending on your plan, you get separate calendars for each member of staff, and you can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard." },
+  { question: "Can I manage multiple staff and services?", answer: "Yes. Every booking shows which staff member it's with, and you can see your whole team's day in one calendar. You can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard." },
 ];
 
 const faqSchema = {

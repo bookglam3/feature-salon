@@ -7,7 +7,6 @@ const times = ["9 AM", "10 AM", "11 AM", "12 PM"];
 
 const listItems = [
   "View by day, week or month",
-  "Drag & drop appointments",
   "Colour-coded by staff or service",
   "Syncs in real-time",
 ];
@@ -38,7 +37,7 @@ export default function LpCalendar() {
         <div>
           <p className="lp-cal-eyebrow">Smart Calendar</p>
           <h2 className="lp-cal-title">Manage your appointments with ease</h2>
-          <p className="lp-cal-text">Our smart calendar helps you visualise your day, week or month. Drag, drop and manage appointments effortlessly.</p>
+          <p className="lp-cal-text">Our smart calendar helps you visualise your day, week or month, and manage appointments effortlessly.</p>
           <ul className="lp-cal-list">
             {listItems.map(item => (
               <li key={item} className="lp-cal-item">
