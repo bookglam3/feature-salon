@@ -8,7 +8,7 @@ import Modal, { FormGroup, Input, ModalActions, BtnPrimary, BtnSecondary } from 
 import { useToast } from "../components/Toast";
 import {
   defaultExpiry, formatPence, formatUkDate, parsePoundsToPence, ukToday,
-  validateCreateInput, voucherDisplayState, type VoucherDisplayState,
+  validateCreateInput, voucherBalanceSummary, voucherDisplayState, type VoucherDisplayState,
 } from "@/app/lib/vouchers/input";
 
 // ─── Types (shapes returned by /api/vouchers) ────────────────────────────────
@@ -125,12 +125,6 @@ const textareaStyle: React.CSSProperties = {
   width: "100%", padding: "10px 13px", border: `1px solid ${C.line}`, borderRadius: 10, fontSize: 14,
   color: C.text, background: "#FFFFFF", outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box",
 };
-
-function balanceLine(v: Pick<VoucherRow, "kind" | "remaining_pence" | "amount_pence" | "services_total" | "services_used">) {
-  if (v.kind === "money") return { main: `${formatPence(v.remaining_pence)} left`, sub: `of ${formatPence(v.amount_pence)}` };
-  const left = Math.max(0, v.services_total - v.services_used);
-  return { main: `${left} service${left === 1 ? "" : "s"} left`, sub: `of ${v.services_total}` };
-}
 
 // ─── Add voucher ─────────────────────────────────────────────────────────────
 function AddVoucherModal({ salonId, services, onClose, onCreated }: {
@@ -358,9 +352,18 @@ function VoucherDetailModal({ salonId, voucherId, onClose, onChanged }: {
             <StateBadge state={state} />
           </div>
 
-          {/* Balance */}
-          <div style={{ background: C.soft, border: `1px solid ${C.line}`, borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
-            {v.kind === "money" ? (
+          {/* Balance — a cancelled voucher shows what it was worth, never an amount "left" */}
+          <div style={{ background: cancelled ? "#FFFFFF" : C.soft, border: `1px ${cancelled ? "dashed" : "solid"} ${C.line}`, borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
+            {cancelled ? (
+              <>
+                <div style={{ fontSize: 22, fontWeight: 900, color: C.muted, letterSpacing: "-0.5px" }}>Cancelled</div>
+                <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>
+                  {v.kind === "money"
+                    ? `Original value ${formatPence(v.amount_pence)}`
+                    : `Originally ${data.services.map(s => `${s.quantity} × ${s.service_name}`).join(", ")}`}
+                </div>
+              </>
+            ) : v.kind === "money" ? (
               <>
                 <div style={{ fontSize: 26, fontWeight: 900, color: C.text, letterSpacing: "-0.5px" }}>{formatPence(v.remaining_pence)} <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>left of {formatPence(v.amount_pence)}</span></div>
                 {v.held_pence > 0 && <div style={{ fontSize: 12.5, color: C.amber, marginTop: 4 }}>{formatPence(v.held_pence)} on hold for upcoming bookings · {formatPence(v.available_pence)} available now</div>}
@@ -650,7 +653,7 @@ export default function GiftVouchersPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {vouchers.map(v => {
-              const b = balanceLine(v);
+              const b = voucherBalanceSummary(v);
               const names = [v.buyer_name, v.recipient_name].filter(Boolean).join(" → ");
               return (
                 <button key={v.id} type="button" className="gv-row" onClick={() => setOpenId(v.id)}>
@@ -665,7 +668,7 @@ export default function GiftVouchersPage() {
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{b.main}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: b.cancelled ? C.muted : C.text }}>{b.main}</div>
                     <div style={{ fontSize: 12, color: C.faint }}>{b.sub}{v.held_pence > 0 || v.services_held > 0 ? " · some on hold" : ""}</div>
                   </div>
                 </button>
