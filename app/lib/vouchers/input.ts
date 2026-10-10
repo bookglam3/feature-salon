@@ -283,6 +283,23 @@ export function voucherErrorMessage(name: string | undefined, detail?: string | 
 
 // ── Display ──────────────────────────────────────────────────────────────────
 
+/**
+ * The balance line in the voucher list. A cancelled voucher never shows an
+ * amount "left" (owners shouldn't think it is still owed) — it shows
+ * "Cancelled" and what it was originally worth.
+ */
+export function voucherBalanceSummary(v: {
+  status: string; kind: string; amount_pence: number | null; remaining_pence: number | null;
+  services_total: number; services_used: number;
+}): { main: string; sub: string; cancelled: boolean } {
+  const plural = (n: number) => `${n} service${n === 1 ? "" : "s"}`;
+  if (v.status === "cancelled") {
+    return { main: "Cancelled", sub: v.kind === "money" ? `Original value ${formatPence(v.amount_pence)}` : `Originally ${plural(v.services_total)}`, cancelled: true };
+  }
+  if (v.kind === "money") return { main: `${formatPence(v.remaining_pence)} left`, sub: `of ${formatPence(v.amount_pence)}`, cancelled: false };
+  return { main: `${plural(Math.max(0, v.services_total - v.services_used))} left`, sub: `of ${v.services_total}`, cancelled: false };
+}
+
 export type VoucherDisplayState = "active" | "used" | "expired" | "cancelled";
 
 /** One badge per voucher: cancelled beats expired beats fully used. */
