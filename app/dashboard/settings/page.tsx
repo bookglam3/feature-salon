@@ -6,6 +6,8 @@ import { supabase } from "../../lib/supabase";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import { useSalon } from "../context/SalonContext";
 import type { Service } from "../../types";
+import { hasFeatureAccess } from "../../lib/featureAccess";
+import { getVoucherAccess, type VoucherBlockReason } from "../../lib/vouchers/access";
 
 // ─── Types ────────────────────────────────────────────────────
 interface PaymentMethods {
@@ -36,7 +38,19 @@ interface SalonData {
   review_link?: string;
   whatsapp_enabled?: boolean;
   payment_methods?: Partial<PaymentMethods>;
+  subscription_plan?: string | null;
+  subscription_status?: string | null;
+  stripe_account_id?: string | null;
+  charges_enabled?: boolean | null;
+  gift_vouchers_enabled?: boolean;
 }
+
+// Why online voucher sales are off (display only — the server enforces the same rules)
+const VOUCHER_SALES_BLOCKED: Partial<Record<VoucherBlockReason, string>> = {
+  stripe_not_connected: "Online voucher sales need your Stripe account connected.",
+  stripe_not_ready:     "Online voucher sales start once Stripe has verified your account.",
+  online_payments_off:  "Online voucher sales need at least one online payment method turned on in Payment Methods.",
+};
 
 // ─── Toggle switch ────────────────────────────────────────────
 function Toggle({
@@ -185,6 +199,9 @@ export default function SettingsPage() {
   // WhatsApp settings
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
   const [waSaved, setWaSaved] = useState(false);
+  const [vouchersOn, setVouchersOn] = useState(false);
+  const [vouchersSaved, setVouchersSaved] = useState(false);
+  const [vouchersError, setVouchersError] = useState("");
 
   // Payment methods
   const [pm, setPm] = useState<PaymentMethods>(DEFAULT_PAYMENT_METHODS);
@@ -217,6 +234,7 @@ export default function SettingsPage() {
       setRemindersEnabled(salonData?.reminders_enabled ?? true);
       setReviewLink(salonData?.review_link || "");
       setWhatsappEnabled(salonData?.whatsapp_enabled ?? false);
+      setVouchersOn(salonData?.gift_vouchers_enabled === true);
 
       // Load payment methods — fall back to defaults if column missing
       if (salonData?.payment_methods) {
@@ -312,6 +330,15 @@ export default function SettingsPage() {
     setTimeout(() => setWaSaved(false), 1500);
   };
 
+  const handleToggleVouchers = async (value: boolean) => {
+    if (!salon) return;
+    setVouchersOn(value); setVouchersError("");
+    const { error } = await supabase.from("salons").update({ gift_vouchers_enabled: value }).eq("id", salon.id);
+    if (error) { setVouchersOn(!value); setVouchersError("Couldn't save. Please try again."); return; } // revert on failure
+    setVouchersSaved(true);
+    setTimeout(() => setVouchersSaved(false), 1500);
+  };
+
   const handleSavePaymentMethods = async () => {
     if (!salon) return;
     const pct = Math.min(100, Math.max(1, pm.deposit_percent || 50));
@@ -320,6 +347,7 @@ export default function SettingsPage() {
     setPmSaving(true); setSaveError("");
     const { error } = await supabase.from("salons").update({ payment_methods: sanitised }).eq("id", salon.id);
     if (error) { setSaveError("Failed to save payment settings. Please try again."); setPmSaving(false); return; }
+    setSalon(prev => prev ? { ...prev, payment_methods: sanitised } : prev); // keeps the Gift Vouchers status current
     setPmSaved(true); setPmSaving(false);
     setTimeout(() => setPmSaved(false), 2000);
   };
@@ -356,6 +384,14 @@ export default function SettingsPage() {
       </div>
     </DashboardShell>
   );
+
+  const voucherAccess = salon ? getVoucherAccess({
+    planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon.subscription_plan ?? null, salon.subscription_status ?? null),
+    vouchersEnabled: vouchersOn,
+    stripeAccountId: salon.stripe_account_id,
+    chargesEnabled: salon.charges_enabled,
+    paymentMethods: salon.payment_methods,
+  }) : null;
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: "#FFFFFF", borderRadius: "16px",
@@ -652,6 +688,76 @@ export default function SettingsPage() {
           disabled={pmSaving}
           {...saveBtn(pmSaved, pmSaving, "Save Payment Settings")}
         />
+      </div>
+
+      {/* ── Gift Vouchers ── */}
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: "4px" }}>
+          <div style={{ fontSize: "14px", fontWeight: 600, color: "#12101A" }}>Gift Vouchers</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: "12px", color: vouchersOn ? "#047857" : "#6B6577", fontWeight: 600 }}>
+              {vouchersSaved ? "Saved ✓" : vouchersOn ? "On" : "Off"}
+            </span>
+            <Toggle
+              id="gift-vouchers-toggle"
+              checked={vouchersOn}
+              onChange={handleToggleVouchers}
+              disabled={!vouchersOn && !voucherAccess?.canCreateInDashboard}
+            />
+          </div>
+        </div>
+        <p style={{ fontSize: "13px", color: "#524D60", margin: "6px 0 16px", lineHeight: 1.6 }}>
+          Turn on to let clients use gift vouchers when booking online and, if you take online payments, buy them
+          from your booking page. Turning it off hides vouchers from your booking page; every voucher you&apos;ve sold
+          stays valid and you can still view and redeem them in your dashboard.
+        </p>
+
+        {voucherAccess && !voucherAccess.canCreateInDashboard && (
+          <div style={{ background: "#FFFBF0", border: "0.5px solid #FDE68A", borderRadius: 8, padding: "12px 14px", marginBottom: 12, fontSize: "12px", color: "#B45309", lineHeight: 1.6 }}>
+            Gift vouchers are part of the <strong>Pro</strong> and <strong>Business</strong> plans.
+            {vouchersOn && " Your booking page won\u2019t show them on your current plan."}
+          </div>
+        )}
+
+        {voucherAccess && vouchersOn && voucherAccess.canCreateInDashboard && (
+          <div style={{ border: "1px solid #ECE9F1", borderRadius: 10, padding: "4px 14px", marginBottom: 12 }}>
+            {[
+              { ok: voucherAccess.canApplyAtBooking, label: "Ready for voucher codes at booking", note: "" },
+              {
+                ok: voucherAccess.canBuyOnline,
+                label: "Ready for online voucher sales",
+                note: voucherAccess.buyBlockedBy ? VOUCHER_SALES_BLOCKED[voucherAccess.buyBlockedBy] ?? "" : "",
+              },
+            ].map((row, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderTop: i ? "0.5px solid #ECE9F1" : "none" }}>
+                <span aria-hidden style={{ fontSize: 13, fontWeight: 800, color: row.ok ? "#047857" : "#B45309", width: 14, flexShrink: 0 }}>{row.ok ? "✓" : "–"}</span>
+                <div>
+                  <div style={{ fontSize: "13px", color: "#12101A", fontWeight: 500 }}>{row.label}</div>
+                  {row.note && (
+                    <div style={{ fontSize: "12px", color: "#524D60", marginTop: 2 }}>
+                      {row.note}{" "}
+                      {voucherAccess.buyBlockedBy !== "online_payments_off" && (
+                        <button
+                          type="button"
+                          onClick={() => router.push("/dashboard/earnings")}
+                          style={{ background: "none", border: "none", padding: 0, color: "#7C3AED", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}
+                        >
+                          Manage Payouts →
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ fontSize: "12px", color: "#6B6577", lineHeight: 1.6 }}>
+          Coming soon: a Gift Vouchers page to add, find and redeem vouchers, selling them on your booking page,
+          and voucher codes at booking. Your choice here is saved now.
+        </div>
+        {vouchersError && <div role="alert" style={{ fontSize: "12px", color: "#B91C1C", marginTop: 10 }}>{vouchersError}</div>}
       </div>
 
       {/* ── Automated Reminders ── */}

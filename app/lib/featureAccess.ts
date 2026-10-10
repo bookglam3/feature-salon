@@ -13,6 +13,7 @@ export type Feature =
   | "analytics_full"
   | "reviews"
   | "gift_cards"
+  | "gift_vouchers"
   | "client_portal";
 
 /** Which plans unlock which features */
@@ -22,6 +23,7 @@ const FEATURE_PLANS: Record<Feature, Plan[]> = {
   analytics_full:  ["business", "enterprise"],
   reviews:         ["pro", "business", "enterprise"],
   gift_cards:      ["business", "enterprise"],
+  gift_vouchers:   ["pro", "business", "enterprise"], // create + sell; viewing/redeeming sold vouchers is never plan-locked
   client_portal:   ["business", "enterprise"],
 };
 
@@ -45,6 +47,7 @@ export const FEATURE_META: Record<Feature, { label: string; icon: string; requir
   analytics_full:  { label: "Full Analytics",   icon: "📊", requiredPlan: "business" },
   reviews:         { label: "Reviews",          icon: "⭐", requiredPlan: "pro"      },
   gift_cards:      { label: "Gift Cards",       icon: "🎁", requiredPlan: "business" },
+  gift_vouchers:   { label: "Gift Vouchers",    icon: "🎁", requiredPlan: "pro"      },
   client_portal:   { label: "Client Portal",    icon: "🔐", requiredPlan: "business" },
 };
 
