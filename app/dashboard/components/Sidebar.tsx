@@ -51,7 +51,8 @@ const NAV = [
       { label: "Tips",         path: "/dashboard/tips" },
       { label: "Invoices",     path: "/dashboard/invoices" },
       { label: "Reports",      path: "/dashboard/reports" },
-      { label: "Gift Cards",   path: "/dashboard/gift-cards" },
+      { label: "Gift Vouchers",  path: "/dashboard/gift-vouchers" },
+      { label: "Discount Codes", path: "/dashboard/gift-cards" },
     ],
   },
   {

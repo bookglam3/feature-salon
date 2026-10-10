@@ -22,6 +22,7 @@ import {
   ReceiptText,
   BarChart3,
   Gift,
+  BadgePercent,
   Star,
   Heart,
   Share2,
@@ -84,6 +85,7 @@ export const TipsIcon         = makeIcon(BadgeDollarSign);
 export const InvoicesIcon     = makeIcon(ReceiptText);
 export const ReportsIcon      = makeIcon(BarChart3);
 export const GiftCardsIcon    = makeIcon(Gift);
+export const DiscountCodesIcon = makeIcon(BadgePercent);
 export const ReviewsIcon      = makeIcon(Star);
 export const LoyaltyIcon      = makeIcon(Heart);
 export const ReferralsIcon    = makeIcon(Share2);
@@ -132,7 +134,8 @@ export const NAV_ICON_MAP: Record<string, React.FC<IconProps>> = {
   "Tips":          TipsIcon,
   "Invoices":      InvoicesIcon,
   "Reports":       ReportsIcon,
-  "Gift Cards":    GiftCardsIcon,
+  "Gift Vouchers": GiftCardsIcon,
+  "Discount Codes": DiscountCodesIcon,
   "Reviews":       ReviewsIcon,
   "Loyalty":       LoyaltyIcon,
   "Referrals":     ReferralsIcon,
