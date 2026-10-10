@@ -62,7 +62,7 @@ const softwareSchema = {
   applicationSubCategory: "Health & Wellbeing Booking Software",
   operatingSystem: "Web, iOS, Android",
   browserRequirements: "Requires JavaScript. Requires HTML5.",
-  description: "Feature is a UK booking & management platform for Health & Wellbeing businesses. Manage online bookings, staff scheduling, WhatsApp & email reminders, Stripe payments, client CRM, revenue analytics, gift cards, and loyalty programs — all from one dashboard.",
+  description: "Feature is a UK booking & management platform for Health & Wellbeing businesses. Manage online bookings, staff scheduling, WhatsApp & email reminders, Stripe payments, client CRM, revenue analytics, gift vouchers, and loyalty programs — all from one dashboard.",
   featureList: [
     "Online booking system with 24/7 client self-booking",
     "Automated WhatsApp appointment reminders",
@@ -73,7 +73,7 @@ const softwareSchema = {
     "Client CRM with visit history",
     "Revenue analytics and reports",
     "Multi-location management",
-    "Gift card system",
+    "Gift vouchers (sold and redeemed in salon)",
     "Loyalty rewards program",
     "Waitlist management",
     "Mobile-first PWA design",

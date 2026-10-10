@@ -128,7 +128,8 @@ begin
               v_money, v_salon, v_vs)),
       ('T24 redemption under the wrong salon -> refused', 'admin', 'error', '23503',
        format('insert into public.voucher_redemptions (voucher_id, salon_id, amount_pence) values (%L, %L, 100)', v_money, gen_random_uuid())),
-      ('T25 deleting a voucher that has history -> refused', 'admin', 'error', '23001',
+      -- restrict_violation (23001) or foreign_key_violation (23503), depending on the Postgres version
+      ('T25 deleting a voucher that has history -> refused', 'admin', 'error', '23001/23503',
        format('delete from public.vouchers where id = %L', v_money)),
 
       -- Holds (need one booking on the test salon)
@@ -240,7 +241,7 @@ begin
       when sqlstate 'VT000' then
         null;
       when others then
-        if r.kind = 'error' and sqlstate = r.expected then
+        if r.kind = 'error' and sqlstate = any(string_to_array(r.expected, '/')) then
           v_pass := v_pass + 1;
         else
           v_fail := v_fail || format('%s: unexpected error %s %s', r.label, sqlstate, sqlerrm);

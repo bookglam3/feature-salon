@@ -46,7 +46,7 @@ export const FEATURE_META: Record<Feature, { label: string; icon: string; requir
   analytics_basic: { label: "Analytics",        icon: "📊", requiredPlan: "pro"      },
   analytics_full:  { label: "Full Analytics",   icon: "📊", requiredPlan: "business" },
   reviews:         { label: "Reviews",          icon: "⭐", requiredPlan: "pro"      },
-  gift_cards:      { label: "Gift Cards",       icon: "🎁", requiredPlan: "business" },
+  gift_cards:      { label: "Discount Codes",   icon: "🏷️", requiredPlan: "business" }, // the old Gift Cards page now holds discount codes
   gift_vouchers:   { label: "Gift Vouchers",    icon: "🎁", requiredPlan: "pro"      },
   client_portal:   { label: "Client Portal",    icon: "🔐", requiredPlan: "business" },
 };
