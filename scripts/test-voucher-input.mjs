@@ -8,7 +8,7 @@
 
 import {
   addMonths, defaultExpiry, formatPence, formatUkDate, generateVoucherCode, isUuid, parsePoundsToPence,
-  ukToday, validateCancelReason, validateCreateInput, validateRedeemInput, voucherDisplayState, voucherErrorMessage,
+  ukToday, validateCancelReason, validateCreateInput, validateRedeemInput, voucherBalanceSummary, voucherDisplayState, voucherErrorMessage,
 } from "../app/lib/vouchers/input.ts";
 
 let passed = 0, failed = 0;
@@ -122,6 +122,16 @@ check("expired beats used up", voucherDisplayState({ status: "active", kind: "mo
 check("money at £0 is used up", voucherDisplayState({ status: "active", kind: "money", is_expired: false, remaining_pence: 0 }), "used");
 check("services all used", voucherDisplayState({ status: "active", kind: "service", is_expired: false, services_total: 2, services_used: 2 }), "used");
 check("services left", voucherDisplayState({ status: "active", kind: "service", is_expired: false, services_total: 2, services_used: 1 }), "active");
+
+console.log("\nBalance line in the list");
+const m = { status: "active", kind: "money", amount_pence: 5000, remaining_pence: 3750, services_total: 0, services_used: 0 };
+check("active money: £ left of value", voucherBalanceSummary(m), { main: "£37.50 left", sub: "of £50.00", cancelled: false });
+check("cancelled money: no amount left, shows original value", voucherBalanceSummary({ ...m, status: "cancelled" }), { main: "Cancelled", sub: "Original value £50.00", cancelled: true });
+check("cancelled money never says 'left'", /left/.test(JSON.stringify(voucherBalanceSummary({ ...m, status: "cancelled" }))), false);
+const sv = { status: "active", kind: "service", amount_pence: null, remaining_pence: null, services_total: 2, services_used: 1 };
+check("active services: N left of total", voucherBalanceSummary(sv), { main: "1 service left", sub: "of 2", cancelled: false });
+check("cancelled services: shows what it was", voucherBalanceSummary({ ...sv, status: "cancelled" }), { main: "Cancelled", sub: "Originally 2 services", cancelled: true });
+check("cancelled single service", voucherBalanceSummary({ ...sv, status: "cancelled", services_total: 1 }).sub, "Originally 1 service");
 
 console.log(`\n${"─".repeat(60)}`);
 console.log(`  ${passed} passed  |  ${failed} failed`);
