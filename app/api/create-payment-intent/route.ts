@@ -27,14 +27,20 @@ export async function POST(req: NextRequest) {
     // salon_id and the single-service join are fetched unconditionally — salon_id is
     // needed regardless of pricing path, and the single-service join is the
     // backward-compat fallback source of truth when no line items exist.
-    const { data: apptData } = await supabaseAdmin
+    const { data: apptData, error: apptError } = await supabaseAdmin
       .from("appointments")
       .select("salon_id, services(price, price_is_from)")
       .eq("id", booking_id)
-      .single();
+      .maybeSingle();
+    if (apptError) {
+      return NextResponse.json({ error: "Could not verify payment setup" }, { status: 500 });
+    }
 
     // Resolve salon from DB (not client body) to prevent Connect routing injection
     const resolvedSalonId = (apptData as { salon_id?: string } | null)?.salon_id ?? null;
+    if (!resolvedSalonId) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
 
     // Multi-service line items, if any exist for this appointment. Empty for
     // every appointment made before multi-service shipped, and for every
@@ -85,31 +91,46 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    let stripeAccountId: string | null = null;
     let depositPercent = 50; // deposit_online's fixed rate — the default when the salon isn't using a custom percentage
-    if (resolvedSalonId) {
-      const { data: salon } = await supabaseAdmin
-        .from("salons")
-        .select("stripe_account_id, charges_enabled, payment_methods")
-        .eq("id", resolvedSalonId)
-        .single();
-      if (salon?.stripe_account_id && salon?.charges_enabled) {
-        stripeAccountId = salon.stripe_account_id;
-      }
-      // Never trust the client-supplied charge amount for the deposit percentage
-      // either — re-derive it from the salon's own configured rate so the
-      // amount Stripe actually charges always matches what the client was shown.
-      const pm = salon?.payment_methods as { custom_deposit?: boolean; deposit_percent?: number } | null;
-      if (pm?.custom_deposit && typeof pm.deposit_percent === "number" && pm.deposit_percent > 0 && pm.deposit_percent < 100) {
-        depositPercent = pm.deposit_percent;
-      }
+    const { data: salon, error: salonError } = await supabaseAdmin
+      .from("salons")
+      .select("stripe_account_id, charges_enabled, payment_methods")
+      .eq("id", resolvedSalonId)
+      .maybeSingle();
+    if (salonError) {
+      return NextResponse.json({ error: "Could not verify payment setup" }, { status: 500 });
+    }
+    if (!salon) {
+      return NextResponse.json({ error: "Business not found" }, { status: 404 });
+    }
+
+    // Online payments only ever go to the salon's own connected Stripe account.
+    // Without one (or before Stripe enables charges) refuse — never fall back to
+    // charging on the platform account, where the salon would never get the money.
+    if (!salon.stripe_account_id || salon.charges_enabled !== true) {
+      return NextResponse.json(
+        {
+          error: "This business can't take online payments yet. Please choose Pay at Salon, or contact them directly.",
+          code: "online_payments_unavailable",
+        },
+        { status: 409 },
+      );
+    }
+    const stripeAccountId: string = salon.stripe_account_id;
+
+    // Never trust the client-supplied charge amount for the deposit percentage
+    // either — re-derive it from the salon's own configured rate so the
+    // amount Stripe actually charges always matches what the client was shown.
+    const pm = salon.payment_methods as { custom_deposit?: boolean; deposit_percent?: number } | null;
+    if (pm?.custom_deposit && typeof pm.deposit_percent === "number" && pm.deposit_percent > 0 && pm.deposit_percent < 100) {
+      depositPercent = pm.deposit_percent;
     }
 
     const chargeAmount = deposit_only
       ? Math.round(totalPrice * (depositPercent / 100) * 100)
       : Math.round(totalPrice * 100);
 
-    const platformFee = stripeAccountId ? Math.round(chargeAmount * PLATFORM_FEE_PERCENT) : undefined;
+    const platformFee = Math.round(chargeAmount * PLATFORM_FEE_PERCENT);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: chargeAmount,
@@ -124,11 +145,9 @@ export async function POST(req: NextRequest) {
         full_amount:   String(Math.round(totalPrice * 100)),
         salon_id:      resolvedSalonId || "",
       },
-      // Destination charge — routes payment to salon's Stripe account
-      ...(stripeAccountId && {
-        transfer_data:        { destination: stripeAccountId },
-        application_fee_amount: platformFee,
-      }),
+      // Destination charge — always routed to the salon's own Stripe account
+      transfer_data:          { destination: stripeAccountId },
+      application_fee_amount: platformFee,
     });
 
     return NextResponse.json({

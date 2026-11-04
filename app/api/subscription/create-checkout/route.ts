@@ -62,8 +62,14 @@ export async function POST(req: NextRequest) {
     // hasn't already elapsed. Without this check, a salon reactivating
     // AFTER their trial expired would get a brand-new 14-day trial instead
     // of being charged immediately — the exact "customer can't pay us" bug.
+    //
+    // Stripe also requires subscription_data.trial_end to be at least 48 hours
+    // in the future, or Checkout Session creation fails. So the existing trial
+    // end is only passed when at least 48 hours (plus 5 minutes of margin)
+    // remain; with less time left the salon is charged straight away.
+    const TRIAL_END_MIN_LEAD_MS = (48 * 60 + 5) * 60 * 1000;
     const trialEndsAtMs = salon.trial_ends_at ? new Date(salon.trial_ends_at).getTime() : 0;
-    const stillInTrial = trialEndsAtMs > Date.now();
+    const keepTrialEnd = trialEndsAtMs - Date.now() >= TRIAL_END_MIN_LEAD_MS;
 
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -75,8 +81,9 @@ export async function POST(req: NextRequest) {
       subscription_data: {
         metadata: { salon_id: salonId, plan },
         // Align to their existing trial end rather than resetting to a
-        // fresh 14 days; omitted entirely (charge immediately) once expired.
-        ...(stillInTrial ? { trial_end: Math.floor(trialEndsAtMs / 1000) } : {}),
+        // fresh 14 days; omitted entirely (charge immediately) once expired
+        // or when less than 48h 5m remain (Stripe's 48-hour minimum).
+        ...(keepTrialEnd ? { trial_end: Math.floor(trialEndsAtMs / 1000) } : {}),
       },
       success_url:                `${appUrl}/dashboard?subscription=success&plan=${plan}`,
       cancel_url:                 `${appUrl}/subscribe?cancelled=true`,
