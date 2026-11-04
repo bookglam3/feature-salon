@@ -235,6 +235,10 @@ export default function BookingPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [paymentError, setPaymentError] = useState("");
+  // Can this business take online payments (connected Stripe account with
+  // charges enabled)? null = unknown — options then show as configured, and
+  // create-payment-intent still refuses on its own if the salon isn't ready.
+  const [onlinePaymentsReady, setOnlinePaymentsReady] = useState<boolean | null>(null);
 
   // Confirmation screen state (for pay_at_salon and free services)
   const [confirmedBooking, setConfirmedBooking] = useState<{ service: string; date: string; time: string; name: string; salon: string; apptId: string; paymentStatus: string; servicePrice: number; servicePriceIsFrom: boolean } | null>(null);
@@ -333,6 +337,10 @@ export default function BookingPage() {
       if (!s) { setNotFound(true); setLoading(false); return; }
       setSalon(s);
       setBookingVc(getVerticalConfig(s.business_type));
+      fetch(`/api/online-payments-ready?salon_id=${encodeURIComponent(s.id)}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => { if (d && typeof d.ready === "boolean") setOnlinePaymentsReady(d.ready); })
+        .catch(() => { /* unknown — leave null */ });
       const [{ data: sv },{ data: st },{ data: rv },{ data: cats }] = await Promise.all([
         supabase.from("services").select("*").eq("salon_id", s.id).order("price"),
         supabase.from("staff").select("*").eq("salon_id", s.id).eq("active", true),
@@ -383,11 +391,13 @@ export default function BookingPage() {
   const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
   const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration_minutes ?? s.duration ?? 30), 0);
 
+  // When the business can't take online payments (no connected Stripe account
+  // with charges enabled), hide every online option and always offer Pay at Salon.
   const paymentOptionsRaw = [
-    (salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
-    salonPm.deposit_online && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#047857" },
-    salonPm.custom_deposit && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
-    salonPm.pay_at_salon   && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#64748B" },
+    (onlinePaymentsReady !== false && salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
+    (onlinePaymentsReady !== false && salonPm.deposit_online) && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#047857" },
+    (onlinePaymentsReady !== false && salonPm.custom_deposit) && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
+    (salonPm.pay_at_salon || onlinePaymentsReady === false) && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#64748B" },
   ].filter(Boolean) as { id: string; label: string; sub: string; pct: number; color: string }[];
 
   // Fallback: if the salon's only enabled method was full online payment, hiding
