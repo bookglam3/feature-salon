@@ -194,7 +194,7 @@ export default function SalonDepositsPage() {
                 "Stripe deposits taken at booking — no chasing payment after the fact",
                 "Set the deposit amount per service or apply it across all bookings",
                 "WhatsApp & email reminders automatically sent 24h and 2h before each appointment",
-                "All on one flat £29/month — no commission on any booking",
+                "All on one flat £29/month — deposits taken online have a 5% fee; nothing when clients pay at the salon",
               ].map((pt, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
                   <span style={{ color: gold, fontSize: 16, lineHeight: 1.5, marginTop: 1, flexShrink: 0 }}>&#10003;</span>
@@ -210,7 +210,7 @@ export default function SalonDepositsPage() {
               Protect your diary with deposits
             </h3>
             <p style={{ fontSize: 16, color: text2, marginBottom: 24, lineHeight: 1.6 }}>
-              14-day free trial &mdash; no card, no commission, no catch.
+              14-day free trial &mdash; no card needed, cancel anytime.
             </p>
             <Link
               href="/signup"
@@ -234,7 +234,7 @@ export default function SalonDepositsPage() {
                 Salon Software with WhatsApp Reminders
               </Link>
               <Link href="/blog/salon-booking-software-no-commission" style={{ display: "block", background: surface, border: `1px solid ${border}`, borderRadius: 10, padding: "16px 18px", textDecoration: "none", color: text2, fontSize: 14, lineHeight: 1.5, fontWeight: 500 }}>
-                Salon Booking Software with No Commission (2026)
+                Commission vs Flat-Fee Salon Booking Software (2026)
               </Link>
             </div>
           </div>

@@ -86,7 +86,7 @@ export default function LpPricing() {
       <div className="lp-section-inner">
         <p className="lp-eyebrow">Pricing</p>
         <h2 className="lp-section-title">Simple, transparent pricing</h2>
-        <p className="lp-section-sub">One flat monthly fee. No commission, no per-booking charges, no hidden fees.</p>
+        <p className="lp-section-sub">One flat monthly fee, no per-booking charges. Online card payments have a 5% fee; paying at the salon has none.</p>
         <div className="lp-plans">
           {plans.map(plan =>
             plan.popular ? (

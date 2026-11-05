@@ -205,7 +205,7 @@ export default async function BlogPostPage({
             Ready to transform your salon?
           </h3>
           <p style={{ fontSize: 15, color: "#475569", marginBottom: 20 }}>
-            Try <Link href="/" style={{ color: "#4F46E5", fontWeight: 600 }}>Feature Salon</Link> free for 14 days — automated bookings, reminders, and payments with no commission fees.
+            Try <Link href="/" style={{ color: "#4F46E5", fontWeight: 600 }}>Feature Salon</Link> free for 14 days — automated bookings, reminders, and payments on one flat monthly price (5% fee on online card payments only).
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/signup" className="btn-primary">Start free trial — no card needed</Link>

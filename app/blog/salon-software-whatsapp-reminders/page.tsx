@@ -209,12 +209,12 @@ export default function WhatsAppRemindersPage() {
               Feature is a UK-built booking platform with <strong style={{ color: C.text }}>WhatsApp and email reminders built in from day one</strong> — because reaching clients where they actually read is the whole point. Clients book online, get an instant confirmation, and receive automatic reminders before their appointment, all branded to your salon.
             </p>
             <p>
-              And it&apos;s all on one flat price: <strong style={{ color: C.gold }}>£29/month, no commission on your bookings, ever.</strong>
+              And it&apos;s all on one flat price: <strong style={{ color: C.gold }}>£29/month, plus a 5% fee only on online card payments.</strong>
             </p>
 
             <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center", margin: "28px 0 20px" }}>
               <p style={{ fontSize: 17, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
-                Start your 14-day free trial — no card, no commission, no catch.
+                Start your 14-day free trial — no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free →

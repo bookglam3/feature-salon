@@ -84,7 +84,7 @@ const h2Style: React.CSSProperties = {
 const sectionStyle: React.CSSProperties = { marginBottom: 44 };
 
 const FEATURE_POINTS = [
-  "One flat £29/month for the whole business — no per-member fees — with no commission on any booking, ever.",
+  "One flat £29/month for the whole business — no per-member fees. Online card payments have a 5% fee; paying in person has none.",
   "Online booking through your own branded page, with per-trainer scheduling so members can pick their trainer.",
   "WhatsApp & email reminders built in to cut no-shows.",
   "Payments via Stripe, landing in your account, with the language that fits fitness — members, trainers, sessions and classes rather than salon terms.",
@@ -255,7 +255,7 @@ export default function GymPTBookingPage() {
             </div>
 
             <p>
-              Honest trade-off: Feature isn&apos;t a fitness discovery marketplace, so it won&apos;t find you brand-new members the way some commission-based apps can. You bring your clients; in return you keep 100% of every booking and your cost never moves. For an established trainer or studio with a steady client base, that predictability usually wins. If your growth depends on a marketplace finding you new faces, a discovery platform may suit you better &mdash; and that&apos;s the honest answer.
+              Honest trade-off: Feature isn&apos;t a fitness discovery marketplace, so it won&apos;t find you brand-new members the way some commission-based apps can. You bring your clients; in return you pay one flat monthly price that never moves, with no fee when clients pay in person (online card payments carry a 5% fee). For an established trainer or studio with a steady client base, that predictability usually wins. If your growth depends on a marketplace finding you new faces, a discovery platform may suit you better &mdash; and that&apos;s the honest answer.
             </p>
 
             <p style={{ fontSize: 14, color: C.dim, fontStyle: "italic" }}>
@@ -270,7 +270,7 @@ export default function GymPTBookingPage() {
                 Try it for your gym or studio
               </h3>
               <p style={{ fontSize: 16, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
-                Start a 14-day free trial &mdash; no card, no commission, no catch.
+                Start a 14-day free trial &mdash; no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free &rarr;

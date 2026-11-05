@@ -17,7 +17,7 @@ const prose: React.CSSProperties = {
 const beliefs: { bold: string; rest: string }[] = [
   {
     bold: "Your clients are yours. Your money is yours.",
-    rest: " Feature charges one flat monthly price — no commission on bookings, no cut of your payments, no surprises. When your salon has a good month, that’s your good month. Not ours.",
+    rest: " Feature charges one flat monthly price, with no charge per booking and no surprises. The only other fee is 5% on payments your clients make online by card; when they pay at the salon, there’s no fee.",
   },
   {
     bold: "Clients read WhatsApp.",
@@ -143,7 +143,7 @@ export default function AboutPage() {
           Feature is the booking platform that works for you &mdash; not against you.
         </h2>
         <p className="final-cta-sub">
-          If you&apos;ve ever felt like your software was on someone else&apos;s side, come and try ours. 14 days free. No card. No commission. No catch.
+          If you&apos;ve ever felt like your software was on someone else&apos;s side, come and try ours. 14 days free. No card needed. One flat monthly price.
         </p>
         <Link href="/signup" className="btn-primary btn-lg btn-glow">
           Start free &rarr;

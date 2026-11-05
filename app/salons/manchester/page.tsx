@@ -46,7 +46,7 @@ export default function ManchesterPage() {
       </section>
 
       <section className="trust-bar">
-        {["No commission fees", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
+        {["Flat monthly price", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
           <div key={item} className="trust-item"><div className="trust-dot" />{item}</div>
         ))}
       </section>
@@ -58,7 +58,7 @@ export default function ManchesterPage() {
           {[
             { title: "Online booking 24/7", desc: "Your clients can book haircuts, colour treatments, and beauty appointments at any time from any device." },
             { title: "Automated reminders", desc: "Send WhatsApp and email reminders automatically — so clients don't forget their appointment." },
-            { title: "No marketplace commission", desc: "Unlike Treatwell, Feature charges a flat monthly fee. Keep 100% of your booking revenue." },
+            { title: "No marketplace commission", desc: "Unlike Treatwell, Feature charges a flat monthly fee, with no extra charge for new clients. Online card payments have a 5% fee; paying at the salon has none." },
             { title: "Staff scheduling", desc: "Manage rotas, breaks, and shifts for your entire Manchester salon team in one place." },
             { title: "Online deposits & payments", desc: "Collect deposits via Stripe at booking time to protect against last-minute cancellations." },
             { title: "Revenue analytics", desc: "See daily, weekly, and monthly revenue trends. Understand which services are most profitable." },
@@ -74,7 +74,7 @@ export default function ManchesterPage() {
 
       <section className="section" style={{ textAlign: "center" }}>
         <h2 className="section-title">Be one of the first Manchester salons on Feature</h2>
-        <p className="hero-sub">No commission, no contracts, no marketplace fees — just straightforward software at a flat monthly price.</p>
+        <p className="hero-sub">No contracts and no marketplace fees — just straightforward software at a flat monthly price, with a 5% fee on online card payments only.</p>
         <div className="hero-btns" style={{ justifyContent: "center", marginTop: 24 }}>
           <Link href="/signup" className="btn-primary btn-lg">Start free 14-day trial →</Link>
         </div>

@@ -111,7 +111,7 @@ const BARBERSHOP_NEEDS = [
 ];
 
 const FEATURE_POINTS = [
-  "One flat £29/month for the whole shop — not per barber — with no commission on any booking, ever.",
+  "One flat £29/month for the whole shop — not per barber. No charge per booking; online card payments have a 5% fee.",
   "Per-barber booking so clients pick their barber, and you see each chair clearly.",
   "WhatsApp & email reminders built in to cut no-shows.",
   "Card payments and deposits via Stripe, landing in your account.",
@@ -212,7 +212,7 @@ export default function BarbershopBookingPage() {
               Some platforms (like Booksy, around £40/month plus per-barber fees, or Fresha on its newer paid plans) run a <strong style={{ color: C.text }}>consumer marketplace</strong> — a client-facing app that can send you new customers, in exchange for a commission on those new bookings (Booksy&apos;s &ldquo;Boost&rdquo; takes 30% of a new client&apos;s first visit; Fresha takes 20% on new marketplace clients). If most of your growth comes from that marketplace, it can be worth it.
             </p>
             <p>
-              But many barbershops grow through word of mouth, repeat regulars and their own Instagram — not a marketplace. If that&apos;s you, you may be paying commission for introductions you&apos;d have made anyway. In that case, a <strong style={{ color: C.text }}>flat-rate platform</strong> — one predictable monthly price, no cut of your bookings — usually works out better and far easier to budget.
+              But many barbershops grow through word of mouth, repeat regulars and their own Instagram — not a marketplace. If that&apos;s you, you may be paying commission for introductions you&apos;d have made anyway. In that case, a <strong style={{ color: C.text }}>flat-rate platform</strong> — one predictable monthly price instead of a cut of every new booking — usually works out better and far easier to budget.
             </p>
             <p>
               Per-barber pricing is the other thing to watch. A &ldquo;£27.50 for one barber&rdquo; headline can climb quickly once you add chairs and the add-ons (loyalty, marketing) that are often sold separately. Always work out the <em>all-in</em> monthly cost for your actual number of barbers before you commit.
@@ -236,7 +236,7 @@ export default function BarbershopBookingPage() {
             </div>
 
             <p>
-              We&apos;ll be straight about the trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put your shop in front of strangers the way Booksy can. You bring your clients; in return, you keep 100% of what they spend and your cost never moves. For an established shop with a loyal chair, that&apos;s usually the better deal — but if marketplace discovery is your main growth engine, a marketplace platform may suit you better. That&apos;s the honest answer.
+              We&apos;ll be straight about the trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put your shop in front of strangers the way Booksy can. You bring your clients; in return, you pay one flat monthly price that never moves, with no fee when clients pay in person (online card payments carry a 5% fee). For an established shop with a loyal chair, that&apos;s usually the better deal — but if marketplace discovery is your main growth engine, a marketplace platform may suit you better. That&apos;s the honest answer.
             </p>
 
             <p style={{ fontSize: 14, color: C.dim, fontStyle: "italic" }}>
@@ -251,13 +251,13 @@ export default function BarbershopBookingPage() {
                 Try it for your shop
               </h3>
               <p style={{ fontSize: 16, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
-                Start a 14-day free trial — no card, no commission, no catch.
+                Start a 14-day free trial — no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free →
               </Link>
               <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", marginTop: 20, marginBottom: 0 }}>
-                Feature: UK-built booking software for barbershops, salons, gyms and clinics. Online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat price, zero commission.
+                Feature: UK-built booking software for barbershops, salons, gyms and clinics. Online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat monthly price, 5% fee on online card payments only.
               </p>
             </div>
           </section>

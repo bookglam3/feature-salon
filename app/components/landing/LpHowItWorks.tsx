@@ -11,7 +11,7 @@ const steps = [
   },
   {
     title: "Let it run",
-    text: "Bookings land in your calendar, payments go through Stripe straight to your account, and reminders go out by WhatsApp and email on their own. All you need to do is turn up.",
+    text: "Bookings land in your calendar, online payments go through Stripe to your own account (minus a 5% fee), and reminders go out by WhatsApp and email on their own. All you need to do is turn up.",
   },
 ];
 

@@ -10,12 +10,12 @@ const text2   = "#524D60";
 const muted   = "#6B6577";
 
 export const metadata: Metadata = {
-  title: "Salon Booking Software with No Commission: Why It Matters (2026) | Feature",
-  description: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a flat-rate, no-commission model can be worth far more than it looks.",
+  title: "Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026) | Feature",
+  description: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a flat-rate model can be worth far more than it looks.",
   alternates: { canonical: "https://featuresalon.co.uk/blog/salon-booking-software-no-commission" },
   openGraph: {
-    title: "Salon Booking Software with No Commission: Why It Matters (2026) | Feature",
-    description: "How commission quietly eats salon profits — and why a flat-rate, no-commission model can be worth far more than it looks.",
+    title: "Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026) | Feature",
+    description: "How commission quietly eats salon profits — and why a flat-rate model can be worth far more than it looks.",
     url: "https://featuresalon.co.uk/blog/salon-booking-software-no-commission",
     locale: "en_GB",
     type: "article",
@@ -27,13 +27,13 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Article",
-      "headline": "Salon Booking Software with No Commission: Why It Matters (2026)",
+      "headline": "Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026)",
       "datePublished": "2026-06-01",
       "dateModified": "2026-06-01",
       "author": { "@type": "Organization", "name": "Feature Team" },
       "publisher": { "@type": "Organization", "name": "Feature", "url": "https://featuresalon.co.uk" },
       "url": "https://featuresalon.co.uk/blog/salon-booking-software-no-commission",
-      "description": "An honest look at how commission quietly eats salon profits — and why a flat-rate, no-commission model can be worth far more than it looks.",
+      "description": "An honest look at how commission quietly eats salon profits — and why a flat-rate model can be worth far more than it looks.",
       "mainEntityOfPage": { "@type": "WebPage", "@id": "https://featuresalon.co.uk/blog/salon-booking-software-no-commission" },
     },
     {
@@ -41,7 +41,7 @@ const jsonLd = {
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://featuresalon.co.uk" },
         { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://featuresalon.co.uk/blog" },
-        { "@type": "ListItem", "position": 3, "name": "Salon Booking Software with No Commission", "item": "https://featuresalon.co.uk/blog/salon-booking-software-no-commission" },
+        { "@type": "ListItem", "position": 3, "name": "Commission vs Flat-Fee Booking Software", "item": "https://featuresalon.co.uk/blog/salon-booking-software-no-commission" },
       ],
     },
   ],
@@ -71,19 +71,19 @@ export default function NoCommissionPage() {
           <span style={{ margin: "0 8px" }}>&rsaquo;</span>
           <Link href="/blog" style={{ color: gold, textDecoration: "none" }}>Blog</Link>
           <span style={{ margin: "0 8px" }}>&rsaquo;</span>
-          <span style={{ color: text2 }}>Salon Booking Software with No Commission</span>
+          <span style={{ color: text2 }}>Commission vs Flat-Fee Booking Software</span>
         </div>
 
         {/* Article header */}
         <header style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 32px" }}>
           <div style={{ display: "inline-block", background: "rgba(124,58,237,0.15)", color: gold, fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 99, marginBottom: 20, letterSpacing: "2px", textTransform: "uppercase" }}>
-            NO COMMISSION BOOKING
+            COMMISSION VS FLAT FEE
           </div>
           <h1 style={{ fontSize: "clamp(26px,4.5vw,40px)", fontWeight: 800, color: text, margin: "0 0 20px", lineHeight: 1.2, letterSpacing: "-0.5px" }}>
-            Salon Booking Software with No Commission: Why It Matters (2026)
+            Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026)
           </h1>
           <p style={{ fontSize: 18, color: text2, lineHeight: 1.7, margin: "0 0 24px" }}>
-            &ldquo;Free&rdquo; booking software is rarely free. Here&rsquo;s an honest look at how commission quietly eats salon profits &mdash; and why a no-commission, flat-rate model can be worth far more than it looks.
+            &ldquo;Free&rdquo; booking software is rarely free. Here&rsquo;s an honest look at how commission quietly eats salon profits &mdash; and why a flat-rate model can be worth far more than it looks.
           </p>
           <div style={{ display: "flex", gap: 20, fontSize: 13, color: muted, flexWrap: "wrap" }}>
             <span>Feature Team</span>
@@ -146,16 +146,16 @@ export default function NoCommissionPage() {
           {/* Section 3 */}
           <section style={{ marginBottom: 52 }}>
             <h2 style={{ fontSize: "clamp(20px,3vw,26px)", fontWeight: 700, color: text, marginBottom: 16, letterSpacing: "-0.3px" }}>
-              What &ldquo;no commission&rdquo; actually changes
+              What a flat monthly price actually changes
             </h2>
             <p style={{ fontSize: 16, color: text2, lineHeight: 1.8, marginBottom: 16 }}>
-              A no-commission, flat-rate platform flips the model. You pay one predictable monthly price, and <strong style={{ color: text }}>every booking &mdash; and every penny from it &mdash; stays yours.</strong> A fully booked Saturday costs you exactly the same in software as a quiet Tuesday.
+              A flat-rate platform flips the model. You pay one predictable monthly price, and <strong style={{ color: text }}>a new client costs you no more than a regular.</strong> A fully booked Saturday costs you the same monthly price as a quiet Tuesday.
             </p>
             <p style={{ fontSize: 16, color: text2, lineHeight: 1.8, marginBottom: 16 }}>
               For an established salon with a loyal client base, that predictability usually wins. You can plan your costs, your busy months reward you (not your software), and there&rsquo;s no nasty surprise when a regular gets miscounted as &ldquo;new&rdquo;.
             </p>
             <p style={{ fontSize: 15, color: muted, lineHeight: 1.8 }}>
-              The trade-off is honest and worth stating: a no-commission platform isn&rsquo;t a consumer marketplace, so it won&rsquo;t put you in front of strangers the way Fresha or Booksy can. You bring your clients; in return, you keep everything and your cost never moves.
+              The trade-off is honest and worth stating: a flat-rate platform isn&rsquo;t a consumer marketplace, so it won&rsquo;t put you in front of strangers the way Fresha or Booksy can. You bring your clients; in return, you pay one flat monthly price that never moves, with no fee when clients pay at the salon (online card payments carry a 5% fee).
             </p>
           </section>
 
@@ -165,11 +165,11 @@ export default function NoCommissionPage() {
               Where Feature fits
             </h2>
             <p style={{ fontSize: 16, color: text2, lineHeight: 1.8, marginBottom: 20 }}>
-              Feature is built entirely on the no-commission model:
+              Feature is built on the flat-price model:
             </p>
 
             {[
-              { label: "One flat £29/month for the whole business", detail: "No per-staff fees. No commission on any booking, ever." },
+              { label: "One flat £29/month for the whole business", detail: "No per-staff fees and no charge per booking. Online card payments (including deposits) have a 5% fee; paying at the salon has none." },
               { label: "WhatsApp & email reminders", detail: "Automated reminders built in to cut no-shows, on your own branded booking page." },
               { label: "Stripe payments that land in your account", detail: "Mainstream payment processing with full transparency — no middleman taking a percentage." },
               { label: "UK-built", detail: "For salons, barbers, gyms and clinics. GBP, GDPR-friendly, UK support." },
@@ -184,7 +184,7 @@ export default function NoCommissionPage() {
             ))}
 
             <p style={{ fontSize: 15, color: muted, lineHeight: 1.8, marginTop: 20 }}>
-              If marketplace discovery is your main growth engine, a marketplace platform may suit you better &mdash; and that&rsquo;s a fair answer. But if you&rsquo;d rather keep 100% of what your clients spend and always know your costs, no commission is the point.
+              If marketplace discovery is your main growth engine, a marketplace platform may suit you better &mdash; and that&rsquo;s a fair answer. But if you&rsquo;d rather pay one predictable monthly price, with no extra charge for new clients, the flat model is the point.
             </p>
           </section>
 
@@ -196,10 +196,10 @@ export default function NoCommissionPage() {
           {/* CTA box */}
           <div style={{ background: `linear-gradient(135deg, ${surface} 0%, #F5F3FF 100%)`, border: `1.5px solid ${gold}`, borderRadius: 16, padding: "36px 32px", textAlign: "center", marginBottom: 56 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: text, margin: "0 0 10px" }}>
-              Keep every penny your clients spend
+              One flat monthly price for your whole business
             </h3>
             <p style={{ fontSize: 16, color: text2, marginBottom: 24, lineHeight: 1.6 }}>
-              14-day free trial &mdash; no card, no commission, no catch.
+              14-day free trial &mdash; no card needed, cancel anytime.
             </p>
             <Link
               href="/signup"
@@ -208,7 +208,7 @@ export default function NoCommissionPage() {
               Start free trial
             </Link>
             <p style={{ fontSize: 13, color: muted, marginTop: 14, lineHeight: 1.5 }}>
-              UK-built booking software for salons, barbers, gyms and clinics &mdash; one flat price, zero commission.
+              UK-built booking software for salons, barbers, gyms and clinics &mdash; one flat monthly price, 5% fee on online card payments only.
             </p>
           </div>
 

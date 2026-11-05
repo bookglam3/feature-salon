@@ -3,7 +3,7 @@ import "./landing.css";
 
 const checklist = [
   "Online Booking 24/7",
-  "Zero Commission",
+  "Flat Monthly Price",
   "Easy Client Management",
   "Accept Payments Securely",
 ];

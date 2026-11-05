@@ -5,14 +5,14 @@ import { POSTS } from "../posts";
 export const metadata: Metadata = {
   title: "Best Fresha Alternative for UK Salons & Clinics (2026) | Feature",
   description:
-    "Looking for a Fresha alternative with no commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, zero commission.",
+    "Looking for a Fresha alternative without marketplace commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, 5% fee only on online card payments.",
   alternates: {
     canonical: "https://featuresalon.co.uk/blog/fresha-alternative-uk-2026",
   },
   openGraph: {
     title: "Best Fresha Alternative for UK Salons & Clinics (2026) | Feature",
     description:
-      "Looking for a Fresha alternative with no commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, zero commission.",
+      "Looking for a Fresha alternative without marketplace commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, 5% fee only on online card payments.",
     url: "https://featuresalon.co.uk/blog/fresha-alternative-uk-2026",
     locale: "en_GB",
     type: "article",
@@ -71,8 +71,8 @@ const FAQ_ITEMS = [
     a: "Yes — there's a 14-day free trial, and you don't need to enter a card to begin.",
   },
   {
-    q: "Does Feature charge commission on bookings?",
-    a: "No. It's a flat £29/month with no commission on any booking.",
+    q: "Are there any fees on top of the monthly price?",
+    a: "Only one. It's a flat £29/month, plus a 5% fee on payments clients make online by card (deposits included). Paying at the salon has no fee.",
   },
   {
     q: "Will my clients be charged to book?",
@@ -88,7 +88,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What's the catch compared to Fresha or Booksy?",
-    a: "Feature isn't a consumer marketplace, so it won't find you new clients the way they can. In exchange, you pay one flat price and keep every penny of every booking.",
+    a: "Feature isn't a consumer marketplace, so it won't find you new clients the way they can. In exchange, you pay one flat monthly price, with no extra charge for new clients and no fee when they pay at the salon (online card payments: 5%).",
   },
 ];
 
@@ -289,7 +289,7 @@ export default function FreshaAlternative2026Page() {
               The <strong style={{ color: C.text }}>marketplace model</strong> (Fresha, Booksy) bundles your booking software with a consumer app where clients can discover you — and charges a cut of the new business it sends your way. If you rely on that discovery, it can pay for itself. If most of your clients already come from word of mouth, your own social media, or walk-ins, you may be paying a commission for introductions you&apos;d have made anyway.
             </p>
             <p>
-              The <strong style={{ color: C.text }}>flat model</strong> charges one predictable monthly price and takes nothing from your bookings. There&apos;s no marketplace sending you strangers — you bring your own clients — but every booking, and every penny from it, stays yours. For an established salon or clinic with a loyal client base, that predictability is often worth more than a discovery engine.
+              The <strong style={{ color: C.text }}>flat model</strong> charges one predictable monthly price instead of a share of each new client&apos;s booking. There&apos;s no marketplace sending you strangers — you bring your own clients — and a new client costs you no more than a regular. (With Feature, the only other fee is 5% on online card payments.) For an established salon or clinic with a loyal client base, that predictability is often worth more than a discovery engine.
             </p>
             <p>Neither is &ldquo;right.&rdquo; It depends entirely on where your clients come from.</p>
           </section>
@@ -302,7 +302,7 @@ export default function FreshaAlternative2026Page() {
               {[
                 { title: "Predictable, all-in pricing.", body: "Look past the headline number to the total: subscription + per-staff fees + add-ons + commission. A plan that’s “cheap” at £14.95 can overtake a £29 flat plan once you add team members, reporting, loyalty and a couple of marketplace commissions." },
                 { title: "Reminders clients actually see.", body: "No-shows are pure lost revenue — an empty chair you can’t sell twice. Email reminders are standard, but plenty of clients never open email. Reminders over WhatsApp get read, and that’s the difference between a confirmed booking and a no-show." },
-                { title: "Clear ownership of clients and payments.", body: "Your client list and your takings should obviously be yours, with no cut skimmed off bookings." },
+                { title: "Clear ownership of clients and payments.", body: "Your client list should obviously be yours, and any fee on your takings should be stated plainly up front." },
                 { title: "A genuine UK fit.", body: "Pricing in pounds, UK workflows, and support from people who understand how a British salon or clinic actually runs." },
                 { title: "Flexibility across business types.", body: "Whether you run a hair salon, barbershop, nail or beauty studio, spa, gym, yoga studio, or physio clinic, the software should speak your language — clients or patients, stylists or practitioners." },
               ].map((item, i) => (
@@ -323,7 +323,7 @@ export default function FreshaAlternative2026Page() {
 
             <div style={{ background: C.surface, border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 16, padding: "20px 24px", margin: "20px 0", display: "flex", flexDirection: "column", gap: 14 }}>
               {[
-                "One flat price of £29/month for your whole business — no per-staff fees, no paid add-ons for the core tools, and no commission on any booking, ever.",
+                "One flat price of £29/month for your whole business — no per-staff fees, no paid add-ons for the core tools, and no charge per booking. Online card payments have a 5% fee; paying at the salon has none.",
                 "WhatsApp and email reminders built in, to cut the no-shows that quietly cost you the most.",
                 "Online booking through your own branded page, 24/7, plus card payments via Stripe that land in your account.",
                 "Built for the UK, and flexible enough to run a salon, barber, gym, or clinic in its own words.",
@@ -336,7 +336,7 @@ export default function FreshaAlternative2026Page() {
             </div>
 
             <p>
-              We&apos;ll be straight about the trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put your business in front of strangers the way Fresha or Booksy can. You bring your clients; in return, you keep 100% of what they spend, and your monthly cost never moves. For an established business, that&apos;s usually the better deal. If your growth depends entirely on a marketplace finding you new faces, a marketplace platform may suit you better — and that&apos;s a fair, honest answer.
+              We&apos;ll be straight about the trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put your business in front of strangers the way Fresha or Booksy can. You bring your clients; in return, you pay one flat monthly price that never moves, with no fee when clients pay at the salon (online card payments carry a 5% fee). For an established business, that&apos;s usually the better deal. If your growth depends entirely on a marketplace finding you new faces, a marketplace platform may suit you better — and that&apos;s a fair, honest answer.
             </p>
           </section>
 
@@ -406,18 +406,18 @@ export default function FreshaAlternative2026Page() {
           <section style={sectionStyle}>
             <h2 style={h2Style}>Ready to try a Fresha alternative built for you?</h2>
             <p>
-              If you&apos;ve ever felt like your booking software was on someone else&apos;s side, it&apos;s worth seeing how a flat-rate, commission-free platform feels.
+              If you&apos;ve ever felt like your booking software was on someone else&apos;s side, it&apos;s worth seeing how a flat-rate platform feels.
             </p>
             <div style={{ background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.3)", borderRadius: 18, padding: "36px 32px", textAlign: "center", margin: "28px 0 20px" }}>
               <p style={{ fontSize: 17, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
-                Start your 14-day free trial — no card, no commission, no catch.
+                Start your 14-day free trial — no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free →
               </Link>
             </div>
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", margin: 0 }}>
-              Feature is a UK-built booking platform for salons, barbers, gyms, and clinics: online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat price, zero commission.
+              Feature is a UK-built booking platform for salons, barbers, gyms, and clinics: online bookings, WhatsApp &amp; email reminders, and Stripe payments — one flat monthly price, 5% fee on online card payments only.
             </p>
           </section>
 

@@ -932,7 +932,7 @@ export default function SettingsPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "linear-gradient(135deg,#F5F3FF,#F5F3FF)", border: "1px solid #ECE9F1", borderRadius: 12, marginBottom: 16 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#1E1B4B" }}>Stripe Connect Express</div>
-            <div style={{ fontSize: 11.5, color: "#7C3AED", marginTop: 2 }}>2% platform fee · automatic payouts · Stripe-powered</div>
+            <div style={{ fontSize: 11.5, color: "#7C3AED", marginTop: 2 }}>5% fee on online card payments · no fee for pay at salon · automatic payouts</div>
           </div>
         </div>
         <button

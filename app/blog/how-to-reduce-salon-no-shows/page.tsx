@@ -223,10 +223,10 @@ export default function ReduceNoShowsPage() {
                 How Feature helps
               </h3>
               <p style={{ margin: "0 0 20px" }}>
-                Feature is a UK-built booking platform designed around exactly this. Clients book online 24/7, get automatic <strong style={{ color: C.text }}>WhatsApp and email reminders</strong>, and you can take <strong style={{ color: C.text }}>deposits and payments via Stripe</strong> — all for one flat £29/month, with no commission on your bookings.
+                Feature is a UK-built booking platform designed around exactly this. Clients book online 24/7, get automatic <strong style={{ color: C.text }}>WhatsApp and email reminders</strong>, and you can take <strong style={{ color: C.text }}>deposits and payments via Stripe</strong> — all for one flat £29/month, plus a 5% fee only on payments clients make online by card.
               </p>
               <p style={{ fontSize: 16, color: C.text, fontWeight: 700, marginBottom: 20, margin: "0 0 24px" }}>
-                Start your 14-day free trial — no card, no commission, no catch.
+                Start your 14-day free trial — no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free →

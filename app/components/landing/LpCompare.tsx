@@ -8,10 +8,10 @@ const freshaPoints = [
 ];
 
 const featurePoints = [
-  "One flat fee from £29 a month, and it doesn't change whether you're quiet or fully booked.",
-  "No commission on any booking, whether it's a brand new client or someone who's been coming for years.",
+  "One flat monthly price from £29, and it doesn't change whether you're quiet or fully booked.",
+  "No extra charge for new clients: someone brand new costs you the same as someone who's been coming for years.",
   "WhatsApp and email reminders are just part of it, not something you get charged more for using.",
-  "Payments go through Stripe and land straight in your own account.",
+  "Online payments go through Stripe into your own account, minus a 5% fee. Paying at the salon has no fee.",
 ];
 
 export default function LpCompare() {
@@ -19,8 +19,8 @@ export default function LpCompare() {
     <section className="lp-section" id="compare">
       <div className="lp-section-inner">
         <p className="lp-eyebrow">Feature vs Fresha</p>
-        <h2 className="lp-section-title">One flat fee, or a bill that grows with you</h2>
-        <p className="lp-section-sub">Commission platforms cost more the busier you get. Feature charges the same whether you take ten bookings or a thousand.</p>
+        <h2 className="lp-section-title">A flat monthly price, or a bill that grows with every new client</h2>
+        <p className="lp-section-sub">Commission platforms cost more the more new clients you get. Feature&apos;s monthly price stays the same whether you take ten bookings or a thousand; the only extra is a 5% fee on online card payments.</p>
         <div className="lp-cmp-grid">
           <div className="lp-cmp-card lp-cmp-them">
             <div className="lp-cmp-tag">Fresha</div>

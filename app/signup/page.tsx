@@ -29,7 +29,7 @@ const BUSINESS_TYPES = [
 ];
 
 const BENEFITS = [
-  "One flat monthly fee, zero commission",
+  "One flat monthly fee, no per-booking charges",
   "Online booking 24/7 with your own link",
   "WhatsApp & email reminders",
 ];

@@ -169,7 +169,7 @@ export default function BestSalonBookingSoftwarePage() {
             <div style={{ background: surface, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 16 }}>
               <div style={{ fontWeight: 700, color: text, fontSize: 15, marginBottom: 8 }}>Flat-rate platforms (including Feature)</div>
               <p style={{ fontSize: 15, color: text2, lineHeight: 1.75, margin: 0 }}>
-                One predictable monthly price, no commission on bookings. You bring your own clients; you keep 100% of every booking. Best for established salons with a loyal base who value predictable costs over a discovery engine.
+                One predictable monthly price, with no charge per booking. You bring your own clients; the only extra is a 5% fee on online card payments (nothing when clients pay at the salon). Best for established salons with a loyal base who value predictable costs over a discovery engine.
               </p>
             </div>
 
@@ -239,10 +239,10 @@ export default function BestSalonBookingSoftwarePage() {
               Where Feature fits
             </h2>
             <p style={{ fontSize: 16, color: text2, lineHeight: 1.8, marginBottom: 16 }}>
-              Feature is the flat-rate option: <strong style={{ color: text }}>&pound;29/month for the whole salon, no commission ever, WhatsApp &amp; email reminders, online booking, deposits and Stripe payments</strong>, built in the UK for salons, barbers, gyms and clinics.
+              Feature is the flat-rate option: <strong style={{ color: text }}>&pound;29/month for the whole salon, 5% fee on online card payments only, WhatsApp &amp; email reminders, online booking, deposits and Stripe payments</strong>, built in the UK for salons, barbers, gyms and clinics.
             </p>
             <p style={{ fontSize: 15, color: muted, lineHeight: 1.8 }}>
-              It&rsquo;s the right choice if you want predictable costs and to keep everything you earn. It&rsquo;s not a consumer marketplace, so if finding brand-new clients through an app is your main growth plan, a marketplace platform may suit you better &mdash; and we&rsquo;d rather tell you that honestly than oversell.
+              It&rsquo;s the right choice if you want predictable costs: one flat monthly price, plus 5% only on online card payments. It&rsquo;s not a consumer marketplace, so if finding brand-new clients through an app is your main growth plan, a marketplace platform may suit you better &mdash; and we&rsquo;d rather tell you that honestly than oversell.
             </p>
           </section>
 
@@ -252,7 +252,7 @@ export default function BestSalonBookingSoftwarePage() {
               Try the flat-rate option free
             </h3>
             <p style={{ fontSize: 16, color: text2, marginBottom: 24, lineHeight: 1.6 }}>
-              14-day free trial &mdash; no card, no commission, no catch.
+              14-day free trial &mdash; no card needed, cancel anytime.
             </p>
             <Link
               href="/signup"
@@ -261,7 +261,7 @@ export default function BestSalonBookingSoftwarePage() {
               Start free trial
             </Link>
             <p style={{ fontSize: 13, color: muted, marginTop: 14, lineHeight: 1.5 }}>
-              UK-built salon booking software &mdash; one flat price, zero commission, WhatsApp reminders.
+              UK-built salon booking software &mdash; one flat monthly price, 5% fee on online card payments only, WhatsApp reminders.
             </p>
           </div>
 
@@ -276,7 +276,7 @@ export default function BestSalonBookingSoftwarePage() {
                 The Best Booksy Alternative for UK Salons (2026)
               </Link>
               <Link href="/blog/salon-booking-software-no-commission" style={{ display: "block", background: surface, border: `1px solid ${border}`, borderRadius: 10, padding: "16px 18px", textDecoration: "none", color: text2, fontSize: 14, lineHeight: 1.5, fontWeight: 500 }}>
-                Salon Booking Software with No Commission (2026)
+                Commission vs Flat-Fee Salon Booking Software (2026)
               </Link>
             </div>
           </div>

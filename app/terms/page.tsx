@@ -73,8 +73,8 @@ export default function TermsOfServicePage() {
           <SubHeading>4.2 Paid plans</SubHeading>
           <p>The current subscription price is <strong>£29 per month</strong> (prices inclusive of any applicable VAT). Subscriptions are billed monthly in advance.</p>
 
-          <SubHeading>4.3 No commission</SubHeading>
-          <p>Feature charges a flat monthly subscription fee. We do <strong>not</strong> charge commission or a percentage on bookings made through the platform.</p>
+          <SubHeading>4.3 Fees on online payments</SubHeading>
+          <p>Feature charges a flat monthly subscription fee and does not charge per booking. If you take payments online through Feature, a fee of <strong>5%</strong> of each online card payment (including deposits) is deducted before the payment reaches your Stripe account. Payments you take at your premises have no fee.</p>
 
           <SubHeading>4.4 Payment processing</SubHeading>
           <p>Payments are processed securely by Stripe. We do not store your card details. By providing payment information, you authorise us to charge the applicable fees to your chosen payment method on each billing date.</p>
