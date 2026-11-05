@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { chargePence, onlineChargeOption } from "@/app/lib/payments/bookingPayment";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const supabaseAdmin = createClient(
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
     const {
       email, booking_id,
       salon_name, service_name, deposit_only,
+      charge_amount, // £ the booking page showed — only compared, never charged
     } = await req.json();
 
     if (!email) {
@@ -29,7 +31,7 @@ export async function POST(req: NextRequest) {
     // backward-compat fallback source of truth when no line items exist.
     const { data: apptData, error: apptError } = await supabaseAdmin
       .from("appointments")
-      .select("salon_id, services(price, price_is_from)")
+      .select("salon_id, status, payment_status, payment_method, services(price, price_is_from)")
       .eq("id", booking_id)
       .maybeSingle();
     if (apptError) {
@@ -37,9 +39,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Resolve salon from DB (not client body) to prevent Connect routing injection
-    const resolvedSalonId = (apptData as { salon_id?: string } | null)?.salon_id ?? null;
+    const appt = apptData as { salon_id?: string; status?: string; payment_status?: string; payment_method?: string | null } | null;
+    const resolvedSalonId = appt?.salon_id ?? null;
     if (!resolvedSalonId) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    // Only a booking that is waiting for its online payment can be charged —
+    // never a pay-at-salon, already paid or cancelled one.
+    if (appt?.status !== "pending" || appt?.payment_status !== "pending") {
+      return NextResponse.json(
+        { error: "This booking doesn't need an online payment.", code: "not_awaiting_payment" },
+        { status: 409 },
+      );
     }
 
     // Multi-service line items, if any exist for this appointment. Empty for
@@ -80,18 +92,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Could not determine service price" }, { status: 400 });
     }
 
-    // A variable-priced ("from £X") service can't be charged in full online —
-    // the final amount is unknown and there's no balance-due flow, so the salon
-    // would be locked into charging the listed floor price. Client-side hiding
-    // of the option is not security; this is the real enforcement. Applies if
-    // ANY selected service is variable-priced, not just a single one.
-    if (!deposit_only && anyPriceIsFrom) {
-      return NextResponse.json(
-        { error: "This service has a variable price and can't be paid in full online. Please choose a deposit or pay at the salon." },
-        { status: 400 },
-      );
-    }
-    let depositPercent = 50; // deposit_online's fixed rate — the default when the salon isn't using a custom percentage
     const { data: salon, error: salonError } = await supabaseAdmin
       .from("salons")
       .select("stripe_account_id, charges_enabled, payment_methods")
@@ -118,17 +118,48 @@ export async function POST(req: NextRequest) {
     }
     const stripeAccountId: string = salon.stripe_account_id;
 
-    // Never trust the client-supplied charge amount for the deposit percentage
-    // either — re-derive it from the salon's own configured rate so the
-    // amount Stripe actually charges always matches what the client was shown.
-    const pm = salon.payment_methods as { custom_deposit?: boolean; deposit_percent?: number } | null;
-    if (pm?.custom_deposit && typeof pm.deposit_percent === "number" && pm.deposit_percent > 0 && pm.deposit_percent < 100) {
-      depositPercent = pm.deposit_percent;
+    // What to charge: the option saved on the booking (the one the client
+    // picked — full, 50% deposit or the salon's custom %), still on offer under
+    // the salon's settings now, at the same % the booking page used. The rules
+    // are shared with the page (app/lib/payments/bookingPayment.ts).
+    const option = onlineChargeOption({
+      savedOption: appt?.payment_method ?? null,
+      savedSettings: salon.payment_methods,
+      depositOnlyFlag: deposit_only === true,
+      anyPriceIsFrom,
+    });
+    if (!option) {
+      // A variable-priced ("from £X") service can't be charged in full online —
+      // the final amount is unknown and there's no balance-due flow. Applies if
+      // ANY selected service is variable-priced, not just a single one.
+      const wantedFull = (appt?.payment_method ?? (deposit_only === true ? "deposit_online" : "full_online")) === "full_online";
+      if (wantedFull && anyPriceIsFrom) {
+        return NextResponse.json(
+          { error: "This service has a variable price and can't be paid in full online. Please choose a deposit or pay at the salon." },
+          { status: 400 },
+        );
+      }
+      return NextResponse.json(
+        { error: "That payment option isn't available any more. Please refresh the page and book again.", code: "payment_option_unavailable" },
+        { status: 409 },
+      );
     }
+    const isDeposit = option.id !== "full_online";
+    const chargeAmount = chargePence(totalPrice, option.pct);
 
-    const chargeAmount = deposit_only
-      ? Math.round(totalPrice * (depositPercent / 100) * 100)
-      : Math.round(totalPrice * 100);
+    // Charge exactly what the client was shown. If the price or the deposit %
+    // changed after the booking page loaded, stop rather than charge a
+    // different amount behind the "Pay £X" button.
+    const shownPence = typeof charge_amount === "number" ? Math.round(charge_amount * 100) : NaN;
+    if (shownPence !== chargeAmount) {
+      return NextResponse.json(
+        { error: "The price for this booking changed while you were booking. Please refresh the page and book again.", code: "amount_changed" },
+        { status: 409 },
+      );
+    }
+    if (chargeAmount <= 0) {
+      return NextResponse.json({ error: "Could not determine service price" }, { status: 400 });
+    }
 
     const platformFee = Math.round(chargeAmount * PLATFORM_FEE_PERCENT);
 
@@ -136,12 +167,13 @@ export async function POST(req: NextRequest) {
       amount: chargeAmount,
       currency: "gbp",
       receipt_email: email,
-      description: `${salon_name || "Salon"} – ${service_name || "Appointment"}${deposit_only ? ` (${depositPercent}% Deposit)` : ""}`,
+      description: `${salon_name || "Salon"} – ${service_name || "Appointment"}${isDeposit ? ` (${option.pct}% Deposit)` : ""}`,
       metadata: {
         booking_id:    booking_id || "",
         salon_name:    salon_name || "",
         service_name:  service_name || "",
-        deposit_only:  deposit_only ? "true" : "false",
+        deposit_only:  isDeposit ? "true" : "false",
+        payment_option: option.id,
         full_amount:   String(Math.round(totalPrice * 100)),
         salon_id:      resolvedSalonId || "",
       },
