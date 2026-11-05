@@ -6,15 +6,15 @@ import "./landing.css";
 const faqs = [
   {
     q: "How much does Feature cost?",
-    a: "There are three plans to choose from. Starter is £29 a month, Pro is £59, and Business is £99. Whichever one you pick, it's a flat monthly fee, so there's no commission and no charge per booking.",
+    a: "There are three plans to choose from. Starter is £29 a month, Pro is £59, and Business is £99. Whichever one you pick, it's a flat monthly price with no charge per booking. If clients pay online by card through Feature, there's a 5% fee on those payments (deposits included). If they pay at the salon, there's no fee.",
   },
   {
-    q: "Does Feature charge commission on bookings?",
-    a: "No, never. You pay your monthly fee and that's it. Whatever your clients pay you, you keep. A lot of booking platforms take a cut of every appointment. We don't work that way.",
+    q: "Are there any fees on top of the monthly price?",
+    a: "Only one: a 5% fee on payments your clients make online by card through Feature, deposits included. When clients pay at the salon there's no fee, and there's never a charge per booking or for new clients.",
   },
   {
     q: "Is Feature a good alternative to Fresha, Treatwell or Booksy?",
-    a: "It can be. Those platforms usually take commission or charge per booking, which adds up once you're busy. Feature gives you online booking, payments, reminders and client management for one flat fee instead, so you know exactly what you're paying each month.",
+    a: "It can be. Those platforms usually take commission or charge per booking, which adds up once you're busy. Feature gives you online booking, payments, reminders and client management for one flat monthly price instead. The only other fee is 5% on payments clients make online by card.",
   },
   {
     q: "What types of business is Feature for?",
@@ -30,7 +30,7 @@ const faqs = [
   },
   {
     q: "How do payments work?",
-    a: "Payments run through Stripe, so it's secure and the money lands straight in your own account. You can take deposits or full payment when someone books, and again, we don't take any commission from it.",
+    a: "Online payments run through Stripe, so they're secure, and the money is paid into your own Stripe account. You can take deposits or full payment when someone books. Feature keeps a 5% fee on each online card payment, deposits included. When clients pay at the salon instead, there's no fee.",
   },
   {
     q: "Can I import my existing clients?",

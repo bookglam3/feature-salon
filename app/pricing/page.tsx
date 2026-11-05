@@ -282,7 +282,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p style={{ fontSize:17, color:"rgba(255,255,255,0.6)", maxWidth:520, margin:"0 auto 24px", lineHeight:1.7 }}>
-            One price per plan. No hidden fees. Cancel anytime.
+            One price per plan. Online card payments have a 5% fee; paying at the salon has none. Cancel anytime.
           </p>
 
           {/* Currency detected note */}

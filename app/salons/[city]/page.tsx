@@ -22,7 +22,7 @@ const CITY_DATA: Record<string, {
     tagline: "Built for the pace of London",
     desc: "London hair salons, beauty salons, and barbershops can use Feature to manage bookings, staff, and payments — without Fresha's hidden commission fees.",
     neighborhoods: ["Shoreditch", "Brixton", "Canary Wharf", "Chelsea", "Notting Hill"],
-    localNote: "Feature is available to salons across London — from Shoreditch to Chelsea — with automated reminders, Stripe payments, and zero commission.",
+    localNote: "Feature is available to salons across London — from Shoreditch to Chelsea — with automated reminders, Stripe payments, and one flat monthly price.",
   },
   manchester: {
     name: "Manchester",
@@ -38,16 +38,16 @@ const CITY_DATA: Record<string, {
     region: "West Midlands",
     icon: "house",
     tagline: "Built for Birmingham hair & beauty salons",
-    desc: "Birmingham salons can use Feature instead of Treatwell and Fresha — keeping 100% of their revenue with zero marketplace commission.",
+    desc: "Birmingham salons can use Feature instead of Treatwell and Fresha — with one flat monthly price instead of marketplace commission.",
     neighborhoods: ["Jewellery Quarter", "Moseley", "Edgbaston", "Digbeth", "Harborne"],
-    localNote: "Birmingham's independent salons can switch from Fresha and Treatwell to Feature — with a flat monthly fee and no per-booking commission.",
+    localNote: "Birmingham's independent salons can switch from Fresha and Treatwell to Feature — with a flat monthly fee instead of per-booking commission.",
   },
   leeds: {
     name: "Leeds",
     region: "West Yorkshire",
     icon: "landmark",
     tagline: "Salon software for Leeds salons",
-    desc: "Leeds salons can choose Feature for its flat-rate pricing, zero commission, and powerful automated reminders that keep clients coming back.",
+    desc: "Leeds salons can choose Feature for its flat-rate pricing, no fee when clients pay at the salon, and powerful automated reminders that keep clients coming back.",
     neighborhoods: ["Chapel Allerton", "Headingley", "Roundhay", "Leeds City Centre", "Horsforth"],
     localNote: "Leeds salons from Headingley to the city centre can automate their bookings with Feature.",
   },
@@ -67,7 +67,7 @@ const CITY_DATA: Record<string, {
     tagline: "Salon software for Glasgow salons",
     desc: "Glasgow's salon scene can use Feature to automate bookings, reduce no-shows with WhatsApp reminders, and take Stripe payments — all with no marketplace fees.",
     neighborhoods: ["West End", "Merchant City", "Southside", "Finnieston", "Shawlands"],
-    localNote: "Glasgow's independent salons and barbershops can grow faster with Feature's zero-commission booking system.",
+    localNote: "Glasgow's independent salons and barbershops can grow faster with Feature's flat-price booking system.",
   },
   bristol: {
     name: "Bristol",
@@ -92,7 +92,7 @@ const CITY_DATA: Record<string, {
     region: "Merseyside",
     icon: "music",
     tagline: "Salon software built for Liverpool",
-    desc: "Liverpool salons can use Feature for online booking, automated WhatsApp reminders, and Stripe payments — with no commissions and no hidden fees.",
+    desc: "Liverpool salons can use Feature for online booking, automated WhatsApp reminders, and Stripe payments — on one flat monthly price, with a clear 5% fee on online card payments only.",
     neighborhoods: ["Bold Street", "Allerton", "Woolton", "Aigburth", "Crosby"],
     localNote: "From Bold Street to Allerton, Liverpool salons can automate their operations with Feature.",
   },
@@ -130,7 +130,7 @@ export async function generateMetadata({
 
   return {
     title: `Best Salon Software in ${data.name} | Feature Salon`,
-    description: `Feature Salon is the best salon management software for ${data.name} salons. Online bookings, WhatsApp reminders, Stripe payments. No commission fees. Free 14-day trial.`,
+    description: `Feature Salon is the best salon management software for ${data.name} salons. Online bookings, WhatsApp reminders, Stripe payments. One flat monthly price. Free 14-day trial.`,
     keywords: [
       `salon software ${data.name.toLowerCase()}`,
       `${data.name.toLowerCase()} salon booking system`,
@@ -143,7 +143,7 @@ export async function generateMetadata({
     },
     openGraph: {
       title: `Best Salon Software in ${data.name} | Feature Salon`,
-      description: `The best salon software for ${data.name} salons. Online bookings, automated reminders, Stripe payments — with zero commission fees.`,
+      description: `The best salon software for ${data.name} salons. Online bookings, automated reminders, Stripe payments — on one flat monthly price.`,
       url: `https://featuresalon.co.uk/salons/${city}`,
       locale: "en_GB",
       type: "website",
@@ -172,7 +172,7 @@ export default async function CityPage({
     "@type": "SoftwareApplication",
     "@id": `${pageUrl}#software`,
     name: "Feature Salon",
-    description: `Feature Salon is a UK salon management platform for ${data.name} salons. Online bookings, automated WhatsApp & email reminders, Stripe payments — with zero commission fees.`,
+    description: `Feature Salon is a UK salon management platform for ${data.name} salons. Online bookings, automated WhatsApp & email reminders, Stripe payments — on one flat monthly price.`,
     url: BASE,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web, iOS, Android",
@@ -265,7 +265,7 @@ export default async function CityPage({
               <Link href="/pricing" className="btn-secondary btn-lg">View pricing</Link>
             </div>
             <div className="hero-trust">
-              {["No commission fees", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((t) => (
+              {["Flat monthly price", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((t) => (
                 <span key={t} className="hero-trust-item">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="8" fill="#ECFDF5"/>
@@ -281,7 +281,7 @@ export default async function CityPage({
 
       {/* ── Trust bar ── */}
       <section className="trust-bar">
-        {["No commission fees", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
+        {["Flat monthly price", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
           <div key={item} className="trust-item"><div className="trust-dot" />{item}</div>
         ))}
       </section>
@@ -298,7 +298,7 @@ export default async function CityPage({
           {[
             { icon: "smartphone" as IconName, title: "Online Booking 24/7", desc: `${data.name} clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page.` },
             { icon: "message-circle" as IconName, title: "WhatsApp & Email Reminders", desc: `Reduce no-shows with automated reminders via WhatsApp and email — personalised for every ${data.name} salon.` },
-            { icon: "pound-sterling" as IconName, title: "No Commission Fees", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups — ever." },
+            { icon: "pound-sterling" as IconName, title: "Flat Monthly Price", desc: "Feature charges one flat monthly fee. Online card payments have a 5% fee; when clients pay at the salon, there's no fee." },
             { icon: "users" as IconName, title: "Multi-Staff Scheduling", desc: `Manage your entire ${data.name} salon team's calendars, breaks, and holidays from one clean dashboard.` },
             { icon: "credit-card" as IconName, title: "Stripe Online Payments", desc: "Take deposits or full payments online via Stripe. Reduce no-shows and get paid before clients arrive." },
             { icon: "chart-column" as IconName, title: "Revenue Analytics", desc: `Track your busiest days, top services, and best staff members — specific to your ${data.name} salon.` },
@@ -339,7 +339,7 @@ export default async function CityPage({
       {/* ── Early adopter CTA ── */}
       <section className="section section-white" style={{ textAlign: "center" }}>
         <h2 className="section-title">Be one of the first {data.name} salons on Feature</h2>
-        <p className="hero-sub">No commission, no contracts, no marketplace fees — just straightforward software at a flat monthly price.</p>
+        <p className="hero-sub">No contracts and no marketplace fees — just straightforward software at a flat monthly price, with a 5% fee on online card payments only.</p>
         <div className="hero-btns" style={{ justifyContent: "center", marginTop: 24 }}>
           <Link href="/signup" className="btn-primary btn-lg">Start free 14-day trial →</Link>
         </div>
@@ -351,7 +351,7 @@ export default async function CityPage({
           <div className="section-label">PRICING</div>
           <h2 className="section-title">Simple pricing for {data.name} salons</h2>
           <p style={{ color: "#64748B", marginBottom: 32, fontSize: 16 }}>
-            From £29/month — no contracts, no hidden fees, no commission on bookings.
+            From £29/month — no contracts. Online card payments have a 5% fee; paying at the salon has none.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
             {[
@@ -385,7 +385,7 @@ export default async function CityPage({
       <section className="section final-cta">
         <h2 className="final-cta-title">Ready to grow your {data.name} salon?</h2>
         <p className="final-cta-sub">
-          Automate bookings, send reminders, and manage your team — all from one dashboard, with no commission fees.
+          Automate bookings, send reminders, and manage your team — all from one dashboard, for one flat monthly price.
         </p>
         <Link href="/signup" className="btn-primary btn-lg btn-glow">Start Free 14-Day Trial →</Link>
         <div className="final-cta-trust">

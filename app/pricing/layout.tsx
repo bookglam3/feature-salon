@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing | Salon Management Software — Feature Salon",
   description:
-    "Simple, transparent pricing for UK salons. Feature Salon plans from £29/month with a 14-day free trial. No contracts, no hidden fees. Cancel anytime.",
+    "Simple, transparent pricing for UK salons. Feature Salon plans from £29/month with a 14-day free trial. No contracts. 5% fee on online card payments only. Cancel anytime.",
   keywords: [
     "salon software pricing uk",
     "fresha alternative pricing",

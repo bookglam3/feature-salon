@@ -16,7 +16,7 @@ export default function SchemaMarkup() {
     operatingSystem: "Web, iOS, Android",
     url: "https://featuresalon.co.uk",
     description:
-      "Free salon booking software for UK salons. Online bookings, automated WhatsApp & email reminders, Stripe payments, staff management, and revenue analytics. Better than Fresha — no commission fees.",
+      "Salon booking software for UK salons. Online bookings, automated WhatsApp & email reminders, Stripe payments, staff management, and revenue analytics. Better than Fresha. One flat monthly price, with a 5% fee on online card payments only.",
     inLanguage: "en-GB",
     screenshot: "https://featuresalon.co.uk/og-image.png",
     softwareVersion: "2.0",
@@ -44,7 +44,7 @@ export default function SchemaMarkup() {
       "Revenue reports and analytics",
       "Multi-location support",
       "14-day free trial — no credit card required",
-      "Zero booking commission",
+      "Flat monthly price, 5% fee on online card payments only",
       "UK-based customer support",
     ],
     keywords: "salon software uk, salon booking system, fresha alternative, treatwell alternative, salon management software, uk salon app",
@@ -70,7 +70,7 @@ export default function SchemaMarkup() {
       height: 630,
     },
     description:
-      "Feature Salon is a UK salon management platform helping independent salons and chains manage online bookings, staff, payments, and client communications with zero commission fees.",
+      "Feature Salon is a UK salon management platform helping independent salons and chains manage online bookings, staff, payments, and client communications, for one flat monthly price.",
     foundingDate: "2024",
     areaServed: [
       { "@type": "Country", name: "United Kingdom" },
@@ -102,7 +102,7 @@ export default function SchemaMarkup() {
     "@id": "https://featuresalon.co.uk/#website",
     name: "Feature Salon",
     url: "https://featuresalon.co.uk",
-    description: "Free salon booking software for UK salons — online bookings, payments, and automated reminders",
+    description: "Salon booking software for UK salons — online bookings, payments, and automated reminders",
     inLanguage: "en-GB",
     publisher: { "@id": "https://featuresalon.co.uk/#organization" },
     potentialAction: {

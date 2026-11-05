@@ -14,7 +14,7 @@ import LpFooter from "./components/landing/LpFooter";
 
 export const metadata: Metadata = {
   title: "Feature | Health & Wellbeing Booking Software — Free Trial",
-  description: "Feature is a booking & management platform for salons, gyms, spas, yoga studios, physiotherapy clinics and more. WhatsApp reminders, Stripe payments, staff scheduling & CRM. 14-day free trial. No commission fees.",
+  description: "Feature is a booking & management platform for salons, gyms, spas, yoga studios, physiotherapy clinics and more. WhatsApp reminders, Stripe payments, staff scheduling & CRM. 14-day free trial. One flat monthly price, 5% fee on online card payments only.",
   alternates: { canonical: "https://featuresalon.co.uk" },
 };
 
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
 // can't be imported directly and has to be kept in sync by hand. If you
 // edit the questions/answers in LpFaq.tsx, update this list to match.
 const faqItems = [
-  { question: "How much does Feature cost?", answer: "There are three plans to choose from. Starter is £29 a month, Pro is £59, and Business is £99. Whichever one you pick, it's a flat monthly fee, so there's no commission and no charge per booking." },
-  { question: "Does Feature charge commission on bookings?", answer: "No, never. You pay your monthly fee and that's it. Whatever your clients pay you, you keep. A lot of booking platforms take a cut of every appointment. We don't work that way." },
-  { question: "Is Feature a good alternative to Fresha, Treatwell or Booksy?", answer: "It can be. Those platforms usually take commission or charge per booking, which adds up once you're busy. Feature gives you online booking, payments, reminders and client management for one flat fee instead, so you know exactly what you're paying each month." },
+  { question: "How much does Feature cost?", answer: "There are three plans to choose from. Starter is £29 a month, Pro is £59, and Business is £99. Whichever one you pick, it's a flat monthly price with no charge per booking. If clients pay online by card through Feature, there's a 5% fee on those payments (deposits included). If they pay at the salon, there's no fee." },
+  { question: "Are there any fees on top of the monthly price?", answer: "Only one: a 5% fee on payments your clients make online by card through Feature, deposits included. When clients pay at the salon there's no fee, and there's never a charge per booking or for new clients." },
+  { question: "Is Feature a good alternative to Fresha, Treatwell or Booksy?", answer: "It can be. Those platforms usually take commission or charge per booking, which adds up once you're busy. Feature gives you online booking, payments, reminders and client management for one flat monthly price instead. The only other fee is 5% on payments clients make online by card." },
   { question: "What types of business is Feature for?", answer: "Salons and barbershops mostly, but also gyms, spas, yoga studios, and physio or wellness clinics. Really, if you take appointments and need a way for clients to book you in, it'll work for your business." },
   { question: "Can my clients book online 24/7?", answer: "Yes. You get a booking page and a QR code you can put on your door, your Instagram, wherever suits. Clients can book from their phone at any time of day, and there's nothing for them to download." },
   { question: "Does Feature send appointment reminders?", answer: "It does. WhatsApp and email reminders go out automatically before each appointment, so you're not chasing clients yourself, and you'll see fewer no-shows." },
-  { question: "How do payments work?", answer: "Payments run through Stripe, so it's secure and the money lands straight in your own account. You can take deposits or full payment when someone books, and again, we don't take any commission from it." },
+  { question: "How do payments work?", answer: "Online payments run through Stripe, so they're secure, and the money is paid into your own Stripe account. You can take deposits or full payment when someone books. Feature keeps a 5% fee on each online card payment, deposits included. When clients pay at the salon instead, there's no fee." },
   { question: "Can I import my existing clients?", answer: "Yes, you can bring your existing client list over when you sign up, so you're not starting from scratch. Their details and history come with them." },
   { question: "Is there a free trial? Do I need a card to start?", answer: "There's a 14-day free trial and you don't need to put a card in to start it. If it's not for you, you can cancel any time, no hassle." },
   { question: "Can I manage multiple staff and services?", answer: "Yes. Every booking shows which staff member it's with, and you can see your whole team's day in one calendar. You can set up your services and packages so clients can book more than one thing at once. It's all managed from the same dashboard." },
@@ -77,7 +77,7 @@ const softwareSchema = {
     "Loyalty rewards program",
     "Waitlist management",
     "Mobile-first PWA design",
-    "No booking commission fees",
+    "Flat monthly price, 5% fee on online card payments only",
     "Branded public booking page",
   ],
   screenshot: "https://featuresalon.co.uk/og-image.png",

@@ -246,7 +246,7 @@ export default function Calculator() {
           <div style={{ fontSize: 36, fontWeight: 900, color: C.gold, lineHeight: 1, marginBottom: 2, letterSpacing: "-1.5px" }}>
             £{featureTotal}
           </div>
-          <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>always, no commission</div>
+          <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>a month, flat (+5% of online card payments)</div>
           <div style={{ borderTop: `1px solid rgba(124,58,237,0.2)`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
             {savingVsFresha > 0 && (
               <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(16,185,129,0.12)", borderRadius: 8, padding: "8px 12px" }}>
@@ -277,13 +277,13 @@ export default function Calculator() {
 
       {/* Disclaimer */}
       <p style={{ fontSize: 12.5, color: C.dim, textAlign: "center", fontStyle: "italic", lineHeight: 1.65, marginTop: 20, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
-        This is an estimate based on the numbers you enter and reported 2026 pricing. Commissions apply only to new clients from each platform&apos;s marketplace, not to existing clients. Always check each provider&apos;s current pricing.
+        This is an estimate based on the numbers you enter and reported 2026 pricing. Commissions apply only to new clients from each platform&apos;s marketplace, not to existing clients. Feature&apos;s figure is its monthly price only; a 5% fee also applies to payments your clients make online by card. Always check each provider&apos;s current pricing.
       </p>
 
       {/* CTA */}
       <div style={{ textAlign: "center", marginTop: 36 }}>
         <Link href="/signup" className="btn-primary btn-lg btn-glow">
-          Start your 14-day free trial — no card, no commission →
+          Start your 14-day free trial — no card needed →
         </Link>
       </div>
     </div>

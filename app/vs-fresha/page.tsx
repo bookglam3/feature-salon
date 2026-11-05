@@ -68,11 +68,10 @@ const TABLE: TableRow[] = [
     featColor: C.green,
   },
   {
-    label: "Commission on bookings",
-    feat: "None",
+    label: "Commission / fees on bookings",
+    feat: "5% on online card payments only; none when paying at the salon",
     fresha: "20% on new marketplace clients (min ~£6)",
     booksy: "30% on new Boost clients (min £5)",
-    featColor: C.green,
     freshaColor: C.red,
     booksyColor: C.red,
   },
@@ -214,7 +213,7 @@ export default function VsFresha() {
         <div style={{ background: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "22px 26px", marginTop: 28 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.gold, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>The honest trade-off</div>
           <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.8, margin: 0 }}>
-            Feature has no consumer marketplace, so it won&apos;t put your business in front of strangers the way Fresha or Booksy can. You bring your clients; in return you pay one flat price and keep 100% of every booking. <strong style={{ color: C.text }}>If marketplace discovery is your main source of new clients, a marketplace platform may suit you better</strong> — and that&apos;s a fair, honest answer.
+            Feature has no consumer marketplace, so it won&apos;t put your business in front of strangers the way Fresha or Booksy can. You bring your clients; in return you pay one flat monthly price, with no extra charge for new clients and no fee when they pay at the salon (online card payments carry a 5% fee). <strong style={{ color: C.text }}>If marketplace discovery is your main source of new clients, a marketplace platform may suit you better</strong> — and that&apos;s a fair, honest answer.
           </p>
         </div>
       </section>
@@ -257,8 +256,8 @@ export default function VsFresha() {
             },
             {
               icon: "💷",
-              title: "Keep every penny",
-              body: "No commission on any booking, ever. Every pound your clients spend goes to you — not to the platform.",
+              title: "No extra charge for new clients",
+              body: "A brand-new client costs you the same as a regular. Online card payments have a 5% fee; when clients pay at the salon, there's no fee.",
             },
             {
               icon: "🇬🇧",
@@ -278,7 +277,7 @@ export default function VsFresha() {
       {/* Final CTA */}
       <section className="section final-cta">
         <h2 className="final-cta-title">Ready to try the flat-rate alternative?</h2>
-        <p className="final-cta-sub">14-day free trial. No credit card. No commission on any booking — ever.</p>
+        <p className="final-cta-sub">14-day free trial. No credit card. One flat monthly price.</p>
         <Link href="/signup" className="btn-primary btn-lg btn-glow">
           Start Free 14-Day Trial →
         </Link>

@@ -203,7 +203,7 @@ export default function PhysioClinicBookingPage() {
                 "Online booking with per-practitioner scheduling and clinic-appropriate wording (patients, practitioners, appointments)",
                 "WhatsApp & email reminders built in to cut no-shows",
                 "Payments and deposits via Stripe, landing in your account",
-                "One flat £29/month for the whole clinic — not per practitioner — with no commission, ever",
+                "One flat £29/month for the whole clinic — not per practitioner. Online card payments have a 5% fee; paying at the clinic has none",
                 "GDPR-friendly UK setup with GBP throughout",
               ].map((pt, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12 }}>
@@ -229,7 +229,7 @@ export default function PhysioClinicBookingPage() {
               See if it fits your clinic
             </h3>
             <p style={{ fontSize: 16, color: text2, marginBottom: 24, lineHeight: 1.6 }}>
-              14-day free trial &mdash; no card, no commission, no catch.
+              14-day free trial &mdash; no card needed, cancel anytime.
             </p>
             <Link
               href="/signup"

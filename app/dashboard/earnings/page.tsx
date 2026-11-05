@@ -169,7 +169,7 @@ export default function EarningsPage() {
             <div style={{ fontSize: 64, marginBottom: 20 }}>🏦</div>
             <h2 style={{ fontSize: 26, fontWeight: 900, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.5px" }}>Connect Your Stripe Account</h2>
             <p style={{ fontSize: 14, color: "#524D60", lineHeight: 1.7, margin: "0 0 32px" }}>
-              Receive automatic payouts directly to your bank account for every booking. Automatic payouts with a low <strong style={{ color: "#7C3AED" }}>2% platform fee</strong>.
+              Receive automatic payouts directly to your bank account for payments your clients make online. Feature takes a <strong style={{ color: "#7C3AED" }}>5% fee on online card payments</strong> (deposits included). Pay-at-salon bookings have no fee.
             </p>
             {/* Feature list */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32, textAlign: "left" }}>
@@ -228,7 +228,7 @@ export default function EarningsPage() {
               {[
                 { label: "Available Balance", value: fmt(available, currency), icon: "💵", color: "#059669", desc: "Ready to pay out to your bank" },
                 { label: "Pending Balance", value: fmt(pending, currency), icon: "⏳", color: "#F59E0B", desc: "Processing — arrives in 2-7 days" },
-                { label: "Platform Fee", value: "2%", icon: "🏷️", color: "#7C3AED", desc: "Kept per transaction" },
+                { label: "Feature Fee", value: "5%", icon: "🏷️", color: "#7C3AED", desc: "Of each online card payment" },
               ].map(s => (
                 <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #ECE9F1", borderRadius: 20, padding: "22px 20px", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: s.color }} />
@@ -246,8 +246,8 @@ export default function EarningsPage() {
             <div style={{ background: "#F5F3FF", border: "1px solid #ECE9F1", borderRadius: 16, padding: "18px 22px", marginBottom: 24, display: "flex", gap: 20, flexWrap: "wrap" }}>
               <div style={{ fontSize: 13, fontWeight: 800, color: "#7C3AED", minWidth: 120 }}>How it works</div>
               {[
-                { from: "Client pays £100", to: "Platform fee: £2", via: "→" },
-                { from: "Remaining balance", to: "Auto to your bank", via: "→" },
+                { from: "Client pays £100 online", to: "Feature fee £5", via: "→" },
+                { from: "You receive £95", to: "Auto to your bank", via: "→" },
               ].map((step, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#524D60" }}>
                   <span style={{ color: "#524D60", fontWeight: 700 }}>{step.from}</span>

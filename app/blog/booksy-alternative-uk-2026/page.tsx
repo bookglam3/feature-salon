@@ -140,7 +140,7 @@ const TABLE: TableRow[] = [
 ];
 
 const FEATURE_POINTS = [
-  "One flat £29/month for the whole business — not per staff — with no commission on any booking, ever.",
+  "One flat £29/month for the whole business — not per staff. No charge per booking; online card payments have a 5% fee.",
   "WhatsApp & email reminders built in to cut no-shows.",
   "Online booking through your own branded page, plus card payments via Stripe that land in your account.",
   "UK-built, and flexible for salons, barbers, gyms and clinics alike.",
@@ -306,7 +306,7 @@ export default function BooksyAlternativePage() {
             </div>
 
             <p>
-              The honest trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put you in front of strangers the way Booksy&apos;s Boost can. You bring your clients; in return you keep 100% of every booking and your monthly cost never moves. For an established business with loyal regulars, that&apos;s usually the better deal. If marketplace discovery is your main growth engine, Booksy may suit you better &mdash; and that&apos;s a fair answer.
+              The honest trade-off: Feature isn&apos;t a consumer marketplace, so it won&apos;t put you in front of strangers the way Booksy&apos;s Boost can. You bring your clients; in return you pay one flat monthly price that never moves, with no fee when clients pay in person (online card payments carry a 5% fee). For an established business with loyal regulars, that&apos;s usually the better deal. If marketplace discovery is your main growth engine, Booksy may suit you better &mdash; and that&apos;s a fair answer.
             </p>
           </section>
 
@@ -317,14 +317,14 @@ export default function BooksyAlternativePage() {
                 See the difference for yourself
               </h3>
               <p style={{ fontSize: 16, color: C.text, fontWeight: 700, marginBottom: 24, lineHeight: 1.6 }}>
-                Start a 14-day free trial &mdash; no card, no commission, no catch.
+                Start a 14-day free trial &mdash; no card needed, cancel anytime.
               </p>
               <Link href="/signup" className="btn-primary btn-lg btn-glow">
                 Start free &rarr;
               </Link>
             </div>
             <p style={{ fontSize: 13, color: C.dim, fontStyle: "italic", textAlign: "center", marginTop: 20, marginBottom: 0 }}>
-              Feature: UK-built booking software for salons, barbershops, gyms and clinics &mdash; online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat price, zero commission.
+              Feature: UK-built booking software for salons, barbershops, gyms and clinics &mdash; online bookings, WhatsApp &amp; email reminders, and Stripe payments, one flat monthly price, 5% fee on online card payments only.
             </p>
           </section>
 

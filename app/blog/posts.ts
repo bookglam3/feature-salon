@@ -17,7 +17,7 @@ export const POSTS: BlogPost[] = [
     slug: "fresha-alternative-uk-2026",
     title: "The Best Fresha Alternative for UK Salons & Clinics in 2026",
     metaTitle: "Best Fresha Alternative for UK Salons & Clinics (2026) | Feature",
-    metaDescription: "Looking for a Fresha alternative with no commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, zero commission.",
+    metaDescription: "Looking for a Fresha alternative without marketplace commission? Compare Fresha, Booksy and Feature on real 2026 UK pricing — flat £29/month, WhatsApp reminders, 5% fee only on online card payments.",
     keyword: "fresha alternative 2026",
     publishedDate: "2026-05-31",
     updatedDate: "2026-05-31",
@@ -57,15 +57,15 @@ export const POSTS: BlogPost[] = [
 
   {
     slug: "salon-booking-software-no-commission",
-    title: "Salon Booking Software with No Commission: Why It Matters (2026)",
-    metaTitle: "Salon Booking Software with No Commission: Why It Matters (2026) | Feature",
-    metaDescription: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a flat-rate, no-commission model can be worth far more than it looks.",
-    keyword: "no commission booking software",
+    title: "Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026)",
+    metaTitle: "Commission vs Flat-Fee Salon Booking Software: Why It Matters (2026) | Feature",
+    metaDescription: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a flat-rate model can be worth far more than it looks.",
+    keyword: "flat-fee booking software",
     publishedDate: "2026-06-01",
     updatedDate: "2026-06-01",
     readingTime: 4,
     author: "Feature Team",
-    excerpt: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a no-commission, flat-rate model can be worth far more than it looks.",
+    excerpt: "\"Free\" booking software is rarely free. An honest look at how commission quietly eats salon profits — and why a flat-rate model can be worth far more than it looks.",
     sections: [],
   },
 
@@ -206,7 +206,7 @@ export const POSTS: BlogPost[] = [
     slug: "fresha-alternative-uk-2025",
     title: "Fresha Alternative UK 2025 — Why Salons Are Switching",
     metaTitle: "Best Fresha Alternative UK 2025 | Feature Salon",
-    metaDescription: "Looking for a Fresha alternative in the UK? Feature Salon offers a flat monthly fee with zero commission — no hidden fees, no marketplace cuts.",
+    metaDescription: "Looking for a Fresha alternative in the UK? Feature Salon offers a flat monthly fee with no marketplace commission, and a clearly stated 5% fee on online card payments only.",
     keyword: "fresha alternative",
     publishedDate: "2025-02-14",
     updatedDate: "2025-05-01",
@@ -232,7 +232,7 @@ export const POSTS: BlogPost[] = [
         h2: "Feature Salon — The Honest Fresha Alternative",
         body: "Feature Salon was built specifically to offer everything Fresha provides — without the commission model. Here's how we compare:",
         h3Items: [
-          { h3: "Flat Monthly Fee — No Commission", body: "Feature Salon charges £29–£99/month depending on your plan. That's it. No commission on bookings, no payment processing markup, no per-message fees. Every pound your clients pay goes to you." },
+          { h3: "Flat Monthly Fee", body: "Feature Salon charges £29–£99/month depending on your plan, with no charge per booking and no per-message fees. The only other fee is 5% on payments clients make online by card (deposits included); when clients pay at the salon, there's no fee." },
           { h3: "Your Own Branded Booking Page", body: "Just like Fresha, Feature gives you a beautiful public booking page where clients can browse services, select staff, and book online 24/7. Unlike Fresha, it's not listed on a marketplace competing with other salons." },
           { h3: "Automated WhatsApp & Email", body: "Feature Salon sends automated reminders via WhatsApp and email to help reduce no-shows. Fresha offers reminders too, but they don't include WhatsApp support on standard plans." },
           { h3: "Stripe Payments — Your Account", body: "Feature Salon uses Stripe directly — connected to your own account. You see every transaction, every payout, with full transparency. No middleman taking a percentage." },
@@ -240,7 +240,7 @@ export const POSTS: BlogPost[] = [
       },
       {
         h2: "The Maths — Does Switching Save Money?",
-        body: "For a salon doing £5,000/month in revenue with a mix of new and existing clients, Fresha's marketplace commission plus payment fees can easily reach £100–£150/month. Feature Salon's Pro plan is £59/month — flat, with no commission. The saving depends on your own revenue and how much of it comes through the Fresha marketplace, but the structure is transparent and predictable from day one.",
+        body: "For a salon doing £5,000/month in revenue with a mix of new and existing clients, Fresha's marketplace commission plus payment fees can easily reach £100–£150/month. Feature Salon's Pro plan is £59/month, flat, plus a 5% fee only on payments clients make online by card. The saving depends on your own revenue and how much of it comes through the Fresha marketplace, but the structure is transparent and predictable from day one.",
       },
       {
         h2: "How to Switch from Fresha to Feature Salon",
@@ -254,7 +254,7 @@ export const POSTS: BlogPost[] = [
       },
       {
         h2: "The Verdict",
-        body: "Fresha made sense when it was genuinely free. In 2025, the commission model makes it one of the most expensive salon software options for busy UK salons. Feature Salon offers everything Fresha does — branded booking page, staff management, automated reminders, Stripe payments — for a single transparent monthly fee. No surprises. No commissions. No hidden costs.",
+        body: "Fresha made sense when it was genuinely free. In 2025, the commission model makes it one of the most expensive salon software options for busy UK salons. Feature Salon offers everything Fresha does — branded booking page, staff management, automated reminders, Stripe payments — for a single transparent monthly fee, plus a clearly stated 5% fee on online card payments. No surprises, and no extra charge for new clients.",
       },
     ],
   },
@@ -288,11 +288,11 @@ export const POSTS: BlogPost[] = [
       },
       {
         h2: "Feature Salon — Best Overall for UK Independents",
-        body: "Feature Salon is built specifically for UK independent salons and small chains. It offers a flat monthly subscription starting at £29, with no commission on bookings or payments. Every plan includes a branded booking page, Stripe payments, automated WhatsApp and email reminders, staff management, and revenue analytics. The Pro plan at £59 covers most growing salons with up to 5 staff members. Feature Salon's UK-based support team responds within the hour during business hours.",
+        body: "Feature Salon is built specifically for UK independent salons and small chains. It offers a flat monthly subscription starting at £29, with no charge per booking and a 5% fee only on online card payments. Every plan includes a branded booking page, Stripe payments, automated WhatsApp and email reminders, staff management, and revenue analytics. The Pro plan at £59 covers most growing salons with up to 5 staff members. Feature Salon's UK-based support team responds within the hour during business hours.",
         h3Items: [
-          { h3: "Pros", body: "Zero commission. WhatsApp reminders included. Transparent flat pricing. UK support. 14-day free trial. Clean, modern interface." },
+          { h3: "Pros", body: "Flat monthly price (5% fee only on online card payments). WhatsApp reminders included. Transparent flat pricing. UK support. 14-day free trial. Clean, modern interface." },
           { h3: "Cons", body: "No marketplace — clients must discover you through your own marketing. Newer platform with a smaller review base than Fresha." },
-          { h3: "Best for", body: "Independent stylists, barbershops, beauty salons, and growing chains that want to keep 100% of their revenue." },
+          { h3: "Best for", body: "Independent stylists, barbershops, beauty salons, and growing chains that want one predictable monthly price instead of marketplace commission." },
         ],
       },
       {
@@ -387,7 +387,7 @@ export const POSTS: BlogPost[] = [
         body: "This is where the comparison becomes stark:",
         h3Items: [
           { h3: "Treatwell", body: "Treatwell charges no monthly subscription fee, but takes a commission of 20–35% on every booking made through the Treatwell marketplace. The exact rate depends on your contract and how much of your revenue comes via Treatwell. There is no way to use Treatwell's booking system without being listed on the marketplace." },
-          { h3: "Feature Salon", body: "Feature Salon charges a flat monthly fee: £29 (Starter), £59 (Pro), or £99 (Business). Zero commission on any booking or payment. You keep 100% of your revenue, regardless of how many bookings you take. Your monthly cost is completely predictable." },
+          { h3: "Feature Salon", body: "Feature Salon charges a flat monthly fee: £29 (Starter), £59 (Pro), or £99 (Business). No charge per booking, and a 5% fee only on payments clients make online by card. Your monthly price stays the same however many bookings you take." },
           { h3: "Real-world example", body: "A salon doing £8,000/month on Treatwell at 25% commission pays £2,000/month to Treatwell. The same salon on Feature Salon Pro pays £59/month — a saving of £1,941 per month, or £23,292 per year. That's not a rounding error. That's a second full-time salary." },
         ],
       },
@@ -421,7 +421,7 @@ export const POSTS: BlogPost[] = [
       },
       {
         h2: "How to Switch from Treatwell to Feature Salon",
-        body: "Switching is straightforward. Export your client data from Treatwell, set up your Feature Salon account (takes under 10 minutes), and share your new booking link with clients via WhatsApp and email. Run both platforms in parallel for your first week to ensure no appointments are lost. Once your clients are booking through Feature, cancel Treatwell and start keeping 100% of your revenue. Most salons recoup their Feature Salon subscription fee within the first day of switching.",
+        body: "Switching is straightforward. Export your client data from Treatwell, set up your Feature Salon account (takes under 10 minutes), and share your new booking link with clients via WhatsApp and email. Run both platforms in parallel for your first week to ensure no appointments are lost. Once your clients are booking through Feature, cancel Treatwell and stop paying marketplace commission. Most salons recoup their Feature Salon subscription fee within the first day of switching.",
       },
     ],
   },

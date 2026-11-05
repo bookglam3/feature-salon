@@ -46,7 +46,7 @@ export default function BirminghamPage() {
       </section>
 
       <section className="trust-bar">
-        {["No commission fees", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
+        {["Flat monthly price", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
           <div key={item} className="trust-item"><div className="trust-dot" />{item}</div>
         ))}
       </section>
@@ -58,7 +58,7 @@ export default function BirminghamPage() {
           {[
             { title: "Your own booking page", desc: "Get a beautiful, branded booking page that clients can find on Google, Instagram, and your website." },
             { title: "WhatsApp reminders", desc: "Send automatic appointment reminders via WhatsApp — the most effective way to reduce no-shows in the UK." },
-            { title: "Zero commission model", desc: "Feature charges a simple flat fee starting at £29/month. No percentage taken from your bookings or payments." },
+            { title: "Flat monthly price", desc: "Feature charges a simple flat fee starting at £29/month. The only percentage is a 5% fee on online card payments; paying at the salon has no fee." },
             { title: "Multi-location support", desc: "Running more than one salon in Birmingham? Feature supports multi-location management on our Business plan." },
             { title: "Client records & history", desc: "Keep detailed notes on every client — preferences, allergies, visit history — all in one place." },
             { title: "GDPR compliant", desc: "Feature is fully GDPR compliant, keeping your Birmingham salon and client data protected." },
@@ -74,7 +74,7 @@ export default function BirminghamPage() {
 
       <section className="section" style={{ textAlign: "center" }}>
         <h2 className="section-title">Be one of the first Birmingham salons on Feature</h2>
-        <p className="hero-sub">No commission, no contracts, no marketplace fees — just straightforward software at a flat monthly price.</p>
+        <p className="hero-sub">No contracts and no marketplace fees — just straightforward software at a flat monthly price, with a 5% fee on online card payments only.</p>
         <div className="hero-btns" style={{ justifyContent: "center", marginTop: 24 }}>
           <Link href="/signup" className="btn-primary btn-lg">Start free 14-day trial →</Link>
         </div>

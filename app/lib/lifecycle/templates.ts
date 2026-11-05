@@ -117,7 +117,7 @@ export function renderEmail(key: EmailKey, d: EmailData): RenderedEmail {
         "If you'd like to keep taking bookings, you can choose a plan here:",
         subscribeLink,
         "",
-        "Plans start at £29 a month. That's one flat fee, with no commission on any booking. You can cancel any time.",
+        "Plans start at £29 a month. That's one flat fee, with no charge per booking. If clients pay online by card there's a 5% fee on those payments; paying at the salon has no fee. You can cancel any time.",
         "",
         "If you're not sure Feature is right for you, or something's holding you back, reply and tell us. We'd rather hear it than lose you without knowing why.",
       ];

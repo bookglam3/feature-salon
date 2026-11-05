@@ -46,7 +46,7 @@ export default function LondonPage() {
       </section>
 
       <section className="trust-bar">
-        {["No commission fees", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
+        {["Flat monthly price", "Free 14-day trial", "Cancel anytime", "UK-based support"].map((item) => (
           <div key={item} className="trust-item"><div className="trust-dot" />{item}</div>
         ))}
       </section>
@@ -58,7 +58,7 @@ export default function LondonPage() {
           {[
             { title: "Online booking 24/7", desc: "London clients expect to book at any time. Feature gives every salon a beautiful, mobile-first booking page." },
             { title: "WhatsApp & email reminders", desc: "Reduce no-shows with automated reminders via WhatsApp and email — before every appointment." },
-            { title: "No Fresha commission", desc: "Feature charges a flat monthly fee. No per-booking commissions, no payment processing markups." },
+            { title: "Flat monthly price", desc: "Feature charges one flat monthly fee, with no extra charge for new clients. Online card payments have a 5% fee; paying at the salon has none." },
             { title: "Multi-staff scheduling", desc: "Manage your entire team's calendars, breaks, and holidays from one clean dashboard." },
             { title: "Stripe online payments", desc: "Take deposits or full payments online via Stripe. Perfect for London salons with high no-show risk." },
             { title: "UK-based support", desc: "Our support team is based in the UK and responds within the hour." },
@@ -74,7 +74,7 @@ export default function LondonPage() {
 
       <section className="section" style={{ textAlign: "center" }}>
         <h2 className="section-title">Be one of the first London salons on Feature</h2>
-        <p className="hero-sub">No commission, no contracts, no marketplace fees — just straightforward software at a flat monthly price.</p>
+        <p className="hero-sub">No contracts and no marketplace fees — just straightforward software at a flat monthly price, with a 5% fee on online card payments only.</p>
         <div className="hero-btns" style={{ justifyContent: "center", marginTop: 24 }}>
           <Link href="/signup" className="btn-primary btn-lg">Start free 14-day trial →</Link>
         </div>
