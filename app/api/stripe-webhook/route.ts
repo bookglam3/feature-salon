@@ -286,9 +286,10 @@ export async function POST(req: NextRequest) {
     if (bookingId) {
       // A "failed" event can arrive after the client retried and paid on the
       // same PaymentIntent — it must not turn a paid booking back to failed.
+      // The booking's notes are left untouched (they hold the client's own
+      // notes); the failure shows under Payments → Failed.
       const { error: failApptErr } = await supabase.from("appointments").update({
         payment_status: "failed",
-        notes: `⚠️ Payment failed on ${new Date().toLocaleDateString("en-GB")}. Client may need to rebook.`,
       })
         .eq("id", bookingId)
         .or("payment_status.is.null,payment_status.not.in.(paid,deposit_paid)");
