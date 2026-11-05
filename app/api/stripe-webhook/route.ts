@@ -28,22 +28,39 @@ function subPeriodEnd(sub: Stripe.Subscription): string | null {
   return ts ? new Date(Number(ts) * 1000).toISOString() : null;
 }
 
-/** Resolve salon row by stripe_customer_id first; fallback to an explicit salonId. */
+/**
+ * Resolve salon row by stripe_customer_id first; fallback to an explicit salonId.
+ * A database error is returned (not swallowed) so the caller can answer 500
+ * and Stripe retries. Two salons sharing a customer id keep the old behaviour:
+ * use the fallback id.
+ */
 async function resolveSalonId(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sb: SupabaseClient<any>,
   customerId: string,
   fallbackId?: string | null,
-): Promise<string | null> {
+): Promise<{ salonId: string | null; error: { message: string } | null }> {
   if (customerId) {
-    const { data } = await sb
+    const { data, error } = await sb
       .from("salons")
       .select("id")
       .eq("stripe_customer_id", customerId)
-      .maybeSingle();
-    if (data?.id) return data.id as string;
+      .limit(2);
+    if (error) return { salonId: null, error };
+    if (data?.length === 1) return { salonId: data[0].id as string, error: null };
+    if (data && data.length > 1) return { salonId: fallbackId ?? (data[0].id as string), error: null };
   }
-  return fallbackId ?? null;
+  return { salonId: fallbackId ?? null, error: null };
+}
+
+/**
+ * Any failed database step answers 500 so Stripe retries the event. Every
+ * handler below is safe to run again, so a retry finishes the job instead of
+ * doing it twice.
+ */
+function dbError(step: string, error: { message?: string } | null) {
+  console.error(`[webhook] ${step} failed:`, error?.message);
+  return NextResponse.json({ error: "DB error" }, { status: 500 });
 }
 
 /** Columns to write for every subscription state change. */
@@ -91,46 +108,53 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "payment_intent.succeeded") {
     const pi = event.data.object as Stripe.PaymentIntent;
-
-    // Idempotency: skip if this payment_intent was already processed
-    const { data: existingPayment } = await supabase
-      .from("payments")
-      .select("id")
-      .eq("stripe_payment_intent_id", pi.id)
-      .maybeSingle();
-    if (existingPayment) {
-      console.log(`[webhook] Duplicate event skipped — payment_intent ${pi.id} already processed`);
-      return NextResponse.json({ received: true });
-    }
-
     const bookingId  = pi.metadata?.booking_id;
     const depositOnly = pi.metadata?.deposit_only === "true";
     const amount = pi.amount / 100;
 
-    const { error: paymentInsertErr } = await supabase.from("payments").insert({
-      appointment_id: bookingId || null,
-      stripe_payment_intent_id: pi.id,
-      amount,
-      currency: pi.currency,
-      status: "succeeded",
-      deposit_only: depositOnly,
-      receipt_email: pi.receipt_email,
-      created_at: new Date().toISOString(),
-    });
-    if (paymentInsertErr) {
-      console.error("[webhook] payments insert failed:", paymentInsertErr.message);
-      return NextResponse.json({ error: "DB error" }, { status: 500 });
+    // Retry-safe: each step below can run again without harm. Before, an
+    // existing payments row made a retry skip everything — so a booking whose
+    // update had failed (or whose card failed once on this same PaymentIntent)
+    // stayed unpaid for good.
+
+    // 1. Record the successful payment once.
+    const { data: existingPayment, error: paymentLookupErr } = await supabase
+      .from("payments")
+      .select("id")
+      .eq("stripe_payment_intent_id", pi.id)
+      .eq("status", "succeeded")
+      .maybeSingle();
+    if (paymentLookupErr) return dbError("payments lookup", paymentLookupErr);
+    if (!existingPayment) {
+      const { error: paymentInsertErr } = await supabase.from("payments").insert({
+        appointment_id: bookingId || null,
+        stripe_payment_intent_id: pi.id,
+        amount,
+        currency: pi.currency,
+        status: "succeeded",
+        deposit_only: depositOnly,
+        receipt_email: pi.receipt_email,
+        created_at: new Date().toISOString(),
+      });
+      if (paymentInsertErr) return dbError("payments insert", paymentInsertErr);
     }
 
     if (bookingId) {
-      const { error: apptUpdateErr } = await supabase.from("appointments").update({
+      // 2. Confirm the booking only if it isn't paid yet. The returned row
+      // tells us whether THIS delivery confirmed it, so the client and owner
+      // are notified exactly once, even when Stripe sends the event again.
+      const { data: confirmed, error: apptUpdateErr } = await supabase.from("appointments").update({
         status: "confirmed",
         payment_status: depositOnly ? "deposit_paid" : "paid",
         payment_intent_id: pi.id,
-      }).eq("id", bookingId);
-      if (apptUpdateErr) {
-        console.error("[webhook] appointments update failed:", apptUpdateErr.message);
-        return NextResponse.json({ error: "DB error" }, { status: 500 });
+      })
+        .eq("id", bookingId)
+        .or("payment_status.is.null,payment_status.not.in.(paid,deposit_paid)")
+        .select("id");
+      if (apptUpdateErr) return dbError("appointments update", apptUpdateErr);
+      if (!confirmed?.length) {
+        console.log(`[webhook] booking ${bookingId} already paid (or not found) — no new notifications for ${pi.id}`);
+        return NextResponse.json({ received: true });
       }
 
       // ── Send confirmation emails directly (no HTTP self-call) ──────────
@@ -236,42 +260,40 @@ export async function POST(req: NextRequest) {
     const pi = event.data.object as Stripe.PaymentIntent;
     const bookingId = pi.metadata?.booking_id;
 
-    // Idempotency: skip if this failure was already recorded
-    const { data: existingFailure } = await supabase
+    // Retry-safe, like payment_intent.succeeded: record the failure once, then
+    // (again on a retry) mark the booking — but never a booking that is paid.
+    const { data: existingFailure, error: failLookupErr } = await supabase
       .from("payments")
       .select("id")
       .eq("stripe_payment_intent_id", pi.id)
       .eq("status", "failed")
       .maybeSingle();
-    if (existingFailure) {
-      console.log(`[webhook] Duplicate payment_failed skipped — ${pi.id}`);
-      return NextResponse.json({ received: true });
-    }
-
-    const { error: failInsertErr } = await supabase.from("payments").insert({
-      appointment_id: bookingId || null,
-      stripe_payment_intent_id: pi.id,
-      amount: pi.amount / 100,
-      currency: pi.currency,
-      status: "failed",
-      deposit_only: pi.metadata?.deposit_only === "true",
-      receipt_email: pi.receipt_email,
-      created_at: new Date().toISOString(),
-    });
-    if (failInsertErr) {
-      console.error("[webhook] failed payment insert error:", failInsertErr.message);
-      return NextResponse.json({ error: "DB error" }, { status: 500 });
+    if (failLookupErr) return dbError("failed payment lookup", failLookupErr);
+    if (!existingFailure) {
+      const { error: failInsertErr } = await supabase.from("payments").insert({
+        appointment_id: bookingId || null,
+        stripe_payment_intent_id: pi.id,
+        amount: pi.amount / 100,
+        currency: pi.currency,
+        status: "failed",
+        deposit_only: pi.metadata?.deposit_only === "true",
+        receipt_email: pi.receipt_email,
+        created_at: new Date().toISOString(),
+      });
+      if (failInsertErr) return dbError("failed payment insert", failInsertErr);
     }
 
     if (bookingId) {
+      // A "failed" event can arrive after the client retried and paid on the
+      // same PaymentIntent — it must not turn a paid booking back to failed.
+      // The booking's notes are left untouched (they hold the client's own
+      // notes); the failure shows under Payments → Failed.
       const { error: failApptErr } = await supabase.from("appointments").update({
         payment_status: "failed",
-        notes: `⚠️ Payment failed on ${new Date().toLocaleDateString("en-GB")}. Client may need to rebook.`,
-      }).eq("id", bookingId);
-      if (failApptErr) {
-        console.error("[webhook] failed payment appointment update error:", failApptErr.message);
-        return NextResponse.json({ error: "DB error" }, { status: 500 });
-      }
+      })
+        .eq("id", bookingId)
+        .or("payment_status.is.null,payment_status.not.in.(paid,deposit_paid)");
+      if (failApptErr) return dbError("failed payment appointment update", failApptErr);
     }
   }
 
@@ -285,11 +307,12 @@ export async function POST(req: NextRequest) {
           ? session.customer
           : (session.customer as Stripe.Customer)?.id ?? "";
 
-      const salonId = await resolveSalonId(
+      const { salonId, error: resolveErr } = await resolveSalonId(
         supabase,
         customerId,
         session.client_reference_id || session.metadata?.salon_id,
       );
+      if (resolveErr) return dbError("salon lookup (checkout)", resolveErr);
 
       if (salonId) {
         const subId =
@@ -307,9 +330,10 @@ export async function POST(req: NextRequest) {
           ? planFromPrice
           : session.metadata.plan;
 
-        await supabase.from("salons")
+        const { error: updateErr } = await supabase.from("salons")
           .update(subColumns(sub, plan, customerId))
           .eq("id", salonId);
+        if (updateErr) return dbError("salons update (checkout)", updateErr);
 
         console.log(`[Webhook] checkout.session.completed salon=${salonId} status=${sub.status} plan=${plan}`);
       } else {
@@ -319,13 +343,18 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
-    const sub = event.data.object as Stripe.Subscription;
+    // Stripe retries a failed event for days, and events can arrive out of
+    // order — so write the subscription as it is NOW, not the snapshot inside
+    // this (possibly old) event.
+    const eventSub = event.data.object as Stripe.Subscription;
+    const sub = await stripe.subscriptions.retrieve(eventSub.id, { expand: ["items.data.price"] });
     const customerId =
       typeof sub.customer === "string"
         ? sub.customer
         : (sub.customer as Stripe.Customer).id;
 
-    const salonId = await resolveSalonId(supabase, customerId, sub.metadata?.salon_id);
+    const { salonId, error: resolveErr } = await resolveSalonId(supabase, customerId, sub.metadata?.salon_id);
+    if (resolveErr) return dbError(`salon lookup (${event.type})`, resolveErr);
 
     if (salonId) {
       const priceId = sub.items?.data?.[0]?.price?.id;
@@ -334,9 +363,10 @@ export async function POST(req: NextRequest) {
         ? planFromPrice
         : sub.metadata.plan;
 
-      await supabase.from("salons")
+      const { error: updateErr } = await supabase.from("salons")
         .update(subColumns(sub, plan, customerId))
         .eq("id", salonId);
+      if (updateErr) return dbError(`salons update (${event.type})`, updateErr);
 
       console.log(`[Webhook] ${event.type} salon=${salonId} status=${sub.status} plan=${plan}`);
     } else {
@@ -350,12 +380,14 @@ export async function POST(req: NextRequest) {
       typeof sub.customer === "string"
         ? sub.customer
         : (sub.customer as Stripe.Customer).id;
-    const salonId = await resolveSalonId(supabase, customerId, sub.metadata?.salon_id);
+    const { salonId, error: resolveErr } = await resolveSalonId(supabase, customerId, sub.metadata?.salon_id);
+    if (resolveErr) return dbError("salon lookup (subscription.deleted)", resolveErr);
     if (salonId) {
-      await supabase.from("salons").update({
+      const { error: updateErr } = await supabase.from("salons").update({
         subscription_status: sub.status,   // Stripe actual: "canceled"
         subscription_id:     null,
       }).eq("id", salonId);
+      if (updateErr) return dbError("salons update (subscription.deleted)", updateErr);
       console.log(`[Webhook] subscription.deleted salon=${salonId} status=${sub.status}`);
     }
   }
@@ -367,10 +399,17 @@ export async function POST(req: NextRequest) {
         ? inv.customer
         : (inv.customer as Stripe.Customer)?.id;
     if (customerId) {
-      await supabase.from("salons")
-        .update({ subscription_status: "past_due" })
+      // A retry can arrive after the customer has already paid — so use the
+      // subscription's current status when the invoice belongs to one, instead
+      // of always writing past_due (which would lock a salon that has paid).
+      const parentSub = inv.parent?.subscription_details?.subscription;
+      const subId = typeof parentSub === "string" ? parentSub : parentSub?.id;
+      const status = subId ? (await stripe.subscriptions.retrieve(subId)).status : "past_due";
+      const { error: updateErr } = await supabase.from("salons")
+        .update({ subscription_status: status })
         .eq("stripe_customer_id", customerId);
-      console.log(`[Webhook] invoice.payment_failed customer=${customerId}`);
+      if (updateErr) return dbError("salons update (invoice.payment_failed)", updateErr);
+      console.log(`[Webhook] invoice.payment_failed customer=${customerId} status=${status}`);
     }
   }
 
@@ -378,10 +417,11 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "account.updated") {
     const account = event.data.object as Stripe.Account;
-    await supabase.from("salons").update({
+    const { error: updateErr } = await supabase.from("salons").update({
       charges_enabled: account.charges_enabled,
       payouts_enabled: account.payouts_enabled,
     }).eq("stripe_account_id", account.id);
+    if (updateErr) return dbError("salons update (account.updated)", updateErr);
     console.log(`[Webhook] account.updated id=${account.id} charges=${account.charges_enabled} payouts=${account.payouts_enabled}`);
   }
 
