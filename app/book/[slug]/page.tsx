@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/app/lib/supabase";
@@ -14,6 +14,9 @@ import {
   addMinutesToSlot, intervalsOverlap, utcToSalonTime, isStaffAvailableForWindow, computeBlocked,
 } from "@/app/lib/slot-availability";
 import { formatWallClock } from "@/app/lib/formatTime";
+import {
+  mergePaymentMethods, paymentOptions as offeredPaymentOptions, bookingPaymentFields, type PaymentOption,
+} from "@/app/lib/payments/bookingPayment";
 
 interface SalonData {
   id: string; name: string; slug: string; description?: string;
@@ -161,15 +164,16 @@ function toE164(local: string, countryCode: CountryCode): string {
   return `${country.dial}${digits}`;
 }
 
-/* ── Payment method types ── */
-interface PaymentMethods {
-  full_online: boolean;
-  deposit_online: boolean;
-  pay_at_salon: boolean;
-  custom_deposit: boolean;
-  deposit_percent: number;
+/* ── Payment options: which ones exist comes from app/lib/payments/bookingPayment.ts
+   (the server checks the same rules); this only adds how each one looks. ── */
+function paymentOptionDisplay(o: PaymentOption) {
+  switch (o.id) {
+    case "full_online":    return { label: "Pay Full Amount", sub: "Pay 100% now — nothing due at the salon", color: "#667eea" };
+    case "deposit_online": return { label: "50% Deposit", sub: "Pay half now, remainder at salon", color: "#047857" };
+    case "custom_deposit": return { label: `${o.pct}% Deposit`, sub: `Pay ${o.pct}% now, remainder at salon`, color: "#F59E0B" };
+    default:               return { label: "Pay at Salon", sub: "No payment required now", color: "#64748B" };
+  }
 }
-const DEFAULT_PM: PaymentMethods = { full_online: true, deposit_online: true, pay_at_salon: false, custom_deposit: false, deposit_percent: 50 };
 
 /* ── Stripe Payment Form ── */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -377,10 +381,6 @@ export default function BookingPage() {
     ? services
     : services.filter(s => s.category_id === selectedCategoryTab);
 
-  const salonPm: PaymentMethods = salon?.payment_methods
-    ? { ...DEFAULT_PM, ...salon.payment_methods }
-    : DEFAULT_PM;
-
   // A variable-priced ("from £X") service can't be paid in full online — the
   // final amount is unknown and there's no balance-due flow, so the salon would
   // be locked into charging the listed floor price. Just omit the option.
@@ -391,25 +391,25 @@ export default function BookingPage() {
   const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
   const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration_minutes ?? s.duration ?? 30), 0);
 
-  // When the business can't take online payments (no connected Stripe account
-  // with charges enabled), hide every online option and always offer Pay at Salon.
-  const paymentOptionsRaw = [
-    (onlinePaymentsReady !== false && salonPm.full_online && !anyFromService) && { id: "full_online",    label: "Pay Full Amount",           sub: "Pay 100% now — nothing due at the salon", pct: 100,                      color: "#667eea" },
-    (onlinePaymentsReady !== false && salonPm.deposit_online) && { id: "deposit_online",  label: "50% Deposit",               sub: "Pay half now, remainder at salon",         pct: 50,                       color: "#047857" },
-    (onlinePaymentsReady !== false && salonPm.custom_deposit) && { id: "custom_deposit",  label: `${salonPm.deposit_percent}% Deposit`, sub: `Pay ${salonPm.deposit_percent}% now, remainder at salon`, pct: salonPm.deposit_percent, color: "#F59E0B" },
-    (salonPm.pay_at_salon || onlinePaymentsReady === false) && { id: "pay_at_salon",   label: "Pay at Salon",               sub: "No payment required now",                  pct: 0,                        color: "#64748B" },
-  ].filter(Boolean) as { id: string; label: string; sub: string; pct: number; color: string }[];
-
-  // Fallback: if the salon's only enabled method was full online payment, hiding
-  // it for a "from" service would leave zero bookable options. Force Pay at
-  // Salon on instead of silently falling through to a broken $0/pending booking.
-  const paymentOptions = (anyFromService && paymentOptionsRaw.length === 0)
-    ? [{ id: "pay_at_salon", label: "Pay at Salon", sub: "No payment required now", pct: 0, color: "#64748B" }]
-    : paymentOptionsRaw;
-
-  // Auto-select first available option
-  const selectedOption = paymentOptions.find(o => o.id === paymentMethod) || paymentOptions[0];
-  const chargeAmount = selectedOption ? totalPrice * selectedOption.pct / 100 : 0;
+  // Options on offer: no online ones when the business can't take online
+  // payments (and then always Pay at Salon); no full payment for a "from £X"
+  // price; Pay at Salon if that leaves nothing. Then what this booking sends
+  // for the chosen option (first one by default): status, payment status,
+  // saved option and the amount charged now. Shared with the server — the
+  // booking function only accepts what this would send.
+  const salonPaymentSettings = salon?.payment_methods;
+  const { paymentOptions, pay } = useMemo(() => {
+    const options = offeredPaymentOptions(mergePaymentMethods(salonPaymentSettings), onlinePaymentsReady, anyFromService)
+      .map(o => ({ ...o, ...paymentOptionDisplay(o) }));
+    return {
+      paymentOptions: options,
+      pay: bookingPaymentFields(options, paymentMethod, totalPrice, !!salonPaymentSettings),
+    };
+  }, [salonPaymentSettings, onlinePaymentsReady, anyFromService, paymentMethod, totalPrice]);
+  const {
+    selected: selectedOption, chargeAmount, immediatelyConfirmed,
+    status: bookingStatus, paymentStatus: bookingPaymentStatus, paymentMethod: bookingPaymentMethod,
+  } = pay;
   const isPayAtSalon = selectedOption?.id === "pay_at_salon";
 
   // Step 3 -> Step 4: Save appointment + conditionally create PaymentIntent
@@ -433,11 +433,7 @@ export default function BookingPage() {
     // skips Stripe. These must never be decided separately: if they disagree,
     // the client sees "confirmed" on screen and in the confirmation email
     // while the row is silently stuck at status=pending/payment_status=pending.
-    const isImmediatelyConfirmed = isPayAtSalon || chargeAmount === 0;
-
-    // payment_method column only exists after migration — salon.payment_methods
-    // being set is the proxy for whether migration has run.
-    const hasMigration = !!salon?.payment_methods;
+    const isImmediatelyConfirmed = immediatelyConfirmed;
     // id and review_token stay client-generated (crypto.randomUUID(), same
     // CSPRNG class as Postgres's gen_random_uuid() default) — unchanged from
     // the single-service flow. No .select() needed either way: an RPC's
@@ -477,9 +473,9 @@ export default function BookingPage() {
         p_service_id: selectedServices[0].id,
         p_staff_id: selectedStaff?.id || null,
         p_date_time: iso,
-        p_status: isImmediatelyConfirmed ? "confirmed" : "pending",
-        p_payment_status: isImmediatelyConfirmed ? "pay_at_salon" : "pending",
-        p_payment_method: hasMigration ? pm : null,
+        p_status: bookingStatus,
+        p_payment_status: bookingPaymentStatus,
+        p_payment_method: bookingPaymentMethod,
         p_line_items: lineItems,
       });
 
@@ -491,6 +487,11 @@ export default function BookingPage() {
           // A real server-side bug (the two availability checks disagreeing),
           // not anything the client did — don't imply user error.
           alert("Something went wrong on our end. Please try again in a moment, or contact the salon directly.");
+        } else if (msg.includes("ONLINE_PAYMENTS_UNAVAILABLE")) {
+          alert("This business can't take online payments right now. Please choose Pay at Salon if it's offered, or contact them directly.");
+        } else if (msg.includes("PAYMENT_OPTION_NOT_ALLOWED")) {
+          // The business changed its payment settings after this page loaded.
+          alert("That payment option isn't available any more. Please refresh the page and choose again.");
         } else {
           // INVALID_SALON / INVALID_SERVICE / INVALID_STAFF / INVALID_STATUS /
           // INVALID_PAYMENT_STATUS / INVALID_PAYMENT_METHOD / EMPTY_LINE_ITEMS /
@@ -551,7 +552,7 @@ export default function BookingPage() {
       alert("Something went wrong while processing your booking (" + msg + "). Please try again, or contact the salon directly.");
       setSubmitting(false);
     }
-  }, [salon, selectedServices, selectedStaff, selDate, selTime, form, selectedOption, isPayAtSalon, chargeAmount, totalPrice, anyFromService, validateForm]);
+  }, [salon, selectedServices, selectedStaff, selDate, selTime, form, selectedOption, immediatelyConfirmed, bookingStatus, bookingPaymentStatus, bookingPaymentMethod, chargeAmount, totalPrice, anyFromService, validateForm]);
 
   // If the OTP send fails on the server (Resend down, quota exhausted, etc.)
   // the booking page has no other way to take the booking — the customer
