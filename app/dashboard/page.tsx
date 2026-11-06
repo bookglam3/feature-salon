@@ -24,6 +24,7 @@ import { useSalon } from "./context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "@/app/lib/appointmentServices";
 import PaymentBadge from "./components/PaymentBadge";
 import { loadPaidPence } from "@/app/lib/payments/paidAmounts";
+import { confirmOwnerSlot, loadOwnerLineItem, saveOwnerLineItem } from "@/app/lib/ownerBooking";
 import PushNotificationButton from "@/app/components/PushNotificationButton";
 import { formatTimeDisplay } from "@/app/lib/formatTime";
 
@@ -255,6 +256,12 @@ export default function DashboardPage() {
     const selectedSvc = services.find(s => s.id === formData.service_id);
     const durationMin = selectedSvc?.duration_minutes || 30;
     const end_time = new Date(new Date(date_time).getTime() + durationMin * 60_000).toISOString();
+    // Same slot check as the public booking (the owner may book over a clash
+    // after confirming), and the booking's price line item from the services
+    // table, like create_booking_with_services writes.
+    if (!(await confirmOwnerSlot(supabase, { salonId: salon.id, startIso: date_time, endIso: end_time, staffId: formData.staff_id || null, timeZone: salonTz }))) return;
+    const lineItem = formData.service_id ? await loadOwnerLineItem(supabase, salon.id, formData.service_id) : null;
+    if (formData.service_id && !lineItem) { toast.error("Failed to create booking"); return; }
     const { data: inserted, error } = await supabase.from("appointments").insert({
       salon_id: salon.id,
       client_name: formData.client_name,
@@ -266,6 +273,7 @@ export default function DashboardPage() {
       status: "confirmed",
     }).select("id").single();
     if (error) { toast.error("Failed to create booking"); return; }
+    if (lineItem && inserted?.id && !(await saveOwnerLineItem(supabase, inserted.id, lineItem))) { toast.error("Failed to create booking"); return; }
     // Send email + WhatsApp via the same route as online bookings
     if (formData.client_email && inserted?.id) {
       try {

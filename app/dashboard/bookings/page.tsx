@@ -15,6 +15,7 @@ import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
 import PaymentBadge from "../components/PaymentBadge";
 import { loadPaidPence } from "@/app/lib/payments/paidAmounts";
+import { confirmOwnerSlot, loadOwnerLineItem, saveOwnerLineItem } from "@/app/lib/ownerBooking";
 import { formatTimeDisplay, formatWallClock, withMeridiem } from "@/app/lib/formatTime";
 
 type StaffItem = { id: string; name: string };
@@ -275,6 +276,18 @@ export default function BookingsPage() {
       ? new Date(new Date(startIso).getTime() + durationMin * 60_000).toISOString()
       : null;
     if (editingId) {
+      // Moving a booking (time, length or staff), or bringing a cancelled one
+      // back: check the new slot like the public booking does — the booking
+      // itself doesn't count — and let the owner book over a clash if they confirm.
+      const original = appointments.find(x => x.id === editingId);
+      const staffId = formData.staff_id || null;
+      const moved = !original
+        || (startIso !== null && Date.parse(original.date_time) !== Date.parse(startIso))
+        || (endTimeIso !== null && (original.end_time ? Date.parse(original.end_time) : NaN) !== Date.parse(endTimeIso))
+        || (original.staff_id ?? null) !== staffId
+        || (original.status === "cancelled" && formData.status !== "cancelled");
+      if (moved && formData.status !== "cancelled" && startIso && endTimeIso
+          && !(await confirmOwnerSlot(supabase, { salonId: salon.id, startIso, endIso: endTimeIso, staffId, timeZone: salonTz, excludeId: editingId }))) return;
       // Loyalty stamps are counted from completed_at, so it has to track the
       // status both ways: stamped on the way in, cleared on the way out. If a
       // status is corrected away from "completed" the visit must stop counting,
@@ -290,6 +303,13 @@ export default function BookingsPage() {
       if (error) { toast.error("Failed to update booking"); return; }
       toast.success("Booking updated!");
     } else {
+      // Same slot check as the public booking (the owner may book over a
+      // clash after confirming), and the booking's price line item from the
+      // services table, like create_booking_with_services writes.
+      if (formData.status !== "cancelled" && startIso && endTimeIso
+          && !(await confirmOwnerSlot(supabase, { salonId: salon.id, startIso, endIso: endTimeIso, staffId: formData.staff_id || null, timeZone: salonTz }))) return;
+      const lineItem = formData.service_id ? await loadOwnerLineItem(supabase, salon.id, formData.service_id) : null;
+      if (formData.service_id && !lineItem) { toast.error("Failed to create booking"); return; }
       const { data: inserted, error } = await supabase
         .from("appointments")
         .insert({ salon_id: salon.id, client_name: formData.client_name, client_email: formData.client_email, client_phone: formData.client_phone, staff_id: formData.staff_id || null, service_id: formData.service_id, date_time: startIso, end_time: endTimeIso, status: formData.status, notes: notesValue })
@@ -305,6 +325,10 @@ export default function BookingsPage() {
         } else {
           toast.error("Failed to create booking");
         }
+        return;
+      }
+      if (lineItem && inserted?.id && !(await saveOwnerLineItem(supabase, inserted.id, lineItem))) {
+        toast.error("Failed to create booking");
         return;
       }
 
