@@ -13,6 +13,8 @@ import { useToast } from "../components/Toast";
 import type { Appointment, Service } from "../../types";
 import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
+import PaymentBadge from "../components/PaymentBadge";
+import { loadPaidPence } from "@/app/lib/payments/paidAmounts";
 import { formatTimeDisplay, formatWallClock, withMeridiem } from "@/app/lib/formatTime";
 
 type StaffItem = { id: string; name: string };
@@ -130,6 +132,8 @@ export default function BookingsPage() {
   // bookings that predate multi-service. Same pattern as 3D's confirmation
   // fix, shared via app/lib/appointmentServices.ts instead of copied here.
   const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
+  // Pence actually paid online per booking (succeeded payments rows), for the payment labels.
+  const [paidPence, setPaidPence] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     // "Book Again" hand-off from /dashboard/clients: that page routes here
@@ -178,7 +182,9 @@ export default function BookingsPage() {
         setAppointments(appts || []);
         setStaff(staffData || []);
         setServices(svcs || []);
-        setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
+        const [resolved, paid] = await Promise.all([resolveAppointmentServices(supabase, appts || []), loadPaidPence(supabase, salonData.id)]);
+        setServiceDisplay(resolved);
+        setPaidPence(paid);
       }
       setLoading(false);
 
@@ -220,8 +226,18 @@ export default function BookingsPage() {
     if (!salon) return;
     const { data } = await supabase.from("appointments").select("*, services(name,price,price_is_from), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
     setAppointments(data || []);
-    setServiceDisplay(await resolveAppointmentServices(supabase, data || []));
+    const [resolved, paid] = await Promise.all([resolveAppointmentServices(supabase, data || []), loadPaidPence(supabase, salon.id)]);
+    setServiceDisplay(resolved);
+    setPaidPence(paid);
   }, [salon]);
+
+  // A booking's payment label (Paid in full / Deposit paid … / Pay at salon …).
+  const paymentBadge = (a: Appointment, compact?: boolean, style?: CSSProperties) => (
+    <PaymentBadge compact={compact} style={style} status={a.status} paymentStatus={a.payment_status}
+      paymentIntentId={a.payment_intent_id} total={serviceDisplay.get(a.id)?.combinedPrice}
+      anyPriceIsFrom={serviceDisplay.get(a.id)?.anyPriceIsFrom} paidPence={paidPence.get(a.id)} />
+  );
+  const editingAppt = editingId ? appointments.find(x => x.id === editingId) : undefined;
 
   const serializeNotes = useCallback((fd: typeof EMPTY_FORM, hasConsultation: boolean): string | null => {
     if (!hasConsultation) return fd.notes || null;
@@ -505,7 +521,7 @@ export default function BookingsPage() {
                         <td style={{ color: "#524D60" }}>{serviceDisplay.get(a.id)?.serviceName || <span style={{opacity:.3}}>—</span>}</td>
                         <td style={{ color: "#524D60" }}>{a.staff?.name || <span style={{fontSize:11,opacity:.4}}>Any</span>}</td>
                         <td style={{ color: "#524D60", whiteSpace: "nowrap" }}>{withMeridiem(new Date(a.date_time).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour: "numeric",minute:"2-digit", hour12: true}))}</td>
-                        <td style={{ fontWeight: 700, color: "#059669" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}</td>
+                        <td style={{ fontWeight: 700, color: "#059669" }}>{serviceDisplay.get(a.id)?.combinedPrice ? `${serviceDisplay.get(a.id)?.anyPriceIsFrom ? "from " : ""}£${serviceDisplay.get(a.id)?.combinedPrice}` : <span style={{opacity:.3}}>—</span>}{paymentBadge(a, false, { display: "block", width: "fit-content", marginTop: 4 })}</td>
                         <td style={{ whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 4 }}>
                             <button onClick={() => handleEdit(a)} className="bk-btn-ghost" style={{ padding: "4px 10px", fontSize: 11.5 }}>Edit</button>
@@ -585,6 +601,7 @@ export default function BookingsPage() {
                           <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7C3AED", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{formatTimeDisplay(a.date_time)}</div>
                           <div style={{ fontSize: 10.5, color: "#12101A", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.client_name}</div>
                           <div style={{ fontSize: 10, color: "#524D60", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{serviceDisplay.get(a.id)?.serviceName}</div>
+                          {paymentBadge(a, true, { display: "block", width: "fit-content", marginTop: 3 })}
                         </div>
                       ))}
                     </div>
@@ -631,6 +648,7 @@ export default function BookingsPage() {
         <form id="booking-form" onSubmit={handleSubmit}>
         {editingId ? (
           <>
+          {editingAppt && paymentBadge(editingAppt, false, { display: "block", width: "fit-content", margin: "0 0 12px" })}
           <div style={{ margin: "0 0 10px", paddingBottom: 8, borderBottom: "1px solid #ECE9F1" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", letterSpacing: "0.8px", textTransform: "uppercase" }}>Client Details</div>
           </div>
