@@ -74,7 +74,7 @@ export default function LpHero() {
             </div>
             <div className="lp-mock-main">
               <div className="lp-mock-head">
-                <div><h4>Dashboard</h4><p>Welcome back, Anita</p></div>
+                <div><h4>Dashboard</h4><p>Welcome back, Sam</p></div>
               </div>
               <div className="lp-mock-stats">
                 {stats.map(stat => (
