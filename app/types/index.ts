@@ -31,6 +31,10 @@ export interface Appointment {
   services?: { name: string; price: number; price_is_from?: boolean } | null;
   staff?: { name: string } | null;
   notes?: string | null;
+  /** paid / deposit_paid / pay_at_salon / failed / pending — shown as the booking's payment label. */
+  payment_status?: string | null;
+  /** Set once an online payment was started for the booking. */
+  payment_intent_id?: string | null;
 }
 
 export interface StaffMember {

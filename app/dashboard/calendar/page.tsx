@@ -24,6 +24,9 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal from "../components/Modal";
 import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices } from "@/app/lib/appointmentServices";
+import PaymentBadge from "../components/PaymentBadge";
+import { loadPaidPence } from "@/app/lib/payments/paidAmounts";
+import { bookingPaymentLabel } from "@/app/lib/payments/paymentLabel";
 import { formatTimeDisplay } from "@/app/lib/formatTime";
 
 interface Appointment {
@@ -47,6 +50,15 @@ interface Appointment {
   serviceName?: string;
   combinedPrice?: number;
   anyPriceIsFrom?: boolean;
+  // Payment label inputs: from select("*"), plus pence paid online
+  // (succeeded payments rows), added at fetch time like the fields above.
+  payment_status?: string | null;
+  payment_intent_id?: string | null;
+  paidPence?: number;
+}
+
+function paymentLabelInput(a: Appointment) {
+  return { status: a.status, paymentStatus: a.payment_status, paymentIntentId: a.payment_intent_id, total: a.combinedPrice, anyPriceIsFrom: a.anyPriceIsFrom, paidPence: a.paidPence };
 }
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string; dot: string }> = {
@@ -508,6 +520,7 @@ function DayView({ currentDate, getApptsByDay, setSelectedAppt, loyalty }: DayVi
                           )}
                         </div>
                         <div style={{ fontSize: 12, color: "#524D60", marginTop: 2 }}>{a.serviceName || "No service"}{a.staff ? ` · ${a.staff.name}` : ""}</div>
+                        <PaymentBadge {...paymentLabelInput(a)} style={{ display: "block", width: "fit-content", marginTop: 4 }} />
                       </div>
                       <div style={{ textAlign: "right" }}>
                         {!!a.combinedPrice && <div style={{ fontSize: 14, fontWeight: 800, color: "#047857" }}>{a.anyPriceIsFrom ? "from " : ""}£{a.combinedPrice}</div>}
@@ -571,6 +584,7 @@ function AgendaRow({ a, onClick, loyalty }: { a: Appointment; onClick: () => voi
         <div className="cal-agenda-service">
           {a.serviceName || "No service"}{a.staff?.name ? ` \u00b7 ${a.staff.name}` : ""}
         </div>
+        <PaymentBadge {...paymentLabelInput(a)} style={{ display: "block", width: "fit-content", marginTop: 3 }} />
       </div>
       {typeof a.combinedPrice === "number" && a.combinedPrice > 0 && (
         <div className="cal-agenda-price">£{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}</div>
@@ -713,6 +727,12 @@ function ApptDrawer({ selectedAppt, setSelectedAppt, onViewAll, salonName, loyal
           <span className="cal-drawer-total-value">£{a.combinedPrice}{a.anyPriceIsFrom ? "+" : ""}</span>
         </div>
       )}
+      {bookingPaymentLabel(paymentLabelInput(a)) && (
+        <div className="cal-drawer-row">
+          <span className="cal-drawer-row-label">Payment</span>
+          <PaymentBadge {...paymentLabelInput(a)} />
+        </div>
+      )}
     </Modal>
   );
 }
@@ -739,10 +759,10 @@ function CalendarContent() {
         .select("*, services(name,price,price_is_from), staff(name)")
         .eq("salon_id", profile.salon.id)
         .order("date_time", { ascending: true });
-      const resolved = await resolveAppointmentServices(supabase, data || []);
+      const [resolved, paid] = await Promise.all([resolveAppointmentServices(supabase, data || []), loadPaidPence(supabase, profile.salon.id)]);
       const enriched = (data || []).map(a => {
         const r = resolved.get(a.id);
-        return { ...a, serviceName: r?.serviceName, combinedPrice: r?.combinedPrice, anyPriceIsFrom: r?.anyPriceIsFrom };
+        return { ...a, serviceName: r?.serviceName, combinedPrice: r?.combinedPrice, anyPriceIsFrom: r?.anyPriceIsFrom, paidPence: paid.get(a.id) };
       });
       setAppts(enriched);
 

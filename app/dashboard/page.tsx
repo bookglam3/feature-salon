@@ -22,6 +22,8 @@ import type { Salon, Appointment, Service } from "../types";
 import OnboardingChecklist from "./components/OnboardingChecklist";
 import { useSalon } from "./context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "@/app/lib/appointmentServices";
+import PaymentBadge from "./components/PaymentBadge";
+import { loadPaidPence } from "@/app/lib/payments/paidAmounts";
 import PushNotificationButton from "@/app/components/PushNotificationButton";
 import { formatTimeDisplay } from "@/app/lib/formatTime";
 
@@ -136,7 +138,7 @@ function Avatar({ name, size = 40 }: { name: string; size?: number }) {
    service via serviceDisplay, staff from the join, price from
    combinedPrice. No duration is shown because the appointments query
    carries none (services(name,price) only) — omitted rather than faked. */
-function ApptRow({ appt, serviceName, price, onClick }: { appt: Appointment; serviceName?: string; price?: number; onClick: () => void }) {
+function ApptRow({ appt, serviceName, price, anyPriceIsFrom, paidPence, onClick }: { appt: Appointment; serviceName?: string; price?: number; anyPriceIsFrom?: boolean; paidPence?: number; onClick: () => void }) {
   const accent = AVATAR_COLORS[(appt.client_name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
   return (
     <div className="bk-schedule-row" onClick={onClick}
@@ -159,6 +161,9 @@ function ApptRow({ appt, serviceName, price, onClick }: { appt: Appointment; ser
         <div style={{ fontSize: 11.5, color: "#524D60", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {serviceName || "No service"}{appt.staff?.name ? ` \u00b7 ${appt.staff.name}` : ""}
         </div>
+        <PaymentBadge status={appt.status} paymentStatus={appt.payment_status} paymentIntentId={appt.payment_intent_id}
+          total={price} anyPriceIsFrom={anyPriceIsFrom} paidPence={paidPence}
+          style={{ display: "block", width: "fit-content", marginTop: 4 }} />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
@@ -202,6 +207,8 @@ export default function DashboardPage() {
   const [formData, setFormData] = useState({ client_name: "", client_email: "", client_phone: "", service_id: "", staff_id: "", date: "", time: "" });
   // Multi-service aware (3C-2b-display) — see app/lib/appointmentServices.ts
   const [serviceDisplay, setServiceDisplay] = useState<Map<string, ResolvedAppointmentServices>>(new Map());
+  // Pence actually paid online per booking (succeeded payments rows), for the payment labels.
+  const [paidPence, setPaidPence] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     const load = async () => {
@@ -217,7 +224,9 @@ export default function DashboardPage() {
         supabase.from("services").select("*").eq("salon_id", id),
       ]);
       setAppointments(appts || []); setStaff(staffData || []); setServices(svcs || []);
-      setServiceDisplay(await resolveAppointmentServices(supabase, appts || []));
+      const [resolved, paid] = await Promise.all([resolveAppointmentServices(supabase, appts || []), loadPaidPence(supabase, id)]);
+      setServiceDisplay(resolved);
+      setPaidPence(paid);
       setLoading(false);
     };
     load();
@@ -227,7 +236,9 @@ export default function DashboardPage() {
     if (!salon) return;
     const { data } = await supabase.from("appointments").select("*, services(name,price), staff(name)").eq("salon_id", salon.id).order("date_time", { ascending: true });
     setAppointments(data || []);
-    setServiceDisplay(await resolveAppointmentServices(supabase, data || []));
+    const [resolved, paid] = await Promise.all([resolveAppointmentServices(supabase, data || []), loadPaidPence(supabase, salon.id)]);
+    setServiceDisplay(resolved);
+    setPaidPence(paid);
   }, [salon]);
 
   const handleNewBooking = useCallback(async () => {
@@ -482,7 +493,7 @@ export default function DashboardPage() {
             <>
               <div>
                 {todayAppts.map(a => (
-                  <ApptRow key={a.id} appt={a} serviceName={serviceDisplay.get(a.id)?.serviceName} price={serviceDisplay.get(a.id)?.combinedPrice} onClick={() => router.push("/dashboard/bookings")} />
+                  <ApptRow key={a.id} appt={a} serviceName={serviceDisplay.get(a.id)?.serviceName} price={serviceDisplay.get(a.id)?.combinedPrice} anyPriceIsFrom={serviceDisplay.get(a.id)?.anyPriceIsFrom} paidPence={paidPence.get(a.id)} onClick={() => router.push("/dashboard/bookings")} />
                 ))}
               </div>
               <div style={{ borderTop: "1px solid #eeecf2", padding: "13px 20px", textAlign: "center" }}>
@@ -556,7 +567,7 @@ export default function DashboardPage() {
           ) : (
             <div>
               {recentAppts.map(a => (
-                <ApptRow key={a.id} appt={a} serviceName={serviceDisplay.get(a.id)?.serviceName} price={serviceDisplay.get(a.id)?.combinedPrice} onClick={() => router.push("/dashboard/bookings")} />
+                <ApptRow key={a.id} appt={a} serviceName={serviceDisplay.get(a.id)?.serviceName} price={serviceDisplay.get(a.id)?.combinedPrice} anyPriceIsFrom={serviceDisplay.get(a.id)?.anyPriceIsFrom} paidPence={paidPence.get(a.id)} onClick={() => router.push("/dashboard/bookings")} />
               ))}
             </div>
           )}
