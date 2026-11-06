@@ -140,20 +140,41 @@ export async function POST(req: NextRequest) {
     }
 
     if (bookingId) {
-      // 2. Confirm the booking only if it isn't paid yet. The returned row
-      // tells us whether THIS delivery confirmed it, so the client and owner
-      // are notified exactly once, even when Stripe sends the event again.
+      // 2. Confirm the booking only if it isn't paid yet and is still pending
+      // (or already confirmed by the owner). The returned row tells us whether
+      // THIS delivery confirmed it, so the client and owner are notified
+      // exactly once, even when Stripe sends the event again.
       const { data: confirmed, error: apptUpdateErr } = await supabase.from("appointments").update({
         status: "confirmed",
         payment_status: depositOnly ? "deposit_paid" : "paid",
         payment_intent_id: pi.id,
       })
         .eq("id", bookingId)
+        .in("status", ["pending", "confirmed"])
         .or("payment_status.is.null,payment_status.not.in.(paid,deposit_paid)")
         .select("id");
       if (apptUpdateErr) return dbError("appointments update", apptUpdateErr);
       if (!confirmed?.length) {
-        console.log(`[webhook] booking ${bookingId} already paid (or not found) — no new notifications for ${pi.id}`);
+        // A payment for a booking that is cancelled (the owner or the client
+        // cancelled it while the client was still paying — the 30-minute
+        // cleanup closes the payment first, so not there), completed or marked
+        // no-show: it is NEVER turned back into a confirmed booking and nobody
+        // is notified — but the payment is recorded on it, so the owner can
+        // see it and refund.
+        const { data: paidLate, error: paidLateErr } = await supabase.from("appointments").update({
+          payment_status: depositOnly ? "deposit_paid" : "paid",
+          payment_intent_id: pi.id,
+        })
+          .eq("id", bookingId)
+          .not("status", "in", "(pending,confirmed)")
+          .or("payment_status.is.null,payment_status.not.in.(paid,deposit_paid)")
+          .select("id, status");
+        if (paidLateErr) return dbError("appointments update (paid after cancel)", paidLateErr);
+        if (paidLate?.length) {
+          console.warn(`[webhook] booking ${bookingId} is ${paidLate[0].status} — ${pi.id} succeeded after that. Kept ${paidLate[0].status}, marked paid, no notifications; the owner may need to refund.`);
+        } else {
+          console.log(`[webhook] booking ${bookingId} already paid (or not found) — no new notifications for ${pi.id}`);
+        }
         return NextResponse.json({ received: true });
       }
 

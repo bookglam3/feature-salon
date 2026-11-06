@@ -194,7 +194,14 @@ function CheckoutForm({ amount, chargeAmount, methodLabel, bookingId, reviewToke
         return_url: `${appUrl}/payment/success?service=${encodeURIComponent(service)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&name=${encodeURIComponent(name)}&amount=${chargeAmount.toFixed(2)}&deposit=${chargeAmount < amount}&salon=${encodeURIComponent(salon)}&appt_id=${encodeURIComponent(bookingId)}&slug=${encodeURIComponent(slug)}${reviewToken ? `&review_token=${encodeURIComponent(reviewToken)}` : ""}`,
       },
     });
-    if (error) { onError(error.message || "Payment failed"); setProcessing(false); }
+    if (error) {
+      // The booking was held for 30 minutes and then released (the payment was closed).
+      const expired = error.code === "payment_intent_unexpected_state" && error.payment_intent?.status === "canceled";
+      onError(expired
+        ? "This booking was held for 30 minutes and has now been released, so no payment was taken. Please book again."
+        : error.message || "Payment failed");
+      setProcessing(false);
+    }
   };
 
   return (

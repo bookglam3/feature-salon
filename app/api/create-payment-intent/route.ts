@@ -182,6 +182,21 @@ export async function POST(req: NextRequest) {
       application_fee_amount: platformFee,
     });
 
+    // Save the PaymentIntent on the booking. The 30-minute cleanup
+    // (/api/cron/expire-pending-bookings) only ever touches bookings that have
+    // one — that is how it tells an online booking from an owner-made one.
+    // If saving fails the client can still pay; the booking just isn't
+    // auto-expired.
+    const { error: savePiErr } = await supabaseAdmin
+      .from("appointments")
+      .update({ payment_intent_id: paymentIntent.id })
+      .eq("id", booking_id)
+      .eq("status", "pending")
+      .eq("payment_status", "pending");
+    if (savePiErr) {
+      console.error(`[create-payment-intent] couldn't save ${paymentIntent.id} on booking ${booking_id}:`, savePiErr.message);
+    }
+
     return NextResponse.json({
       clientSecret:     paymentIntent.client_secret,
       paymentIntentId:  paymentIntent.id,
