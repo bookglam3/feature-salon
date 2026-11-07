@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 import StatCard from "../components/StatCard";
 import EmptyState from "../components/EmptyState";
@@ -485,10 +485,15 @@ function LoyaltyContent() {
   );
 }
 
+// LoyaltyContent calls useToast() and renders DashboardShell itself, so the
+// shell's ToastProvider sits below it — without this one every toast here was
+// a silent no-op. Same as /dashboard/partners.
 export default function LoyaltyPage() {
   return (
-    <FeatureGate feature="analytics_basic">
-      <LoyaltyContent />
-    </FeatureGate>
+    <ToastProvider>
+      <FeatureGate feature="analytics_basic">
+        <LoyaltyContent />
+      </FeatureGate>
+    </ToastProvider>
   );
 }

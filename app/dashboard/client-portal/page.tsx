@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 import { resolveAppointmentServices } from "@/app/lib/appointmentServices";
 
@@ -238,10 +238,15 @@ function ClientPortalContent() {
     </DashboardShell>
   );
 }
+// ClientPortalContent calls useToast() and renders DashboardShell itself, so the
+// shell's ToastProvider sits below it — without this one every toast here was
+// a silent no-op. Same as /dashboard/partners.
 export default function ClientPortalPage() {
   return (
-    <FeatureGate feature="client_portal">
-      <ClientPortalContent />
-    </FeatureGate>
+    <ToastProvider>
+      <FeatureGate feature="client_portal">
+        <ClientPortalContent />
+      </FeatureGate>
+    </ToastProvider>
   );
 }

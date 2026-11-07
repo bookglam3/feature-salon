@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 
 interface Review {
@@ -230,10 +230,15 @@ function ReviewsContent() {
     </DashboardShell>
   );
 }
+// ReviewsContent calls useToast() and renders DashboardShell itself, so the
+// shell's ToastProvider sits below it — without this one every toast here was
+// a silent no-op. Same as /dashboard/partners.
 export default function ReviewsPage() {
   return (
-    <FeatureGate feature="reviews">
-      <ReviewsContent />
-    </FeatureGate>
+    <ToastProvider>
+      <FeatureGate feature="reviews">
+        <ReviewsContent />
+      </FeatureGate>
+    </ToastProvider>
   );
 }
