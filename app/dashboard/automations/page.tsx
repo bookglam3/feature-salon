@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface Automation {
   id?: string;
@@ -58,7 +58,7 @@ const TYPE_META: Record<string, { icon: string; label: string; desc: string; col
   referral:    { icon: "🔗", label: "Referral Prompt",      desc: "Encourage clients to refer friends",       color: "#047857" },
 };
 
-export default function AutomationsPage() {
+function AutomationsPageInner() {
   const router = useRouter();
   const toast = useToast();
   const [salonId, setSalonId] = useState<string | null>(null);
@@ -218,5 +218,16 @@ export default function AutomationsPage() {
         </div>
       </div>
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function AutomationsPage() {
+  return (
+    <ToastProvider>
+      <AutomationsPageInner />
+    </ToastProvider>
   );
 }

@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface Balance { amount: number; currency: string; }
 interface Payout {
@@ -35,7 +35,7 @@ function fmtDate(ts: number) {
   return new Date(ts * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export default function EarningsPage() {
+function EarningsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -308,5 +308,16 @@ export default function EarningsPage() {
         )}
       </div>
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function EarningsPage() {
+  return (
+    <ToastProvider>
+      <EarningsPageInner />
+    </ToastProvider>
   );
 }

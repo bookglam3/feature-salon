@@ -5,7 +5,7 @@ import Image from "next/image";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface Photo { id: string; url: string; caption: string; category: string; is_featured: boolean; created_at: string; }
 
@@ -25,7 +25,7 @@ function getGalleryCategories(bt?: string): string[] {
   }
 }
 
-export default function GalleryPage() {
+function GalleryPageInner() {
   const router = useRouter();
   const toast = useToast();
   const [salonId, setSalonId] = useState<string | null>(null);
@@ -310,5 +310,16 @@ export default function GalleryPage() {
         </div>
       )}
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function GalleryPage() {
+  return (
+    <ToastProvider>
+      <GalleryPageInner />
+    </ToastProvider>
   );
 }

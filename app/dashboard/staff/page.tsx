@@ -7,7 +7,7 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
 import EmptyState from "../components/EmptyState";
 import { SkeletonDashboard } from "../components/SkeletonLoader";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import type { StaffMember } from "../../types";
 import { useSalon } from "../context/SalonContext";
 
@@ -25,7 +25,7 @@ function Avatar({ name }: { name: string }) {
   return <div style={{ width: 40, height: 40, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{initials}</div>;
 }
 
-export default function StaffPage() {
+function StaffPageInner() {
   const router = useRouter();
   const toast = useToast();
   const { vc } = useSalon();
@@ -366,5 +366,16 @@ export default function StaffPage() {
         </form>
       </Modal>
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function StaffPage() {
+  return (
+    <ToastProvider>
+      <StaffPageInner />
+    </ToastProvider>
   );
 }
