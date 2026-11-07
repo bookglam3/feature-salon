@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import FeatureGate from "../components/FeatureGate";
 
 interface BroadcastMsg {
@@ -42,7 +42,7 @@ function BroadcastContent() {
   const [history, setHistory] = useState<BroadcastMsg[]>([]);
   const [recipientCount, setRecipientCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ title: "", message: "", channel: "whatsapp" as "whatsapp"|"sms"|"email", filter: "all" as "all"|"vip"|"new"|"inactive" });
+  const [form, setForm] = useState({ title: "", message: "", channel: "email" as "whatsapp"|"sms"|"email", filter: "all" as "all"|"vip"|"new"|"inactive" });
   const [sending, setSending] = useState(false);
   const [businessType, setBusinessType] = useState<string | undefined>(undefined);
 
@@ -131,7 +131,7 @@ function BroadcastContent() {
       } else {
         toast.success(`✅ Sent to ${successCount} clients!`);
       }
-      setForm({ title: "", message: "", channel: "whatsapp", filter: "all" });
+      setForm({ title: "", message: "", channel: "email", filter: "all" });
     } catch (e) {
       toast.error(`Send failed: ${e}`);
     }
@@ -168,7 +168,8 @@ function BroadcastContent() {
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: "#524D60", display: "block", marginBottom: 8 }}>Channel</label>
               <div style={{ display: "flex", gap: 10 }}>
-                {(["whatsapp", "sms", "email"] as const).map(ch => (
+                {/* Email only for now — SMS / WhatsApp need opt-out handling first (the API refuses them). */}
+                {(["email"] as const).map(ch => (
                   <button key={ch} onClick={() => setForm(f => ({ ...f, channel: ch }))}
                     style={{ flex: 1, padding: "10px 4px", borderRadius: 12, border: `2px solid ${form.channel === ch ? channelColor[ch] : "#ECE9F1"}`, background: form.channel === ch ? `${channelColor[ch]}12` : "#FFFFFF", cursor: "pointer", transition: "all 0.12s", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                     <span style={{ fontSize: 22 }}>{channelIcon[ch]}</span>
@@ -265,10 +266,15 @@ function BroadcastContent() {
   );
 }
 
+// BroadcastContent calls useToast() and renders DashboardShell itself, so the
+// shell's ToastProvider sits below it — without this one every toast here
+// (sent, failed, the daily limit) was a silent no-op. Same as /dashboard/partners.
 export default function BroadcastPage() {
   return (
-    <FeatureGate feature="analytics_basic">
-      <BroadcastContent />
-    </FeatureGate>
+    <ToastProvider>
+      <FeatureGate feature="analytics_basic">
+        <BroadcastContent />
+      </FeatureGate>
+    </ToastProvider>
   );
 }

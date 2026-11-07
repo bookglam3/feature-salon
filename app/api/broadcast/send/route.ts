@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendOfferEmail } from "@/app/lib/email";
-import { sendSMS } from "@/app/lib/sms";
-import { sendWhatsApp } from "@/app/lib/whatsapp";
+import { broadcastLimitError, canBroadcast, type BroadcastSalon } from "@/app/lib/broadcastAccess";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +13,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-interface SalonRow { id: string; name: string; slug: string; }
+interface SalonRow extends BroadcastSalon { id: string; name: string; slug: string; }
 
 // Resolves the caller's salon from their session token — salon identity is
 // NEVER trusted from the request body, so a tampered payload can't target
@@ -26,9 +25,10 @@ async function getOwnerSalon(req: NextRequest): Promise<SalonRow | null> {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return null;
 
+  // "*" so lifetime_access is included once that column exists
   const { data: salon, error: salonErr } = await supabase
     .from("salons")
-    .select("id, name, slug")
+    .select("*")
     .eq("owner_id", user.id)
     .single();
   if (salonErr || !salon) return null;
@@ -36,8 +36,8 @@ async function getOwnerSalon(req: NextRequest): Promise<SalonRow | null> {
 }
 
 // Recipients are derived here, server-side, on every send — never accepted
-// from the client. Email-only for now (SMS/WhatsApp opt-out plumbing is a
-// separate piece of work).
+// from the client. Email only for now: SMS / WhatsApp need opt-out handling
+// first, so the API refuses any other channel.
 async function getRecipients(salonId: string) {
   const { data, error } = await supabase
     .from("clients")
@@ -71,14 +71,49 @@ export async function POST(req: NextRequest) {
 
     const { broadcastId, channel, title, message } = await req.json();
 
-    if (!channel || !message) {
+    // Refusing a send also marks the page's "sending" log row as failed.
+    const refuse = async (status: number, error: string, code: string) => {
+      if (broadcastId) {
+        await supabase.from("broadcast_messages").update({ status: "failed" })
+          .eq("id", broadcastId).eq("salon_id", salon.id).eq("status", "sending");
+      }
+      return NextResponse.json({ error, code }, { status });
+    };
+
+    // Plan: checked here, not only in the browser.
+    if (!canBroadcast(salon, new Date())) {
+      return refuse(403, "Broadcasts are included in the Pro and Business plans.", "plan_required");
+    }
+    if (channel !== "email") {
+      return refuse(400, "Only email broadcasts are available right now.", "email_only");
+    }
+    if (!message || !broadcastId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // The page logs every send first (status "sending"). Only a fresh log row
+    // of this salon's can be sent — so every send is on record for the daily limit.
+    const since10min = new Date(Date.now() - 10 * 60_000).toISOString();
+    const { data: logRow, error: logErr } = await supabase.from("broadcast_messages").select("id")
+      .eq("id", broadcastId).eq("salon_id", salon.id).eq("status", "sending").gt("created_at", since10min)
+      .maybeSingle();
+    if (logErr) throw logErr;
+    if (!logRow) {
+      return NextResponse.json({ error: "Please refresh the page and try again.", code: "stale_broadcast" }, { status: 400 });
     }
 
     const recipients = await getRecipients(salon.id);
     if (recipients.length === 0) {
-      return NextResponse.json({ error: "No recipients matched" }, { status: 400 });
+      return refuse(400, "No recipients matched", "no_recipients");
     }
+
+    // Daily limit: this salon's broadcasts sent in the last 24 hours.
+    const since24h = new Date(Date.now() - 24 * 3600_000).toISOString();
+    const { data: recent, error: recentErr } = await supabase.from("broadcast_messages").select("recipient_count")
+      .eq("salon_id", salon.id).in("status", ["sent", "partial"]).gt("created_at", since24h).neq("id", broadcastId);
+    if (recentErr) throw recentErr;
+    const limitError = broadcastLimitError(recent || [], recipients.length);
+    if (limitError) return refuse(429, limitError, "daily_limit");
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
     const bookingLink = `${appUrl}/book/${salon.slug}`;
@@ -94,7 +129,7 @@ export async function POST(req: NextRequest) {
         .replace(/{link}/g, bookingLink);
 
       try {
-        if (channel === "email" && client.email) {
+        if (client.email) {
           const unsubLink = `${appUrl}/unsubscribe?email=${encodeURIComponent(client.email)}&salon=${encodeURIComponent(salon.slug)}`;
           await sendOfferEmail({
             to:           client.email,
@@ -106,12 +141,6 @@ export async function POST(req: NextRequest) {
             unsubLink,
           });
           sent++;
-        } else if (channel === "sms" && client.phone) {
-          await sendSMS(client.phone, personalised, salon.name);
-          sent++;
-        } else if (channel === "whatsapp" && client.phone) {
-          await sendWhatsApp(client.phone, personalised);
-          sent++;
         }
       } catch (e) {
         errors.push(`${client.name} (${client.email || client.phone}): ${e}`);
@@ -120,13 +149,11 @@ export async function POST(req: NextRequest) {
 
     // Update broadcast record with actual sent count — scoped to this salon
     // so a stale/foreign broadcastId can't touch another salon's log row.
-    if (broadcastId) {
-      await supabase
-        .from("broadcast_messages")
-        .update({ status: errors.length === 0 ? "sent" : "partial", recipient_count: sent })
-        .eq("id", broadcastId)
-        .eq("salon_id", salon.id);
-    }
+    await supabase
+      .from("broadcast_messages")
+      .update({ status: errors.length === 0 ? "sent" : "partial", recipient_count: sent })
+      .eq("id", broadcastId)
+      .eq("salon_id", salon.id);
 
     return NextResponse.json({ success: true, sent, errors: errors.length > 0 ? errors : undefined });
 
