@@ -17,7 +17,7 @@ import DashboardShell, { HamburgerBtn } from "./components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "./components/Modal";
 import EmptyState from "./components/EmptyState";
 import { SkeletonDashboard } from "./components/SkeletonLoader";
-import { useToast } from "./components/Toast";
+import { useToast, ToastProvider } from "./components/Toast";
 import type { Salon, Appointment, Service } from "../types";
 import OnboardingChecklist from "./components/OnboardingChecklist";
 import { useSalon } from "./context/SalonContext";
@@ -191,7 +191,7 @@ const STAFF_ICON_MAP: Record<string, React.ReactNode> = {
   users:       <Users size={20} strokeWidth={1.8} />,
 };
 
-export default function DashboardPage() {
+function DashboardPageInner() {
   const router = useRouter();
   const toast = useToast();
   const { vc } = useSalon();
@@ -622,5 +622,17 @@ export default function DashboardPage() {
       />
 
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows (Booking created / Failed …) need a ToastProvider
+// ABOVE the component that calls useToast() — DashboardShell's own provider sits
+// below it, so on its own every toast here was a silent no-op. Same wrapper as
+// /dashboard/partners.
+export default function DashboardPage() {
+  return (
+    <ToastProvider>
+      <DashboardPageInner />
+    </ToastProvider>
   );
 }

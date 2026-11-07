@@ -9,7 +9,7 @@ import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
 import Modal, { FormGroup, Input, Select, ModalActions, BtnPrimary, BtnSecondary } from "../components/Modal";
 import EmptyState from "../components/EmptyState";
 import { SkeletonDashboard } from "../components/SkeletonLoader";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 import type { Appointment, Service } from "../../types";
 import { useSalon } from "../context/SalonContext";
 import { resolveAppointmentServices, type ResolvedAppointmentServices } from "../../lib/appointmentServices";
@@ -84,7 +84,7 @@ function wizardTapCardStyle(selected: boolean): CSSProperties {
   };
 }
 
-export default function BookingsPage() {
+function BookingsPageInner() {
   const router = useRouter();
   const toast = useToast();
   const { vc } = useSalon();
@@ -984,3 +984,14 @@ export default function BookingsPage() {
   );
 }
 
+// The toasts this page shows (Booking created / Failed …) need a ToastProvider
+// ABOVE the component that calls useToast() — DashboardShell's own provider sits
+// below it, so on its own every toast here was a silent no-op. Same wrapper as
+// /dashboard/partners.
+export default function BookingsPage() {
+  return (
+    <ToastProvider>
+      <BookingsPageInner />
+    </ToastProvider>
+  );
+}
