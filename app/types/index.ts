@@ -23,6 +23,8 @@ export interface Appointment {
   service_id: string | null;
   staff_id: string | null;
   date_time: string;
+  /** Written on every booking; select("*") returns it. */
+  end_time?: string | null;
   status: 'confirmed' | 'pending' | 'cancelled' | 'completed' | 'no_show';
   created_at: string;
   /** Set when status becomes 'completed', cleared when it moves away.
