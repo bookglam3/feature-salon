@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface Referral {
   id: string;
@@ -28,7 +28,7 @@ function genCode(name: string) {
   return name.trim().split(" ")[0].toUpperCase().slice(0, 6) + Math.floor(Math.random() * 1000);
 }
 
-export default function ReferralsPage() {
+function ReferralsPageInner() {
   const router = useRouter();
   const toast = useToast();
   const [salonId, setSalonId] = useState<string | null>(null);
@@ -219,5 +219,16 @@ export default function ReferralsPage() {
         </div>
       )}
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function ReferralsPage() {
+  return (
+    <ToastProvider>
+      <ReferralsPageInner />
+    </ToastProvider>
   );
 }

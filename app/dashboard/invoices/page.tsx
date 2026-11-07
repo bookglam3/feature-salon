@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface Invoice {
   id: string;
@@ -32,7 +32,7 @@ function StatusBadge({ status }: { status: string }) {
   return <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 99, background: s.bg, color: s.color }}>{s.label}</span>;
 }
 
-export default function InvoicesPage() {
+function InvoicesPageInner() {
   const router = useRouter();
   const toast = useToast();
   const [salonId, setSalonId] = useState<string | null>(null);
@@ -432,5 +432,16 @@ export default function InvoicesPage() {
         </div>
       )}
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function InvoicesPage() {
+  return (
+    <ToastProvider>
+      <InvoicesPageInner />
+    </ToastProvider>
   );
 }

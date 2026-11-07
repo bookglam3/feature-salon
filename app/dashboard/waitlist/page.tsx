@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { getCurrentUserProfile } from "@/app/lib/auth";
 import DashboardShell, { HamburgerBtn } from "../components/DashboardShell";
-import { useToast } from "../components/Toast";
+import { useToast, ToastProvider } from "../components/Toast";
 
 interface WaitlistEntry {
   id: string;
@@ -25,7 +25,7 @@ const STATUS_MAP = {
   removed:   { label: "Removed",   bg: "#F5F3FF", color: "#524D60" },
 };
 
-export default function WaitlistPage() {
+function WaitlistPageInner() {
   const router = useRouter();
   const toast = useToast();
   const [salonId, setSalonId] = useState<string | null>(null);
@@ -238,5 +238,16 @@ export default function WaitlistPage() {
         </div>
       )}
     </DashboardShell>
+  );
+}
+
+// The toasts this page shows need a ToastProvider ABOVE the component that
+// calls useToast() — DashboardShell's own provider sits below it, so on its own
+// every toast here was a silent no-op. Same wrapper as /dashboard/partners.
+export default function WaitlistPage() {
+  return (
+    <ToastProvider>
+      <WaitlistPageInner />
+    </ToastProvider>
   );
 }
