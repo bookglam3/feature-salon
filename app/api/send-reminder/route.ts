@@ -9,13 +9,6 @@ import {
 } from "@/app/lib/email";
 import { getLoyaltySnapshot } from "@/app/lib/loyalty";
 import {
-  send24hWhatsApp,
-  send2hWhatsApp,
-  sendThankyouWhatsApp,
-  formatWATime,
-  normalisePhone,
-} from "@/app/lib/whatsapp";
-import {
   isMetaConfigured,
   formatPhoneE164,
   sendTemplateMessage,
@@ -50,6 +43,12 @@ export const maxDuration = 60;
 // BEFORE it is sent, so two runs at the same time can't both send it, and a
 // booking never gets the same message twice. Email and WhatsApp are separate:
 // a WhatsApp problem never stops the email.
+//
+// WhatsApp goes ONLY through Meta, and only when WHATSAPP_PHONE_NUMBER_ID and
+// WHATSAPP_ACCESS_TOKEN are both set; otherwise it is off (no Twilio fallback)
+// and the run says "whatsapp":"off". Only the 24h / 2h reminders use it (Meta
+// template appointment_reminder); thank-you is email only until it has a
+// template of its own.
 
 const MAX_PER_KIND = 25;          // per message type per run; the rest go on the next run
 const TIME_BUDGET_MS = 45_000;    // stop starting new bookings after this (function limit 60 s)
@@ -94,11 +93,8 @@ const SELECT =
   "services(name,price), staff(name), " +
   "salons(id,name,slug,owner_id,owner_email,reminders_enabled,whatsapp_enabled,review_link,business_type)";
 
-type Provider = "meta" | "twilio" | "none";
-const twilioConfigured = () =>
-  !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_WHATSAPP_FROM);
-/** Which WhatsApp path the 24h / 2h reminders use. Only yes/no on env vars — never their values. */
-const reminderProvider = (): Provider => (isMetaConfigured() ? "meta" : twilioConfigured() ? "twilio" : "none");
+/** "meta" when both Meta env vars are set, else "off". Only yes/no on env vars — never their values. */
+const whatsappMode = (): "meta" | "off" => (isMetaConfigured() ? "meta" : "off");
 
 function emptyCounts(): Record<ReminderKind, number> {
   return { "24h": 0, "2h": 0, thankyou: 0, noshow: 0, winback: 0 };
@@ -109,14 +105,13 @@ function newSummary(dryRun: boolean, now: Date) {
     dryRun,
     checkedAt: now.toISOString(),
     timezone: "Europe/London",
-    whatsapp: { reminders: reminderProvider(), thankyou: (twilioConfigured() ? "twilio" : "none") as Provider },
+    whatsapp: whatsappMode(),
     due: emptyCounts(),
     sent: emptyCounts(),
     skipped: { remindersOff: 0, rebooked: 0, noEmailOrUnsubscribed: 0, alreadyTaken: 0, timeBudget: 0 },
     email: { sent: 0, failed: 0 },
     whatsappSent: 0,
     whatsappFailed: 0,
-    whatsappNotSent: 0,                        // no WhatsApp provider configured
     whatsappErrors: {} as Record<string, number>, // error code → count (e.g. Meta 132001 = template missing)
     errors: 0,
   };
@@ -232,11 +227,12 @@ async function deliver(kind: ReminderKind, a: Booking, s: Summary) {
         businessType: a.salons?.business_type ?? undefined,
       }));
     }
-    if (await whatsappAllowed(a)) await reminderWhatsApp(kind, a, s);
+    if (whatsappMode() === "meta" && (await whatsappAllowed(a))) await reminderWhatsApp(kind, a, s);
     return;
   }
 
   if (kind === "thankyou") {
+    // email only (no Meta template for it yet)
     const reviewLink = a.salons?.review_link || undefined;
     if (a.client_email) {
       await email("thank-you", async () => {
@@ -249,12 +245,6 @@ async function deliver(kind: ReminderKind, a: Booking, s: Summary) {
           serviceName: a.services?.name ?? undefined, reviewLink, loyalty,
         });
       });
-    }
-    if (await whatsappAllowed(a)) {
-      if (!twilioConfigured()) { s.whatsappNotSent++; return; }
-      await whatsappAttempt(s, a.id, () => sendThankyouWhatsApp({
-        to: a.client_phone!, clientName: a.client_name ?? "", salonName, reviewLink,
-      }));
     }
     return;
   }
@@ -306,21 +296,10 @@ async function whatsappAttempt(s: Summary, id: string, send: () => Promise<unkno
   }
 }
 
+/** 24h / 2h reminder over Meta WhatsApp (only called when whatsappMode() is "meta"). */
 async function reminderWhatsApp(kind: "24h" | "2h", a: Booking, s: Summary) {
-  const provider = reminderProvider();
   const sentFlag = kind === "24h" ? "whatsapp_24h_sent" : "whatsapp_2h_sent";
   const salonName = a.salons?.name || "Your Salon";
-  if (provider === "none") { s.whatsappNotSent++; return; }
-
-  if (provider === "twilio") {
-    const ok = await whatsappAttempt(s, a.id, () => kind === "24h"
-      ? send24hWhatsApp({ to: a.client_phone!, clientName: a.client_name ?? "", time: formatWATime(a.date_time), salonName, serviceName: a.services?.name ?? undefined })
-      : send2hWhatsApp({ to: a.client_phone!, clientName: a.client_name ?? "", time: formatWATime(a.date_time), salonName }));
-    if (ok) await supabase.from("appointments").update({ [sentFlag]: true }).eq("id", a.id);
-    return;
-  }
-
-  // Meta Cloud API
   const phone = formatPhoneE164(a.client_phone!);
   if (!phone) { s.whatsappFailed++; s.whatsappErrors.bad_phone = (s.whatsappErrors.bad_phone ?? 0) + 1; return; }
   const [firstName] = (a.client_name || "Client").split(" ");
@@ -369,8 +348,8 @@ async function reminderWhatsApp(kind: "24h" | "2h", a: Booking, s: Summary) {
 
 /** STOP list (SMS + WhatsApp). Saved as +44…; bookings may say 07… — both are checked. */
 async function isOptedOut(raw: string): Promise<boolean> {
-  const e164 = normalisePhone(raw);
-  const keys = [...new Set([raw.trim(), e164, e164?.replace(/^\+/, "")].filter((k): k is string => !!k))];
+  const digits = formatPhoneE164(raw);            // 447…
+  const keys = [...new Set([raw.trim(), digits ? `+${digits}` : null, digits].filter((k): k is string => !!k))];
   const { data, error } = await supabase.from("sms_opt_outs").select("id").in("phone", keys).limit(1);
   if (error) {
     console.error("[Reminder] opt-out lookup failed — not sending WhatsApp:", error.message);
