@@ -1,46 +1,77 @@
 /**
- * Unit tests for plan-based feature access (app/lib/featureAccess.ts).
- * Imports the real module (it has no imports, so node runs it directly).
- * The expired-trial / cancelled dashboard lock lives in app/dashboard/layout.tsx
- * and is not changed by plan rules; these tests cover the per-feature gate.
+ * Unit tests for the shared access rule (app/lib/featureAccess.ts): who can
+ * use the dashboard (salonAccess) and which plan features (hasFeatureAccess).
+ * The same rule runs in the browser (dashboard layout, FeatureGate, Settings)
+ * and on the server (owner API routes via app/lib/dashboardLock.ts, the gift
+ * voucher checks). Imports the real module (no imports, node runs it directly).
  * Run: npm test   (or: node scripts/test-feature-access.mjs)
  */
 
-import { hasFeatureAccess, getRequiredPlan } from "../app/lib/featureAccess.ts";
+import { hasFeatureAccess, getRequiredPlan, salonAccess } from "../app/lib/featureAccess.ts";
 
 let passed = 0, failed = 0;
 function check(label, actual, expected) {
-  if (actual === expected) { passed++; console.log(`  ✅ PASS  ${label}`); }
-  else { failed++; console.log(`  ❌ FAIL  ${label}\n           expected ${expected}, got ${actual}`); }
+  const ok = JSON.stringify(actual) === JSON.stringify(expected);
+  if (ok) { passed++; console.log(`  ✅ PASS  ${label}`); }
+  else { failed++; console.log(`  ❌ FAIL  ${label}\n           expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`); }
 }
 
-console.log("\nCalendar — open on every plan");
-check("Starter (active) → calendar", hasFeatureAccess("calendar", "starter", "active"), true);
-check("Pro (active) → calendar", hasFeatureAccess("calendar", "pro", "active"), true);
-check("Business (active) → calendar", hasFeatureAccess("calendar", "business", "active"), true);
-check("Enterprise (active) → calendar", hasFeatureAccess("calendar", "enterprise", "active"), true);
-check("Comped (active, no plan) → calendar", hasFeatureAccess("calendar", null, "active"), true);
-check("Plan name in capitals (active) → calendar", hasFeatureAccess("calendar", "Starter", "active"), true);
-check("Free trial → calendar", hasFeatureAccess("calendar", "starter", "trial"), true);
-check("Stripe trial (trialing) → calendar", hasFeatureAccess("calendar", "starter", "trialing"), true);
+const NOW = new Date("2026-11-08T12:00:00Z");
+const FUTURE = "2026-11-20T00:00:00Z", PAST = "2026-11-01T00:00:00Z";
+const s = (subscription_status, subscription_plan = null, extra = {}) => ({ subscription_status, subscription_plan, ...extra });
+const can = (feature, salon) => hasFeatureAccess(feature, salon, NOW);
+const lock = (salon) => { const a = salonAccess(salon, NOW); return a.locked ? `locked:${a.lockReason}` : `open:${a.state}`; };
 
-console.log("\nCalendar — still locked without an active plan (as before)");
-check("Past due → locked", hasFeatureAccess("calendar", "pro", "past_due"), false);
-check("Unpaid → locked", hasFeatureAccess("calendar", "pro", "unpaid"), false);
-check("Cancelled → locked", hasFeatureAccess("calendar", "pro", "cancelled"), false);
-check("Canceled (Stripe spelling) → locked", hasFeatureAccess("calendar", "pro", "canceled"), false);
-check("No status → locked", hasFeatureAccess("calendar", "starter", null), false);
+console.log("\nDashboard lock");
+check("active → open", lock(s("active", "starter")), "open:active");
+check("past_due → open (a payment problem shows a banner, it doesn't lock)", lock(s("past_due", "pro")), "open:past_due");
+check("trial with time left → open", lock(s("trial", "starter", { trial_ends_at: FUTURE })), "open:trial");
+check("Stripe trial (trialing) with time left → open", lock(s("trialing", "starter", { trial_ends_at: FUTURE })), "open:trial");
+check("trial ended → locked", lock(s("trial", "starter", { trial_ends_at: PAST })), "locked:trial_ended");
+check("Stripe trial ended (status not updated yet) → locked", lock(s("trialing", "starter", { trial_ends_at: PAST })), "locked:trial_ended");
+check("trial with no end date → locked", lock(s("trial", "starter")), "locked:trial_ended");
+check("no status counts as a trial: with time left → open, without → locked", [lock({ trial_ends_at: FUTURE }), lock({})], ["open:trial", "locked:trial_ended"]);
+check("cancelled / canceled → locked", [lock(s("cancelled", "pro")), lock(s("canceled", "pro"))], ["locked:cancelled", "locked:cancelled"]);
+check("unpaid → locked", lock(s("unpaid", "business")), "locked:unpaid");
+check("incomplete / incomplete_expired → locked", [lock(s("incomplete")), lock(s("incomplete_expired"))], ["locked:incomplete", "locked:incomplete"]);
+check("a status we don't know (e.g. paused) → locked", lock(s("paused", "pro")), "locked:inactive");
+check("lifetime → open, whatever the status says", [
+  lock(s("active", "starter", { lifetime_access: true })),
+  lock(s("cancelled", "starter", { lifetime_access: true })),
+  lock(s("trial", null, { lifetime_access: true, trial_ends_at: PAST })),
+  lock({ lifetime_access: true }),
+], ["open:lifetime", "open:lifetime", "open:lifetime", "open:lifetime"]);
+check("lifetime_access false / null changes nothing", [lock(s("cancelled", "pro", { lifetime_access: false })), lock(s("active", "pro", { lifetime_access: null }))], ["locked:cancelled", "open:active"]);
+check("status in capitals / with spaces counts the same (hand-edited rows)", [lock(s("Active", "pro")), lock(s(" past_due ", "pro")), lock(s("CANCELLED", "pro")), lock(s("", "pro", { trial_ends_at: FUTURE }))], ["open:active", "open:past_due", "locked:cancelled", "open:trial"]);
+check("exactly when the trial ends it is over", lock(s("trial", "starter", { trial_ends_at: NOW.toISOString() })), "locked:trial_ended");
 
-console.log("\nOther features — unchanged");
-check("Starter → no analytics", hasFeatureAccess("analytics_basic", "starter", "active"), false);
-check("Pro → analytics", hasFeatureAccess("analytics_basic", "pro", "active"), true);
-check("Pro → no full analytics", hasFeatureAccess("analytics_full", "pro", "active"), false);
-check("Starter → no reviews", hasFeatureAccess("reviews", "starter", "active"), false);
-check("Pro → reviews", hasFeatureAccess("reviews", "pro", "active"), true);
-check("Pro → no gift cards", hasFeatureAccess("gift_cards", "pro", "active"), false);
-check("Business → gift cards", hasFeatureAccess("gift_cards", "business", "active"), true);
-check("Pro → no client portal", hasFeatureAccess("client_portal", "pro", "active"), false);
-check("Trial → everything (e.g. client portal)", hasFeatureAccess("client_portal", "starter", "trial"), true);
+console.log("\nCalendar — every open salon, every plan");
+for (const plan of ["starter", "pro", "business", "enterprise", null, "Starter", "premium"]) {
+  check(`active, plan ${JSON.stringify(plan)} → calendar`, can("calendar", s("active", plan)), true);
+}
+check("past_due → calendar", can("calendar", s("past_due", "starter")), true);
+check("running trial → calendar", can("calendar", s("trial", "starter", { trial_ends_at: FUTURE })), true);
+check("lifetime → calendar", can("calendar", s("cancelled", null, { lifetime_access: true })), true);
+check("locked (trial ended / cancelled / unpaid) → no calendar", [
+  can("calendar", s("trial", "starter", { trial_ends_at: PAST })), can("calendar", s("cancelled", "pro")), can("calendar", s("unpaid", "pro")),
+], [false, false, false]);
+
+console.log("\nPlan features");
+check("Starter → no analytics / reviews / gift vouchers", [can("analytics_basic", s("active", "starter")), can("reviews", s("active", "starter")), can("gift_vouchers", s("active", "starter"))], [false, false, false]);
+check("Pro → analytics, reviews, gift vouchers", [can("analytics_basic", s("active", "pro")), can("reviews", s("active", "pro")), can("gift_vouchers", s("active", "pro"))], [true, true, true]);
+check("Pro → no Business features (full analytics, discount codes, client portal)", [can("analytics_full", s("active", "pro")), can("gift_cards", s("active", "pro")), can("client_portal", s("active", "pro"))], [false, false, false]);
+check("Business → Business features", [can("analytics_full", s("active", "business")), can("gift_cards", s("active", "business")), can("client_portal", s("active", "business"))], [true, true, true]);
+check("Enterprise → Business features", can("client_portal", s("active", "enterprise")), true);
+check("plan name in capitals", can("reviews", s("active", "PRO")), true);
+check("a plan we don't know ('premium') counts as Starter", [can("reviews", s("active", "premium")), can("calendar", s("active", "premium"))], [false, true]);
+check("past_due keeps its plan's features", [can("reviews", s("past_due", "pro")), can("client_portal", s("past_due", "pro"))], [true, false]);
+check("running trial → every feature", can("client_portal", s("trial", "starter", { trial_ends_at: FUTURE })), true);
+check("trial ended → no features", can("reviews", s("trial", "business", { trial_ends_at: PAST })), false);
+check("lifetime → every Business feature, even on a Starter subscription", [
+  can("analytics_full", s("active", "starter", { lifetime_access: true })), can("gift_cards", s("active", "starter", { lifetime_access: true })),
+  can("client_portal", s("active", "starter", { lifetime_access: true })), can("gift_vouchers", s("active", "starter", { lifetime_access: true })),
+], [true, true, true, true]);
+check("lifetime's plan is Business", salonAccess(s("active", "starter", { lifetime_access: true }), NOW).plan, "business");
 
 console.log("\nRequired plan shown on upgrade screens");
 check("calendar needs Starter", getRequiredPlan("calendar"), "starter");

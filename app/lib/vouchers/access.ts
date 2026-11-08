@@ -23,7 +23,7 @@ export type VoucherBlockReason =
   | "online_payments_off"; // salon turned off every online payment method
 
 export interface VoucherSalonState {
-  /** hasFeatureAccess("gift_vouchers", subscription_plan, subscription_status) */
+  /** hasFeatureAccess("gift_vouchers", salon) — plan, status, trial end and lifetime access */
   planAllowsVouchers: boolean;
   /** salons.gift_vouchers_enabled (missing column = off) */
   vouchersEnabled: boolean | null | undefined;

@@ -28,18 +28,22 @@ const PAY_AT_SALON_ONLY = { full_online: false, deposit_online: false, pay_at_sa
 const summary = (a) => ({ create: a.canCreateInDashboard, apply: a.canApplyAtBooking, buy: a.canBuyOnline, applyBlockedBy: a.applyBlockedBy, buyBlockedBy: a.buyBlockedBy });
 const access = (changes) => getVoucherAccess({ ...READY, ...changes });
 
-console.log("\nPlan rule — gift_vouchers");
-check("Starter (active) → no", hasFeatureAccess("gift_vouchers", "starter", "active"), false);
-check("Pro (active) → yes", hasFeatureAccess("gift_vouchers", "pro", "active"), true);
-check("Business (active) → yes", hasFeatureAccess("gift_vouchers", "business", "active"), true);
-check("Enterprise (active) → yes", hasFeatureAccess("gift_vouchers", "enterprise", "active"), true);
-check("Free trial (Starter) → yes", hasFeatureAccess("gift_vouchers", "starter", "trial"), true);
-check("Stripe trial (trialing) → yes", hasFeatureAccess("gift_vouchers", "starter", "trialing"), true);
-check("Pro past due → no", hasFeatureAccess("gift_vouchers", "pro", "past_due"), false);
-check("Pro cancelled → no", hasFeatureAccess("gift_vouchers", "pro", "cancelled"), false);
-check("Plan name in capitals (PRO) → yes", hasFeatureAccess("gift_vouchers", "PRO", "active"), true);
+console.log("\nPlan rule — gift_vouchers (the shared access rule in app/lib/featureAccess.ts)");
+const NOW = new Date("2026-11-08T12:00:00Z");
+const plan = (subscription_status, subscription_plan, extra = {}) => hasFeatureAccess("gift_vouchers", { subscription_status, subscription_plan, ...extra }, NOW);
+check("Starter (active) → no", plan("active", "starter"), false);
+check("Pro (active) → yes", plan("active", "pro"), true);
+check("Business (active) → yes", plan("active", "business"), true);
+check("Enterprise (active) → yes", plan("active", "enterprise"), true);
+check("Free trial (Starter), time left → yes", plan("trial", "starter", { trial_ends_at: "2026-11-20T00:00:00Z" }), true);
+check("Stripe trial (trialing), time left → yes", plan("trialing", "starter", { trial_ends_at: "2026-11-20T00:00:00Z" }), true);
+check("Free trial ended → no", plan("trial", "starter", { trial_ends_at: "2026-11-01T00:00:00Z" }), false);
+check("Pro past due → yes (keeps its plan while the payment is retried)", plan("past_due", "pro"), true);
+check("Pro cancelled → no", plan("cancelled", "pro"), false);
+check("Plan name in capitals (PRO) → yes", plan("active", "PRO"), true);
+check("Lifetime access on a Starter subscription → yes", plan("active", "starter", { lifetime_access: true }), true);
 check("upgrade screen asks for Pro", getRequiredPlan("gift_vouchers"), "pro");
-check("old Gift Cards page still Business only (unchanged)", hasFeatureAccess("gift_cards", "pro", "active"), false);
+check("old Gift Cards page still Business only (unchanged)", hasFeatureAccess("gift_cards", { subscription_status: "active", subscription_plan: "pro" }, NOW), false);
 
 console.log("\nState 1 — switch OFF");
 check("nothing public; owner can still add paper vouchers",

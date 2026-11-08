@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 // Service-role client — bypasses RLS, trusted server-side only
 const adminSupabase = createClient(
@@ -31,6 +32,8 @@ async function getOwnerSalon(req: NextRequest) {
 
 // ── GET /api/service-categories — list categories for authenticated owner
 export async function GET(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -46,6 +49,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST /api/service-categories — create a new category
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -83,6 +88,8 @@ export async function POST(req: NextRequest) {
 
 // ── PATCH /api/service-categories — rename, or reorder via move up/down
 export async function PATCH(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -146,6 +153,8 @@ export async function PATCH(req: NextRequest) {
 // services.category_id is ON DELETE SET NULL, so affected services
 // become uncategorised automatically; they are never deleted here.
 export async function DELETE(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 

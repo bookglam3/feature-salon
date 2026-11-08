@@ -22,7 +22,7 @@ export interface OwnerContext {
 }
 
 const SALON_COLUMNS =
-  "id, subscription_plan, subscription_status, gift_vouchers_enabled, stripe_account_id, charges_enabled, payment_methods";
+  "id, subscription_plan, subscription_status, trial_ends_at, lifetime_access, gift_vouchers_enabled, stripe_account_id, charges_enabled, payment_methods";
 
 function fail(status: number, error: string) {
   return NextResponse.json({ error }, { status, headers: NO_STORE });
@@ -54,7 +54,7 @@ export async function requireOwner(req: NextRequest, salonIdHint: unknown): Prom
     userId: user.id,
     salonId: salon.id,
     access: getVoucherAccess({
-      planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon.subscription_plan, salon.subscription_status),
+      planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon),
       vouchersEnabled: salon.gift_vouchers_enabled,
       stripeAccountId: salon.stripe_account_id,
       chargesEnabled: salon.charges_enabled,

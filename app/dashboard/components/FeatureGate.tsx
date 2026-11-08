@@ -11,9 +11,10 @@ import {
   type Plan,
 } from "../../lib/featureAccess";
 
-// Statuses where the account has a plan but the payment failed: show a
-// "fix your payment" screen instead of an upgrade prompt.
-const PAYMENT_PROBLEM_STATUSES = new Set(["past_due", "unpaid", "incomplete"]);
+// Statuses where a failed payment locks the account: show a "fix your
+// payment" screen instead of an upgrade prompt. Not past_due — it keeps its
+// plan's features, so a feature it can't open needs a higher plan instead.
+const PAYMENT_PROBLEM_STATUSES = new Set(["unpaid", "incomplete"]);
 
 interface FeatureGateProps {
   feature: Feature;
@@ -42,7 +43,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
         // "Checking access…" spinner. Mirrors getCurrentUserProfile in lib/auth.
         const { data: salon, error } = await supabase
           .from("salons")
-          .select("id, subscription_status, subscription_plan, stripe_customer_id")
+          .select("id, subscription_status, subscription_plan, trial_ends_at, lifetime_access, stripe_customer_id")
           .eq("owner_id", user.id)
           .order("created_at", { ascending: true })
           .limit(1)
@@ -65,7 +66,7 @@ export default function FeatureGate({ feature, children }: FeatureGateProps) {
         setHasCustId(!!salon.stripe_customer_id);
         setSubStatus(salon.subscription_status);
 
-        const allowed = hasFeatureAccess(feature, salon.subscription_plan, salon.subscription_status);
+        const allowed = hasFeatureAccess(feature, salon);
         setStatus(allowed ? "allowed" : "locked");
       } catch (e) {
         // Safety net: any rejection (network, auth, lock contention) lands on a

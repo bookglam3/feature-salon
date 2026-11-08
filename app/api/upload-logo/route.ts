@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,8 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   try {
     // Verify the user is authenticated
     const authHeader = req.headers.get("authorization");
