@@ -138,23 +138,11 @@ function InvoicesPageInner() {
       const res = await fetch("/api/send-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session?.access_token}` },
-        body: JSON.stringify({
-          invoiceNumber: inv.invoice_number,
-          clientName: inv.client_name,
-          clientEmail: inv.client_email,
-          salonName,
-          items: inv.items,
-          subtotal: inv.subtotal,
-          taxRate: inv.tax_rate,
-          taxAmount: inv.tax_amount,
-          total: inv.total,
-          dueDate: inv.due_date,
-          notes: inv.notes,
-          status: inv.status,
-        }),
+        // The server emails the SAVED invoice to its saved address — only the id is sent.
+        body: JSON.stringify({ invoiceId: inv.id }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) { toast.error(json.error || "Failed to send email — check client email address"); return; }
       toast.success(`Invoice emailed to ${inv.client_email}!`);
       // Auto-mark as sent if still draft
       if (inv.status === "draft") await updateStatus(inv.id, "sent");
