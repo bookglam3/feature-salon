@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { SalonProvider } from "./context/SalonContext";
+import { salonAccess } from "../lib/featureAccess";
 
 type SubStatus = "trial" | "trialing" | "active" | "past_due" | "cancelled" | "canceled" | "unpaid" | null;
 
@@ -15,6 +16,7 @@ interface SalonSub {
   trial_ends_at:       string | null;
   current_period_end:  string | null;
   stripe_customer_id:  string | null;
+  lifetime_access?:    boolean | null;
 }
 
 function daysLeft(dateStr: string | null): number {
@@ -131,7 +133,9 @@ function LockedOverlay({ salon }: { salon: SalonSub }) {
         <p style={{ color:"#524D60", fontSize:15, lineHeight:1.7, marginBottom:32 }}>
           {salon.subscription_status === "cancelled" || salon.subscription_status === "canceled"
             ? "Your subscription has been cancelled. Reactivate to access your dashboard."
-            : "Your subscription has expired. Please renew to continue managing your salon."}
+            : salonAccess(salon).lockReason === "trial_ended"
+              ? "Your free trial has ended. Choose a plan to keep managing your salon — your booking page keeps taking bookings."
+              : "Your subscription has expired. Please renew to continue managing your salon."}
         </p>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           <button
@@ -181,7 +185,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       const { data } = await supabase
         .from("salons")
-        .select("id,subscription_status,subscription_plan,plan,trial_ends_at,current_period_end,stripe_customer_id")
+        .select("id,subscription_status,subscription_plan,plan,trial_ends_at,current_period_end,stripe_customer_id,lifetime_access")
         .eq("owner_id", userId)
         .single();
       setSalon(data as SalonSub | null);
@@ -237,11 +241,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  // One rule for the browser and the server (app/lib/featureAccess.ts):
+  // lifetime / active / past_due / a running trial are open; an ended trial,
+  // cancelled, unpaid or incomplete subscription locks the dashboard.
   const status       = salon?.subscription_status ?? "trial";
-  const trialDays    = daysLeft(salon?.trial_ends_at ?? null);
-  const isLocked     = status === "cancelled" || status === "canceled" || (status === "trial" && trialDays === 0);
-  const showTrial    = status === "trial" || status === "trialing";
-  const showPastDue  = status === "past_due";
+  const lifetime     = salon?.lifetime_access === true;
+  const isLocked     = !!salon && salonAccess(salon).locked;
+  const showTrial    = !lifetime && (status === "trial" || status === "trialing");
+  const showPastDue  = !lifetime && status === "past_due";
 
   return (
     <SalonProvider>

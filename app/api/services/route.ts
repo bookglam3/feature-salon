@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 // Service-role client — bypasses RLS, trusted server-side only
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,6 +49,8 @@ async function getOwnerSalon(req: NextRequest) {
 
 // ── GET /api/services — list services for authenticated owner
 export async function GET(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -66,6 +69,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST /api/services — create a new service
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -111,6 +116,8 @@ export async function POST(req: NextRequest) {
 
 // ── PATCH /api/services — update an existing service
 export async function PATCH(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -157,6 +164,8 @@ export async function PATCH(req: NextRequest) {
 
 // ── DELETE /api/services — delete a service
 export async function DELETE(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 

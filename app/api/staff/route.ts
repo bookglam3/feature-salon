@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 // Service-role client — bypasses RLS, trusted server-side only
 const adminSupabase = createClient(
@@ -40,6 +41,8 @@ async function getOwnerSalon(req: NextRequest) {
 
 // ── GET /api/staff — list staff for authenticated owner
 export async function GET(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -58,6 +61,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST /api/staff — create a new staff member
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -94,6 +99,8 @@ export async function POST(req: NextRequest) {
 
 // ── PATCH /api/staff — update an existing staff member
 export async function PATCH(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -128,6 +135,8 @@ export async function PATCH(req: NextRequest) {
 
 // ── DELETE /api/staff — delete a staff member
 export async function DELETE(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -151,6 +160,8 @@ export async function DELETE(req: NextRequest) {
 
 // ── PUT /api/staff — toggle active status
 export async function PUT(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const salon = await getOwnerSalon(req);
   if (!salon) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 

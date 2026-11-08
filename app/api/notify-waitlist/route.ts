@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { sendWhatsApp } from "@/app/lib/whatsapp";
 import { Resend } from "resend";
 import { escapeHtml } from "@/app/lib/escapeHtml";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,8 @@ const FROM = process.env.FROM_EMAIL || "noreply@featuresalon.co.uk";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://featuresalon.co.uk";
 
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   try {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");

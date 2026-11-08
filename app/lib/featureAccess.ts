@@ -1,8 +1,18 @@
 /**
- * Feature Access Control
- * Plans: starter | pro | business | enterprise
- * During trial: ALL features unlocked
- * After trial: locked by plan
+ * Who can use the dashboard, and which plan features — ONE rule for the
+ * browser (dashboard layout, FeatureGate, Settings) and the server (owner API
+ * routes, the gift voucher checks).
+ *
+ *   lifetime_access  → never locked, every feature (Business).
+ *   active, past_due → open; features by plan (calendar on every plan). A
+ *                      payment problem shows a banner, it doesn't lock.
+ *   trial / trialing → open with every feature while trial_ends_at is ahead;
+ *                      locked once it has passed (no status = a trial).
+ *   cancelled, unpaid, incomplete, anything else → locked.
+ * Public booking, online payments and reminders are never decided here — they
+ * keep working for every salon.
+ *
+ * Plans: starter | pro | business | enterprise (a name we don't know counts as starter).
  */
 
 export type Plan = "starter" | "pro" | "business" | "enterprise";
@@ -51,19 +61,53 @@ export const FEATURE_META: Record<Feature, { label: string; icon: string; requir
   client_portal:   { label: "Client Portal",    icon: "🔐", requiredPlan: "business" },
 };
 
-export function hasFeatureAccess(
-  feature: Feature,
-  plan: string | null,
-  status: string | null
-): boolean {
-  // Trial or trialing — all features unlocked
-  if (status === "trial" || status === "trialing") return true;
-  // Not active — no extra features
-  if (status !== "active") return false;
+/** The salon fields the rule reads. */
+export interface SalonAccessFields {
+  subscription_status?: string | null;
+  subscription_plan?: string | null;
+  trial_ends_at?: string | null;
+  lifetime_access?: boolean | null;
+}
 
-  const normalizedPlan = (plan || "starter").toLowerCase() as Plan;
-  const allowedPlans = FEATURE_PLANS[feature];
-  return allowedPlans.includes(normalizedPlan);
+export type AccessState = "lifetime" | "active" | "past_due" | "trial" | "locked";
+export type LockReason = "trial_ended" | "cancelled" | "unpaid" | "incomplete" | "inactive";
+
+export interface SalonAccess {
+  state: AccessState;
+  locked: boolean;
+  lockReason: LockReason | null;
+  /** The plan whose features apply (lifetime = business; unknown names = starter). */
+  plan: Plan;
+}
+
+function knownPlan(plan: string | null | undefined): Plan {
+  const p = (plan || "").toLowerCase();
+  return Object.prototype.hasOwnProperty.call(PLAN_RANK, p) ? (p as Plan) : "starter";
+}
+
+export function salonAccess(s: SalonAccessFields, now: Date = new Date()): SalonAccess {
+  const open = (state: AccessState, plan: Plan): SalonAccess => ({ state, locked: false, lockReason: null, plan });
+  const locked = (lockReason: LockReason): SalonAccess => ({ state: "locked", locked: true, lockReason, plan: knownPlan(s.subscription_plan) });
+
+  if (s.lifetime_access === true) return open("lifetime", "business");
+  const status = (s.subscription_status ?? "").trim().toLowerCase() || "trial"; // "Active " (hand-edited) = active
+  if (status === "active" || status === "past_due") return open(status, knownPlan(s.subscription_plan));
+  if (status === "trial" || status === "trialing") {
+    const ends = s.trial_ends_at ? Date.parse(s.trial_ends_at) : NaN;
+    return ends > now.getTime() ? open("trial", knownPlan(s.subscription_plan)) : locked("trial_ended");
+  }
+  if (status === "cancelled" || status === "canceled") return locked("cancelled");
+  if (status === "unpaid") return locked("unpaid");
+  if (status === "incomplete" || status === "incomplete_expired") return locked("incomplete");
+  return locked("inactive");
+}
+
+export function hasFeatureAccess(feature: Feature, salon: SalonAccessFields, now: Date = new Date()): boolean {
+  const access = salonAccess(salon, now);
+  if (access.locked) return false;
+  // Lifetime and a running trial: everything. The calendar: every open salon.
+  if (access.state === "lifetime" || access.state === "trial" || feature === "calendar") return true;
+  return FEATURE_PLANS[feature].includes(access.plan);
 }
 
 export function getRequiredPlan(feature: Feature): Plan {

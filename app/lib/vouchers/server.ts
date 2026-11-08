@@ -13,7 +13,7 @@ import { hasFeatureAccess } from "@/app/lib/featureAccess";
 import { getVoucherAccess, type VoucherAccess } from "./access";
 
 const SALON_COLUMNS =
-  "id, subscription_plan, subscription_status, gift_vouchers_enabled, stripe_account_id, charges_enabled, payment_methods";
+  "id, subscription_plan, subscription_status, trial_ends_at, lifetime_access, gift_vouchers_enabled, stripe_account_id, charges_enabled, payment_methods";
 
 export type VoucherAccessLookup =
   | { found: true; salonId: string; access: VoucherAccess }
@@ -37,7 +37,7 @@ export async function loadVoucherAccess(where: { salonId: string } | { slug: str
     found: true,
     salonId: salon.id,
     access: getVoucherAccess({
-      planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon.subscription_plan, salon.subscription_status),
+      planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon),
       vouchersEnabled: salon.gift_vouchers_enabled,
       stripeAccountId: salon.stripe_account_id,
       chargesEnabled: salon.charges_enabled,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 // Service-role client — bypasses RLS, trusted server-side only
 const adminSupabase = createClient(
@@ -86,6 +87,8 @@ interface SkippedRow {
 }
 
 export async function POST(req: NextRequest) {
+  const locked = await dashboardLockedResponse(req); // the dashboard lock, on the server
+  if (locked) return locked;
   const auth = await getOwnerSalon(req);
   if (!auth) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   const { salon, user } = auth;

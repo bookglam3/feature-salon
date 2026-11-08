@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
 import { escapeHtml } from "@/app/lib/escapeHtml";
+import { dashboardLockedResponse } from "@/app/lib/dashboardLock";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -149,6 +150,8 @@ function buildInvoiceEmail({
 }
 
 export async function POST(request: NextRequest) {
+  const locked = await dashboardLockedResponse(request); // the dashboard lock, on the server
+  if (locked) return locked;
   try {
     const token = request.headers.get("authorization")?.replace("Bearer ", "").trim();
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

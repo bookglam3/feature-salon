@@ -386,7 +386,7 @@ export default function SettingsPage() {
   );
 
   const voucherAccess = salon ? getVoucherAccess({
-    planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon.subscription_plan ?? null, salon.subscription_status ?? null),
+    planAllowsVouchers: hasFeatureAccess("gift_vouchers", salon),
     vouchersEnabled: vouchersOn,
     stripeAccountId: salon.stripe_account_id,
     chargesEnabled: salon.charges_enabled,
