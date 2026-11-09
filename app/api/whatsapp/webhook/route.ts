@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
+import { isOptOutReply } from "@/app/lib/reminders/schedule";
 
 export const runtime = "nodejs";
 
@@ -66,6 +67,8 @@ interface MetaInboundMessage {
   id:        string;                                         // wamid
   timestamp: string;                                         // Unix epoch seconds
   type:      string;                                         // "text" | "image" | …
+  text?:     { body?: string };                              // type "text"
+  button?:   { text?: string };                              // type "button" (template quick reply)
 }
 
 interface WebhookChange {
@@ -195,6 +198,16 @@ export async function POST(req: NextRequest) {
           });
         if (logErr && logErr.code !== "23505") {          // 23505 = unique_violation (already logged)
           console.error(`[WA Webhook] Inbound log failed for ${msg.id}:`, logErr.message);
+        }
+
+        // "STOP": add the number to the shared opt-out list the reminders
+        // check (same +44… form the Twilio opt-out saves).
+        if (isOptOutReply(msg.text?.body ?? msg.button?.text)) {
+          const { error: optErr } = await supabaseAdmin
+            .from("sms_opt_outs")
+            .upsert({ phone: `+${msg.from.replace(/\D/g, "")}` }, { onConflict: "phone" });
+          if (optErr) console.error(`[WA Webhook] Opt-out save failed for ${msg.id}:`, optErr.message);
+          else console.log(`[WA Webhook] Opt-out recorded (${msg.id})`);
         }
       }
     }

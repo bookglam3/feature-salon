@@ -75,7 +75,7 @@ function getConfig() {
   return {
     phoneNumberId: requireEnv("WHATSAPP_PHONE_NUMBER_ID"),
     accessToken:   requireEnv("WHATSAPP_ACCESS_TOKEN"),
-    apiVersion:    process.env.WHATSAPP_API_VERSION ?? "v23.0",
+    apiVersion:    process.env.WHATSAPP_API_VERSION || "v23.0", // empty in Vercel = not set (else the URL breaks)
   } as const;
 }
 
